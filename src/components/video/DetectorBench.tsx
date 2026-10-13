@@ -14,6 +14,12 @@ import { FileVideo, Play, Search, Crosshair } from 'lucide-react';
  *  shot into a miss, so gaps are the statistic that predicts false misses. */
 const LOST_BALL_MS = 1500;
 
+/** How a single pass over the clip ended. Anything but 'ended' is partial. */
+type SweepEnd = 'ended' | 'paused' | 'stalled';
+
+/** No frame for this long means the pass is stuck and will never finish. */
+const STALL_MS = 8000;
+
 interface Report {
   durationS: number;
   wallClockS: number;
@@ -61,11 +67,24 @@ export function DetectorBench() {
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
   /** True while the player is tapping the two rim edges. */
   const [marking, setMarking] = useState(false);
-  const [running, setRunning] = useState(false);
+  // Named phases, because the model download and the measurement take very
+  // different amounts of time and one spinner for both made a 30-second CDN
+  // fetch look identical to a hang.
+  const [phase, setPhase] = useState<'idle' | 'loading' | 'measuring'>('idle');
+  const [progress, setProgress] = useState<{ sec: number; total: number } | null>(null);
   const [report, setReport] = useState<Report | null>(null);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [magnify, setMagnify] = useState(1);
   const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+
+  const running = phase !== 'idle';
+  const phaseLabel =
+    phase === 'loading'
+      ? 'Loading model…'
+      : progress
+        ? `Measuring ${progress.sec}s of ${progress.total}s…`
+        : 'Measuring…';
 
   // Ground truth, typed in by whoever shot the clip
   const [trueAttempts, setTrueAttempts] = useState('');
@@ -108,32 +127,101 @@ export function DetectorBench() {
   }
 
   /**
-   * Plays the clip through once, handing each frame to `onFrame`.
-   * Shared so the benchmark and the diagnosis measure identical conditions.
+   * Plays the clip through once, handing each frame to `onFrame`, and reports
+   * how the pass ended. Shared so the benchmark and the diagnosis measure
+   * identical conditions.
+   *
+   * The end of a pass has to come from an event, not from the frame callback.
+   * requestVideoFrameCallback only fires while new frames are being presented
+   * for composition, and at the end of a clip none are - so a resolve that
+   * lived only inside the callback never ran. Every benchmark deadlocked on its
+   * final frame: the promise never settled, the finally never closed the
+   * detector, and the button span forever while the numbers never arrived.
+   * Playing the clip again just fed a second pass into the same tally.
    */
-  async function sweep(onFrame: (video: HTMLVideoElement, videoMs: number, ts: number) => void) {
+  async function sweep(
+    onFrame: (video: HTMLVideoElement, videoMs: number, ts: number) => void
+  ): Promise<SweepEnd> {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) return 'stalled';
     let lastTs = 0;
+    let lastSec = -1;
+    let settled = false;
+    let lastFrameAt = performance.now();
+    let watchdog: ReturnType<typeof setInterval> | undefined;
+
     video.currentTime = 0;
     video.playbackRate = 1;
-    await video.play();
-    await new Promise<void>((resolve) => {
+
+    return new Promise<SweepEnd>((resolve, reject) => {
+      const cleanup = () => {
+        if (watchdog !== undefined) clearInterval(watchdog);
+        video.removeEventListener('ended', onEnded);
+        video.removeEventListener('pause', onPaused);
+      };
+      const finish = (how: SweepEnd) => {
+        if (settled) return;
+        settled = true;
+        cleanup();
+        resolve(how);
+      };
+      const onEnded = () => finish('ended');
+      const onPaused = () => finish(video.ended ? 'ended' : 'paused');
+
+      video.addEventListener('ended', onEnded);
+      video.addEventListener('pause', onPaused);
+
+      // Backgrounding the tab or scrolling the video out of view also stops the
+      // frame callback, and so does a stalled download, none of which fire an
+      // event. Without this the same deadlock comes back by another route.
+      watchdog = setInterval(() => {
+        if (performance.now() - lastFrameAt > STALL_MS) finish('stalled');
+      }, 500);
+
       const step = () => {
+        if (settled) return;
         if (video.paused || video.ended) {
-          resolve();
+          finish(video.ended ? 'ended' : 'paused');
           return;
         }
+        lastFrameAt = performance.now();
         const videoMs = video.currentTime * 1000;
         const ts = Math.max(lastTs + 1, Math.round(videoMs));
         lastTs = ts;
         onFrame(video, videoMs, ts);
+        // Once per second of footage, not once per frame: 60 re-renders a
+        // second would compete with inference for the main thread.
+        const sec = Math.floor(videoMs / 1000);
+        if (sec !== lastSec) {
+          lastSec = sec;
+          setProgress({ sec, total: Math.round(video.duration || 0) });
+        }
         const v = video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number };
         if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(step);
         else requestAnimationFrame(step);
       };
-      step();
+
+      video.play().then(
+        () => {
+          setPhase('measuring');
+          step();
+        },
+        (e) => {
+          cleanup();
+          reject(e);
+        }
+      );
     });
+  }
+
+  /** Warns when numbers came from a pass that did not reach the end. */
+  function warnIfPartial(how: SweepEnd) {
+    if (how === 'ended') return;
+    setWarning(
+      how === 'paused'
+        ? 'The clip was paused before the end, so these numbers cover only the part that played.'
+        : 'The clip stopped sending frames before the end - usually a backgrounded tab or the video scrolled out of view. These numbers cover only the part that played, so run it again with the page in front of you.'
+    );
   }
 
   /** Adds one frame's detections into a running tally of classes. */
@@ -164,8 +252,10 @@ export function DetectorBench() {
   async function diagnose() {
     const video = videoRef.current;
     if (!video) return;
-    setRunning(true);
+    setPhase('loading');
+    setProgress(null);
     setError(null);
+    setWarning(null);
     setDiagnosis(null);
     // Closed in the finally below: these are per-run instances, and without
     // closing them each run leaks its WASM model into the tab.
@@ -188,7 +278,7 @@ export function DetectorBench() {
       canvas.height = CROP_CANVAS_PX;
       const ctx = canvas.getContext('2d');
 
-      await sweep((v, _videoMs, ts) => {
+      const how = await sweep((v, _videoMs, ts) => {
         frames += 1;
         const detections = fullDetector.detectForVideo(v, ts).detections || [];
         if (detections.length) framesWithAnything += 1;
@@ -201,6 +291,7 @@ export function DetectorBench() {
           tally(seenCrop, cropDetector.detectForVideo(canvas, ts).detections || []);
         }
       });
+      warnIfPartial(how);
 
       setDiagnosis({
         frames,
@@ -216,15 +307,18 @@ export function DetectorBench() {
     } finally {
       full?.close();
       cropped?.close();
-      setRunning(false);
+      setPhase('idle');
+      setProgress(null);
     }
   }
 
   async function run() {
     const video = videoRef.current;
     if (!video || !rim) return;
-    setRunning(true);
+    setPhase('loading');
+    setProgress(null);
     setError(null);
+    setWarning(null);
     setReport(null);
 
     let detector: ObjectDetector | null = null;
@@ -252,7 +346,7 @@ export function DetectorBench() {
       if (!ctx) throw new Error('Could not get a 2d canvas context.');
       let gain = 1;
 
-      await sweep((v, videoMs, ts) => {
+      const how = await sweep((v, videoMs, ts) => {
         // Same hoop crop the tracker uses, so the benchmark measures the real thing
         const crop = cropRectFor(rim, v.videoWidth, v.videoHeight);
         gain = magnification(crop, v.videoWidth);
@@ -281,6 +375,7 @@ export function DetectorBench() {
           ball: box ? ballCentreInFrame(box, crop, v.videoWidth, v.videoHeight) : null,
         });
       });
+      warnIfPartial(how);
       setMagnify(gain);
 
       setReport({
@@ -297,7 +392,8 @@ export function DetectorBench() {
       setError(e instanceof Error ? e.message : 'Detection failed.');
     } finally {
       detector?.close();
-      setRunning(false);
+      setPhase('idle');
+      setProgress(null);
     }
   }
 
@@ -325,10 +421,11 @@ export function DetectorBench() {
           <div className="relative">
             {/* Native controls are off while marking the rim. With them on, the
                 browser's own play/pause owns every click on the video and the
-                taps never land. */}
+                taps never land. They are also off during a run: replaying the
+                clip mid-sweep feeds a second pass into the same tally. */}
             <video
               ref={videoRef}
-              controls={!marking}
+              controls={!marking && !running}
               playsInline
               muted
               className="w-full rounded-2xl bg-black"
@@ -342,10 +439,18 @@ export function DetectorBench() {
               />
             )}
             {firstEdge && (
+              /* A crosshair, not a blob. The old 12px dot covered the rim edge it
+                 was meant to mark, so you could not see what you had hit - and the
+                 rim width it produces feeds the crop and the crossing test. Thin
+                 lines locate the point; the 4px centre keeps it visible. */
               <div
-                className="pointer-events-none absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-2 ring-white"
+                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
                 style={{ left: `${firstEdge.x * 100}%`, top: `${firstEdge.y * 100}%` }}
-              />
+              >
+                <div className="absolute left-1/2 top-1/2 h-px w-6 -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+                <div className="absolute left-1/2 top-1/2 h-6 w-px -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+                <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-1 ring-white" />
+              </div>
             )}
             {rim && (
               <div
@@ -390,12 +495,30 @@ export function DetectorBench() {
           )}
 
           <Button variant="primary" size="lg" className="w-full gap-2" disabled={!rim} isLoading={running} onClick={() => void run()}>
-            <Play className="h-4 w-4" /> {running ? 'Processing in real time…' : 'Run benchmark'}
+            <Play className="h-4 w-4" /> {running ? phaseLabel : 'Run benchmark'}
           </Button>
 
           <Button variant="secondary" size="lg" className="w-full gap-2" isLoading={running} onClick={() => void diagnose()}>
-            <Search className="h-4 w-4" /> What can the model see?{rim ? ' (full frame vs hoop crop)' : ''}
+            <Search className="h-4 w-4" /> {running ? phaseLabel : `What can the model see?${rim ? ' (full frame vs hoop crop)' : ''}`}
           </Button>
+
+          {phase === 'loading' && (
+            <p className="text-xs text-zinc-400">
+              Fetching the detector model and runtime (about 10 MB, from two CDNs). Only the first run pays
+              for this; after that the browser has them cached.
+            </p>
+          )}
+          {phase === 'measuring' && (
+            <p className="text-xs text-zinc-400">
+              The clip plays at normal speed on purpose, so the detector sees frames the way the live tracker
+              does. Keep this page in front of you - a backgrounded tab stops sending frames.
+            </p>
+          )}
+          {warning && (
+            <Alert variant="warning" title="Partial pass">
+              {warning}
+            </Alert>
+          )}
           {!rim && (
             <p className="text-xs text-amber-400">
               Set the rim first. Without it this only measures the full frame, which is the case that already
