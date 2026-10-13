@@ -130,6 +130,21 @@ export default function NewWorkoutPage() {
   const [now, setNow] = useState(() => Date.now());
 
   const supabaseRef = useRef<SupabaseClient<Database> | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * Shows a validation message and scrolls it into view.
+   *
+   * Errors render in one slot above the exercise list, and ticking a set off
+   * happens down in that list. A bad rep count further down the page set the
+   * message somewhere the player could not see, so the tick just failed
+   * silently. The finish panel renders its own copy, so leave the page be when
+   * it is open.
+   */
+  function fail(message: string) {
+    setError(message);
+    if (!finishOpen) errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
   const getSupabase = () => (supabaseRef.current ??= createClient());
 
   // ---------------------------------------------------------------------------
@@ -359,11 +374,11 @@ export default function NewWorkoutPage() {
     const weight = weightText === '' ? null : Number(weightText);
 
     if (!Number.isInteger(reps) || reps < 1 || reps > 500) {
-      setError(`${e.name}: enter the reps for set ${index + 1} (a whole number).`);
+      fail(`${e.name}: enter the reps for set ${index + 1} (a whole number).`);
       return;
     }
     if (weight !== null && (!Number.isFinite(weight) || weight < 0 || weight > 2000)) {
-      setError(`${e.name}: weight for set ${index + 1} must be a positive number.`);
+      fail(`${e.name}: weight for set ${index + 1} must be a positive number.`);
       return;
     }
     setError(null);
@@ -445,7 +460,7 @@ export default function NewWorkoutPage() {
   function openFinish() {
     const completed = draft.exercises.some((e) => e.sets.some((s) => s.done));
     if (!completed) {
-      setError('Tick ✓ on at least one set before finishing.');
+      fail('Tick ✓ on at least one set before finishing.');
       return;
     }
     setError(null);
@@ -623,11 +638,14 @@ export default function NewWorkoutPage() {
           </select>
         </div>
 
-        {error && (
-          <Alert variant="error" title="Check this" className="mb-4">
-            {error}
-          </Alert>
-        )}
+        {/* Always mounted so fail() can scroll here before the Alert renders */}
+        <div ref={errorRef}>
+          {error && (
+            <Alert variant="error" title="Check this" className="mb-4">
+              {error}
+            </Alert>
+          )}
+        </div>
 
         {/* Exercises */}
         <div className="space-y-4">

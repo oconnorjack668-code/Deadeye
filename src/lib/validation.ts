@@ -1,6 +1,32 @@
 // src/lib/validation.ts
 // Form rules for the loggers and sign-up. Uses "zod/mini", the tree-shakable build of Zod:
 // the same checks and messages, but ~80 KB (gzipped) less JavaScript on the pages that load it.
+//
+// NOT EVERY SCHEMA HERE IS WIRED UP. Five are parsed by a form:
+//
+//   signUpSchema          (auth)/signup
+//   updatePasswordSchema  (auth)/update-password
+//   sessionSchema         (app)/basketball/new
+//   workoutSchema         (app)/workouts/new
+//   performanceTestSchema (app)/workouts/tests/new
+//
+// The rest are never imported. Their rules are enforced inline instead, and in
+// several cases more tightly than the schema states, so do not assume a field is
+// unguarded just because its schema is unused - and do not "fix" a form by
+// wiring one of these up without comparing the two rule sets first:
+//
+//   signInSchema                (auth)/login - required + type="email"
+//   resetPasswordSchema         (auth)/reset-password - required + type="email"
+//   onboardingSchema            onboarding handleFinish: height range, and at
+//                               least one goal and focus area. displayName
+//                               deliberately falls back to "Player" rather than
+//                               blocking setup, which the schema would not allow.
+//   shootingEntrySchema         basketball/new addTotals: whole numbers,
+//                               attempts >= 1, makes <= attempts, max 1000
+//   workoutSetSchema            workouts/new: reps 1-500, weight 0-2000
+//   goalSchema                  goals/GoalsEditor addGoal: whole number, 1..max
+//                               per goal type, custom title >= 3 chars
+//   notificationPreferencesSchema  no form parses this one
 import * as z from 'zod/mini';
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;

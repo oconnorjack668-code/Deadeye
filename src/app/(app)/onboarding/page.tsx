@@ -1,7 +1,7 @@
 // src/app/(app)/onboarding/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Logo } from '@/components/Logo';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -58,6 +58,7 @@ export default function OnboardingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingProfile, setIsFetchingProfile] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   // Form State
   const [displayName, setDisplayName] = useState('');
@@ -146,12 +147,24 @@ export default function OnboardingPage() {
     }
   }
 
+  /**
+   * Shows a setup message and scrolls it into view.
+   *
+   * The error slot sits above the step content, and step 3 runs long enough on a
+   * phone that the Finish button is well below it. Without this, a player who
+   * cleared their goals tapped Finish and watched nothing happen.
+   */
+  function fail(message: string) {
+    setError(message);
+    errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   async function handleFinish() {
     setError(null);
 
     // Matches the profiles.height_cm CHECK (between 100 and 250 cm)
     if (heightCm !== '' && (Number(heightCm) <= 100 || Number(heightCm) >= 250)) {
-      setError(
+      fail(
         units === 'metric'
           ? 'Height must be between 101 and 249 cm.'
           : 'Height must be between 3\' 4" and 8\' 2".'
@@ -159,7 +172,19 @@ export default function OnboardingPage() {
       return;
     }
     if (units === 'imperial' && inches !== '' && (Number(inches) < 0 || Number(inches) > 11)) {
-      setError('Inches must be between 0 and 11.');
+      fail('Inches must be between 0 and 11.');
+      return;
+    }
+    // The minimum onboardingSchema has always specified, and the one the labels
+    // promise. It was never enforced here, so a player could finish with no
+    // goals at all - which is what recommend.ts maps to a program and what the
+    // AI coach reads as context, so an empty answer degrades both quietly.
+    if (goals.length === 0) {
+      fail('Pick at least one primary goal so your programme and coaching match what you are working on.');
+      return;
+    }
+    if (focusAreas.length === 0) {
+      fail('Pick at least one focus area so your programme and coaching match what you are working on.');
       return;
     }
 
@@ -199,7 +224,7 @@ export default function OnboardingPage() {
       const updateError = updateResponse.error;
 
       if (updateError) {
-        setError(updateError.message);
+        fail(updateError.message);
         setIsLoading(false);
         return;
       }
@@ -232,7 +257,7 @@ export default function OnboardingPage() {
       router.push(isEditing ? '/profile' : '/dashboard');
       router.refresh();
     } catch {
-      setError('Failed to save profile. Please try again.');
+      fail('Failed to save profile. Please try again.');
       setIsLoading(false);
     }
   }
@@ -275,11 +300,14 @@ export default function OnboardingPage() {
           </div>
         </div>
 
-        {error && (
-          <Alert variant="error" title="Setup Error">
-            {error}
-          </Alert>
-        )}
+        {/* Always mounted so fail() can scroll here before the Alert renders */}
+        <div ref={errorRef}>
+          {error && (
+            <Alert variant="error" title="Setup Error">
+              {error}
+            </Alert>
+          )}
+        </div>
 
         {/* STEP 1: Athlete Bio */}
         {step === 1 && (
@@ -471,7 +499,7 @@ export default function OnboardingPage() {
               {/* Primary Goals */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-                  Primary Goals (Select up to 3) <span className="text-zinc-500">· {goals.length}/3</span>
+                  Primary Goals (Select 1-3) <span className="text-zinc-500">· {goals.length}/3</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {GOAL_OPTIONS.map((g) => {
@@ -501,7 +529,7 @@ export default function OnboardingPage() {
               {/* Focus Areas */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-                  Immediate Focus Areas (Select up to 3) <span className="text-zinc-500">· {focusAreas.length}/3</span>
+                  Immediate Focus Areas (Select 1-3) <span className="text-zinc-500">· {focusAreas.length}/3</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {FOCUS_AREA_OPTIONS.map((fa) => {
