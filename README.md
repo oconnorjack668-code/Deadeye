@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (35 files, 255 tests)
+npm test            # vitest (36 files, 268 tests)
 npm run build       # production build
 ```
 
@@ -121,6 +121,14 @@ scored `person` at 0.919 but `sports ball` at only 0.174 full-frame, rising to
 0.729 on the crop. The rim is measured from two taps — one on each side — rather
 than assumed, which is what makes the crop possible and what lets the tracker
 work on side-on footage or with the hoop near a frame edge.
+
+A measured rim can be **remembered per hoop** (`src/lib/video/rimMemory.ts`), so
+a returning player taps nothing: the saved list appears on the calibrate step
+and starts tracking immediately. It is kept in `localStorage` rather than the
+database on purpose — a rim is only valid for the camera position it was
+measured from, and where a given phone sits is a property of that phone. The
+offer to save appears in the review step, once the player can see whether the
+detection actually worked.
 
 Those two taps also carry the rim's **tilt**, because a rim is only horizontal
 on screen when the camera is square to it. The crossing test works from the

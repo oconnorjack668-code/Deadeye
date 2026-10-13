@@ -7,6 +7,15 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
+import {
+  loadSavedRims,
+  storeSavedRims,
+  touchSavedRim,
+  withSavedRim,
+  withoutSavedRim,
+  MAX_RIM_NAME,
+  type SavedRim,
+} from '@/lib/video/rimMemory';
 import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { localDateString } from '@/lib/dates';
 import { getBallDetector } from '@/lib/video/mediapipe';
@@ -39,7 +48,13 @@ export function ShotTracker({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  // The chosen clip is held twice on purpose: the ref for the tracking loop,
+  // which reads it outside React's render, and state for the JSX below. Reading
+  // fileRef.current during render is a refs-in-render violation that bails the
+  // React Compiler out of this component, and the bailout reports itself as
+  // unrelated impure-render errors elsewhere in the file.
   const fileRef = useRef<File | null>(null);
+  const [videoFile, setVideoFile] = useState<File | null>(null);
   const stopRef = useRef(false);
   // Offscreen: the hoop crop is drawn here and handed to the model, never shown.
   // Created when tracking starts, not during render - document.createElement is
@@ -119,7 +134,7 @@ export function ShotTracker({
       });
       streamRef.current = stream;
       setSource('camera');
-      setStep('calibrate');
+      startCalibrating();
       requestAnimationFrame(() => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
@@ -142,8 +157,9 @@ export function ShotTracker({
 
   function openFile(file: File) {
     fileRef.current = file;
+    setVideoFile(file);
     setSource('file');
-    setStep('calibrate');
+    startCalibrating();
     requestAnimationFrame(() => {
       if (videoRef.current) {
         videoRef.current.srcObject = null;
@@ -157,6 +173,62 @@ export function ShotTracker({
   // no ring to drag, no size slider, no separate "start" step.
   const [calibrating, setCalibrating] = useState(false);
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
+
+  // Hoops measured before, so a returning player taps nothing. Read when the
+  // calibrate step opens rather than on mount: localStorage does not exist while
+  // this renders on the server, and seeding state from it would hydrate to a
+  // different list than the server sent.
+  const [savedRims, setSavedRims] = useState<SavedRim[]>([]);
+  /** Name being typed in the review step to remember the rim just used. */
+  const [rimName, setRimName] = useState('');
+  const [rimSaved, setRimSaved] = useState(false);
+
+  function startCalibrating() {
+    setSavedRims(loadSavedRims());
+    setRimSaved(false);
+    setRimName('');
+    setStep('calibrate');
+  }
+
+  /**
+   * Skips both taps: this hoop was measured on this device already.
+   *
+   * Takes the event and reads the id off a data attribute, rather than the
+   * tidier `onClick={() => startFromSavedRim(s)}`. Called from a closure built
+   * during render, the React Compiler analyses this body - and everything it
+   * calls, which includes startTracking - as render code, and rejects the
+   * Date.now() below and the performance.now() in there as impure calls during
+   * render. Handed to onClick directly, as tapRim is, it is understood as an
+   * event handler. Keep it a direct reference.
+   *
+   * Not named useSavedRim either: the hooks lint rule reads any `use` prefix as
+   * a hook, and calling a hook from a callback is its own error.
+   */
+  function startFromSavedRim(e: React.MouseEvent<HTMLButtonElement>) {
+    const entry = savedRims.find((s) => s.id === e.currentTarget.dataset.rimId);
+    if (!entry) return;
+    const next = touchSavedRim(savedRims, entry.id, Date.now());
+    setSavedRims(next);
+    storeSavedRims(next);
+    setRim(entry.rim);
+    setFirstEdge(null);
+    setCalibrating(true);
+    startTracking(entry.rim).finally(() => setCalibrating(false));
+  }
+
+  function saveCurrentRim() {
+    if (!rim || !rimName.trim()) return;
+    const next = withSavedRim(savedRims, rimName, rim, Date.now());
+    setSavedRims(next);
+    storeSavedRims(next);
+    setRimSaved(true);
+  }
+
+  function forgetRim(id: string) {
+    const next = withoutSavedRim(savedRims, id);
+    setSavedRims(next);
+    storeSavedRims(next);
+  }
 
   function tapRim(e: React.MouseEvent<HTMLCanvasElement>) {
     if (step !== 'calibrate' || calibrating) return;
@@ -539,6 +611,46 @@ export function ShotTracker({
               Start the rim again
             </button>
           )}
+
+          {/* Measured here before, on this device, at this camera position. Only
+              offered before the first tap - once a tap has landed the player is
+              clearly measuring a new one. */}
+          {savedRims.length > 0 && !firstEdge && !calibrating && (
+            <div className="space-y-2 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                Or start on a hoop you have measured
+              </p>
+              <div className="space-y-1.5">
+                {savedRims.map((s) => (
+                  <div key={s.id} className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      data-rim-id={s.id}
+                      onClick={startFromSavedRim}
+                      className="flex-1 min-w-0 rounded-xl border border-zinc-700/80 bg-zinc-900 px-3 py-2 text-left text-sm font-semibold text-zinc-100 hover:border-orange-500/60"
+                    >
+                      <span className="block truncate">{s.name}</span>
+                      <span className="block text-xs font-normal text-zinc-500">
+                        {(s.rim.width * 100).toFixed(1)}% wide · starts tracking straight away
+                      </span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => forgetRim(s.id)}
+                      aria-label={`Forget ${s.name}`}
+                      className="flex-shrink-0 rounded-lg p-2 text-zinc-500 hover:text-red-400"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-zinc-500">
+                A saved rim only fits the spot the camera was in when you measured it. If the phone has moved,
+                tap the rim again.
+              </p>
+            </div>
+          )}
           {source === 'file' && !calibrating && (
             <label className="text-xs text-zinc-400 flex items-center gap-2">
               Analysis speed
@@ -588,8 +700,8 @@ export function ShotTracker({
                   {s.made ? 'Make' : 'Miss'}
                   {!s.confident && <span className="text-xs text-zinc-400"> (check)</span>}
                 </button>
-                {source === 'file' && onCheckForm && fileRef.current && (
-                  <button type="button" onClick={() => onCheckForm(fileRef.current!, s.t)} className="text-xs text-cyan-400 underline">
+                {source === 'file' && onCheckForm && videoFile && (
+                  <button type="button" onClick={() => onCheckForm(videoFile, s.t)} className="text-xs text-cyan-400 underline">
                     Form
                   </button>
                 )}
@@ -614,6 +726,41 @@ export function ShotTracker({
             </button>
           </div>
 
+          {/* Offered here rather than the moment the rim is measured, because
+              here the player knows whether the detection actually worked. A rim
+              that produced nonsense is not one worth skipping the taps for. */}
+          {rim && shots.length > 0 && (
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
+              {rimSaved ? (
+                <p className="text-sm text-emerald-300">
+                  Hoop saved. Next time at this spot you can start tracking without tapping the rim.
+                </p>
+              ) : (
+                <>
+                  <label htmlFor="rim-name" className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                    Remember this hoop?
+                  </label>
+                  <p className="mt-1 text-xs text-zinc-500">
+                    Skip the two taps next time you film from this spot.
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      id="rim-name"
+                      value={rimName}
+                      onChange={(e) => setRimName(e.target.value)}
+                      maxLength={MAX_RIM_NAME}
+                      placeholder="e.g. Home driveway"
+                      className="flex-1 min-w-0 rounded-xl border border-zinc-700/80 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-orange-500 focus:outline-none"
+                    />
+                    <Button variant="secondary" size="sm" disabled={!rimName.trim()} onClick={saveCurrentRim}>
+                      Save
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
           <label className="block text-sm text-zinc-300">
             Where were you shooting from?
             <select value={zone} onChange={(e) => setZone(e.target.value as CourtZone | 'all-around')} className="mt-1 w-full rounded-xl bg-zinc-900 border border-zinc-800 px-3 py-2 text-white">
@@ -626,9 +773,9 @@ export function ShotTracker({
             </select>
           </label>
 
-          {source === 'file' && fileRef.current ? (
+          {source === 'file' && videoFile ? (
             <HighlightReel
-              file={fileRef.current}
+              file={videoFile}
               makeTimesMs={shots.filter((s) => s.made).map((s) => s.t)}
               makes={makes}
               attempts={shots.length}
