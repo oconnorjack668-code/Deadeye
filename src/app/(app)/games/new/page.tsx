@@ -240,8 +240,8 @@ export default function NewGamePage() {
           <input
             value={draft.opponent}
             onChange={(e) => setDraft((d) => ({ ...d, opponent: e.target.value }))}
-            placeholder="Opponent"
-            aria-label="Opponent"
+            placeholder="Opponent name"
+            aria-label="Opponent name"
             maxLength={80}
             className="rounded-xl bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-white"
           />
@@ -337,12 +337,16 @@ export default function NewGamePage() {
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-3">
             <h2 className="font-bold text-white">Final details</h2>
             <div className="grid grid-cols-2 gap-2">
+              {/* These are scores, not names. Labelled "Your team" and
+                  "Opponent" they collided with the opponent NAME field higher
+                  up the same form, so players typed a team name into a number
+                  input and it silently rejected the letters. */}
               <label className="text-xs text-zinc-400">
-                Your team
+                Your score
                 <input type="number" inputMode="numeric" min={0} value={teamScore} onChange={(e) => setScores(e.target.value, oppScore)} className="mt-1 w-full rounded-lg bg-zinc-800 px-2 py-2 text-white" />
               </label>
               <label className="text-xs text-zinc-400">
-                Opponent
+                Opponent score
                 <input type="number" inputMode="numeric" min={0} value={oppScore} onChange={(e) => setScores(teamScore, e.target.value)} className="mt-1 w-full rounded-lg bg-zinc-800 px-2 py-2 text-white" />
               </label>
               <label className="text-xs text-zinc-400">
