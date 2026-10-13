@@ -124,6 +124,7 @@ export default function NewBasketballSessionPage() {
 
   const shotsRef = useRef(0);
   const shotListRef = useRef<TrackedShot[]>([]);
+  const errorRef = useRef<HTMLDivElement>(null);
 
   // Restore an unfinished session, then add a drill started from the drill library
   useEffect(() => {
@@ -238,9 +239,24 @@ export default function NewBasketballSessionPage() {
     setSpot({ x, y, zone: classifyZone(x, y) });
   }
 
+  /**
+   * Shows a validation message and scrolls it into view.
+   *
+   * Every error on this page renders in one slot near the top. The drill and
+   * totals sub-forms are far below it on a phone, so a player who got something
+   * wrong down there tapped the button, saw nothing move, and had no way to know
+   * why. The slot below is always mounted so this can scroll to it before the
+   * message itself has rendered. When the finish panel is open the error renders
+   * inside the panel, so leave the page behind it where it is.
+   */
+  function fail(message: string) {
+    setError(message);
+    if (!finishOpen) errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
   function record(made: boolean) {
     if (!spot) {
-      setError('Tap the court where you are shooting from first.');
+      fail('Tap the court where you are shooting from first.');
       return;
     }
     setError(null);
@@ -266,7 +282,7 @@ export default function NewBasketballSessionPage() {
     const makes = Number(totalsMakes);
     const attempts = Number(totalsAttempts);
     if (!Number.isInteger(makes) || !Number.isInteger(attempts) || makes < 0 || attempts < 1 || makes > attempts || attempts > 1000) {
-      setError('Enter whole numbers, with makes no more than attempts.');
+      fail('Enter whole numbers, with makes no more than attempts.');
       return;
     }
     setError(null);
@@ -285,11 +301,11 @@ export default function NewBasketballSessionPage() {
   function addOtherDrill() {
     const minutes = Number(otherMinutes);
     if (!otherName.trim()) {
-      setError('Give the drill a name.');
+      fail('Give the drill a name.');
       return;
     }
     if (!Number.isInteger(minutes) || minutes < 1 || minutes > 600) {
-      setError('Minutes must be a whole number between 1 and 600.');
+      fail('Minutes must be a whole number between 1 and 600.');
       return;
     }
     setError(null);
@@ -469,11 +485,14 @@ export default function NewBasketballSessionPage() {
           </Button>
         </div>
 
-        {error && (
-          <Alert variant="error" title="Check this" className="mb-3">
-            {error}
-          </Alert>
-        )}
+        {/* Always mounted so fail() can scroll here before the Alert renders */}
+        <div ref={errorRef}>
+          {error && (
+            <Alert variant="error" title="Check this" className="mb-3">
+              {error}
+            </Alert>
+          )}
+        </div>
 
         {/* Drill tabs */}
         <div className="flex gap-2 overflow-x-auto pb-2 mb-2 [scrollbar-width:none]">

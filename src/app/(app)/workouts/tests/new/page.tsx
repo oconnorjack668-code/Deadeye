@@ -224,12 +224,14 @@ export default function NewPerformanceTestPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
+              <label htmlFor="test-notes" className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
                 Notes (Optional)
               </label>
               <textarea
+                id="test-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
+                maxLength={500}
                 placeholder="How did the test feel? Any conditions to note?"
                 className="w-full h-16 rounded-xl border border-zinc-700/80 bg-zinc-900/90 px-3.5 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               />

@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (35 files, 247 tests)
+npm test            # vitest (35 files, 248 tests)
 npm run build       # production build
 ```
 
@@ -64,7 +64,7 @@ constraint, widen the matching TypeScript union, which has drifted before.
 ## Layout
 
 ```
-src/app/(auth)/       login, signup, verify, reset
+src/app/(auth)/       login, signup, verify, reset, update-password
 src/app/(app)/        the app: dashboard, basketball, workouts (incl. fuel),
                       goals, ai-coach, study, drills, programs, guides, video,
                       leaderboard, achievements, friends, teams, games,
@@ -80,6 +80,14 @@ __tests__/            unit tests
 Auth session refresh runs in `src/proxy.ts` (Next.js 16 renamed `middleware` to
 `proxy`). Every player-owned table has RLS restricting rows to their owner, and
 video is kept in a private bucket.
+
+Both password-reset entry points — "Forgot password?" on `/login` and "Email me
+a reset link" in Settings — send their email to
+`/auth/callback?next=/update-password`, so the recovery code becomes a session
+before the player reaches the form that sets the password. `/update-password` is
+deliberately **not** in the proxy's `isAuthPath` list: needing a session to open
+it is what proves the emailed link was genuine, and a stale or reused link fails
+the exchange in the callback and lands on `/login`.
 
 Owner-only tools live at `/admin`, reachable from the shield badge in the
 header. They include a detector benchmark for measuring shot detection against

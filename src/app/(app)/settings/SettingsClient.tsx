@@ -142,7 +142,12 @@ export function SettingsClient({
 
   async function sendPasswordReset() {
     if (!email) return;
-    const { error } = await createClient().auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
+    // /reset-password is the form that ASKS for a reset email, so pointing the
+    // emailed link back at it just showed that form again - an unbreakable loop
+    // for anyone trying to change a password from here.
+    const { error } = await createClient().auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
+    });
     if (error) setStatus({ tone: 'error', text: error.message });
     else setResetSent(true);
   }

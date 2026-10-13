@@ -1,7 +1,7 @@
 // __tests__/validation.test.ts
 // The form rules moved to "zod/mini" (smaller download); these pin the messages players see.
 import { describe, it, expect } from 'vitest';
-import { performanceTestSchema, sessionSchema, signUpSchema, workoutSchema } from '@/lib/validation';
+import { performanceTestSchema, sessionSchema, signUpSchema, updatePasswordSchema, workoutSchema } from '@/lib/validation';
 
 const firstMessage = (r: { success: boolean; error?: { issues: Array<{ message: string }> } }) =>
   r.success ? null : r.error!.issues[0].message;
@@ -14,6 +14,25 @@ describe('form validation', () => {
     expect(firstMessage(signUpSchema.safeParse({ ...ok, password: 'password1' }))).toBe('Password must contain at least one uppercase letter');
     expect(firstMessage(signUpSchema.safeParse({ ...ok, password: 'Pass1' }))).toBe('Password must be at least 8 characters');
     expect(firstMessage(signUpSchema.safeParse({ ...ok, ageConfirmed: false }))).toBe('You must be 13 or older to use Deadeye');
+  });
+
+  // Written with the rest of the auth forms but never imported until
+  // /update-password existed, so the mismatch rule had never run.
+  it('setting a new password', () => {
+    expect(updatePasswordSchema.safeParse({ password: 'Password1', confirmPassword: 'Password1' }).success).toBe(true);
+    expect(firstMessage(updatePasswordSchema.safeParse({ password: 'Password1', confirmPassword: 'Password2' }))).toBe(
+      "Passwords don't match"
+    );
+    // The strength rules are the same ones sign-up enforces
+    expect(firstMessage(updatePasswordSchema.safeParse({ password: 'short', confirmPassword: 'short' }))).toBe(
+      'Password must be at least 8 characters'
+    );
+    expect(firstMessage(updatePasswordSchema.safeParse({ password: 'passwordone', confirmPassword: 'passwordone' }))).toBe(
+      'Password must contain at least one uppercase letter'
+    );
+    expect(firstMessage(updatePasswordSchema.safeParse({ password: 'Passwordone', confirmPassword: 'Passwordone' }))).toBe(
+      'Password must contain at least one number'
+    );
   });
 
   it('basketball session', () => {

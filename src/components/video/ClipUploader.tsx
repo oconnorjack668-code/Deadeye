@@ -239,11 +239,13 @@ export function ClipUploader() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-2">
+              <label htmlFor="video-title" className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-2">
                 Video Title
               </label>
               <input
+                id="video-title"
                 type="text"
+                maxLength={120}
                 placeholder="e.g., Shooting Drill - 3PT Range"
                 value={videoTitle}
                 onChange={(e) => setVideoTitle(e.target.value)}

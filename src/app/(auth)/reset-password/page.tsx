@@ -23,8 +23,12 @@ export default function ResetPasswordPage() {
 
     try {
       const supabase = createClient();
+      // Through the callback, so the recovery code becomes a session, and on to
+      // the page that sets the password. Sending players straight to /profile
+      // signed them in without ever asking for a new password, which left the
+      // forgotten one in place and made every future login need another email.
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: `${window.location.origin}/auth/callback?next=/profile`,
+        redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
       });
 
       if (resetError) {

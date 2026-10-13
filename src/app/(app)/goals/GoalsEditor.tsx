@@ -135,7 +135,7 @@ export function GoalsEditor({ goals }: { goals: GoalRow[] }) {
           ))}
         </select>
         {type === 'custom' && (
-          <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} placeholder="e.g. Left-hand layups made" className="w-full rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white" />
+          <input value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} maxLength={80} aria-label="Custom goal name" placeholder="e.g. Left-hand layups made" className="w-full rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white" />
         )}
         <label className="flex items-center gap-2 text-sm text-zinc-300">
           Target

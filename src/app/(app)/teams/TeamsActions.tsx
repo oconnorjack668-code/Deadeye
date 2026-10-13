@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { normaliseCode } from '@/lib/friends';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 
@@ -24,7 +25,7 @@ export function TeamsActions({ canCreate }: { canCreate: boolean }) {
 
   async function join(e: React.FormEvent) {
     e.preventDefault();
-    const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const clean = normaliseCode(code);
     if (clean.length !== 6) {
       setMessage({ tone: 'error', text: 'Team codes have 6 characters, e.g. T4KX9P.' });
       return;
@@ -67,7 +68,12 @@ export function TeamsActions({ canCreate }: { canCreate: boolean }) {
         <div className="flex gap-2">
           <input
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase().slice(0, 8))}
+            // normaliseCode is the same rule join() validates against: upper
+            // case, alphanumeric, 6 long. Accepting 8 characters here let a
+            // player type two past a code that could never be valid, and a
+            // pasted "T4KX-9P" kept its hyphen.
+            onChange={(e) => setCode(normaliseCode(e.target.value))}
+            maxLength={6}
             placeholder="Team code"
             aria-label="Team code"
             autoCapitalize="characters"

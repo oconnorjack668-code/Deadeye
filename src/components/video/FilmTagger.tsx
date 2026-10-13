@@ -379,6 +379,7 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
               <input
                 value={opponent}
                 onChange={(e) => setOpponent(e.target.value)}
+                maxLength={80}
                 placeholder="Opponent (optional)"
                 aria-label="Opponent"
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white"

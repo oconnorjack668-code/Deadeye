@@ -135,10 +135,13 @@ export default function OnboardingPage() {
     }
   }
 
-  function toggleItem(list: string[], item: string, setter: (items: string[]) => void) {
+  // `max` caps a group that says "select up to N". The chips past the cap are
+  // disabled in the render rather than silently swallowing the tap, so the
+  // limit the label promises is one a player can actually see.
+  function toggleItem(list: string[], item: string, setter: (items: string[]) => void, max?: number) {
     if (list.includes(item)) {
       setter(list.filter((i) => i !== item));
-    } else {
+    } else if (max === undefined || list.length < max) {
       setter([...list, item]);
     }
   }
@@ -468,20 +471,24 @@ export default function OnboardingPage() {
               {/* Primary Goals */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-                  Primary Goals (Select 1-3)
+                  Primary Goals (Select up to 3) <span className="text-zinc-500">· {goals.length}/3</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {GOAL_OPTIONS.map((g) => {
                     const active = goals.includes(g);
+                    const atCap = !active && goals.length >= 3;
                     return (
                       <button
                         key={g}
                         type="button"
-                        onClick={() => toggleItem(goals, g, setGoals)}
+                        disabled={atCap}
+                        onClick={() => toggleItem(goals, g, setGoals, 3)}
                         className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                           active
                             ? 'border-orange-500 bg-orange-500/20 text-orange-300 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
+                            : atCap
+                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-600 cursor-not-allowed'
+                              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
                         }`}
                       >
                         {g}
@@ -494,20 +501,24 @@ export default function OnboardingPage() {
               {/* Focus Areas */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300">
-                  Immediate Focus Areas (Select 1-3)
+                  Immediate Focus Areas (Select up to 3) <span className="text-zinc-500">· {focusAreas.length}/3</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {FOCUS_AREA_OPTIONS.map((fa) => {
                     const active = focusAreas.includes(fa);
+                    const atCap = !active && focusAreas.length >= 3;
                     return (
                       <button
                         key={fa}
                         type="button"
-                        onClick={() => toggleItem(focusAreas, fa, setFocusAreas)}
+                        disabled={atCap}
+                        onClick={() => toggleItem(focusAreas, fa, setFocusAreas, 3)}
                         className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
                           active
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 font-semibold'
-                            : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
+                            : atCap
+                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-600 cursor-not-allowed'
+                              : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
                         }`}
                       >
                         {fa}
