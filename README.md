@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (36 files, 268 tests)
+npm test            # vitest (37 files, 282 tests)
 npm run build       # production build
 ```
 
