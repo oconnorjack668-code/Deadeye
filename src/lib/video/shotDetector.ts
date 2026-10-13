@@ -4,13 +4,53 @@
 
 export interface Rim {
   x: number; // centre
-  y: number; // rim height
+  y: number; // rim height at the centre
   width: number; // rim width (normalised to frame width)
+  /**
+   * Slope of the rim across the frame, dy/dx in normalised units, 0 when level.
+   *
+   * A rim is only horizontal on screen when the camera is square to it. Filmed
+   * from the side, or above or below the ring, the two edges sit at different
+   * heights, and averaging them into one `y` put the crossing line through the
+   * middle of a rim that is actually tilted - testing the wrong height by up to
+   * half the rim width times the slope. That error is worst on side-on footage,
+   * which is exactly what measuring the rim from two taps exists to support.
+   *
+   * Optional so rims measured before this existed, and the tests that build
+   * them by hand, keep behaving exactly as they did: absent means level.
+   */
+  tilt?: number;
 }
 
 /** Narrowest and widest believable rim, as a fraction of frame width. */
 export const MIN_RIM_WIDTH = 0.015;
 export const MAX_RIM_WIDTH = 0.6;
+
+/**
+ * Steepest slope accepted from two taps (~31 degrees in normalised units).
+ *
+ * Past this the taps are far likelier to be sloppy - one on the ring and one on
+ * the backboard, say - than the rim to be that angled, and an over-tilted line
+ * is worse than a level one.
+ */
+export const MAX_RIM_TILT = 0.6;
+
+/** The rim's height at a given x, following its tilt. */
+export function rimYAt(rim: Rim, x: number): number {
+  return rim.y + (x - rim.x) * (rim.tilt ?? 0);
+}
+
+/**
+ * The tilt as an angle, for showing a player what was captured.
+ *
+ * Only a readout: the slope is in normalised units, where x is a fraction of
+ * frame width and y a fraction of frame height, so on a non-square frame this
+ * is not the true on-screen angle. It is close enough to tell a level rim from
+ * a tilted one, which is all it is for.
+ */
+export function rimTiltDegrees(rim: Rim): number {
+  return (Math.atan(rim.tilt ?? 0) * 180) / Math.PI;
+}
 
 /**
  * Builds a rim from two taps, one on each side of it.
@@ -22,13 +62,23 @@ export const MAX_RIM_WIDTH = 0.6;
  * everything as a make.
  */
 export function rimFromEdges(a: { x: number; y: number }, b: { x: number; y: number }): Rim {
+  const dx = b.x - a.x;
+  // Two taps at the same x carry no slope, and dividing by that dx would give
+  // an infinite one.
+  const slope = Math.abs(dx) < 1e-6 ? 0 : (b.y - a.y) / dx;
   return {
     x: (a.x + b.x) / 2,
     y: (a.y + b.y) / 2,
-    // Horizontal extent, because the crossing test below is horizontal. Seen
-    // side-on the rim foreshortens, and a narrower target is the right answer
-    // there - the ball really does pass through a narrower gap on screen.
-    width: Math.min(MAX_RIM_WIDTH, Math.max(MIN_RIM_WIDTH, Math.abs(b.x - a.x))),
+    // Horizontal extent, because the crossing test compares horizontal
+    // distances. Seen side-on the rim foreshortens, and a narrower target is
+    // the right answer there - the ball really does pass through a narrower gap
+    // on screen. The tilt below carries the angle the width no longer does.
+    width: Math.min(MAX_RIM_WIDTH, Math.max(MIN_RIM_WIDTH, Math.abs(dx))),
+    // The `|| 0` collapses negative zero, which a level rim produces when the
+    // taps run right to left. It behaves identically in every calculation but
+    // is not equal to 0, so two measurements of the same level rim compared
+    // unequal depending on tap order.
+    tilt: Math.min(MAX_RIM_TILT, Math.max(-MAX_RIM_TILT, slope)) || 0,
   };
 }
 
@@ -78,7 +128,12 @@ export class ShotDetector {
     const { x, y } = obs.ball;
     this.lastSeen = obs.t;
     const sideways = Math.abs(x - rim.x);
-    const aboveRim = y < rim.y - halfRim * 0.3;
+    // How far below the rim line the ball is, at the ball's own x. Negative is
+    // above it. Every test below is in terms of this rather than a flat `y`, so
+    // a tilted rim is measured along its own line - and with tilt 0 it reduces
+    // to exactly the comparisons against rim.y that it replaced.
+    const depth = y - rimYAt(rim, x);
+    const aboveRim = depth < -halfRim * 0.3;
 
     if (aboveRim && sideways < rim.width * APPROACH_WIDTHS) {
       if (this.armedAt === null) this.armedAt = obs.t;
@@ -89,9 +144,13 @@ export class ShotDetector {
     if (this.armedAt === null) return null;
 
     // Ball has come down to rim level: did it pass through the rim?
-    if (y >= rim.y && this.lastAbove) {
+    if (depth >= 0 && this.lastAbove) {
       const prev = this.lastAbove;
-      const fraction = (rim.y - prev.y) / Math.max(y - prev.y, 1e-6);
+      // Both the ball's path and the rim line are straight, so `depth` runs
+      // linearly along this step and the crossing is where it reaches zero.
+      const prevDepth = prev.y - rimYAt(rim, prev.x);
+      const closed = prevDepth - depth;
+      const fraction = Math.abs(closed) < 1e-6 ? 1 : prevDepth / closed;
       const crossX = prev.x + (x - prev.x) * Math.min(1, Math.max(0, fraction));
       const throughRim = Math.abs(crossX - rim.x) <= halfRim * 1.1;
       const confident = obs.t - prev.t <= 250;

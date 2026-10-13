@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (35 files, 248 tests)
+npm test            # vitest (35 files, 255 tests)
 npm run build       # production build
 ```
 
@@ -121,6 +121,13 @@ scored `person` at 0.919 but `sports ball` at only 0.174 full-frame, rising to
 0.729 on the crop. The rim is measured from two taps — one on each side — rather
 than assumed, which is what makes the crop possible and what lets the tracker
 work on side-on footage or with the hoop near a frame edge.
+
+Those two taps also carry the rim's **tilt**, because a rim is only horizontal
+on screen when the camera is square to it. The crossing test works from the
+ball's height relative to the tilted line rather than one averaged `y`; with a
+tilt of zero it reduces to exactly the comparisons it replaced, so a level rim
+behaves as before. The error it removes grows with how flat the ball's path is,
+which means it matters most on the side-on clips the two taps exist to support.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { ShotDetector, rimFromEdges, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
+import { ShotDetector, rimFromEdges, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { localDateString } from '@/lib/dates';
 import { getBallDetector } from '@/lib/video/mediapipe';
@@ -195,19 +195,24 @@ export function ShotTracker({
     if (rim) {
       // The measured rim, drawn as the span between the two taps so the player
       // can see what was actually captured rather than trusting a dot.
-      const half = (rim.width / 2) * canvas.width;
-      const cx = rim.x * canvas.width;
-      const cy = rim.y * canvas.height;
+      // Follows the rim's tilt, so what is drawn is the line the crossing test
+      // actually uses. Each end's height comes from rimYAt at that end's x.
+      const leftX = rim.x - rim.width / 2;
+      const rightX = rim.x + rim.width / 2;
+      const ends: Array<[number, number]> = [
+        [leftX * canvas.width, rimYAt(rim, leftX) * canvas.height],
+        [rightX * canvas.width, rimYAt(rim, rightX) * canvas.height],
+      ];
       ctx.strokeStyle = '#f97316';
       ctx.lineWidth = 3;
       ctx.beginPath();
-      ctx.moveTo(cx - half, cy);
-      ctx.lineTo(cx + half, cy);
+      ctx.moveTo(ends[0][0], ends[0][1]);
+      ctx.lineTo(ends[1][0], ends[1][1]);
       ctx.stroke();
       ctx.fillStyle = '#f97316';
-      for (const x of [cx - half, cx + half]) {
+      for (const [ex, ey] of ends) {
         ctx.beginPath();
-        ctx.arc(x, cy, 4, 0, Math.PI * 2);
+        ctx.arc(ex, ey, 4, 0, Math.PI * 2);
         ctx.fill();
       }
     }
@@ -447,10 +452,18 @@ export function ShotTracker({
           <video ref={videoRef} playsInline muted className="w-full h-auto" />
           <canvas ref={canvasRef} onClick={tapRim} className="absolute inset-0 h-full w-full touch-manipulation" />
           {step === 'calibrate' && firstEdge && (
+            /* A crosshair rather than a 14px dot, which covered the rim edge it
+               was marking. This tap sets the rim width and tilt, which feed the
+               detection crop and the crossing test, so hitting the edge
+               precisely is worth more than a marker you can see from afar. */
             <div
-              className="pointer-events-none absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-2 ring-white"
+              className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
               style={{ left: `${firstEdge.x * 100}%`, top: `${firstEdge.y * 100}%` }}
-            />
+            >
+              <div className="absolute left-1/2 top-1/2 h-px w-7 -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+              <div className="absolute left-1/2 top-1/2 h-7 w-px -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+              <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-1 ring-white" />
+            </div>
           )}
           {step === 'tracking' && (
             <>

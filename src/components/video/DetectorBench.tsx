@@ -4,7 +4,7 @@
 import React, { useRef, useState } from 'react';
 import { createBallDetector, createDiagnosticDetector, getActiveDelegate } from '@/lib/video/mediapipe';
 import type { Detection, ObjectDetector } from '@mediapipe/tasks-vision';
-import { ShotDetector, rimFromEdges, type DetectedShot } from '@/lib/video/shotDetector';
+import { ShotDetector, rimFromEdges, rimYAt, rimTiltDegrees, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { cropRectFor, ballCentreInFrame, magnification, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
@@ -63,7 +63,7 @@ function pct(n: number, d: number): string {
 export function DetectorBench() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasVideo, setHasVideo] = useState(false);
-  const [rim, setRim] = useState<{ x: number; y: number; width: number } | null>(null);
+  const [rim, setRim] = useState<Rim | null>(null);
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
   /** True while the player is tapping the two rim edges. */
   const [marking, setMarking] = useState(false);
@@ -453,10 +453,28 @@ export function DetectorBench() {
               </div>
             )}
             {rim && (
-              <div
-                className="pointer-events-none absolute h-1 -translate-y-1/2 rounded-full bg-orange-500 ring-1 ring-white/60"
-                style={{ left: `${(rim.x - rim.width / 2) * 100}%`, top: `${rim.y * 100}%`, width: `${rim.width * 100}%` }}
-              />
+              /* Drawn as an SVG in normalised coordinates rather than a rotated
+                 div: x is a fraction of width and y a fraction of height, so a
+                 CSS rotation would need the element's aspect ratio folded in to
+                 land on the rim. preserveAspectRatio="none" maps the two
+                 straight onto the box, and the non-scaling stroke keeps the
+                 line one pixel wide instead of stretching with the viewBox. */
+              <svg
+                viewBox="0 0 1 1"
+                preserveAspectRatio="none"
+                className="pointer-events-none absolute inset-0 h-full w-full"
+              >
+                <line
+                  x1={rim.x - rim.width / 2}
+                  y1={rimYAt(rim, rim.x - rim.width / 2)}
+                  x2={rim.x + rim.width / 2}
+                  y2={rimYAt(rim, rim.x + rim.width / 2)}
+                  stroke="#f97316"
+                  strokeWidth={3}
+                  strokeLinecap="round"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
             )}
           </div>
 
@@ -488,7 +506,7 @@ export function DetectorBench() {
               </Button>
               <span className="text-sm text-zinc-400">
                 {rim
-                  ? `Rim measured: ${(rim.width * 100).toFixed(1)}% of frame width.`
+                  ? `Rim measured: ${(rim.width * 100).toFixed(1)}% of frame width, tilt ${rimTiltDegrees(rim).toFixed(0)}°.`
                   : 'Scrub to a frame showing the hoop first, then set the rim.'}
               </span>
             </div>

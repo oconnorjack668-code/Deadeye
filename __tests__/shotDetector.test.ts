@@ -1,6 +1,14 @@
 // __tests__/shotDetector.test.ts
 import { describe, it, expect } from 'vitest';
-import { ShotDetector, rimFromEdges, MIN_RIM_WIDTH, MAX_RIM_WIDTH, type BallObservation } from '@/lib/video/shotDetector';
+import {
+  ShotDetector,
+  rimFromEdges,
+  rimYAt,
+  MIN_RIM_WIDTH,
+  MAX_RIM_WIDTH,
+  MAX_RIM_TILT,
+  type BallObservation,
+} from '@/lib/video/shotDetector';
 
 const RIM = { x: 0.5, y: 0.3, width: 0.06 };
 
@@ -61,6 +69,39 @@ describe('rimFromEdges', () => {
   it('clamps an absurdly wide pair of taps', () => {
     const rim = rimFromEdges({ x: 0, y: 0.3 }, { x: 1, y: 0.3 });
     expect(rim.width).toBe(MAX_RIM_WIDTH);
+  });
+
+  it('captures the tilt between two taps at different heights', () => {
+    const rim = rimFromEdges({ x: 0.4, y: 0.34 }, { x: 0.6, y: 0.26 });
+    expect(rim.tilt).toBeCloseTo(-0.4);
+    // The line passes through both taps, which is the whole point of storing it
+    expect(rimYAt(rim, 0.4)).toBeCloseTo(0.34);
+    expect(rimYAt(rim, 0.6)).toBeCloseTo(0.26);
+    // and still through the centre at the averaged height
+    expect(rimYAt(rim, 0.5)).toBeCloseTo(0.3);
+  });
+
+  it('reads the same tilt whichever side is tapped first', () => {
+    const a = rimFromEdges({ x: 0.4, y: 0.34 }, { x: 0.6, y: 0.26 });
+    const b = rimFromEdges({ x: 0.6, y: 0.26 }, { x: 0.4, y: 0.34 });
+    expect(a.tilt).toBeCloseTo(b.tilt!);
+  });
+
+  it('treats a level rim as having no tilt', () => {
+    expect(rimFromEdges({ x: 0.44, y: 0.3 }, { x: 0.56, y: 0.3 }).tilt).toBe(0);
+  });
+
+  it('clamps a wild tilt rather than trusting it', () => {
+    // One tap on the ring, one up on the backboard: far likelier than a rim at
+    // this angle, and an over-tilted line is worse than a level one.
+    const rim = rimFromEdges({ x: 0.48, y: 0.5 }, { x: 0.52, y: 0.1 });
+    expect(rim.tilt).toBe(-MAX_RIM_TILT);
+  });
+
+  it('gives no tilt for two taps in a vertical line, rather than an infinite one', () => {
+    const rim = rimFromEdges({ x: 0.5, y: 0.26 }, { x: 0.5, y: 0.34 });
+    expect(rim.tilt).toBe(0);
+    expect(Number.isFinite(rimYAt(rim, 0.7))).toBe(true);
   });
 
   it('produces a rim the detector can score a make with', () => {
@@ -142,6 +183,37 @@ describe('ShotDetector', () => {
       expect(shots).toHaveLength(1);
       expect(shots[0].made).toBe(false);
       expect(shots[0].confident).toBe(false);
+    });
+  });
+
+  // The case that justifies storing a tilt at all. Filmed from the side the rim
+  // is not horizontal on screen, and a ball on a flat trajectory crosses a long
+  // way along it, so testing the crossing at one averaged height lands the
+  // crossing point far from where it really is.
+  describe('on a tilted rim', () => {
+    /** Ball entering from the left, descending slowly while moving right fast. */
+    const flatTrajectory: BallObservation[] = Array.from({ length: 16 }, (_, i) => {
+      const x = 0.3 + i * 0.04;
+      return { t: i * 33, ball: { x, y: 0.2 + 0.2 * (x - 0.3) } };
+    });
+
+    const tilted = rimFromEdges({ x: 0.4, y: 0.34 }, { x: 0.6, y: 0.26 });
+    const level = { x: 0.5, y: 0.3, width: 0.2 };
+
+    it('scores a make that the level model placed outside the rim', () => {
+      const d = new ShotDetector(tilted);
+      for (const o of flatTrajectory) d.push(o);
+      expect(d.shots).toHaveLength(1);
+      expect(d.shots[0].made).toBe(true);
+    });
+
+    it('and the same ball against a level rim of the same span calls it a miss', () => {
+      // Not a bug being pinned - this is the old behaviour, kept here to show
+      // the tilt is what changes the verdict rather than some other edit.
+      const d = new ShotDetector(level);
+      for (const o of flatTrajectory) d.push(o);
+      expect(d.shots).toHaveLength(1);
+      expect(d.shots[0].made).toBe(false);
     });
   });
 
