@@ -4,7 +4,15 @@
 import React, { useRef, useState } from 'react';
 import { createBallDetector, createDiagnosticDetector, getActiveDelegate } from '@/lib/video/mediapipe';
 import type { Detection, ObjectDetector } from '@mediapipe/tasks-vision';
-import { ShotDetector, rimFromEdges, rimYAt, rimTiltDegrees, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
+import {
+  ShotDetector,
+  rimFromEdges,
+  rimTapProblem,
+  rimYAt,
+  rimTiltDegrees,
+  type DetectedShot,
+  type Rim,
+} from '@/lib/video/shotDetector';
 import { cropRectFor, ballCentreInFrame, magnification, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
@@ -121,6 +129,15 @@ export function DetectorBench() {
       setFirstEdge(point);
       return;
     }
+    // Same check the tracker makes: measuring a benchmark against a rim that had
+    // to be clamped would blame the detector for a bad measurement.
+    const problem = rimTapProblem(firstEdge, point);
+    if (problem) {
+      setError(problem);
+      setFirstEdge(null);
+      return;
+    }
+    setError(null);
     setRim(rimFromEdges(firstEdge, point));
     setFirstEdge(null);
     setMarking(false);
@@ -434,7 +451,11 @@ export function DetectorBench() {
               <button
                 type="button"
                 onClick={tapRim}
-                aria-label={firstEdge ? 'Tap the other side of the rim' : 'Tap one side of the rim'}
+                aria-label={
+                  firstEdge
+                    ? 'Tap the opposite edge of the ring, straight across'
+                    : 'Tap the left or right edge of the ring, at its widest'
+                }
                 className="absolute inset-0 cursor-crosshair touch-manipulation"
               />
             )}
@@ -481,7 +502,9 @@ export function DetectorBench() {
           {marking ? (
             <div className="rounded-xl border border-orange-500/40 bg-orange-500/10 p-3">
               <p className="text-sm font-semibold text-orange-200">
-                {firstEdge ? 'Now tap the other side of the rim.' : 'Tap one side of the rim.'}
+                {firstEdge
+                  ? 'Now tap the opposite side, straight across the ring.'
+                  : 'Tap the left and right edges of the ring — its widest points across, not the front and back.'}
               </p>
               <p className="mt-1 text-xs text-zinc-400">
                 Playback is paused and the video controls are off, so your taps land on the frame instead of

@@ -61,6 +61,31 @@ export function rimTiltDegrees(rim: Rim): number {
  * assumed the detector armed on balls nowhere near the hoop and scored nearly
  * everything as a make.
  */
+/**
+ * Why a pair of taps cannot be a rim, or null when they can.
+ *
+ * The clamps in rimFromEdges stop a bad pair producing nonsense, but clamping
+ * invents a number instead of measuring one, and the player is never told. The
+ * two taps set the crop size and the make window, so a pair that had to be
+ * clamped is the single worst thing that can happen to detection accuracy -
+ * worse than a shaky hand or poor light. Better to say so and ask again.
+ *
+ * The rule is one idea applied twice: reject exactly when the measurement would
+ * have to be invented. A genuinely side-on rim foreshortens to a sliver and
+ * that is the correct target there, so narrow is fine - only narrower than the
+ * clamp floor is not.
+ */
+export function rimTapProblem(a: { x: number; y: number }, b: { x: number; y: number }): string | null {
+  const dx = Math.abs(b.x - a.x);
+  if (dx < MIN_RIM_WIDTH) {
+    return 'Those two taps are almost in line with each other. Tap the far left and far right of the ring - its widest points across - rather than the front and back of it.';
+  }
+  if (Math.abs((b.y - a.y) / (b.x - a.x)) > MAX_RIM_TILT) {
+    return 'Those two taps are at very different heights. Tap the left and right of the ring itself, not the backboard above it.';
+  }
+  return null;
+}
+
 export function rimFromEdges(a: { x: number; y: number }, b: { x: number; y: number }): Rim {
   const dx = b.x - a.x;
   // Two taps at the same x carry no slope, and dividing by that dx would give

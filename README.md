@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (37 files, 282 tests)
+npm test            # vitest (37 files, 289 tests)
 npm run build       # production build
 ```
 
@@ -121,6 +121,14 @@ scored `person` at 0.919 but `sports ball` at only 0.174 full-frame, rising to
 0.729 on the crop. The rim is measured from two taps — one on each side — rather
 than assumed, which is what makes the crop possible and what lets the tracker
 work on side-on footage or with the hoop near a frame edge.
+
+The two taps go on the ring's **left and right edges** — the ends of the long
+axis of the ellipse a ring projects to from any angle but dead level. They set
+the crop size and the make window, so they matter more to accuracy than light
+or camera shake, and `rimTapProblem` rejects a pair that `rimFromEdges` would
+have had to clamp (front-and-back taps, a double tap, or one tap on the
+backboard) rather than silently measuring a sliver. A genuinely side-on rim is
+narrow and that is correct, so only narrower than the clamp floor is refused.
 
 A measured rim can be **remembered per hoop** (`src/lib/video/rimMemory.ts`), so
 a returning player taps nothing: the saved list appears on the calibrate step

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { ShotDetector, rimFromEdges, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
+import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import {
   loadSavedRims,
   storeSavedRims,
@@ -169,7 +169,7 @@ export function ShotTracker({
     });
   }
 
-  // Tap one side of the rim, then the other. Tracking starts on the second tap -
+  // Tap the ring's left and right edges. Tracking starts on the second tap -
   // no ring to drag, no size slider, no separate "start" step.
   const [calibrating, setCalibrating] = useState(false);
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
@@ -242,6 +242,17 @@ export function ShotTracker({
       setFirstEdge(point);
       return;
     }
+
+    // Checked before anything starts: a clamped rim is the worst thing that can
+    // happen to detection accuracy, and starting a whole session on one wastes
+    // the player's time far more than asking for the two taps again.
+    const problem = rimTapProblem(firstEdge, point);
+    if (problem) {
+      setError(problem);
+      setFirstEdge(null);
+      return;
+    }
+    setError(null);
 
     const measured = rimFromEdges(firstEdge, point);
     setRim(measured);
@@ -603,8 +614,8 @@ export function ShotTracker({
             {calibrating
               ? 'Starting…'
               : firstEdge
-                ? 'Now tap the other side of the rim.'
-                : 'Tap one side of the rim, then the other. The hoop can be anywhere in the frame.'}
+                ? 'Now tap the opposite side, straight across the ring from your first tap.'
+                : 'Tap the left and right edges of the ring — its widest points across, not the front and back of it. The hoop can be anywhere in the frame.'}
           </p>
           {firstEdge && !calibrating && (
             <button type="button" onClick={() => setFirstEdge(null)} className="text-xs text-zinc-500 underline">

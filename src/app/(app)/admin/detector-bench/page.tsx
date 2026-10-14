@@ -27,7 +27,11 @@ export default async function DetectorBenchPage() {
             <li>Frame the whole hoop plus a few feet below it. Landscape.</li>
             <li>Take 10–20 shots, deliberately mixing makes and misses, and count them yourself.</li>
             <li>Load the clip, scrub to a frame showing the hoop, then press <strong>Set the rim</strong>.</li>
-            <li>Tap one side of the rim and then the other. Playback stays paused while you do.</li>
+            <li>
+              Tap the left and right edges of the ring — its widest points across, not the front and back.
+              Those two taps set the detection crop and the make window, so a sloppy pair shows up as a bad
+              detector. Playback stays paused while you do it.
+            </li>
             <li>Run the benchmark, or the full-frame versus hoop-crop comparison.</li>
           </ol>
           <p className="text-zinc-400">

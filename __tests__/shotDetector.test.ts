@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import {
   ShotDetector,
   rimFromEdges,
+  rimTapProblem,
   rimYAt,
   MIN_RIM_WIDTH,
   MAX_RIM_WIDTH,
@@ -113,6 +114,53 @@ describe('rimFromEdges', () => {
     }
     expect(d.shots).toHaveLength(1);
     expect(d.shots[0].made).toBe(true);
+  });
+});
+
+describe('rimTapProblem', () => {
+  it('accepts a normal pair of taps across the ring', () => {
+    expect(rimTapProblem({ x: 0.44, y: 0.3 }, { x: 0.56, y: 0.3 })).toBeNull();
+  });
+
+  it('still accepts a side-on rim, which is genuinely narrow', () => {
+    // The same pair the width test above calls correct: foreshortened is not
+    // mis-tapped, and rejecting it would block the footage two taps exist for.
+    expect(rimTapProblem({ x: 0.7, y: 0.3 }, { x: 0.73, y: 0.31 })).toBeNull();
+  });
+
+  it('accepts a steeply angled rim short of the tilt clamp', () => {
+    expect(rimTapProblem({ x: 0.4, y: 0.25 }, { x: 0.6, y: 0.35 })).toBeNull();
+  });
+
+  it('rejects taps on the front and back of the ring', () => {
+    // Almost no horizontal gap: the short axis of the ellipse, not the long one
+    expect(rimTapProblem({ x: 0.5, y: 0.28 }, { x: 0.505, y: 0.33 })).toMatch(/widest points/);
+  });
+
+  it('rejects a double tap in one spot', () => {
+    expect(rimTapProblem({ x: 0.5, y: 0.3 }, { x: 0.5, y: 0.3 })).toMatch(/widest points/);
+  });
+
+  it('rejects one tap on the ring and one on the backboard', () => {
+    expect(rimTapProblem({ x: 0.46, y: 0.4 }, { x: 0.54, y: 0.1 })).toMatch(/backboard/);
+  });
+
+  it('rejects exactly the pairs rimFromEdges would have had to clamp', () => {
+    // The two functions agree by construction, so a measurement that survives
+    // the check is one that was measured rather than invented.
+    const pairs: Array<[{ x: number; y: number }, { x: number; y: number }]> = [
+      [{ x: 0.5, y: 0.3 }, { x: 0.5, y: 0.3 }],
+      [{ x: 0.5, y: 0.28 }, { x: 0.505, y: 0.33 }],
+      [{ x: 0.46, y: 0.4 }, { x: 0.54, y: 0.1 }],
+      [{ x: 0.44, y: 0.3 }, { x: 0.56, y: 0.3 }],
+      [{ x: 0.7, y: 0.3 }, { x: 0.73, y: 0.31 }],
+    ];
+    for (const [a, b] of pairs) {
+      const rim = rimFromEdges(a, b);
+      const clamped =
+        rim.width !== Math.abs(b.x - a.x) || Math.abs(rim.tilt!) === MAX_RIM_TILT;
+      expect(rimTapProblem(a, b) !== null).toBe(clamped);
+    }
   });
 });
 
