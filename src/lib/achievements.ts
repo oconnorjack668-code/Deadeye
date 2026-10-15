@@ -61,8 +61,13 @@ export const BADGES: Badge[] = [
   { id: 'makes-1000', title: '1K Makes', description: 'Make 1,000 shots', tier: 'silver', icon: 'CircleDot', earned: (s) => s.totalMakes >= 1000 },
   { id: 'makes-5000', title: '5K Makes', description: 'Make 5,000 shots', tier: 'gold', icon: 'CircleDot', earned: (s) => s.totalMakes >= 5000 },
   { id: 'makes-10000', title: '10K Club', description: 'Make 10,000 shots', tier: 'diamond', icon: 'Gem', earned: (s) => s.totalMakes >= 10000 },
-  { id: 'streak-7', title: 'Week Warrior', description: 'Train 7 days in a row', tier: 'silver', icon: 'Flame', earned: (s) => s.longestStreak >= 7 },
-  { id: 'streak-30', title: 'Unstoppable', description: 'Train 30 days in a row', tier: 'legend', icon: 'Zap', earned: (s) => s.longestStreak >= 30 },
+  // "in a row" stopped being true when STREAK_REST_DAYS allowed a rest day, and
+  // a badge that describes a rule the app no longer applies is worse than a
+  // less punchy one. Making these use a strict streak instead would be worse
+  // still: the dashboard would show a 12-day streak beside a 7-day badge the
+  // player had not earned.
+  { id: 'streak-7', title: 'Week Warrior', description: 'Train 7 days without ever missing two in a row', tier: 'silver', icon: 'Flame', earned: (s) => s.longestStreak >= 7 },
+  { id: 'streak-30', title: 'Unstoppable', description: 'Train 30 days without ever missing two in a row', tier: 'legend', icon: 'Zap', earned: (s) => s.longestStreak >= 30 },
   { id: 'first-pr', title: 'New Personal Best', description: 'Set your first personal record', tier: 'bronze', icon: 'Trophy', earned: (s) => s.totalPRs >= 1 },
   { id: 'prs-10', title: 'Record Breaker', description: 'Set 10 personal records', tier: 'gold', icon: 'Trophy', earned: (s) => s.totalPRs >= 10 },
   { id: 'gym-20', title: 'Iron Hooper', description: 'Log 20 gym workouts', tier: 'silver', icon: 'Dumbbell', earned: (s) => s.totalWorkouts >= 20 },
