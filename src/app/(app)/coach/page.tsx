@@ -6,7 +6,7 @@ import { requireUser, getCurrentSubscription } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { summarizeTeam, type RosterStats } from '@/lib/coach';
 import { userCalendarNow } from '@/lib/userTime';
-import { ClipboardCheck, Crown, Flame, Moon, Plus, Shield, Users } from 'lucide-react';
+import { ClipboardCheck, Crown, Flame, Moon, Plus, Shield, Users, Video } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Coach dashboard - Deadeye' };
@@ -144,6 +144,19 @@ export default async function CoachPage() {
                   )}
                 </div>
               </div>
+
+              {/* Phrased as a count, never a share or a score. Most honest
+                  training is not filmed - nobody props a phone up for a 6am
+                  session alone - so a low number here means "not filmed", and
+                  a coach reading it as "not trusted" would be the one way this
+                  feature could do harm. */}
+              {s.verifiedSessions > 0 && (
+                <p className="flex items-center gap-1.5 text-xs text-cyan-300/90">
+                  <Video className="h-3.5 w-3.5 flex-shrink-0" />
+                  {s.verifiedSessions} of this week&apos;s hoops sessions {s.verifiedSessions === 1 ? 'was' : 'were'} counted
+                  from video
+                </p>
+              )}
 
               <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500">
                 <span className="flex items-center gap-1">

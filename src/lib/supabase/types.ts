@@ -1744,6 +1744,10 @@ export interface Database {
           minutes_7d: number;
           makes_7d: number;
           attempts_7d: number;
+          // Added by migration 00034. Nullable here because a database that has
+          // not run it yet returns rows without the column, and the dashboard
+          // treats a missing count as none rather than failing.
+          verified_7d: number | null;
           sessions_28d: number;
           streak: number;
           last_active: string | null;
