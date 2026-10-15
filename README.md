@@ -99,9 +99,15 @@ takes seconds rather than minutes and needs no browser or person:
 ```bash
 DEADEYE_BENCH_CLIP=/path/to/clip.mp4 \
 DEADEYE_BENCH_RIM=0.5253,0.2194,0.5865,0.1991 \
-DEADEYE_BENCH_3FRAME=1 \
+DEADEYE_BENCH_3FRAME=1 DEADEYE_BENCH_LEARN=1 \
+DEADEYE_BENCH_MAKES=4.1,13.9,20.1,25.2,50.3 \
 npx vitest run __tests__/clipBench.test.ts
 ```
+
+`DEADEYE_BENCH_MAKES` is the hand-labelled times of the shots that went in; give
+it and the run scores every call and prints which ones were wrong. Without it
+you get counts, and counts hide a change that gets two calls wrong in opposite
+directions while leaving the total unmoved — which has happened once already.
 
 `DEADEYE_BENCH_RIM` is the two rim taps as `x,y,x,y` normalised to the frame.
 The test skips without those variables, so the normal gates are unaffected. Set
@@ -212,9 +218,26 @@ mask also covers where the ball *was* — where the current frame shows wall, so
 the colour reads back as a blend (measured at 0.33 similarity to a ball that was
 a perfect match).
 
-Counts matching is not the same as the right shots matching, the rim was placed
-carefully by hand, and this is one clip in one hall with one ball. Treat it as
-"worth building on", not as an accuracy figure.
+With the ten shots hand-labelled, make/miss comes out at **9 of 10 correct**.
+The one error is a make called a miss — the conservative direction, which the
+review step catches. The rim was placed carefully by hand and this is one clip
+in one hall with one ball, so it is a real number but a narrow one.
+
+**A failed experiment worth not repeating.** The crossing rests on just two
+sightings, the last above the rim line and the first at or below it, so one
+badly centred ball can decide a make. Fitting a line across the recent track
+instead — principled, and robust to noise in a unit test — measured *worse* on
+real footage: 7 of 10, having changed exactly two calls and got both wrong. The
+likely reason is that the path is least straight at the moment that matters, as
+a ball clipping the rim or dragging through the net deflects, and a fit reaching
+200ms back averages that deflection into the crossing. Locality beat smoothing.
+The code is in git history at `ba3c0c0`; don't re-add it without labelled clips
+to test against.
+
+**Do not tune the make/miss gate on this clip.** The remaining error is one
+borderline shot, and `halfRim * 1.1` could be widened to catch it — at the risk
+of the five misses it currently gets right. That is overfitting to ten shots in
+one gym. More labelled clips first.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review

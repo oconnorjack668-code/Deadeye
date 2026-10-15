@@ -170,6 +170,25 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     });
 
     const shots = shotDetector.shots;
+
+    // Per-shot scoring against hand-labelled makes. Counts alone hide the thing
+    // that matters: a run can report "4 of 5 makes" while having two of them
+    // wrong in opposite directions, which is exactly how a change that made
+    // the calls worse once looked like it had changed nothing.
+    const makeTimes = (process.env.DEADEYE_BENCH_MAKES || '')
+      .split(',')
+      .map((s) => Number(s.trim()))
+      .filter((n) => Number.isFinite(n));
+    const MATCH_S = 1.0;
+    const scored = makeTimes.length
+      ? shots.map((s) => {
+          const at = s.t / 1000;
+          const trulyMade = makeTimes.some((m) => Math.abs(m - at) <= MATCH_S);
+          return { at, called: s.made, trulyMade, right: s.made === trulyMade };
+        })
+      : null;
+    const correct = scored ? scored.filter((s) => s.right).length : 0;
+
     const lines = [
       '',
       `clip            ${CLIP}`,
@@ -190,7 +209,15 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       `longest gap     ${Math.round(maxGapMs)} ms`,
       `gaps > ${LOST_BALL_MS}ms   ${gapsOverLimit}`,
       `shots called    ${shots.length} (${shots.filter((s) => s.made).length} made, ${shots.filter((s) => !s.confident).length} inferred)`,
-      ...shots.map((s) => `  ${(s.t / 1000).toFixed(1)}s ${s.made ? 'MAKE' : 'MISS'}${s.confident ? '' : ' (inferred)'}`),
+      ...(scored
+        ? [
+            `make/miss        ${correct} of ${scored.length} correct`,
+            ...scored.map(
+              (s) =>
+                `  ${s.at.toFixed(1)}s called ${s.called ? 'MAKE' : 'MISS'}, was ${s.trulyMade ? 'MAKE' : 'MISS'}  ${s.right ? 'ok' : '<-- WRONG'}`
+            ),
+          ]
+        : shots.map((s) => `  ${(s.t / 1000).toFixed(1)}s ${s.made ? 'MAKE' : 'MISS'}${s.confident ? '' : ' (inferred)'}`)),
       `took            ${((Date.now() - startedAt) / 1000).toFixed(0)}s`,
       '',
     ];
