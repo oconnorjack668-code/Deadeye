@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (37 files, 289 tests)
+npm test            # vitest (38 files, 298 tests)
 npm run build       # production build
 ```
 
@@ -144,6 +144,17 @@ ball's height relative to the tilted line rather than one averaged `y`; with a
 tilt of zero it reduces to exactly the comparisons it replaced, so a level rim
 behaves as before. The error it removes grows with how flat the ball's path is,
 which means it matters most on the side-on clips the two taps exist to support.
+
+**Frame coverage is the current bottleneck, not confidence.** Playing a clip at
+1× and inferring on whatever frames arrive measured 14.3 fps on a 30 fps clip —
+under half the frames, and about three frames per shot near the rim. That is too
+few to watch the ball cross it, which is why a measured run called every shot
+`inferred` rather than seen, and why 8 gaps over `LOST_BALL_MS` turned three
+real makes into misses. `/admin/detector-bench` can now step frame by frame
+(`src/lib/video/frameStep.ts`) instead, which decouples frames analysed from
+inference speed at the cost of running longer than the clip. The bench keeps
+both modes so the two can be compared on one clip, and labels every report with
+which produced it.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review

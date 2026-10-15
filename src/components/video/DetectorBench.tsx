@@ -13,6 +13,7 @@ import {
   type DetectedShot,
   type Rim,
 } from '@/lib/video/shotDetector';
+import { sampleTimesMs, seekMadeProgress } from '@/lib/video/frameStep';
 import { cropRectFor, ballCentreInFrame, magnification, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
@@ -28,6 +29,37 @@ type SweepEnd = 'ended' | 'paused' | 'stalled';
 /** No frame for this long means the pass is stuck and will never finish. */
 const STALL_MS = 8000;
 
+/** How long to wait for one seek before giving up on the clip. */
+const SEEK_TIMEOUT_MS = 5000;
+
+/**
+ * Resolves once the video has settled on `timeSec`.
+ *
+ * Both listeners are removed on every path, and a timeout rejects rather than
+ * leaving the pass waiting forever: a clip the browser cannot seek in - a
+ * stream with no index, a partly written file - otherwise hangs on the first
+ * sample with no error and no end.
+ */
+function seekTo(video: HTMLVideoElement, timeSec: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const done = (fail?: Error) => {
+      clearTimeout(timer);
+      video.removeEventListener('seeked', onSeeked);
+      video.removeEventListener('error', onError);
+      if (fail) reject(fail);
+      else resolve();
+    };
+    const onSeeked = () => done();
+    const onError = () => done(new Error('The clip could not be decoded at that point.'));
+    // Declared after done, which closes over it: nothing calls done until the
+    // seek is under way, by which point this is assigned.
+    const timer = setTimeout(() => done(new Error('Seeking timed out.')), SEEK_TIMEOUT_MS);
+    video.addEventListener('seeked', onSeeked);
+    video.addEventListener('error', onError);
+    video.currentTime = timeSec;
+  });
+}
+
 interface Report {
   durationS: number;
   wallClockS: number;
@@ -37,6 +69,8 @@ interface Report {
   maxGapMs: number;
   gapsOverLimit: number;
   shots: DetectedShot[];
+  /** Recorded so two runs on one clip can be told apart afterwards. */
+  mode: 'every-frame' | 'realtime';
 }
 
 interface Diagnosis {
@@ -96,6 +130,15 @@ export function DetectorBench() {
   // fetch look identical to a hang.
   const [phase, setPhase] = useState<'idle' | 'loading' | 'measuring'>('idle');
   const [progress, setProgress] = useState<{ sec: number; total: number } | null>(null);
+  /**
+   * Which pass to run. Frame-by-frame is the default because it is the one
+   * worth measuring; real time is kept so the two can be compared on the same
+   * clip, which is the only way to show what the change bought.
+   */
+  const [mode, setMode] = useState<'every-frame' | 'realtime'>('every-frame');
+  const cancelRef = useRef(false);
+  /** Throttles the progress readout to once per second of footage. */
+  const lastReportedSec = useRef(-1);
   const [report, setReport] = useState<Report | null>(null);
   const [diagnosis, setDiagnosis] = useState<Diagnosis | null>(null);
   const [magnify, setMagnify] = useState(1);
@@ -247,6 +290,58 @@ export function DetectorBench() {
     });
   }
 
+  /**
+   * Walks the clip by seeking to each sample time, handing every one to
+   * `onFrame`. The alternative to sweep(), which plays at 1x and sees only the
+   * frames inference keeps up with.
+   *
+   * Slower than the clip by design: a pass costs a seek, a decode and an
+   * inference per sample, so it runs for as long as that takes rather than for
+   * the clip's length. What it buys is that the number of frames analysed stops
+   * depending on how fast the device is.
+   */
+  async function stepFrames(
+    onFrame: (video: HTMLVideoElement, videoMs: number, ts: number) => void
+  ): Promise<SweepEnd> {
+    const video = videoRef.current;
+    if (!video) return 'stalled';
+    video.pause();
+    const times = sampleTimesMs((video.duration || 0) * 1000);
+    if (times.length === 0) return 'stalled';
+
+    setPhase('measuring');
+    let lastTs = 0;
+    let stuck = 0;
+
+    for (let i = 0; i < times.length; i++) {
+      if (cancelRef.current) return 'paused';
+      const before = video.currentTime * 1000;
+      try {
+        await seekTo(video, times[i] / 1000);
+      } catch {
+        return 'stalled';
+      }
+      const videoMs = video.currentTime * 1000;
+      // A step finer than the clip's real frame interval lands back on the frame
+      // just done. One or two is normal; a run of them means the clip will not
+      // advance and the loop would spin to the end for nothing.
+      if (i > 0 && !seekMadeProgress(before, videoMs)) {
+        if (++stuck > 10) return 'stalled';
+        continue;
+      }
+      stuck = 0;
+      const ts = Math.max(lastTs + 1, Math.round(videoMs));
+      lastTs = ts;
+      onFrame(video, videoMs, ts);
+      const sec = Math.floor(videoMs / 1000);
+      if (sec !== lastReportedSec.current) {
+        lastReportedSec.current = sec;
+        setProgress({ sec, total: Math.round(video.duration || 0) });
+      }
+    }
+    return 'ended';
+  }
+
   /** Warns when numbers came from a pass that did not reach the end. */
   function warnIfPartial(how: SweepEnd) {
     if (how === 'ended') return;
@@ -290,6 +385,8 @@ export function DetectorBench() {
     setError(null);
     setWarning(null);
     setDiagnosis(null);
+    cancelRef.current = false;
+    lastReportedSec.current = -1;
     // Closed in the finally below: these are per-run instances, and without
     // closing them each run leaks its WASM model into the tab.
     let full: ObjectDetector | null = null;
@@ -311,7 +408,8 @@ export function DetectorBench() {
       canvas.height = CROP_CANVAS_PX;
       const ctx = canvas.getContext('2d');
 
-      const how = await sweep((v, _videoMs, ts) => {
+      const pass = mode === 'every-frame' ? stepFrames : sweep;
+      const how = await pass((v, _videoMs, ts) => {
         frames += 1;
         const detections = fullDetector.detectForVideo(v, ts).detections || [];
         if (detections.length) framesWithAnything += 1;
@@ -353,6 +451,8 @@ export function DetectorBench() {
     setError(null);
     setWarning(null);
     setReport(null);
+    cancelRef.current = false;
+    lastReportedSec.current = -1;
 
     let detector: ObjectDetector | null = null;
     try {
@@ -379,7 +479,8 @@ export function DetectorBench() {
       if (!ctx) throw new Error('Could not get a 2d canvas context.');
       let gain = 1;
 
-      const how = await sweep((v, videoMs, ts) => {
+      const pass = mode === 'every-frame' ? stepFrames : sweep;
+      const how = await pass((v, videoMs, ts) => {
         // Same hoop crop the tracker uses, so the benchmark measures the real thing
         const crop = cropRectFor(rim, v.videoWidth, v.videoHeight);
         gain = magnification(crop, v.videoWidth);
@@ -420,6 +521,7 @@ export function DetectorBench() {
         maxGapMs,
         gapsOverLimit,
         shots: shotDetector.shots,
+        mode,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Detection failed.');
@@ -556,6 +658,43 @@ export function DetectorBench() {
             </div>
           )}
 
+          {!running && (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">How to analyse</p>
+              <div className="mt-2 space-y-2">
+                {(
+                  [
+                    [
+                      'every-frame',
+                      'Every frame',
+                      'Seeks frame by frame. Slower than the clip, and what the detector sees stops depending on how fast this device is.',
+                    ],
+                    [
+                      'realtime',
+                      'At playback speed',
+                      'Plays at 1x and takes whatever frames inference keeps up with. Measured 14.3 fps on a 30 fps clip, so under half of them.',
+                    ],
+                  ] as const
+                ).map(([value, label, hint]) => (
+                  <label key={value} className="flex gap-2 text-sm text-zinc-200">
+                    <input
+                      type="radio"
+                      name="bench-mode"
+                      value={value}
+                      checked={mode === value}
+                      onChange={() => setMode(value)}
+                      className="mt-1 accent-red-500"
+                    />
+                    <span className="min-w-0">
+                      <span className="font-semibold">{label}</span>
+                      <span className="block text-xs text-zinc-500">{hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
           <Button variant="primary" size="lg" className="w-full gap-2" disabled={!rim} isLoading={running} onClick={() => void run()}>
             <Play className="h-4 w-4" /> {running ? phaseLabel : 'Run benchmark'}
           </Button>
@@ -572,9 +711,21 @@ export function DetectorBench() {
           )}
           {phase === 'measuring' && (
             <p className="text-xs text-zinc-400">
-              The clip plays at normal speed on purpose, so the detector sees frames the way the live tracker
-              does. Keep this page in front of you - a backgrounded tab stops sending frames.
+              {mode === 'every-frame'
+                ? 'Seeking to every frame in turn, so this takes longer than the clip. It can run in a background tab.'
+                : 'The clip plays at normal speed, so the detector sees frames the way the live tracker does. Keep this page in front of you - a backgrounded tab stops sending frames.'}
             </p>
+          )}
+          {running && mode === 'every-frame' && (
+            <button
+              type="button"
+              onClick={() => {
+                cancelRef.current = true;
+              }}
+              className="text-xs text-zinc-400 underline"
+            >
+              Stop and keep what has been measured
+            </button>
           )}
           {warning && (
             <Alert variant="warning" title="Partial pass">
@@ -688,9 +839,16 @@ export function DetectorBench() {
           {report && (
             <div className="space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400 mb-2">Ball detection</h3>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400 mb-2">
+                  Ball detection
+                  <span className="ml-2 font-normal normal-case tracking-normal text-zinc-500">
+                    {report.mode === 'every-frame' ? 'every frame' : 'at playback speed'}
+                  </span>
+                </h3>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  <span className="text-zinc-400">Frames processed</span>
+                  <span className="text-zinc-400">
+                    {report.mode === 'every-frame' ? 'Frames analysed' : 'Frames processed'}
+                  </span>
                   <span className="text-right font-semibold text-white">{report.frames}</span>
                   <span className="text-zinc-400">Ball found in</span>
                   <span className="text-right font-semibold text-white">
@@ -708,9 +866,21 @@ export function DetectorBench() {
                   <span className="text-right font-semibold text-white">{Math.round(report.maxGapMs)} ms</span>
                   <span className="text-zinc-400">Gaps over {LOST_BALL_MS} ms</span>
                   <span className="text-right font-semibold text-white">{report.gapsOverLimit}</span>
-                  <span className="text-zinc-400">Processing rate</span>
+                  {/* Coverage and throughput are the same number at playback
+                      speed and come apart frame by frame, where the clip is no
+                      longer the clock. Coverage is the one that decides whether
+                      a crossing can be seen. */}
+                  <span className="text-zinc-400">Frames per second of footage</span>
+                  <span className="text-right font-semibold text-white">
+                    {(report.frames / Math.max(report.durationS, 0.001)).toFixed(1)}
+                  </span>
+                  <span className="text-zinc-400">Inference rate</span>
                   <span className="text-right font-semibold text-white">
                     {(report.frames / Math.max(report.wallClockS, 0.001)).toFixed(1)} fps
+                  </span>
+                  <span className="text-zinc-400">Took</span>
+                  <span className="text-right font-semibold text-white">
+                    {report.wallClockS.toFixed(0)}s for {report.durationS.toFixed(0)}s of clip
                   </span>
                 </div>
                 <p className="mt-2 text-xs text-zinc-500">
