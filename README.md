@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (39 files, 327 tests, 1 skipped)
+npm test            # vitest (40 files, 338 tests, 1 skipped)
 npm run build       # production build
 ```
 
@@ -195,7 +195,19 @@ pixel constant to tune per clip.
 
 Three-frame differencing is the default: two frames light up both where a fast
 ball was and where it is, and on this clip that counted one shot twice, 1.3s
-apart. It costs one frame of lag.
+apart. It costs one frame of lag, and it needs the ball to move further than its
+own width between frames — true in flight, false for a ball resting on the
+floor, which is the right behaviour.
+
+`ballTracker.ts` adds colour **without costing a tap**: shape and motion find
+the ball unaided, and the colours of the confident finds are collected until
+their median can sharpen later frames. On the clip above that lifted detections
+from 37.1% to 44.5% of frames and median ball-likeness from 0.553 to 0.630,
+while still calling 10 attempts with no guesses, having learned `rgb(87, 56,
+52)` by itself. It only learns from three-frame detections, because a two-frame
+mask also covers where the ball *was* — where the current frame shows wall, so
+the colour reads back as a blend (measured at 0.33 similarity to a ball that was
+a perfect match).
 
 Counts matching is not the same as the right shots matching, the rim was placed
 carefully by hand, and this is one clip in one hall with one ball. Treat it as

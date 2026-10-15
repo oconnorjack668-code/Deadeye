@@ -14,7 +14,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { spawnSync, spawn } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
-import { findBall, expectedBallDiameter } from '@/lib/video/motionBall';
+import { expectedBallDiameter } from '@/lib/video/motionBall';
+import { createBallTracker } from '@/lib/video/ballTracker';
 import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { ShotDetector, rimFromEdges } from '@/lib/video/shotDetector';
 
@@ -118,6 +119,9 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     let lastBallMs: number | null = null;
     const startedAt = Date.now();
 
+    const learnColour = process.env.DEADEYE_BENCH_LEARN === '1';
+    const tracker = createBallTracker({ expectedDiameter, learn: learnColour });
+
     /** Scores one frame against its neighbours and feeds the shot detector. */
     const measure = (
       prev: Uint8ClampedArray,
@@ -126,7 +130,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       next?: Uint8ClampedArray
     ) => {
       const videoMs = (index * 1000) / fps;
-      const found = findBall(prev, cur, CROP_CANVAS_PX, CROP_CANVAS_PX, { expectedDiameter }, next);
+      const found = tracker.track(prev, cur, CROP_CANVAS_PX, CROP_CANVAS_PX, next);
       if (!found) {
         shotDetector.push({ t: videoMs, ball: null });
         return;
@@ -173,6 +177,13 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       `rim             x=${rim.x.toFixed(4)} y=${rim.y.toFixed(4)} width=${rim.width.toFixed(4)} tilt=${(rim.tilt ?? 0).toFixed(3)}`,
       `crop            ${Math.round(crop.side)}px at (${Math.round(crop.sx)}, ${Math.round(crop.sy)}), ball expected ${expectedDiameter.toFixed(1)}px of ${CROP_CANVAS_PX}`,
       `differencing    ${threeFrame ? 'three frame' : 'two frame'}`,
+      `colour          ${
+        learnColour
+          ? tracker.colour()
+            ? `learned rgb(${Math.round(tracker.colour()!.r)}, ${Math.round(tracker.colour()!.g)}, ${Math.round(tracker.colour()!.b)}) from ${tracker.samples()} samples`
+            : `learning, only ${tracker.samples()} samples`
+          : 'not used'
+      }`,
       `frames          ${frames}`,
       `ball found in   ${framesWithBall} (${((framesWithBall / Math.max(frames, 1)) * 100).toFixed(1)}%)`,
       `ball-likeness   median ${median(scores).toFixed(3)}, best ${scores.length ? Math.max(...scores).toFixed(3) : '-'}`,
