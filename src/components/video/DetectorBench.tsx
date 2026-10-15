@@ -488,9 +488,14 @@ export function DetectorBench() {
       if (!ctx) throw new Error('Could not get a 2d canvas context.');
       let gain = 1;
 
-      // Previous crop, for the motion tracker. Null on the first frame, which
-      // is why it reports nothing there - there is no motion in one frame.
-      let prevPixels: Uint8ClampedArray | null = null;
+      // The motion tracker measures the MIDDLE of three frames, which reports
+      // where the ball is rather than where it was and is. Measured on a real
+      // clip that is the difference between 11 shots and the 10 actually taken:
+      // two-frame differencing counted one shot twice, 1.3s apart. The cost is
+      // one frame of lag, so the frame being scored is the previous one, and
+      // its own timestamp travels with it.
+      let older: Uint8ClampedArray | null = null;
+      let held: { pixels: Uint8ClampedArray; ms: number } | null = null;
 
       const pass = mode === 'every-frame' ? stepFrames : sweep;
       const how = await pass((v, videoMs, ts) => {
@@ -501,6 +506,9 @@ export function DetectorBench() {
 
         let box: { originX: number; originY: number; width: number; height: number } | null = null;
         let score = 0;
+        // The moment being measured. Equal to videoMs for the object model, one
+        // frame behind it for the motion tracker.
+        let atMs = videoMs;
 
         if (ballDetector) {
           const result = ballDetector.detectForVideo(canvas, ts);
@@ -511,13 +519,20 @@ export function DetectorBench() {
           score = best?.categories[0]?.score || 0;
         } else {
           const pixels = ctx.getImageData(0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX).data;
-          if (prevPixels) {
+          const measured = Boolean(older && held);
+          if (older && held) {
+            atMs = held.ms;
             // The rim is measured in frame pixels; the tracker works in the
             // crop canvas, so carry the scale across rather than guessing a size
             const rimOnCanvas = rim.width * v.videoWidth * (CROP_CANVAS_PX / crop.side);
-            const found = findBall(prevPixels, pixels, CROP_CANVAS_PX, CROP_CANVAS_PX, {
-              expectedDiameter: expectedBallDiameter(rimOnCanvas),
-            });
+            const found = findBall(
+              older,
+              held.pixels,
+              CROP_CANVAS_PX,
+              CROP_CANVAS_PX,
+              { expectedDiameter: expectedBallDiameter(rimOnCanvas) },
+              pixels
+            );
             if (found) {
               box = {
                 originX: found.x - found.diameter / 2,
@@ -528,7 +543,10 @@ export function DetectorBench() {
               score = found.score;
             }
           }
-          prevPixels = pixels;
+          older = held?.pixels ?? null;
+          held = { pixels, ms: videoMs };
+          // The first two frames have no middle to measure yet
+          if (!measured) return;
         }
         frames += 1;
 
@@ -536,15 +554,15 @@ export function DetectorBench() {
           framesWithBall += 1;
           scores.push(score);
           if (lastBallMs !== null) {
-            const gap = videoMs - lastBallMs;
+            const gap = atMs - lastBallMs;
             if (gap > maxGapMs) maxGapMs = gap;
             if (gap > LOST_BALL_MS) gapsOverLimit += 1;
           }
-          lastBallMs = videoMs;
+          lastBallMs = atMs;
         }
 
         shotDetector.push({
-          t: videoMs,
+          t: atMs,
           ball: box ? ballCentreInFrame(box, crop, v.videoWidth, v.videoHeight) : null,
         });
       });

@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (39 files, 327 tests)
+npm test            # vitest (39 files, 327 tests, 1 skipped)
 npm run build       # production build
 ```
 
@@ -92,6 +92,20 @@ the exchange in the callback and lands on `/login`.
 Owner-only tools live at `/admin`, reachable from the shield badge in the
 header. They include a detector benchmark for measuring shot detection against
 a real clip.
+
+The same measurement runs headlessly, with ffmpeg decoding the frames, which
+takes seconds rather than minutes and needs no browser or person:
+
+```bash
+DEADEYE_BENCH_CLIP=/path/to/clip.mp4 \
+DEADEYE_BENCH_RIM=0.5253,0.2194,0.5865,0.1991 \
+DEADEYE_BENCH_3FRAME=1 \
+npx vitest run __tests__/clipBench.test.ts
+```
+
+`DEADEYE_BENCH_RIM` is the two rim taps as `x,y,x,y` normalised to the frame.
+The test skips without those variables, so the normal gates are unaffected. Set
+`DEADEYE_BENCH_FFMPEG` if ffmpeg is not on PATH.
 
 ## Two deliberate design decisions
 
@@ -156,19 +170,36 @@ inference speed at the cost of running longer than the clip. The bench keeps
 both modes so the two can be compared on one clip, and labels every report with
 which produced it.
 
-**The COCO detector is probably the wrong tool, and there is a replacement in
-progress.** Measured on a real clip at every one of its 1540 frames, it found
-the ball in 7.1% of them at a median confidence of 0.246 against a 0.12 floor.
-The frames show why: a heavily motion-blurred maroon ball in dim indoor light,
-seams smeared away — outside what a model trained on sharp, mostly orange balls
-recognises. `src/lib/video/motionBall.ts` takes the opposite approach, finding
-the ball by what it does rather than what it looks like: the camera does not
-move, so differencing frames leaves only the player and the ball, and a ball is
-the small round one. Nothing in it assumes a colour — players' balls differ, and
-a tracker looking for orange would fail on the clip that prompted it. Size comes
-from the rim, which is already measured (a ball is ~0.53 of a rim's width), so
-there is no pixel constant to tune per clip. It is tested but not yet wired into
-the bench or the tracker.
+**The COCO object model is the wrong tool here, and `motionBall.ts` replaces
+it.** Measured on one real clip (2336×1080, 30 fps, 1540 frames, 10 attempts and
+5 makes by hand count), at every single frame:
+
+| | object model | motion, 2-frame | motion, 3-frame |
+|---|---|---|---|
+| ball found in | 7.1% | 60.8% | 37.1% |
+| longest blind gap | 11,067 ms | 3,364 ms | 3,598 ms |
+| attempts (10 real) | 5 | 11 | **10** |
+| makes (5 real) | 1 | 6 | 4 |
+| calls that were guesses | 4 of 5 | 0 of 11 | **0 of 10** |
+| time | 311 s | 14 s | 17 s |
+
+The frames show why the model struggles: a heavily motion-blurred maroon ball in
+dim indoor light, seams smeared away — outside what a model trained on sharp,
+mostly orange balls recognises. `motionBall.ts` finds the ball by what it does
+instead. The camera does not move, so differencing frames leaves the player and
+the ball and discards everything static, including a rim that happens to be the
+same colour as the ball. Nothing assumes a colour — players' balls differ, and a
+tracker looking for orange would fail on the clip that prompted it. Size comes
+from the rim, already measured (a ball is ~0.53 of a rim's width), so there is no
+pixel constant to tune per clip.
+
+Three-frame differencing is the default: two frames light up both where a fast
+ball was and where it is, and on this clip that counted one shot twice, 1.3s
+apart. It costs one frame of lag.
+
+Counts matching is not the same as the right shots matching, the rim was placed
+carefully by hand, and this is one clip in one hall with one ball. Treat it as
+"worth building on", not as an accuracy figure.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review
