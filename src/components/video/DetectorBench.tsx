@@ -68,6 +68,22 @@ function pct(n: number, d: number): string {
   return d > 0 ? `${Math.round((n / d) * 1000) / 10}%` : '–';
 }
 
+/**
+ * The top `limit` classes, always including "sports ball".
+ *
+ * The crop list was a plain slice(0, 8), and on a good crop the ball ranks
+ * below eight other classes - the backboard reads as a refrigerator, the
+ * shooter as a person - so the one class this whole page exists to measure was
+ * the one hidden. The summary above said 7.5% while the list appeared to show
+ * no ball at all.
+ */
+function withBall(classes: ClassStat[], limit: number): ClassStat[] {
+  const top = classes.slice(0, limit);
+  if (top.some((c) => c.label === 'sports ball')) return top;
+  const ball = classes.find((c) => c.label === 'sports ball');
+  return ball ? [...top.slice(0, limit - 1), ball] : top;
+}
+
 export function DetectorBench() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasVideo, setHasVideo] = useState(false);
@@ -418,7 +434,12 @@ export function DetectorBench() {
   const detectedMakes = report?.shots.filter((s) => s.made).length ?? 0;
   const ta = Number(trueAttempts);
   const tm = Number(trueMakes);
-  const haveTruth = trueAttempts !== '' && trueMakes !== '' && Number.isFinite(ta) && Number.isFinite(tm);
+  const truthEntered = trueAttempts !== '' && trueMakes !== '' && Number.isFinite(ta) && Number.isFinite(tm);
+  // You cannot make more than you take. Without this the comparison accepted
+  // "5 attempts, 10 makes" - two numbers typed into the wrong boxes - and
+  // reported the detector as 8 makes short of an impossible target.
+  const truthImpossible = truthEntered && (tm > ta || ta < 0 || tm < 0);
+  const haveTruth = truthEntered && !truthImpossible;
 
   return (
     <div className="space-y-4">
@@ -623,7 +644,7 @@ export function DetectorBench() {
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1">On the hoop crop</h4>
                   <div className="space-y-1 text-sm">
-                    {diagnosis.cropClasses.slice(0, 8).map((c) => (
+                    {withBall(diagnosis.cropClasses, 8).map((c) => (
                       <div key={c.label} className="flex items-center justify-between gap-2">
                         <span className={c.label === 'sports ball' ? 'font-bold text-emerald-400' : 'text-zinc-300'}>
                           {c.label}
@@ -739,6 +760,12 @@ export function DetectorBench() {
                     className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white"
                   />
                 </div>
+                {truthImpossible && (
+                  <p className="mt-2 text-xs font-semibold text-amber-400">
+                    That is more makes than attempts, so the comparison is hidden. Attempts goes in the left
+                    box, makes in the right.
+                  </p>
+                )}
                 {haveTruth && (
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
                     <span className="text-zinc-400">Attempts</span>
