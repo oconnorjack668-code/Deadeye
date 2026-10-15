@@ -11,7 +11,6 @@ const POSE_MODEL =
   'https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task';
 
 let filesetPromise: ReturnType<typeof FilesetResolver.forVisionTasks> | null = null;
-let ballDetectorPromise: Promise<ObjectDetector> | null = null;
 let posePromise: Promise<PoseLandmarker> | null = null;
 
 function fileset() {
@@ -41,7 +40,7 @@ async function withDelegate<T>(create: (delegate: 'GPU' | 'CPU') => Promise<T>):
 /**
  * An unfiltered detector, for working out what the model actually sees.
  *
- * getBallDetector() restricts results to the COCO "sports ball" class, so a
+ * createBallDetector() restricts results to the COCO "sports ball" class, so a
  * label mismatch, a model that cannot resolve a small fast ball, and a broken
  * inference pipeline are indistinguishable - all three show up as zero
  * detections. This one keeps every class at a very low threshold so the
@@ -60,18 +59,20 @@ export async function createDiagnosticDetector(): Promise<ObjectDetector> {
 }
 
 /**
- * A ball detector that is NOT shared.
+ * A ball detector, for the benchmark only.
  *
- * MediaPipe's VIDEO mode requires strictly increasing timestamps per detector
- * instance. The cached getBallDetector() below is shared by the live tracker
- * and the benchmark, and those feed it different clocks - the tracker uses
- * performance.now(), the benchmark uses video time that restarts at zero on
- * every run. Whichever went second handed the shared instance a timestamp that
- * went backwards, and MediaPipe aborted the whole graph:
+ * The live tracker no longer uses this. Measured against a real clip it found
+ * the ball in 7.1% of frames at a median confidence of 0.246, because a
+ * motion-blurred ball in dim light is outside what a model trained on sharp,
+ * mostly orange balls recognises; src/lib/video/motionBall.ts replaced it and
+ * reached 10 of 10 attempts on the same footage. It is kept so the bench can
+ * still run the comparison, and so that claim can be re-checked rather than
+ * taken on trust.
  *
- *   "Packet timestamp mismatch ... expected 27441001 but received 1000"
- *
- * Anything that replays a file from the start needs its own instance.
+ * Never cached. MediaPipe's VIDEO mode requires strictly increasing timestamps
+ * per instance, and anything that replays a file from the start restarts its
+ * clock - a shared instance aborted the whole graph with
+ * "Packet timestamp mismatch ... expected 27441001 but received 1000".
  */
 export async function createBallDetector(): Promise<ObjectDetector> {
   const vision = await fileset();
@@ -92,11 +93,6 @@ function ballOptions(delegate: 'GPU' | 'CPU') {
     maxResults: 5,
     categoryAllowlist: ['sports ball'],
   };
-}
-
-/** Shared instance for the live tracker, whose timestamps only ever go up. */
-export function getBallDetector(): Promise<ObjectDetector> {
-  return (ballDetectorPromise ??= createBallDetector());
 }
 
 export function getPoseLandmarker(): Promise<PoseLandmarker> {

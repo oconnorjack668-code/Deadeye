@@ -123,13 +123,16 @@ it is not the only lever.
 
 ## On-device video
 
-Shot tracking and form check run entirely in the browser via MediaPipe Tasks
-Vision — frames never leave the phone. Shot detection uses a general-purpose
-COCO object detector plus rim-crossing geometry, with the player confirming or
-correcting every call before it is saved.
+Shot tracking and form check run entirely in the browser — frames never leave
+the phone. Shot tracking is `motionBall.ts` plus rim-crossing geometry and needs
+no model at all, so it starts instantly and works offline; form check uses
+MediaPipe Tasks Vision for pose. The player confirms or corrects every call
+before it is saved.
 
-Detection runs on a **crop around the rim**, not the whole frame. The model
-takes a 320px square input, so a 2561px-wide clip was downscaled about 8× and a
+Detection runs on a **crop around the rim**, not the whole frame. This began as
+a fix for the object model's 320px square input, and it still earns its place:
+it keeps the pixel work to one small square however large the footage is, and it
+is what sizes the ball. A 2561px-wide clip was downscaled about 8× and a
 basketball landed on roughly a dozen pixels. Measured on real footage: the model
 scored `person` at 0.919 but `sports ball` at only 0.174 full-frame, rising to
 0.729 on the crop. The rim is measured from two taps — one on each side — rather

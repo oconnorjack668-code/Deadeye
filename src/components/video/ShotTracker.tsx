@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
+import { expectedBallDiameter } from '@/lib/video/motionBall';
+import { createBallTracker, type BallTracker } from '@/lib/video/ballTracker';
 import {
   loadSavedRims,
   storeSavedRims,
@@ -18,7 +20,6 @@ import {
 } from '@/lib/video/rimMemory';
 import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { localDateString } from '@/lib/dates';
-import { getBallDetector } from '@/lib/video/mediapipe';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import type { ShootingSummary } from '@/components/video/VideoAIFeedback';
 import { HighlightReel } from '@/components/video/HighlightReel';
@@ -310,15 +311,8 @@ export function ShotTracker({
     const video = videoRef.current;
     if (!video) return;
     setError(null);
-    setStatus('Loading the ball tracker (first time takes a few seconds)…');
-    let detector;
-    try {
-      detector = await getBallDetector();
-    } catch {
-      setStatus(null);
-      setError('Could not load the ball tracker. Check your connection and try again.');
-      return;
-    }
+    // No model to fetch any more: the tracker is pixel maths, so tracking can
+    // start the instant the rim is set, offline, with nothing downloaded.
     setStatus(null);
     setShots([]);
     setStep('tracking');
@@ -340,8 +334,17 @@ export function ShotTracker({
 
     const shotDetector = new ShotDetector(calibratedRim);
     const startedAt = performance.now();
-    let lastTs = -1;
     let nextId = 1;
+
+    // Three-frame differencing: the frame being scored is the middle one, so
+    // the newest frame is held back a turn. Measured on a real clip, two-frame
+    // counted one shot twice 1.3s apart where three-frame called 10 of the 10
+    // actually taken.
+    let older: Uint8ClampedArray | null = null;
+    let held: { pixels: Uint8ClampedArray; t: number } | null = null;
+    // Built on the first frame that has real dimensions: videoWidth is 0 until
+    // metadata loads, and the expected ball size is derived from it.
+    let ballTracker: BallTracker | null = null;
 
     if (source === 'file') {
       video.currentTime = 0;
@@ -356,28 +359,41 @@ export function ShotTracker({
         return;
       }
       if (video.readyState >= 2 && video.videoWidth > 0) {
-        // MediaPipe needs strictly increasing timestamps
-        const ts = Math.max(lastTs + 1, Math.round(performance.now()));
-        lastTs = ts;
-
-        // Detect on a crop around the hoop rather than the whole frame. The
-        // model takes a 320px square, so a 2561px-wide frame put the ball on
-        // about a dozen pixels and it scored 0.174 at best; the crop hands it
-        // the ball at a size it can actually resolve.
+        // Work on a crop around the hoop rather than the whole frame: it is
+        // what makes the ball big enough to measure, and it keeps the pixel
+        // work to a 320px square however large the footage is.
         const crop = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight);
         const canvas = cropCanvasRef.current;
         const ctx = canvas?.getContext('2d');
         if (!canvas || !ctx) return;
         ctx.drawImage(video, crop.sx, crop.sy, crop.side, crop.side, 0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX);
 
-        const result = detector.detectForVideo(canvas, ts);
-        const best = [...(result.detections || [])].sort(
-          (a, b) => (b.categories[0]?.score || 0) - (a.categories[0]?.score || 0)
-        )[0];
-        const box = best?.boundingBox;
+        if (!ballTracker) {
+          const rimOnCanvas = calibratedRim.width * video.videoWidth * (CROP_CANVAS_PX / crop.side);
+          ballTracker = createBallTracker({ expectedDiameter: expectedBallDiameter(rimOnCanvas) });
+        }
+
+        const now = source === 'file' ? video.currentTime * 1000 : performance.now() - startedAt;
+        const pixels = ctx.getImageData(0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX).data;
+        const ready = Boolean(older && held);
+        const found =
+          older && held ? ballTracker.track(older, held.pixels, CROP_CANVAS_PX, CROP_CANVAS_PX, pixels) : null;
+        // The moment just scored is the middle frame's, not this one's
+        const t = held ? held.t : now;
+        older = held?.pixels ?? null;
+        held = { pixels, t: now };
+
         // Crop pixels back to whole-frame fractions, so everything downstream
         // keeps working in the coordinate space it always used.
         const scale = crop.side / CROP_CANVAS_PX;
+        const box = found
+          ? {
+              originX: found.x - found.diameter / 2,
+              originY: found.y - found.diameter / 2,
+              width: found.diameter,
+              height: found.diameter,
+            }
+          : null;
         const centre = box ? ballCentreInFrame(box, crop, video.videoWidth, video.videoHeight) : null;
         const ball =
           box && centre
@@ -388,8 +404,8 @@ export function ShotTracker({
                 y: centre.y - (box.height * scale) / video.videoHeight / 2,
               }
             : null;
-        const t = source === 'file' ? video.currentTime * 1000 : performance.now() - startedAt;
-        const shot = shotDetector.push({ t, ball: centre });
+        // Nothing has been scored until three frames have arrived
+        const shot = ready ? shotDetector.push({ t, ball: centre }) : null;
         if (shot) {
           setShots((cur) => [...cur, { ...shot, id: nextId++ }]);
           navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
