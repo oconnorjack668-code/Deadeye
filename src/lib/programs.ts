@@ -47,6 +47,59 @@ export function sortDays<T extends { week: number; day: number }>(days: T[]): T[
   return [...days].sort((a, b) => a.week - b.week || a.day - b.day);
 }
 
+/**
+ * The phase a week belongs to, from its focus text, or null.
+ *
+ * The content already names these - "Week 1 (Foundation): test standing..." -
+ * and nothing ever showed them, so a player saw an undifferentiated list of
+ * weeks. The single named reason people abandon a training plan is that it
+ * stops feeling like it is going anywhere, and a plan that says Foundation,
+ * then Build, then Peak is visibly going somewhere.
+ */
+export function weekPhase(focus: string): string | null {
+  const match = /^Week\s+\d+\s*\(([^)]+)\)/i.exec(focus.trim());
+  return match ? match[1].trim() : null;
+}
+
+export interface WeekSummary {
+  week: number;
+  sessions: number;
+  minutes: number;
+  phase: string | null;
+  /** Minutes against week one, as a multiple. 1 means no change. */
+  loadVsFirst: number;
+}
+
+/**
+ * Per-week shape of a program, so the arc can be shown rather than asserted.
+ *
+ * Minutes are the honest escalation signal available from the data as it
+ * stands: they come from estimated_minutes on each day and need no new content.
+ * A program whose weeks are all the same length will show exactly that, which
+ * is the point - this reports the arc, it does not invent one.
+ */
+export function weekSummaries<T extends { week: number; day: number; focus: string; estimated_minutes: number }>(
+  days: T[]
+): WeekSummary[] {
+  const byWeek = new Map<number, T[]>();
+  for (const d of sortDays(days)) {
+    const list = byWeek.get(d.week) || [];
+    list.push(d);
+    byWeek.set(d.week, list);
+  }
+  const weeks = [...byWeek.entries()].sort((a, b) => a[0] - b[0]);
+  const minutesOf = (list: T[]) => list.reduce((sum, d) => sum + (d.estimated_minutes || 0), 0);
+  const firstMinutes = weeks.length ? minutesOf(weeks[0][1]) : 0;
+
+  return weeks.map(([week, list]) => ({
+    week,
+    sessions: list.length,
+    minutes: minutesOf(list),
+    phase: list.map((d) => weekPhase(d.focus)).find((p): p is string => p !== null) ?? null,
+    loadVsFirst: firstMinutes > 0 ? minutesOf(list) / firstMinutes : 1,
+  }));
+}
+
 /** The first day (in week/day order) that hasn't been completed, or null when the program is finished. */
 export function nextDay<T extends { id: string; week: number; day: number }>(days: T[], completedIds: Set<string>): T | null {
   return sortDays(days).find((d) => !completedIds.has(d.id)) || null;

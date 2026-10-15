@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { GOAL_LABELS, getActiveProgram, sortDays, type ProgramDay } from '@/lib/programs';
+import { GOAL_LABELS, getActiveProgram, sortDays, weekSummaries, type ProgramDay } from '@/lib/programs';
 import { EnrollButton } from './EnrollButton';
 import { ArrowLeft, CheckCircle2, Circle, Clock } from 'lucide-react';
 
@@ -29,6 +29,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
   const completed = isActive ? active!.completedIds : new Set<string>();
 
   const weeks = Array.from({ length: program.weeks }, (_, i) => days.filter((d) => d.week === i + 1));
+  const summaries = weekSummaries(days);
 
   return (
     <div className="flex-1 overflow-auto">
@@ -58,9 +59,27 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
         </div>
 
         <div className="space-y-4">
-          {weeks.map((weekDays, i) => (
+          {weeks.map((weekDays, i) => {
+            const summary = summaries.find((s) => s.week === i + 1);
+            return (
             <div key={i}>
-              <h2 className="text-sm font-bold uppercase text-zinc-400 mb-2">Week {i + 1}</h2>
+              {/* The phase and the load, not just a week number. A plan that
+                  reads Foundation, then Build, then Peak is visibly going
+                  somewhere; an undifferentiated list of weeks is the thing
+                  people abandon around week eight. Shows the real figures, so
+                  a flat week reads as flat rather than being dressed up. */}
+              <h2 className="mb-2 flex flex-wrap items-baseline gap-x-2 text-sm font-bold uppercase text-zinc-400">
+                Week {i + 1}
+                {summary?.phase && <span className="text-orange-400">{summary.phase}</span>}
+                {summary && summary.minutes > 0 && (
+                  <span className="font-normal normal-case tracking-normal text-zinc-500">
+                    {summary.sessions} session{summary.sessions === 1 ? '' : 's'} · {summary.minutes} min
+                    {summary.loadVsFirst > 1.05 && (
+                      <span className="text-emerald-400"> · {Math.round((summary.loadVsFirst - 1) * 100)}% on week 1</span>
+                    )}
+                  </span>
+                )}
+              </h2>
               <div className="space-y-2">
                 {weekDays.map((d) => (
                   <Link
@@ -86,7 +105,8 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
                 ))}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
