@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   ShotDetector,
+  crossingFromTrack,
   rimFromEdges,
   rimTapProblem,
   rimYAt,
@@ -114,6 +115,61 @@ describe('rimFromEdges', () => {
     }
     expect(d.shots).toHaveLength(1);
     expect(d.shots[0].made).toBe(true);
+  });
+});
+
+describe('crossingFromTrack', () => {
+  const rim = { x: 0.5, y: 0.3, width: 0.1 };
+
+  /** A straight descent crossing rim height at a chosen x. */
+  const descent = (crossAt: number, dxPerMs: number) =>
+    Array.from({ length: 5 }, (_, i) => {
+      const t = i * 33;
+      const dt = t - 132; // last point sits at rim height
+      return { t, x: crossAt + dxPerMs * dt, y: 0.3 + 0.0008 * dt };
+    });
+
+  it('finds where a clean descent meets the rim', () => {
+    expect(crossingFromTrack(descent(0.5, 0.0002), rim)).toBeCloseTo(0.5, 3);
+  });
+
+  it('is barely moved by one badly centred ball', () => {
+    // The case this exists for: with two-point interpolation a single stray
+    // centre decides the make outright.
+    const points = descent(0.5, 0.0002);
+    const noisy = points.map((p, i) => (i === 2 ? { ...p, x: p.x + 0.05 } : p));
+    const fitted = crossingFromTrack(noisy, rim)!;
+    expect(Math.abs(fitted - 0.5)).toBeLessThan(0.02);
+  });
+
+  it('follows the rim tilt when working out where the path meets it', () => {
+    // Off-centre on purpose: at rim.x the rim sits at rim.y whatever its tilt,
+    // so a crossing there cannot tell the two apart.
+    const level = crossingFromTrack(descent(0.56, 0.0006), { ...rim, tilt: 0 })!;
+    const tilted = crossingFromTrack(descent(0.56, 0.0006), { ...rim, tilt: -0.3 })!;
+    expect(level).toBeCloseTo(0.56, 3);
+    // A rim that drops away to the right is met earlier, and so further left
+    expect(tilted).toBeLessThan(level - 0.005);
+  });
+
+  it('declines when there is too little to fit', () => {
+    expect(crossingFromTrack(descent(0.5, 0.0002).slice(0, 2), rim)).toBeNull();
+  });
+
+  it('declines when the ball is not descending towards the rim', () => {
+    const rising = descent(0.5, 0.0002).map((p) => ({ ...p, y: 0.3 - 0.0008 * (p.t - 132) }));
+    expect(crossingFromTrack(rising, rim)).toBeNull();
+  });
+
+  it('declines when every sighting lands on the same instant', () => {
+    const frozen = descent(0.5, 0.0002).map((p) => ({ ...p, t: 100 }));
+    expect(crossingFromTrack(frozen, rim)).toBeNull();
+  });
+
+  it('declines a crossing far outside the stretch it saw', () => {
+    // Barely descending, so the rim is a long way off in time
+    const shallow = descent(0.5, 0.0002).map((p) => ({ ...p, y: 0.1 + 0.000002 * (p.t - 132) }));
+    expect(crossingFromTrack(shallow, rim)).toBeNull();
   });
 });
 

@@ -118,6 +118,82 @@ export interface DetectedShot {
   confident: boolean; // false when the result was inferred without seeing the ball cross the rim
 }
 
+/**
+ * How many recent sightings the crossing is fitted to.
+ *
+ * Two points - the last one above the rim and the first at or below it - is the
+ * least evidence the crossing can be computed from, and it puts the whole
+ * make-or-miss call on the precision of exactly two ball centres. Fitting a
+ * short track instead lets one noisy centre be outvoted.
+ */
+export const TRACK_POINTS = 6;
+
+/**
+ * Longest run of sightings worth fitting, in ms.
+ *
+ * A line is only a fair description of the path over a short stretch. Reaching
+ * further back picks up the top of the arc, where the ball is still rising, and
+ * bends the fit away from the descent that matters.
+ */
+export const TRACK_WINDOW_MS = 220;
+
+/** Fewest points before a fit is preferred to plain interpolation. */
+export const MIN_FIT_POINTS = 3;
+
+export interface TrackPoint {
+  t: number;
+  x: number;
+  y: number;
+}
+
+/**
+ * Where a short ball track crosses the rim line, as an x in frame units.
+ *
+ * Fits x and y against time by least squares and solves for the moment the
+ * ball's depth below the rim line reaches zero. Straight lines rather than a
+ * parabola on purpose: across the ~200ms either side of the rim, gravity bends
+ * the path by far less than detection noise moves a single centre, so a
+ * quadratic mostly fits the noise and costs the stability this is for.
+ *
+ * Returns null when the points do not describe a crossing, leaving the caller
+ * to fall back to interpolating between its two nearest observations.
+ */
+export function crossingFromTrack(points: TrackPoint[], rim: Rim): number | null {
+  if (points.length < MIN_FIT_POINTS) return null;
+  const n = points.length;
+  // Time relative to the last point, so the numbers stay small and well scaled
+  const t0 = points[n - 1].t;
+  const ts = points.map((p) => p.t - t0);
+  const meanT = ts.reduce((a, b) => a + b, 0) / n;
+  let varT = 0;
+  for (const t of ts) varT += (t - meanT) ** 2;
+  // Every sighting at the same instant carries no velocity
+  if (varT < 1e-9) return null;
+
+  const slopeOf = (values: number[]) => {
+    const mean = values.reduce((a, b) => a + b, 0) / n;
+    let cov = 0;
+    for (let i = 0; i < n; i++) cov += (ts[i] - meanT) * (values[i] - mean);
+    return { slope: cov / varT, intercept: mean - (cov / varT) * meanT };
+  };
+
+  const fx = slopeOf(points.map((p) => p.x));
+  const fy = slopeOf(points.map((p) => p.y));
+  const tilt = rim.tilt ?? 0;
+
+  // depth(t) = y(t) - rimYAt(x(t)), which is linear in t given linear x and y
+  const depthSlope = fy.slope - fx.slope * tilt;
+  const depthAt0 = fy.intercept - rim.y - (fx.intercept - rim.x) * tilt;
+  // A ball that is not descending relative to the rim never crosses it
+  if (depthSlope <= 1e-9) return null;
+
+  const tCross = -depthAt0 / depthSlope;
+  // Only trust a crossing inside, or just beyond, the stretch actually seen
+  const earliest = ts[0] - TRACK_WINDOW_MS;
+  if (tCross < earliest || tCross > TRACK_WINDOW_MS) return null;
+  return fx.intercept + fx.slope * tCross;
+}
+
 const COOLDOWN_MS = 1200; // ignore rim bounces / put-backs right after a decision
 const LOST_BALL_MS = 1500; // armed shot with the ball out of view this long -> miss
 const MAX_FLIGHT_MS = 3500;
@@ -126,6 +202,8 @@ const APPROACH_WIDTHS = 3; // ball must be within this many rim widths sideways 
 export class ShotDetector {
   private armedAt: number | null = null;
   private lastAbove: { t: number; x: number; y: number } | null = null;
+  /** Recent sightings, newest last, for fitting the crossing. */
+  private track: TrackPoint[] = [];
   private lastSeen = 0;
   private cooldownUntil = 0;
   readonly shots: DetectedShot[] = [];
@@ -152,6 +230,12 @@ export class ShotDetector {
 
     const { x, y } = obs.ball;
     this.lastSeen = obs.t;
+    this.track.push({ t: obs.t, x, y });
+    // Keep it short in both count and time: an old sighting from the top of
+    // the arc would bend the fit away from the descent being measured.
+    while (this.track.length > TRACK_POINTS || (this.track.length > 1 && obs.t - this.track[0].t > TRACK_WINDOW_MS)) {
+      this.track.shift();
+    }
     const sideways = Math.abs(x - rim.x);
     // How far below the rim line the ball is, at the ball's own x. Negative is
     // above it. Every test below is in terms of this rather than a flat `y`, so
@@ -176,7 +260,11 @@ export class ShotDetector {
       const prevDepth = prev.y - rimYAt(rim, prev.x);
       const closed = prevDepth - depth;
       const fraction = Math.abs(closed) < 1e-6 ? 1 : prevDepth / closed;
-      const crossX = prev.x + (x - prev.x) * Math.min(1, Math.max(0, fraction));
+      const interpolated = prev.x + (x - prev.x) * Math.min(1, Math.max(0, fraction));
+      // Fitted across the recent track where there is enough of it, so one
+      // badly centred ball cannot decide a make on its own; otherwise the two
+      // nearest sightings, which is all there is to go on.
+      const crossX = crossingFromTrack(this.track, rim) ?? interpolated;
       const throughRim = Math.abs(crossX - rim.x) <= halfRim * 1.1;
       const confident = obs.t - prev.t <= 250;
       return this.decide(obs.t, throughRim, confident);
@@ -193,6 +281,10 @@ export class ShotDetector {
     this.shots.push(shot);
     this.armedAt = null;
     this.lastAbove = null;
+    // The next shot must be fitted to its own flight, not to the tail of this
+    // one's: sightings of a ball dropping out of the net describe nothing
+    // about the shot that follows.
+    this.track = [];
     this.cooldownUntil = t + COOLDOWN_MS;
     return shot;
   }
