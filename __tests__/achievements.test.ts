@@ -50,18 +50,43 @@ describe('achievements', () => {
 
   it('computes longest and current streaks', () => {
     const days = ['2026-09-01', '2026-09-02', '2026-09-03', '2026-09-10', '2026-09-23', '2026-09-24'];
-    // Trained yesterday but not today: the streak stands, and is at risk
-    expect(streaks(days, '2026-09-25')).toEqual({ longest: 3, current: 2, atRisk: true });
+    // Trained yesterday but not today: the rest day is being used, not spent
+    expect(streaks(days, '2026-09-25')).toEqual({ longest: 3, current: 2, atRisk: false });
     // Trained today: safe
     expect(streaks(days, '2026-09-24')).toEqual({ longest: 3, current: 2, atRisk: false });
+    // Two days since: rest day spent, so today is the last chance
+    expect(streaks(days, '2026-09-26')).toEqual({ longest: 3, current: 2, atRisk: true });
+    // Three days since: two missed in a row, gone
     expect(streaks(days, '2026-09-27').current).toBe(0);
+  });
+
+  it('lets a rest day through but not two', () => {
+    // The rule the app's own advice depends on: trainingLoad tells a player to
+    // rest after six straight days, so the streak must survive taking it.
+    const everyOtherDay = ['2026-09-20', '2026-09-22', '2026-09-24', '2026-09-26'];
+    expect(streaks(everyOtherDay, '2026-09-26').current).toBe(4);
+    // Counts days trained, not days elapsed - this run spans a week
+    expect(streaks(everyOtherDay, '2026-09-26').longest).toBe(4);
+
+    const twoOff = ['2026-09-20', '2026-09-21', '2026-09-24', '2026-09-25'];
+    expect(streaks(twoOff, '2026-09-25')).toMatchObject({ longest: 2, current: 2 });
+  });
+
+  it('can be told to allow no rest at all', () => {
+    const days = ['2026-09-20', '2026-09-22', '2026-09-24'];
+    expect(streaks(days, '2026-09-24', 0)).toMatchObject({ longest: 1, current: 1 });
   });
 
   it('only flags a streak at risk when there is one to lose', () => {
     const days = ['2026-09-23', '2026-09-24'];
     // No streak left at all - nothing to warn about
-    expect(streaks(days, '2026-09-27')).toEqual({ longest: 2, current: 0, atRisk: false });
+    expect(streaks(days, '2026-09-28')).toEqual({ longest: 2, current: 0, atRisk: false });
     // Never trained
     expect(streaks([], '2026-09-27')).toEqual({ longest: 0, current: 0, atRisk: false });
+  });
+
+  it('ignores a date in the future rather than counting it', () => {
+    // A clock-skewed device, or a session logged with tomorrow's date
+    expect(streaks(['2026-09-30'], '2026-09-25').current).toBe(0);
   });
 });

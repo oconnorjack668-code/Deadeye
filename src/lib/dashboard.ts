@@ -54,10 +54,14 @@ export function computeDashboardMetrics(input: MetricsInput): DashboardMetrics {
   // rule as the leaderboard, rank card, friends list and Goals page
   // The database knows the whole history; the windowed dates only reach back
   // HISTORY_WINDOW_DAYS. atRisk is answered from the dates either way, since it
-  // only asks whether today has anything logged.
+  // only looks at the last day or two.
   const windowed = streaks(trainingDays, today);
   const current = input.dbStreaks ? input.dbStreaks.current : windowed.current;
-  const atRisk = current > 0 && !new Set(trainingDays).has(today);
+  // Taken from streaks() rather than recomputed here, so the warning follows
+  // the same rest-day rule as the streak it is warning about. It used to fire
+  // whenever nothing was logged *yet today*, which now means it would go off
+  // on a rest day the app itself recommends.
+  const atRisk = current > 0 && windowed.atRisk;
   const weekTrainingDays = new Set(trainingDays.filter((d) => d >= weekStart && d <= today)).size;
   const since = addDays(today, -(CONSISTENCY_DAYS - 1));
   const activeDays = new Set(trainingDays.filter((d) => d >= since && d <= today)).size;

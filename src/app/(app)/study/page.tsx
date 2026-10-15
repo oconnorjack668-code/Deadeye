@@ -82,7 +82,9 @@ export default async function StudyPage() {
   const answers = dailyRows || [];
   const todaysAnswer = answers.find((a) => a.answer_date === today) || null;
   const answeredDates = answers.map((a) => a.answer_date);
-  // The run of consecutive days answered, counting back from today or yesterday
+  // The run of days answered, which survives one missed day - the same rest-day
+  // rule as the training streak, because a teenager with an exam tomorrow drops
+  // both for the same reason.
   const dailyStreak = streaks(answeredDates, today).current;
 
   let daily: DailyQuestionView | null = null;

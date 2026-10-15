@@ -107,33 +107,72 @@ export function rankFor(xp: number): { name: string; next: { name: string; min: 
 }
 
 /**
- * Longest and current run of consecutive training days (current counts from
- * today or yesterday), plus whether the streak is live but unprotected.
+ * Days a streak survives without anything logged.
  *
- * `atRisk` is true when the player has a streak going and has not trained
- * today, so the app can say "train today to keep your 6-day streak" while
- * there is still time. A streak that only ever tells you after it broke is
+ * One, so a rest day does not break a streak. A daily streak in a training app
+ * is a mechanic arguing with itself: trainingLoad.ts tells a player to rest
+ * after six straight days, and a streak that then punishes the rest it was just
+ * advised to take teaches them to ignore one or the other. Forgiveness is also
+ * what makes the mechanic work at all - Duolingo's streak freeze produces
+ * roughly four and a half times longer streaks by three weeks in - and the
+ * players here are teenagers with exams, and GAA or soccer the same evening.
+ *
+ * Two missed days in a row still breaks it. The streak has to mean something.
+ */
+export const STREAK_REST_DAYS = 1;
+
+/**
+ * Longest and current run of training days, plus whether the streak is live
+ * but unprotected.
+ *
+ * Counts days trained, not days elapsed: a run of Mon/Wed/Fri is 3, not 5. A
+ * number inflated by the days off would be a worse thing to show a player than
+ * a smaller honest one.
+ *
+ * `atRisk` is true when the streak will actually end unless they train today -
+ * that is, they have already used their rest day. Warning every time someone
+ * has not trained *yet today* would cry wolf daily and get ignored, which is
  * the version of this mechanic that makes people quit.
  */
-export function streaks(days: string[], today: string): { longest: number; current: number; atRisk: boolean } {
+export function streaks(
+  days: string[],
+  today: string,
+  restDays: number = STREAK_REST_DAYS
+): { longest: number; current: number; atRisk: boolean } {
   const set = new Set(days);
   const sorted = [...set].sort();
   const dayMs = 86_400_000;
   const toMs = (d: string) => Date.parse(`${d}T00:00:00Z`);
+  // A gap this size or smaller keeps a run alive: +1 because consecutive days
+  // are already 1 apart, so one rest day means a gap of 2.
+  const maxGapMs = (restDays + 1) * dayMs;
+
   let longest = 0;
   let run = 0;
   let prev: number | null = null;
   for (const d of sorted) {
     const ms = toMs(d);
-    run = prev !== null && ms - prev === dayMs ? run + 1 : 1;
+    run = prev !== null && ms - prev <= maxGapMs ? run + 1 : 1;
     longest = Math.max(longest, run);
     prev = ms;
   }
+
+  // Walk back from the most recent training day, counting days trained while
+  // the gaps stay inside the allowance.
+  const last = sorted.length ? toMs(sorted[sorted.length - 1]) : null;
+  const sinceLast = last === null ? Infinity : toMs(today) - last;
   let current = 0;
-  let cursor = set.has(today) ? toMs(today) : toMs(today) - dayMs;
-  while (set.has(new Date(cursor).toISOString().slice(0, 10))) {
-    current++;
-    cursor -= dayMs;
+  if (last !== null && sinceLast >= 0 && sinceLast <= maxGapMs) {
+    current = 1;
+    let cursor = last;
+    for (let i = sorted.length - 2; i >= 0; i--) {
+      const ms = toMs(sorted[i]);
+      if (cursor - ms > maxGapMs) break;
+      current++;
+      cursor = ms;
+    }
   }
-  return { longest, current, atRisk: current > 0 && !set.has(today) };
+
+  // Only once the rest day is spent: train today or the run ends
+  return { longest, current, atRisk: current > 0 && sinceLast === maxGapMs };
 }

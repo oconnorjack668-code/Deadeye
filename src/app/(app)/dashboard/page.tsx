@@ -239,7 +239,9 @@ export default async function DashboardPage() {
           />
 
           {/* A streak that only tells you after it broke is the version of this
-              mechanic that makes people quit. Warn while it can still be saved. */}
+              mechanic that makes people quit. Warn while it can still be saved -
+              but only when it is genuinely at risk, which with a rest day
+              allowed is not every day the player has yet to train. */}
           <StatCard
             label="Streak"
             value={metrics.currentStreak}
@@ -248,9 +250,9 @@ export default async function DashboardPage() {
             valueClass={metrics.streakAtRisk ? 'text-amber-400' : 'text-emerald-400'}
             hint={
               metrics.streakAtRisk
-                ? 'Train today to keep it'
+                ? 'Rest day used - train today to keep it'
                 : metrics.currentStreak > 0
-                  ? 'Safe for today'
+                  ? 'Safe - a rest day will not break it'
                   : 'Train today to start one'
             }
           />

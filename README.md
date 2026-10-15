@@ -15,7 +15,7 @@ npm run dev
 ```
 
 You need a Supabase project. Create one, then apply everything in
-`supabase/migrations/` in filename order (30 migrations) via the Supabase SQL
+`supabase/migrations/` in filename order (31 migrations) via the Supabase SQL
 editor or the Supabase CLI, then `supabase/seed.sql`. Every migration is safe
 to re-run: policies are dropped before they are created, tables and indexes use
 `IF NOT EXISTS`, and content inserts skip rows that already exist.
@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (40 files, 338 tests, 1 skipped)
+npm test            # vitest (41 files, 342 tests, 1 skipped)
 npm run build       # production build
 ```
 
@@ -113,7 +113,18 @@ directions while leaving the total unmoved — which has happened once already.
 The test skips without those variables, so the normal gates are unaffected. Set
 `DEADEYE_BENCH_FFMPEG` if ffmpeg is not on PATH.
 
-## Two deliberate design decisions
+## Three deliberate design decisions
+
+**A streak survives one rest day.** `STREAK_REST_DAYS` in
+`src/lib/achievements.ts`, matched by `my_training_streaks()` in migration
+`00031` — the two must agree, because the dashboard takes the count from the
+database and decides "at risk" in TypeScript. A daily streak in a training app
+is otherwise a mechanic arguing with itself: `trainingLoad.ts` advises rest
+after six straight days, and the streak then punished the rest it had just
+recommended. Two missed days still breaks it, and the count is days *trained*,
+not days elapsed, so Mon/Wed/Fri is 3 rather than 5. "At risk" now fires only
+once the rest day is spent, instead of every day the player had yet to train —
+a warning that appears daily is one nobody reads.
 
 **Fuel tracking is habits, not calories.** `fuel_logs` records whether you ate
 before and after training, water, sleep and energy — there is no intake total in

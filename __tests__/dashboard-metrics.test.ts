@@ -68,11 +68,11 @@ describe('dashboard metrics', () => {
   });
 
   it('still knows the streak is at risk when the count came from the database', () => {
-    // Today has nothing logged, so the streak is live but unprotected - and that
-    // is answered from the dates, not from the database count.
+    // Two days since the last session, so the rest day is spent and today is
+    // the last chance. Answered from the dates, not the database count.
     const atRisk = computeDashboardMetrics({
       ...base,
-      sessionDates: ['2026-09-23'],
+      sessionDates: ['2026-09-22'],
       workoutDates: [],
       dbStreaks: { longest: 900, current: 900 },
     });
@@ -85,6 +85,18 @@ describe('dashboard metrics', () => {
       dbStreaks: { longest: 900, current: 900 },
     });
     expect(safe.streakAtRisk).toBe(false);
+  });
+
+  it('does not nag on a rest day it would itself recommend', () => {
+    // Trained yesterday, nothing logged yet today. The old rule warned here,
+    // every single day, which is how a warning gets ignored.
+    const resting = computeDashboardMetrics({
+      ...base,
+      sessionDates: ['2026-09-23'],
+      workoutDates: [],
+      dbStreaks: { longest: 900, current: 900 },
+    });
+    expect(resting.streakAtRisk).toBe(false);
   });
 
   it('career shooting % comes from the zone totals', () => {
