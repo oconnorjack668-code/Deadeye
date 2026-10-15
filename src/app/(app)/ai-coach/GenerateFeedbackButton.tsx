@@ -35,7 +35,10 @@ export function GenerateFeedbackButton({ sessionId, disabled }: { sessionId: str
   return (
     <div className="text-right space-y-1">
       <Button variant="primary" size="sm" onClick={handleClick} isLoading={loading} disabled={disabled || loading}>
-        {loading ? 'Analyzing...' : 'Get AI feedback'}
+        {/* Not "Analyzing…", which is the exact word reviewers of other apps'
+            AI coaches single out as sounding like a machine thinking about
+            them. This says what it is actually doing. */}
+        {loading ? 'Reading your session…' : 'Get AI feedback'}
       </Button>
       {error && <p className="text-xs text-red-400 max-w-[16rem]">{error}</p>}
     </div>

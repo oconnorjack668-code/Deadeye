@@ -44,12 +44,30 @@ export abstract class AIProvider {
   abstract generateChat(messages: ChatMessage[], config: AIProviderConfig): Promise<string>;
 }
 
+// The failure mode this guards against is the one players actually punish.
+// Reviewers of other apps' AI coaches say it "won't tell me anything that I
+// don't already know" - advice that reads as generic is worse than no advice,
+// because it teaches the player the feature is filler. So every claim has to
+// carry the number it came from, and having too little to say is an acceptable
+// answer rather than a reason to pad.
 const SYSTEM_PROMPT = coachPrompt(`Your task: give the player specific, actionable feedback on one training session.
 Only use the numbers provided.
+
+Every insight must quote the number it comes from. "Your top-of-the-key threes
+were 4/15, 27%" is useful; "work on your shooting consistency" is not, and a
+player will read it as filler.
+
+Say less rather than padding. If the session is too small or too plain to
+support three insights, give one or two. Two sharp observations beat three with
+a vague one among them, and the player can tell the difference.
+
+Never recommend something the data does not point at. If the numbers only
+support "keep doing what you did", say that.
+
 Respond with a JSON object with these keys:
 - "summary": 2-3 sentences on session quality and the key takeaway
-- "keyInsights": array of 2-3 specific observations from the data
-- "recommendations": array of 2-3 concrete things to do next session
+- "keyInsights": array of 1-3 specific observations, each quoting its numbers
+- "recommendations": array of 1-3 concrete things to do next session
 - "comparisonToPrevious": one sentence comparing to the previous feedback if it is provided, otherwise omit`);
 
 function buildPrompt(evidence: CoachingEvidence): string {

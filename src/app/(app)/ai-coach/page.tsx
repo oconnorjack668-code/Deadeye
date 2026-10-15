@@ -57,6 +57,30 @@ export default async function AICoachPage() {
 
   const reviewedSessionIds = new Set(reports?.flatMap((r) => r.source_session_ids || []) || []);
 
+  // Every report links back to the session it was written from. An AI claim a
+  // player cannot trace to their own logged numbers is indistinguishable from
+  // one that was invented, and that is the complaint that sinks these features
+  // elsewhere - advice that "won't tell me anything I don't already know",
+  // with no way to check where it came from.
+  const citedIds = [...new Set(reports?.flatMap((r) => r.source_session_ids || []) || [])];
+  const { data: citedSessions } = citedIds.length
+    ? await supabase
+        .from('training_sessions')
+        .select('id, session_date, session_type, duration_minutes')
+        .eq('user_id', user.id)
+        .in('id', citedIds)
+    : { data: [] as Array<{ id: string; session_date: string; session_type: string; duration_minutes: number }> };
+  const sessionById = new Map((citedSessions || []).map((s) => [s.id, s]));
+
+  // How much there is to reason from. A coach with two sessions of history
+  // cannot spot a trend, and saying so is more useful than a confident
+  // paragraph built on nothing.
+  const { count: totalSessions } = await supabase
+    .from('training_sessions')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id);
+  const thinHistory = (totalSessions || 0) < 3;
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
@@ -128,6 +152,17 @@ export default async function AICoachPage() {
             {outOfCredits && (
               <p className="text-sm text-amber-400">You&apos;ve used all your free AI credits. <Link href="/pro" className="underline">Get unlimited with Pro</Link></p>
             )}
+            {/* Said before they spend a credit, not after they read a thin
+                report: with one session there is nothing to compare against,
+                and a coach that admits that is worth more than one that writes
+                a confident paragraph anyway. */}
+            {thinHistory && (
+              <p className="text-sm text-zinc-400">
+                Feedback on a single session can only talk about that session. Log{' '}
+                {3 - (totalSessions || 0)} more and Coach can start comparing them and spotting what is
+                actually changing.
+              </p>
+            )}
             {sessions.map((session) => (
               <Card key={session.id} className="border-zinc-800 bg-zinc-900/70">
                 <CardContent className="p-4 flex items-center justify-between gap-4">
@@ -190,6 +225,35 @@ export default async function AICoachPage() {
                       <p className="font-semibold text-white">{output.summary}</p>
                       {output.comparisonToPrevious && (
                         <p className="text-sm text-zinc-400">{output.comparisonToPrevious}</p>
+                      )}
+                      {/* The receipts: which of the player's own sessions this
+                          was written from, tappable so the numbers behind any
+                          claim are one touch away. */}
+                      {(report.source_session_ids || []).length > 0 && (
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-1">
+                          <span className="text-xs text-zinc-500">Read from</span>
+                          {(report.source_session_ids || []).map((sid: string) => {
+                            const s = sessionById.get(sid);
+                            return s ? (
+                              <Link
+                                key={sid}
+                                href={`/basketball/${sid}`}
+                                className="text-xs font-semibold text-cyan-400 underline underline-offset-2 hover:text-cyan-300"
+                              >
+                                {new Date(`${s.session_date}T00:00:00`).toLocaleDateString('en-IE', {
+                                  weekday: 'short',
+                                  day: 'numeric',
+                                  month: 'short',
+                                })}{' '}
+                                · {s.duration_minutes} min
+                              </Link>
+                            ) : (
+                              <span key={sid} className="text-xs text-zinc-500">
+                                a session you have since deleted
+                              </span>
+                            );
+                          })}
+                        </div>
                       )}
                     </div>
 
