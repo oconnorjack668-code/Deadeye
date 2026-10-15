@@ -14,6 +14,7 @@ import {
   type Rim,
 } from '@/lib/video/shotDetector';
 import { sampleTimesMs, seekMadeProgress } from '@/lib/video/frameStep';
+import { findBall, expectedBallDiameter } from '@/lib/video/motionBall';
 import { cropRectFor, ballCentreInFrame, magnification, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
@@ -71,6 +72,7 @@ interface Report {
   shots: DetectedShot[];
   /** Recorded so two runs on one clip can be told apart afterwards. */
   mode: 'every-frame' | 'realtime';
+  detector: 'coco' | 'motion';
 }
 
 interface Diagnosis {
@@ -136,6 +138,11 @@ export function DetectorBench() {
    * clip, which is the only way to show what the change bought.
    */
   const [mode, setMode] = useState<'every-frame' | 'realtime'>('every-frame');
+  /**
+   * Which way of finding the ball to measure. Both run through the same crop,
+   * the same ShotDetector and the same report, so the numbers are comparable.
+   */
+  const [detectorKind, setDetectorKind] = useState<'coco' | 'motion'>('motion');
   const cancelRef = useRef(false);
   /** Throttles the progress readout to once per second of footage. */
   const lastReportedSec = useRef(-1);
@@ -458,8 +465,10 @@ export function DetectorBench() {
     try {
       // Its own instance, not the shared one: this replays the clip from the
       // start every run, so its timestamps restart and would go backwards on a
-      // detector the live tracker had already advanced.
-      detector = await createBallDetector();
+      // detector the live tracker had already advanced. Skipped entirely for
+      // the motion tracker, which needs no model and should not wait on a
+      // 10MB download to measure that.
+      detector = detectorKind === 'coco' ? await createBallDetector() : null;
       const ballDetector = detector;
       const shotDetector = new ShotDetector(rim);
       const scores: number[] = [];
@@ -479,6 +488,10 @@ export function DetectorBench() {
       if (!ctx) throw new Error('Could not get a 2d canvas context.');
       let gain = 1;
 
+      // Previous crop, for the motion tracker. Null on the first frame, which
+      // is why it reports nothing there - there is no motion in one frame.
+      let prevPixels: Uint8ClampedArray | null = null;
+
       const pass = mode === 'every-frame' ? stepFrames : sweep;
       const how = await pass((v, videoMs, ts) => {
         // Same hoop crop the tracker uses, so the benchmark measures the real thing
@@ -486,16 +499,42 @@ export function DetectorBench() {
         gain = magnification(crop, v.videoWidth);
         ctx.drawImage(v, crop.sx, crop.sy, crop.side, crop.side, 0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX);
 
-        const result = ballDetector.detectForVideo(canvas, ts);
-        const best = [...(result.detections || [])].sort(
-          (a, b) => (b.categories[0]?.score || 0) - (a.categories[0]?.score || 0)
-        )[0];
+        let box: { originX: number; originY: number; width: number; height: number } | null = null;
+        let score = 0;
+
+        if (ballDetector) {
+          const result = ballDetector.detectForVideo(canvas, ts);
+          const best = [...(result.detections || [])].sort(
+            (a, b) => (b.categories[0]?.score || 0) - (a.categories[0]?.score || 0)
+          )[0];
+          box = best?.boundingBox ?? null;
+          score = best?.categories[0]?.score || 0;
+        } else {
+          const pixels = ctx.getImageData(0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX).data;
+          if (prevPixels) {
+            // The rim is measured in frame pixels; the tracker works in the
+            // crop canvas, so carry the scale across rather than guessing a size
+            const rimOnCanvas = rim.width * v.videoWidth * (CROP_CANVAS_PX / crop.side);
+            const found = findBall(prevPixels, pixels, CROP_CANVAS_PX, CROP_CANVAS_PX, {
+              expectedDiameter: expectedBallDiameter(rimOnCanvas),
+            });
+            if (found) {
+              box = {
+                originX: found.x - found.diameter / 2,
+                originY: found.y - found.diameter / 2,
+                width: found.diameter,
+                height: found.diameter,
+              };
+              score = found.score;
+            }
+          }
+          prevPixels = pixels;
+        }
         frames += 1;
 
-        const box = best?.boundingBox;
         if (box) {
           framesWithBall += 1;
-          scores.push(best.categories[0]?.score || 0);
+          scores.push(score);
           if (lastBallMs !== null) {
             const gap = videoMs - lastBallMs;
             if (gap > maxGapMs) maxGapMs = gap;
@@ -522,6 +561,7 @@ export function DetectorBench() {
         gapsOverLimit,
         shots: shotDetector.shots,
         mode,
+        detector: detectorKind,
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Detection failed.');
@@ -660,7 +700,39 @@ export function DetectorBench() {
 
           {!running && (
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">How to analyse</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">How to find the ball</p>
+              <div className="mt-2 space-y-2">
+                {(
+                  [
+                    [
+                      'motion',
+                      'Motion and shape',
+                      'The camera does not move, so differencing frames leaves the player and the ball. Assumes no colour, and sizes the ball from the rim.',
+                    ],
+                    [
+                      'coco',
+                      'Object model',
+                      'MediaPipe looking for a "sports ball". Found it in 7.1% of frames on the test clip, median confidence 0.246.',
+                    ],
+                  ] as const
+                ).map(([value, label, hint]) => (
+                  <label key={value} className="flex gap-2 text-sm text-zinc-200">
+                    <input
+                      type="radio"
+                      name="bench-detector"
+                      value={value}
+                      checked={detectorKind === value}
+                      onChange={() => setDetectorKind(value)}
+                      className="mt-1 accent-red-500"
+                    />
+                    <span className="min-w-0">
+                      <span className="font-semibold">{label}</span>
+                      <span className="block text-xs text-zinc-500">{hint}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+              <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">How to analyse</p>
               <div className="mt-2 space-y-2">
                 {(
                   [
@@ -842,6 +914,7 @@ export function DetectorBench() {
                 <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-400 mb-2">
                   Ball detection
                   <span className="ml-2 font-normal normal-case tracking-normal text-zinc-500">
+                    {report.detector === 'motion' ? 'motion and shape' : 'object model'} ·{' '}
                     {report.mode === 'every-frame' ? 'every frame' : 'at playback speed'}
                   </span>
                 </h3>
@@ -854,9 +927,15 @@ export function DetectorBench() {
                   <span className="text-right font-semibold text-white">
                     {report.framesWithBall} ({pct(report.framesWithBall, report.frames)})
                   </span>
-                  <span className="text-zinc-400">Median confidence</span>
+                  {/* Not the same quantity across detectors: the model reports
+                      how sure it is that this is a sports ball, the tracker how
+                      ball-like a moving blob's shape and size were. Comparable
+                      within a detector, not between them. */}
+                  <span className="text-zinc-400">
+                    Median {report.detector === 'motion' ? 'ball-likeness' : 'confidence'}
+                  </span>
                   <span className="text-right font-semibold text-white">{median(report.scores).toFixed(3)}</span>
-                  <span className="text-zinc-400">Best confidence</span>
+                  <span className="text-zinc-400">Best {report.detector === 'motion' ? 'ball-likeness' : 'confidence'}</span>
                   <span className="text-right font-semibold text-white">
                     {report.scores.length ? Math.max(...report.scores).toFixed(3) : '–'}
                   </span>
