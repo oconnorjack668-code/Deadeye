@@ -13,6 +13,7 @@ import { getActiveProgram } from '@/lib/programs';
 import { loadAchievements } from '@/lib/achievements-server';
 import { ShotHeatMap } from '@/components/basketball/ShotHeatMap';
 import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
+import { squadActivityLine, type FriendRow } from '@/lib/friends';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,14 +75,19 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient();
-  const [subscription, metrics, shootingByZone, activeProgram, achievements] = await Promise.all([
+  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad] = await Promise.all([
     getCurrentSubscription(),
     calculateDashboardMetrics(user.id),
     getShootingByZone(user.id),
     getActiveProgram(supabase, user.id),
     // Also awards any weekly challenges / badges earned since the last visit
     loadAchievements(user.id),
+    // The same overview the Friends page loads. Players with friends on a
+    // platform churn at about half the rate of solo ones, and for an
+    // individual-skill sport a name you know beats a national rank.
+    supabase.rpc('friends_overview'),
   ]);
+  const squadLine = squadActivityLine((squad.data || []) as unknown as FriendRow[]);
 
   const weeklyGoalPercentage = Math.round((metrics.weeklyGoalProgress / metrics.weeklyGoalTarget) * 100);
   const recommendedGoal = recommendedProgramGoal(profile?.goals, profile?.focus_areas);
@@ -99,6 +105,20 @@ export default async function DashboardPage() {
             {metrics.currentStreak > 0 ? `${metrics.currentStreak}-day streak` : 'Start a streak today'}
           </span>
         </h1>
+
+        {/* Sits above Today, as one quiet line rather than a card: it is a
+            nudge, not a metric, and it earns its place only when someone the
+            player actually knows has trained. Silent otherwise - an empty week
+            reported back is worse than nothing. */}
+        {squadLine && (
+          <Link
+            href="/friends"
+            className="mb-4 flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
+          >
+            <Users className="h-4 w-4 flex-shrink-0 text-cyan-400" />
+            <span className="min-w-0 truncate">{squadLine}</span>
+          </Link>
+        )}
 
         {/* Today. Deliberately the first thing under the greeting: you open the
             app to decide what to train, not to look at a reward meter. */}

@@ -1,6 +1,13 @@
 // __tests__/friends.test.ts
 import { describe, it, expect } from 'vitest';
-import { normaliseCode, rankFriends, weeklyScore, type FriendRow } from '@/lib/friends';
+import {
+  normaliseCode,
+  rankFriends,
+  weeklyScore,
+  activeFriendsThisWeek,
+  squadActivityLine,
+  type FriendRow,
+} from '@/lib/friends';
 
 const row = (over: Partial<FriendRow>): FriendRow => ({
   friendship_id: 'f',
@@ -18,6 +25,38 @@ const row = (over: Partial<FriendRow>): FriendRow => ({
   streak: 0,
   last_active: null,
   ...over,
+});
+
+describe('squad activity', () => {
+  it('counts only accepted friends who actually logged something', () => {
+    const active = activeFriendsThisWeek([
+      row({ display_name: 'Trained', sessions_7d: 1 }),
+      row({ display_name: 'Gym only', workouts_7d: 2 }),
+      row({ display_name: 'Idle' }),
+      row({ display_name: 'Pending', status: 'incoming', sessions_7d: 4 }),
+      row({ display_name: 'Me', is_me: true, sessions_7d: 4 }),
+    ]);
+    expect(active.map((r) => r.display_name)).toEqual(['Gym only', 'Trained']);
+  });
+
+  it('names a couple of people rather than reporting a statistic', () => {
+    const three = [
+      row({ display_name: 'Aoife', sessions_7d: 5 }),
+      row({ display_name: 'Cian', sessions_7d: 3 }),
+      row({ display_name: 'Niamh', sessions_7d: 1 }),
+      row({ display_name: 'Sean', sessions_7d: 1, makes_7d: 1 }),
+    ];
+    expect(squadActivityLine(three)).toBe('Aoife, Cian and 2 more trained this week');
+    expect(squadActivityLine(three.slice(0, 2))).toBe('Aoife and Cian trained this week');
+    expect(squadActivityLine(three.slice(0, 1))).toBe('Aoife trained this week');
+  });
+
+  it('says nothing rather than reporting an empty week back at the player', () => {
+    expect(squadActivityLine([])).toBeNull();
+    expect(squadActivityLine([row({ display_name: 'Idle' })])).toBeNull();
+    // Having trained yourself is not social proof
+    expect(squadActivityLine([row({ display_name: 'Me', is_me: true, sessions_7d: 6 })])).toBeNull();
+  });
 });
 
 describe('friends', () => {
