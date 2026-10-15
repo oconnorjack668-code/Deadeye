@@ -484,7 +484,9 @@ export function DetectorBench() {
       const canvas = document.createElement('canvas');
       canvas.width = CROP_CANVAS_PX;
       canvas.height = CROP_CANVAS_PX;
-      const ctx = canvas.getContext('2d');
+      // willReadFrequently: the motion tracker reads this canvas back every
+      // frame, and a GPU-backed context makes each of those a readback
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
       if (!ctx) throw new Error('Could not get a 2d canvas context.');
       let gain = 1;
 

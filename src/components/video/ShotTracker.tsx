@@ -82,6 +82,21 @@ export function ShotTracker({
   const [flash, setFlash] = useState<{ made: boolean; confident: boolean } | null>(null);
   const ballVisibleRef = useRef(false);
   const lastElapsedPushRef = useRef(0);
+
+  // How well the run actually went, counted in refs so counting cannot cause a
+  // re-render on a device already doing pixel work every frame, and snapshotted
+  // into state once at the end.
+  //
+  // This exists because the tracker was replaced with code that runs on the main
+  // thread instead of the GPU, and every measurement of it so far has been made
+  // on a laptop from a file. A phone filming live is the path most players
+  // actually use and the one nobody has numbers for. It is also worth showing
+  // them: counts from a run that only managed 8 frames a second deserve less
+  // trust than counts from one that managed 30, and only the app knows which
+  // happened.
+  const analysedRef = useRef(0);
+  const ballSeenRef = useRef(0);
+  const [quality, setQuality] = useState<{ fps: number; ballSeenPct: number; frames: number } | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Release the camera, screen lock and any pending flash timer when leaving
@@ -320,6 +335,9 @@ export function ShotTracker({
     setBallVisible(false);
     ballVisibleRef.current = false;
     lastElapsedPushRef.current = 0;
+    analysedRef.current = 0;
+    ballSeenRef.current = 0;
+    setQuality(null);
     stopRef.current = false;
 
     const nav = navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<{ release: () => Promise<void> }> } };
@@ -364,7 +382,12 @@ export function ShotTracker({
         // work to a 320px square however large the footage is.
         const crop = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight);
         const canvas = cropCanvasRef.current;
-        const ctx = canvas?.getContext('2d');
+        // willReadFrequently because the tracker calls getImageData on this
+        // canvas every single frame. A 2d context is GPU-backed by default and
+        // each read forces a readback across that boundary; this asks for a
+        // CPU-backed one instead, which is the cheap half of keeping the pixel
+        // work inside a phone's frame budget.
+        const ctx = canvas?.getContext('2d', { willReadFrequently: true });
         if (!canvas || !ctx) return;
         ctx.drawImage(video, crop.sx, crop.sy, crop.side, crop.side, 0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX);
 
@@ -420,6 +443,12 @@ export function ShotTracker({
         // Only re-render on the edge, not every frame - this runs at up to 60fps
         // on a phone that is also doing ball detection on each frame.
         const seen = ball !== null;
+        // Only frames that were actually scored: the first two of a run have no
+        // middle frame to measure, and counting them would flatter the rate.
+        if (ready) {
+          analysedRef.current += 1;
+          if (seen) ballSeenRef.current += 1;
+        }
         if (seen !== ballVisibleRef.current) {
           ballVisibleRef.current = seen;
           setBallVisible(seen);
@@ -439,6 +468,22 @@ export function ShotTracker({
 
   function finish() {
     stopRef.current = true;
+    // Snapshot how the run went before anything is torn down. Seconds come from
+    // the clip for a file and from the clock for the camera, which is the same
+    // distinction the tracking loop makes.
+    const video = videoRef.current;
+    const seconds =
+      source === 'file' && video?.duration
+        ? Math.min(video.currentTime, video.duration)
+        : elapsedMs / 1000;
+    const frames = analysedRef.current;
+    if (frames > 0 && seconds > 0.5) {
+      setQuality({
+        frames,
+        fps: frames / seconds,
+        ballSeenPct: (ballSeenRef.current / frames) * 100,
+      });
+    }
     videoRef.current?.pause();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     lockRef.current?.release().catch(() => undefined);
@@ -717,6 +762,29 @@ export function ShotTracker({
             </div>
             <div className="text-sm text-zinc-400">{shots.length ? Math.round((makes / shots.length) * 100) : 0}% · tap a shot to switch make/miss</div>
           </div>
+
+          {/* How well the tracking itself went. Counts from a run that managed
+              8 frames a second deserve less trust than one that managed 30, and
+              only the app knows which happened - so say it, rather than letting
+              the player assume every run is equal. Also the only measurement
+              there is of the live camera path on a real phone. */}
+          {quality && (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-semibold uppercase tracking-wider text-zinc-400">Tracking quality</span>
+                <span className="tabular-nums text-zinc-400">
+                  {quality.fps.toFixed(0)} fps analysed · ball seen in {quality.ballSeenPct.toFixed(0)}% of frames
+                </span>
+              </div>
+              <p className="mt-1.5 text-xs text-zinc-500">
+                {quality.fps < 12
+                  ? 'That is a low frame rate, so shots may have been missed between frames. Closing other apps, or filming a clip and analysing it afterwards, gives the tracker more to work with.'
+                  : quality.ballSeenPct < 15
+                    ? 'The ball was hard to pick out - usually dim light, or the hoop being far away. The counts below are worth checking carefully.'
+                    : 'Good conditions. The counts below should be close, but check them anyway.'}
+              </p>
+            </div>
+          )}
 
           <div className="space-y-1.5 max-h-80 overflow-y-auto">
             {shots.map((s, i) => (
