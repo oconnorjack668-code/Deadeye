@@ -559,6 +559,7 @@ export function ShotTracker({
   }
 
   const makes = shots.filter((s) => s.made).length;
+  const unresolved = shots.filter((s) => !s.confident).length;
 
   return (
     <div className="space-y-4">
@@ -761,6 +762,14 @@ export function ShotTracker({
               {makes}/{shots.length}
             </div>
             <div className="text-sm text-zinc-400">{shots.length ? Math.round((makes / shots.length) * 100) : 0}% · tap a shot to switch make/miss</div>
+            {/* Counted at the top, because an unresolved shot is currently
+                saved as a miss and the player should know how many of these
+                the number above is resting on. */}
+            {unresolved > 0 && (
+              <div className="mt-1 text-sm font-semibold text-amber-400">
+                {unresolved} shot{unresolved === 1 ? '' : 's'} the tracker could not call - set {unresolved === 1 ? 'it' : 'them'} below
+              </div>
+            )}
           </div>
 
           {/* How well the tracking itself went. Counts from a run that managed
@@ -791,10 +800,35 @@ export function ShotTracker({
               <div key={s.id} className="flex items-center gap-2 rounded-lg bg-zinc-900/70 px-3 py-2 text-sm">
                 <span className="w-8 text-zinc-500">#{i + 1}</span>
                 <span className="w-12 text-zinc-500">{clock(s.t)}</span>
-                <button type="button" onClick={() => toggleShot(s.id)} className={`flex-1 rounded-md py-1 font-semibold ${s.made ? 'bg-emerald-600/20 text-emerald-300' : 'bg-red-600/20 text-red-300'}`}>
-                  {s.made ? 'Make' : 'Miss'}
-                  {!s.confident && <span className="text-xs text-zinc-400"> (check)</span>}
-                </button>
+                {/* A shot the detector never actually watched cross the rim is
+                    not a miss, it is a question - and it was being shown in the
+                    same red as a miss it had really seen, which invites the
+                    player to scroll past it. Two explicit buttons instead of a
+                    toggle, because a toggle makes confirming the guess cost two
+                    taps and changing it cost one. */}
+                {s.confident ? (
+                  <button type="button" onClick={() => toggleShot(s.id)} className={`flex-1 rounded-md py-1 font-semibold ${s.made ? 'bg-emerald-600/20 text-emerald-300' : 'bg-red-600/20 text-red-300'}`}>
+                    {s.made ? 'Make' : 'Miss'}
+                  </button>
+                ) : (
+                  <div className="flex flex-1 items-center gap-1.5">
+                    <span className="text-xs font-semibold text-amber-400">Unclear</span>
+                    <button
+                      type="button"
+                      onClick={() => setShots((cur) => cur.map((x) => (x.id === s.id ? { ...x, made: true, confident: true } : x)))}
+                      className="flex-1 rounded-md border border-emerald-600/40 py-1 text-xs font-semibold text-emerald-300 hover:bg-emerald-600/20"
+                    >
+                      Make
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShots((cur) => cur.map((x) => (x.id === s.id ? { ...x, made: false, confident: true } : x)))}
+                      className="flex-1 rounded-md border border-red-600/40 py-1 text-xs font-semibold text-red-300 hover:bg-red-600/20"
+                    >
+                      Miss
+                    </button>
+                  </div>
+                )}
                 {source === 'file' && onCheckForm && videoFile && (
                   <button type="button" onClick={() => onCheckForm(videoFile, s.t)} className="text-xs text-cyan-400 underline">
                     Form
