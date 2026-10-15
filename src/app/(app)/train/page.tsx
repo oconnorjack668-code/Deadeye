@@ -1,7 +1,7 @@
 // src/app/(app)/train/page.tsx
 import React from 'react';
 import Link from 'next/link';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getCurrentProfile } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck } from 'lucide-react';
 
@@ -68,17 +68,24 @@ const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
 
 export default async function TrainPage() {
   await requireUser();
+  const profile = await getCurrentProfile();
+  // A player who switched AI coaching off should not be offered it again from
+  // the hub. Everything else on this page is unaffected - the toggle turns off
+  // the commentary, not the app.
+  const aiOff = profile?.ai_coaching_enabled === false;
 
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-3xl mx-auto">
         <PageHeader tone="train" icon={CalendarCheck} title="Train" subtitle="Plan, learn and improve" />
 
-        {GROUPS.map((group) => (
+        {GROUPS.map((group) => {
+          const items = aiOff ? group.items.filter((s) => !s.href.startsWith('/ai-coach')) : group.items;
+          return (
           <section key={group.label} className="mb-6">
             <h2 className={`mb-2 text-xs font-bold uppercase tracking-wider ${group.labelColor}`}>{group.label}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {group.items.map((s) => {
+              {items.map((s) => {
                 const Icon = s.icon;
                 return (
                   <Link
@@ -106,7 +113,8 @@ export default async function TrainPage() {
               })}
             </div>
           </section>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

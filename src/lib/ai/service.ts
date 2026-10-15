@@ -153,9 +153,24 @@ async function buildEvidence(userId: string, sessionId: string): Promise<Coachin
   };
 }
 
+/**
+ * Refuses when the player has switched AI coaching off.
+ *
+ * Enforced here rather than only in the pages, because hiding a button is not
+ * the same as declining to act: an old tab, a bookmark or a direct POST would
+ * otherwise generate a report and spend a credit for someone who opted out.
+ */
+async function assertAiEnabled(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<void> {
+  const { data } = await supabase.from('profiles').select('ai_coaching_enabled').eq('id', userId).maybeSingle();
+  if (data?.ai_coaching_enabled === false) {
+    throw new AICoachError('AI coaching is switched off in your settings.', 403);
+  }
+}
+
 export async function generateSessionReport(userId: string, sessionId: string): Promise<GeneratedReport> {
   const { provider, config } = aiConfig();
   const supabase = await createClient();
+  await assertAiEnabled(supabase, userId);
 
   /** Has this session already been written up? */
   const alreadyReported = async () => {

@@ -178,6 +178,7 @@ export interface Database {
           show_location: boolean;
           allow_friend_requests: boolean;
           share_with_coaches: boolean;
+          ai_coaching_enabled: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -205,6 +206,7 @@ export interface Database {
           show_location?: boolean;
           allow_friend_requests?: boolean;
           share_with_coaches?: boolean;
+          ai_coaching_enabled?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -232,6 +234,7 @@ export interface Database {
           show_location?: boolean;
           allow_friend_requests?: boolean;
           share_with_coaches?: boolean;
+          ai_coaching_enabled?: boolean;
           updated_at?: string;
         };
         Relationships: [];

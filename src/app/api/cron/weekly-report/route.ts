@@ -58,7 +58,20 @@ export async function GET(request: Request) {
     .eq('weekly_report', true);
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
+  // Players who switched AI coaching off get no weekly report, whatever their
+  // notification preferences say. Those two settings answer different
+  // questions - "do you want to be told" versus "do you want this written at
+  // all" - and a cron that only reads the first would keep generating reports,
+  // and push notifications about them, for someone who opted out of the coach.
+  const { data: optedOut } = await admin
+    .from('profiles')
+    .select('id')
+    .in('id', (prefs || []).map((p) => p.user_id))
+    .eq('ai_coaching_enabled', false);
+  const skip = new Set((optedOut || []).map((r) => r.id));
+
   const due = ((prefs || []) as Array<{ user_id: string; last_weekly_report_on: string | null; push_enabled: boolean }>)
+    .filter((p) => !skip.has(p.user_id))
     .filter((p) => !p.last_weekly_report_on || p.last_weekly_report_on < lastWeek)
     .slice(0, MAX_PER_RUN);
 

@@ -8,7 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { IRISH_COUNTIES, cleanRegion, countryOptions, regionLabel } from '@/lib/regions';
 import type { MeasurementSystem } from '@/lib/units';
-import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil } from 'lucide-react';
+import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil, Sparkles } from 'lucide-react';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -23,6 +23,7 @@ interface Initial {
   show_location: boolean;
   allow_friend_requests: boolean;
   share_with_coaches: boolean;
+  ai_coaching_enabled: boolean;
   country: string | null;
   region: string | null;
   timezone: string | null;
@@ -251,6 +252,15 @@ export function SettingsClient({
             Your age is never shown to other players. It&apos;s only used to put you in the right age group on the leaderboard.
           </p>
         </Row>
+      </Section>
+
+      <Section icon={Sparkles} title="AI coaching">
+        <Toggle
+          label="AI coaching"
+          hint="Off hides Coach everywhere and stops your weekly report being written. Your sessions, stats and video all keep working exactly as they do now - this only turns off the commentary on top of them."
+          checked={s.ai_coaching_enabled}
+          onChange={(v) => void save({ ai_coaching_enabled: v })}
+        />
       </Section>
 
       <Section icon={Globe} title="Region">

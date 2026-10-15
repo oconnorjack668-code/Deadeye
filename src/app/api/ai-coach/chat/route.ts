@@ -29,6 +29,18 @@ export async function POST(request: Request) {
     return Response.json({ error: 'AI Coach is not configured (SUPABASE_SERVICE_ROLE_KEY is missing).' }, { status: 503 });
   }
 
+  // Checked server-side, not just hidden in the UI: an old tab or a direct POST
+  // would otherwise reach the coach a player had switched off.
+  const supabaseForProfile = await createClient();
+  const { data: profile } = await supabaseForProfile
+    .from('profiles')
+    .select('ai_coaching_enabled')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (profile?.ai_coaching_enabled === false) {
+    return Response.json({ error: 'AI coaching is switched off in your settings.' }, { status: 403 });
+  }
+
   const body = (await request.json().catch(() => null)) as { message?: unknown } | null;
   const message = typeof body?.message === 'string' ? body.message.trim() : '';
   if (!message) return Response.json({ error: 'Type a question first.' }, { status: 400 });

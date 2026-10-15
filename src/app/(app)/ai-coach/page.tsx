@@ -1,6 +1,6 @@
 // src/app/(app)/ai-coach/page.tsx
 import React from 'react';
-import { requireUser, getCurrentSubscription } from '@/lib/auth';
+import { requireUser, getCurrentSubscription, getCurrentProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { CREDITS_PER_REPORT } from '@/lib/ai/service';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -18,6 +18,35 @@ export const metadata = {
 
 export default async function AICoachPage() {
   const user = await requireUser();
+  const profile = await getCurrentProfile();
+
+  // Checked here as well as hidden from the hub, because a bookmark or an old
+  // link would otherwise walk straight past the setting - and spending a credit
+  // on a report for someone who turned the coach off would be worse than a
+  // broken link.
+  if (profile?.ai_coaching_enabled === false) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 md:p-8 max-w-3xl mx-auto">
+          <h1 className="text-3xl font-black tracking-tight text-white">AI Coach</h1>
+          <Card className="mt-6 border-zinc-800 bg-zinc-900/70">
+            <CardContent className="p-6">
+              <p className="text-zinc-300">
+                You have AI coaching switched off, so nothing is being written about your sessions.
+              </p>
+              <p className="mt-2 text-sm text-zinc-500">
+                Your training, stats and video are unaffected and carry on as normal.
+              </p>
+              <Link href="/settings" className="mt-4 inline-block font-semibold text-red-400 underline hover:text-red-300">
+                Turn it back on in Settings
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   const supabase = await createClient();
 
   const now = new Date();

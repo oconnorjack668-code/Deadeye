@@ -42,6 +42,9 @@ export default async function SettingsPage() {
               show_location: profile.show_location ?? false,
               allow_friend_requests: profile.allow_friend_requests ?? true,
               share_with_coaches: profile.share_with_coaches ?? false,
+              // Defaults on, so a profile row written before migration 00032
+              // behaves as it always did rather than silently losing the coach
+              ai_coaching_enabled: profile.ai_coaching_enabled ?? true,
               country: profile.country ?? null,
               region: profile.region ?? null,
               timezone: profile.timezone ?? null,
