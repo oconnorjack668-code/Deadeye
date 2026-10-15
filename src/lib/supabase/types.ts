@@ -958,6 +958,45 @@ export interface Database {
         };
         Relationships: [];
       };
+      // A player asking a coach whether a decision in their own film was the
+      // right read (migration 00035). Access to the clip follows the question.
+      film_questions: {
+        Row: {
+          id: string;
+          player_id: string;
+          team_id: string | null;
+          video_asset_id: string;
+          moment_ms: number;
+          question: string;
+          player_read: string | null;
+          verdict: 'good_read' | 'wrong_read' | 'depends' | null;
+          coach_note: string | null;
+          answered_by: string | null;
+          answered_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          player_id: string;
+          team_id?: string | null;
+          video_asset_id: string;
+          moment_ms: number;
+          question: string;
+          player_read?: string | null;
+          created_at?: string;
+        };
+        // Only the answer. The column grant in 00035 enforces this in the
+        // database too: a question, and the read the player committed to
+        // before any answer arrived, are a record of what they thought at the
+        // time, and editing either afterwards makes the comparison worthless.
+        Update: {
+          verdict?: 'good_read' | 'wrong_read' | 'depends' | null;
+          coach_note?: string | null;
+          answered_by?: string | null;
+          answered_at?: string | null;
+        };
+        Relationships: [];
+      };
       video_assets: {
         Row: {
           id: string;
