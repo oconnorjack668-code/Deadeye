@@ -15,7 +15,7 @@ npm run dev
 ```
 
 You need a Supabase project. Create one, then apply everything in
-`supabase/migrations/` in filename order (32 migrations) via the Supabase SQL
+`supabase/migrations/` in filename order (33 migrations) via the Supabase SQL
 editor or the Supabase CLI, then `supabase/seed.sql`. Every migration is safe
 to re-run: policies are dropped before they are created, tables and indexes use
 `IF NOT EXISTS`, and content inserts skip rows that already exist.

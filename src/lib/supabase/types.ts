@@ -361,6 +361,7 @@ export interface Database {
           intensity_rpe: number;
           perceived_quality: number;
           notes: string | null;
+          verified_by_video: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -373,9 +374,12 @@ export interface Database {
           intensity_rpe: number;
           perceived_quality: number;
           notes?: string | null;
+          verified_by_video?: boolean;
           created_at?: string;
           updated_at?: string;
         };
+        // verified_by_video is deliberately absent: it records where a count
+        // came from, and an edit cannot change that after the fact.
         Update: {
           session_date?: string;
           session_type?: SessionType;

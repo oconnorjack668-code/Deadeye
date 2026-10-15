@@ -527,6 +527,11 @@ export function ShotTracker({
         intensity_rpe: 6,
         perceived_quality: 3,
         notes: `Tracked with Deadeye video shot tracking (${source === 'camera' ? 'live camera' : 'video'})`,
+        // The one place this is ever set. It records that a camera watched
+        // these shots, not that the count is right - the player has just
+        // corrected it by hand on the screen before this, which is rather the
+        // point.
+        verified_by_video: true,
       })
       .select('id')
       .single();

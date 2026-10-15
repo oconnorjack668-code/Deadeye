@@ -8,7 +8,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { ZONE_LABELS } from '@/lib/court';
 import type { ShotZone } from '@/lib/supabase/types';
-import { ArrowLeft, Target, Sparkles } from 'lucide-react';
+import { ArrowLeft, Target, Sparkles, Video } from 'lucide-react';
 import { ShareCardButton } from '@/components/ShareCardButton';
 
 export const dynamic = 'force-dynamic';
@@ -40,6 +40,7 @@ export default async function BasketballSessionPage({ params }: { params: Promis
         intensity_rpe: number;
         perceived_quality: number;
         notes: string | null;
+        verified_by_video: boolean | null;
       } | null;
     },
     {
@@ -68,6 +69,14 @@ export default async function BasketballSessionPage({ params }: { params: Promis
         <h1 className="text-3xl font-black tracking-tight text-white capitalize flex items-center gap-2">
           <Target className="h-7 w-7 text-orange-400" /> {session.session_type.replace(/-/g, ' ')}
         </h1>
+        {/* Says where the count came from, not that it is correct. A camera
+            watched these shots; the player then confirmed each call by hand,
+            which is the part that makes the number worth anything. */}
+        {session.verified_by_video && (
+          <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300">
+            <Video className="h-3.5 w-3.5" /> Counted from video
+          </p>
+        )}
         <p className="text-sm text-zinc-400 mt-1 mb-6">
           {new Date(`${session.session_date}T00:00:00`).toLocaleDateString('en-US', {
             weekday: 'long',

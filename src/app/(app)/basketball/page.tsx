@@ -34,6 +34,7 @@ export default async function BasketballPage() {
         intensity_rpe: number;
         perceived_quality: number;
         notes: string | null;
+        verified_by_video: boolean | null;
       }>>(),
     // Total count (the list above only shows the latest 10)
     supabase
@@ -159,8 +160,11 @@ export default async function BasketballPage() {
                   <Card className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900/90 hover:border-orange-500/30 transition-all">
                     <CardContent className="p-4 flex items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <h3 className="font-semibold text-white capitalize">
+                        <h3 className="flex items-center gap-1.5 font-semibold text-white capitalize">
                           {session.session_type.replace(/-/g, ' ')}
+                          {session.verified_by_video && (
+                            <Video className="h-3.5 w-3.5 flex-shrink-0 text-cyan-400" aria-label="Counted from video" />
+                          )}
                         </h3>
                         <p className="text-xs text-zinc-400 mt-1">
                           {new Date(`${session.session_date}T00:00:00`).toLocaleDateString('en-US', {
