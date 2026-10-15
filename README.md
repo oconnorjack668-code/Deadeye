@@ -39,7 +39,7 @@ fabricating output or silently failing.
 ```bash
 npm run lint        # eslint
 npx tsc --noEmit    # types
-npm test            # vitest (38 files, 298 tests)
+npm test            # vitest (39 files, 327 tests)
 npm run build       # production build
 ```
 
@@ -155,6 +155,20 @@ real makes into misses. `/admin/detector-bench` can now step frame by frame
 inference speed at the cost of running longer than the clip. The bench keeps
 both modes so the two can be compared on one clip, and labels every report with
 which produced it.
+
+**The COCO detector is probably the wrong tool, and there is a replacement in
+progress.** Measured on a real clip at every one of its 1540 frames, it found
+the ball in 7.1% of them at a median confidence of 0.246 against a 0.12 floor.
+The frames show why: a heavily motion-blurred maroon ball in dim indoor light,
+seams smeared away — outside what a model trained on sharp, mostly orange balls
+recognises. `src/lib/video/motionBall.ts` takes the opposite approach, finding
+the ball by what it does rather than what it looks like: the camera does not
+move, so differencing frames leaves only the player and the ball, and a ball is
+the small round one. Nothing in it assumes a colour — players' balls differ, and
+a tracker looking for orange would fail on the clip that prompted it. Size comes
+from the rim, which is already measured (a ball is ~0.53 of a rim's width), so
+there is no pixel constant to tune per clip. It is tested but not yet wired into
+the bench or the tracker.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review
