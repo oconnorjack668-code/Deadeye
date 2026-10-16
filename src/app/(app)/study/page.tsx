@@ -3,7 +3,7 @@ import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { BookOpen, CheckCircle2, Play, ChevronRight } from 'lucide-react';
+import { BookOpen, CheckCircle2, Play, ChevronRight, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { DailyQuestion, type DailyQuestionView } from '@/components/study/DailyQuestion';
 import { pickDailyQuestion, daysUntilRepeat, type QuestionRef } from '@/lib/dailyIq';
@@ -189,6 +189,26 @@ export default async function StudyPage() {
             <ChevronRight className="h-5 w-5 flex-shrink-0 text-zinc-500" />
           </Link>
         )}
+
+        {/* Lessons teach the game in the abstract; this is the one place a
+            player can ask about a decision in a game of their own. It sits
+            above the sections because that is the harder and more valuable
+            thing to do, not because it is more finished. */}
+        <Link
+          href="/film-questions"
+          className="mb-6 flex items-center gap-3 rounded-2xl border border-cyan-600/40 bg-cyan-600/10 p-4 hover:bg-cyan-600/15"
+        >
+          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-600/20">
+            <Brain className="h-5 w-5 text-cyan-300" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold text-white">Was that the right read?</span>
+            <span className="block text-xs text-zinc-400">
+              Ask a coach about one decision in your own game film
+            </span>
+          </span>
+          <ChevronRight className="h-5 w-5 flex-shrink-0 text-zinc-500" />
+        </Link>
 
         <h2 className="text-lg font-bold text-white mb-3">Sections</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

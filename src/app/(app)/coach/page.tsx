@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { requireUser, getCurrentSubscription } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { summarizeTeam, type RosterStats } from '@/lib/coach';
+import { FilmQueue } from './FilmQueue';
+import type { FilmQuestion } from '@/lib/filmQuestions';
 import { userCalendarNow } from '@/lib/userTime';
 import { ClipboardCheck, Crown, Flame, Moon, Plus, Shield, Users, Video } from 'lucide-react';
 
@@ -57,6 +59,23 @@ export default async function CoachPage() {
     .map((m) => m.teams)
     .filter(Boolean) as Array<{ id: string; name: string; age_group: string | null; club_name: string | null }>;
 
+  // Film questions waiting on this coach, across every team they coach. Row
+  // level security does the filtering: 00035 only exposes a question to a
+  // coach of its team, so this needs no team list of its own.
+  const { data: openQuestions } = await supabase
+    .from('film_questions')
+    .select('*')
+    .is('answered_at', null)
+    .not('team_id', 'is', null)
+    .order('created_at', { ascending: true })
+    .limit(30);
+
+  const askers = [...new Set((openQuestions || []).map((q) => q.player_id))];
+  const { data: askerProfiles } = askers.length
+    ? await supabase.from('profiles').select('id, display_name').in('id', askers)
+    : { data: [] as Array<{ id: string; display_name: string }> };
+  const names = Object.fromEntries((askerProfiles || []).map((p) => [p.id, p.display_name]));
+
   const summaries = await Promise.all(
     teams.map(async (t) => {
       const [{ data: roster }, { data: open }] = await Promise.all([
@@ -71,6 +90,10 @@ export default async function CoachPage() {
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
         {header}
+
+        {/* Above the team summaries: a player waiting on an answer is the one
+            thing here with somebody on the other end of it. */}
+        <FilmQueue questions={(openQuestions || []) as unknown as FilmQuestion[]} names={names} />
 
         {teams.length === 0 ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center space-y-3">

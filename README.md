@@ -255,6 +255,37 @@ Treat the counts as assistive rather than authoritative, and keep the review
 step before saving. `/admin/detector-bench` measures a clip and compares
 full-frame against the crop.
 
+## Asking a coach about a read
+
+`/film-questions` lets a player mark one moment in their own game film and ask
+a coach on one of their teams whether it was the right decision. The IQ lessons
+teach the game in the abstract; this is the only place the app engages with a
+decision the player actually made.
+
+The player's own read is **required before the question can be sent**, and that
+is the mechanism rather than a form field — comparing what they thought with
+what the coach says is the whole exercise, and `readAccuracy` tracks how often
+the two agree (over answered questions only, silent below five, with "depends"
+counting as neither).
+
+**Access follows the question.** A coach has no read on `video_assets` at all.
+`/api/film-questions/[id]/clip` is the only broker: it takes a *question* id,
+leans on the row-level security in `00035` to decide whether the caller may see
+it, and returns a signed URL that expires in ten minutes. A caller cannot pass
+a storage path or an asset id, so there is no way to reach a second clip, and
+deleting a question revokes the access with it. Missing and forbidden return the
+same 404 so the route cannot be used to discover which ids exist.
+
+The column grant in `00035` is the other half: a coach can write only
+`verdict`, `coach_note`, `answered_by` and `answered_at`. It limits players to
+the same columns deliberately, so a question cannot be edited after an answer
+lands.
+
+**Keep apostrophes out of comments in migration files.** SQL clients that split
+a script client-side, including the Supabase editor, can read one inside a `--`
+comment as an opening string literal and fail on a bracket far from the real
+problem. `00035` carries a note saying so, after it happened.
+
 ## Lesson videos
 
 `study_items.youtube_video_id` holds a real YouTube id, and the lesson page
