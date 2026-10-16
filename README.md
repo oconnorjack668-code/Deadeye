@@ -109,13 +109,13 @@ it and the run scores every call and prints which ones were wrong. Without it
 you get counts, and counts hide a change that gets two calls wrong in opposite
 directions while leaving the total unmoved — which has happened once already.
 
-`DEADEYE_BENCH_SAMPLE_FPS` decodes at a different rate, which is how the app's
-**analysis speed** selector is measured: 2× playback presents roughly half the
-frames, so `15` models it. Measured on the labelled clip, 2× costs one call in
-ten — a near-miss at 1.92 half-rims collapses to 1.06 and is called a make,
-because fewer samples put the two sightings either side of the rim further
-apart and coarsen the interpolation between them. It fails toward inventing
-makes, so 1× is the honest default and 2× is for a rough count.
+`DEADEYE_BENCH_SAMPLE_FPS` decodes at a different rate. It is how the app's
+former **2× analysis speed** option was measured, and why that option no longer
+exists: at 15 fps instead of 30 it cost one call in ten, collapsing a miss 1.92
+half-rims outside the ring to 1.06 and calling it good. Halving the samples
+puts the sighting below the rim *after* the ball has deflected off it, which is
+lost information rather than a tuning problem. It failed toward inventing
+makes, so there was no honest way to keep both the speed and the accuracy.
 
 `DEADEYE_BENCH_RIM` is the two rim taps as `x,y,x,y` normalised to the frame.
 The test skips without those variables, so the normal gates are unaffected. Set
@@ -279,6 +279,16 @@ Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review
 step before saving. `/admin/detector-bench` measures a clip and compares
 full-frame against the crop.
+
+The tracker can **call shots out loud** — silent by default, with tones, a
+synthesised swish, or a spoken running score (`src/lib/video/trackerSound.ts`).
+A phone on a tripod is several metres away and the player is usually facing the
+hoop, so vibration is useless and a glance costs the next rep; sound is the part
+of the confirmation that actually reaches them. Tones are synthesised through
+the Web Audio API rather than shipped as files, so there are no assets to load
+and nothing to break offline, and the choice is kept in `localStorage` because
+it belongs to the device rather than the account. Every audio path swallows its
+own failures: a sound that will not play must never stop a shot being counted.
 
 ## Asking a coach about a read
 

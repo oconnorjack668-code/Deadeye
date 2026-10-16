@@ -8,6 +8,13 @@ import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { expectedBallDiameter } from '@/lib/video/motionBall';
+import {
+  announceShot,
+  loadSoundChoice,
+  storeSoundChoice,
+  SOUND_CHOICES,
+  type SoundChoice,
+} from '@/lib/video/trackerSound';
 import { createBallTracker, type BallTracker } from '@/lib/video/ballTracker';
 import {
   loadSavedRims,
@@ -70,7 +77,6 @@ export function ShotTracker({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
-  const [speed, setSpeed] = useState(1);
   const [zone, setZone] = useState<CourtZone | 'all-around'>('all-around');
   const [saving, setSaving] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -79,7 +85,10 @@ export function ShotTracker({
   // tripod, so the overlay has to answer "is this working?" and "did that count?"
   // at a glance, without them walking over to look.
   const [ballVisible, setBallVisible] = useState(false);
-  const [flash, setFlash] = useState<{ made: boolean; confident: boolean } | null>(null);
+  // id forces a fresh element per shot, so the flash animation restarts on a
+  // quick second make rather than sitting there already finished.
+  const [flash, setFlash] = useState<{ id: number; made: boolean; confident: boolean; makes: number; attempts: number } | null>(null);
+  const [sound, setSound] = useState<SoundChoice>('off');
   const ballVisibleRef = useRef(false);
   const lastElapsedPushRef = useRef(0);
 
@@ -202,6 +211,10 @@ export function ShotTracker({
   const [rimSaved, setRimSaved] = useState(false);
 
   function startCalibrating() {
+    // Read here rather than on mount: localStorage does not exist while this
+    // renders on the server, and seeding state from it would hydrate to a
+    // different value than the server sent.
+    setSound(loadSoundChoice());
     setSavedRims(loadSavedRims());
     setRimSaved(false);
     setRimName('');
@@ -368,7 +381,8 @@ export function ShotTracker({
 
     if (source === 'file') {
       video.currentTime = 0;
-      video.playbackRate = speed;
+      // Always real time: see the note where the 2x selector used to be
+      video.playbackRate = 1;
       await video.play().catch(() => undefined);
     }
 
@@ -451,7 +465,17 @@ export function ShotTracker({
           navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
           // Big transient MAKE/MISS badge: a tripod phone's buzz is useless from
           // the arc, so the confirmation has to be visual.
-          setFlash({ made: shot.made, confident: shot.confident });
+          //
+          // Counted from the detector rather than from `shots` state, which has
+          // not re-rendered yet, and rather than from the id counter, which is
+          // incremented inside a state updater React may replay.
+          const attempts = shotDetector.shots.length;
+          const made = shotDetector.shots.filter((s) => s.made).length;
+          setFlash({ id: attempts, made: shot.made, confident: shot.confident, makes: made, attempts });
+          // A phone on a tripod is metres away and the player is usually facing
+          // the hoop, so sound is the part of the confirmation that reaches
+          // them. Silent unless they asked for it.
+          announceShot(sound, shot.made, made, attempts);
           if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
           flashTimerRef.current = setTimeout(() => setFlash(null), 1400);
         }
@@ -679,17 +703,33 @@ export function ShotTracker({
                 </div>
               )}
 
-              {/* Unmistakable confirmation that a shot just registered */}
+              {/* Confirmation a shot registered, read from the arc rather than
+                  up close: a tinted wash of the whole frame carries at a
+                  distance where a centred box does not, and leaves the hoop
+                  visible underneath instead of covering it. The old version
+                  was a solid slab in the middle of the picture. */}
               {flash && (
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div
-                    className={`rounded-2xl px-6 py-3 text-4xl font-black uppercase tracking-wide shadow-2xl ${
-                      flash.made ? 'bg-emerald-500/90 text-white' : 'bg-red-500/90 text-white'
+                <div
+                  key={flash.id}
+                  className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center deadeye-flash ${
+                    flash.made ? 'bg-emerald-500/25' : 'bg-red-500/20'
+                  }`}
+                >
+                  <span
+                    className={`text-6xl font-black uppercase tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-7xl ${
+                      flash.made ? 'text-emerald-300' : 'text-red-300'
                     }`}
                   >
                     {flash.made ? 'Make' : 'Miss'}
-                    {!flash.confident && <span className="ml-2 align-middle text-base font-bold opacity-90">check</span>}
-                  </div>
+                  </span>
+                  <span className="mt-1 text-2xl font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                    {flash.makes}/{flash.attempts}
+                  </span>
+                  {!flash.confident && (
+                    <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">
+                      check this one
+                    </span>
+                  )}
                 </div>
               )}
             </>
@@ -752,12 +792,36 @@ export function ShotTracker({
               </p>
             </div>
           )}
-          {source === 'file' && !calibrating && (
-            <label className="text-xs text-zinc-400 flex items-center gap-2">
-              Analysis speed
-              <select value={speed} onChange={(e) => setSpeed(Number(e.target.value))} className="rounded-lg bg-zinc-900 border border-zinc-800 px-2 py-1 text-white">
-                <option value={1}>1x (most accurate)</option>
-                <option value={2}>2x (faster, may miss quick shots)</option>
+          {/* A 2x option used to live here. Measured against hand-labelled
+              shots it cost one call in ten and failed towards inventing makes:
+              a shot 1.92 half-rims outside the ring collapsed to 1.06 and was
+              called good, because halving the samples puts the sighting below
+              the rim after the ball has already deflected off it. That is lost
+              information rather than a tuning problem, so there was no honest
+              way to keep the speed and the accuracy. A tracker people can
+              trust is the entire proposition; a faster one that is sometimes
+              wrong is worth nothing. */}
+
+          {!calibrating && (
+            <label className="flex items-center gap-2 text-xs text-zinc-400">
+              Call shots out loud
+              <select
+                value={sound}
+                onChange={(e) => {
+                  const choice = e.target.value as SoundChoice;
+                  setSound(choice);
+                  storeSoundChoice(choice);
+                  // Played immediately so the choice can be heard and judged
+                  // here, rather than discovered mid-session from the arc.
+                  announceShot(choice, true, 1, 1);
+                }}
+                className="rounded-lg border border-zinc-800 bg-zinc-900 px-2 py-1 text-white"
+              >
+                {SOUND_CHOICES.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
             </label>
           )}
