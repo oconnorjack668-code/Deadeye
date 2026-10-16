@@ -1,13 +1,15 @@
 // src/app/terms/page.tsx
 import React from 'react';
 import Link from 'next/link';
+import { operator } from '@/lib/legal';
 
 export const metadata = { title: 'Terms of Use - Deadeye' };
 
-const LAST_UPDATED = 'September 25, 2026';
+const LAST_UPDATED = 'October 16, 2026';
 
 export default function TermsPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
+  const runBy = operator();
 
   return (
     <div className="flex-1 bg-zinc-950 px-6 py-12">
@@ -23,8 +25,10 @@ export default function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">Who can use Deadeye</h2>
           <p>
-            You must be 13 or older. If you are under 18, please make sure a parent or guardian is happy for you to
-            use Deadeye and has read these terms with you. You are responsible for keeping your login details safe.
+            You must be 13 or older. If you are 13, 14 or 15, a parent or guardian has to approve your account before
+            you can use it, and they can withdraw that approval at any time. If you are 16 or 17, please make sure a
+            parent or guardian is happy for you to use Deadeye and has read these terms with you. You are responsible
+            for keeping your login details safe.
           </p>
         </section>
 
@@ -50,11 +54,15 @@ export default function TermsPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">Deadeye Pro</h2>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Pro is a paid subscription, billed monthly or yearly through Stripe at the price shown before you pay.</li>
+            <li>
+              Pro is a paid subscription, billed monthly or yearly through Stripe. The price shown before you pay is the
+              full price, with nothing added at checkout.
+            </li>
             <li>It renews automatically until you cancel. You can cancel any time in Profile → Deadeye Pro → Manage subscription; you keep Pro until the end of the period you paid for.</li>
             <li>
-              If you live in the EU or UK you can cancel a new subscription within 14 days of buying it and get a
-              refund by contacting us{contactEmail ? ` at ${contactEmail}` : ''}.
+              You can withdraw from a new subscription within 14 days of buying it and get a full refund. Use the
+              &ldquo;Withdraw from contract&rdquo; button in Profile → Deadeye Pro, or contact us
+              {contactEmail ? ` at ${contactEmail}` : ''}. Pro ends when you withdraw, and we confirm by email.
             </li>
             <li>We will tell you before changing the price of your subscription, and you can cancel before it applies.</li>
           </ul>
@@ -101,12 +109,20 @@ export default function TermsPage() {
           </p>
         </section>
 
-        {contactEmail && (
+        {(contactEmail || runBy) && (
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-white">Contact</h2>
-            <p>
-              Questions: <a className="text-orange-400 underline" href={`mailto:${contactEmail}`}>{contactEmail}</a>
-            </p>
+            {runBy && (
+              <p>
+                Deadeye is run by {runBy.name}
+                {runBy.address ? `, ${runBy.address}` : ''}.
+              </p>
+            )}
+            {contactEmail && (
+              <p>
+                Questions: <a className="text-orange-400 underline" href={`mailto:${contactEmail}`}>{contactEmail}</a>
+              </p>
+            )}
           </section>
         )}
 

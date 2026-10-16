@@ -1,4 +1,4 @@
-# HoopIQ - Deployment & User Testing Guide
+# Deadeye - Deployment & User Testing Guide
 
 ## Phase 1: Pre-Deployment Checklist
 
@@ -67,7 +67,7 @@ git push origin production/v1.0.0
 **Step 2: Vercel Setup**
 1. Visit vercel.com and sign in with GitHub
 2. Click "Add New" → "Project"
-3. Import the HoopIQ repository
+3. Import the Deadeye repository
 4. Configure project name: `hoopiq`
 5. Set environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
@@ -87,7 +87,7 @@ git push origin production/v1.0.0
 
 **Step 4: Configure Domain**
 - In Vercel dashboard: Settings → Domains
-- Add custom domain or use `hoopiq.vercel.app`
+- Add custom domain or use `deadeye.vercel.app`
 - Configure DNS records if custom domain
 - Enable automatic HTTPS
 
@@ -156,7 +156,7 @@ docker push username/hoopiq:1.0.0
 **2. Create Testing Scenarios**
 
 #### Scenario A: New User Onboarding (30 min)
-1. Visit hoopiq.vercel.app
+1. Visit deadeye.ie
 2. Sign up with email
 3. Verify email
 4. Complete onboarding (bio → level → goals)
@@ -210,7 +210,7 @@ docker push username/hoopiq:1.0.0
 **Post-Testing Interview** (30 min):
 1. What's your athletic background?
 2. How do you currently track training?
-3. First impressions of HoopIQ?
+3. First impressions of Deadeye?
 4. Which features are most valuable?
 5. Which features are least useful?
 6. Would you pay for this? (Price point?)
@@ -461,4 +461,4 @@ trackEvent('leaderboard_viewed', { user_rank })
 
 ---
 
-**Ready to deploy HoopIQ to production! 🚀**
+**Ready to deploy Deadeye to production! 🚀**

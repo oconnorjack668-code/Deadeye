@@ -2,7 +2,7 @@
 // AI Coach chat: answers questions using the player's own training data.
 // Pro/owner: unlimited. Free: FREE_CHAT_PER_DAY messages per day (no credits used).
 // Messages are stored by the server (players can read/clear but not write them).
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser, awaitingParentApproval, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { hasUnlimitedCredits } from '@/lib/ai/service';
@@ -17,6 +17,7 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
+  if (await awaitingParentApproval()) return Response.json({ error: PARENT_APPROVAL_NEEDED }, { status: 403 });
 
   let ai: ReturnType<typeof getConfiguredAI>;
   try {

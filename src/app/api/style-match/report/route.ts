@@ -1,6 +1,6 @@
 // src/app/api/style-match/report/route.ts
 // AI coaching report for a saved Play Style Match (owner and Pro plans).
-import { getCurrentUser, getCurrentSubscription, getCurrentProfile } from '@/lib/auth';
+import { getCurrentUser, getCurrentSubscription, getCurrentProfile, awaitingParentApproval, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
@@ -21,6 +21,7 @@ details about anyone. Be specific and encouraging. Respond with a JSON object wi
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
+  if (await awaitingParentApproval()) return Response.json({ error: PARENT_APPROVAL_NEEDED }, { status: 403 });
 
   const subscription = await getCurrentSubscription();
   if (subscription?.plan_type !== 'owner' && subscription?.plan_type !== 'pro') {

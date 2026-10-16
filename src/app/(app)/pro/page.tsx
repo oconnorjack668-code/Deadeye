@@ -2,7 +2,9 @@
 import React from 'react';
 import { requireUser, getCurrentSubscription } from '@/lib/auth';
 import { getStripe, stripeConfigured } from '@/lib/stripe';
+import { withdrawalDeadline, withinWithdrawalPeriod } from '@/lib/withdrawal';
 import { ProActions } from './ProActions';
+import { WithdrawFromContract } from './WithdrawFromContract';
 import { Crown, Check } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -35,6 +37,22 @@ async function priceLabel(priceId: string | undefined): Promise<string | null> {
   }
 }
 
+/** When the 14-day withdrawal window closes, formatted, or null once it has (or if Stripe can't say). */
+async function withdrawalDeadlineFor(subscriptionId: string | null | undefined): Promise<string | null> {
+  if (!subscriptionId) return null;
+  try {
+    const s = await getStripe().subscriptions.retrieve(subscriptionId);
+    if (s.status === 'canceled' || !withinWithdrawalPeriod(s.start_date)) return null;
+    return withdrawalDeadline(s.start_date).toLocaleDateString('en-IE', {
+      day: 'numeric',
+      month: 'long',
+      timeZone: process.env.APP_TIME_ZONE || 'Europe/Dublin',
+    });
+  } catch {
+    return null;
+  }
+}
+
 export default async function ProPage({ searchParams }: { searchParams: Promise<{ success?: string }> }) {
   await requireUser();
   const { success } = await searchParams;
@@ -44,6 +62,7 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
     ? await Promise.all([priceLabel(process.env.STRIPE_PRO_MONTHLY_PRICE_ID), priceLabel(process.env.STRIPE_PRO_YEARLY_PRICE_ID)])
     : [null, null];
   const plan = subscription?.plan_type || 'free';
+  const withdrawBy = plan === 'pro' && configured ? await withdrawalDeadlineFor(subscription?.stripe_subscription_id) : null;
 
   return (
     <div className="flex-1 overflow-auto">
@@ -93,9 +112,10 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
         ) : (
           <ProActions isPro={plan === 'pro'} hasYearly={!!yearly} />
         )}
+        {withdrawBy && <WithdrawFromContract deadline={withdrawBy} />}
         <p className="text-xs text-zinc-500">
-          Payments are handled securely by Stripe. Pro renews automatically until you cancel; cancel any time from Manage
-          subscription. See the{' '}
+          The price shown is the full price you pay. Payments are handled securely by Stripe. Pro renews automatically until you cancel; cancel
+          any time from Manage subscription. In the first 14 days you can also withdraw for a full refund. See the{' '}
           <a href="/terms" className="underline">
             Terms of Use
           </a>

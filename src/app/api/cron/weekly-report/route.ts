@@ -68,7 +68,13 @@ export async function GET(request: Request) {
     .select('id')
     .in('id', (prefs || []).map((p) => p.user_id))
     .eq('ai_coaching_enabled', false);
-  const skip = new Set((optedOut || []).map((r) => r.id));
+  // Nor do under-16s a parent has not approved (00036): their data goes nowhere
+  const { data: waitingForParent } = await admin
+    .from('age_checks')
+    .select('user_id')
+    .in('user_id', (prefs || []).map((p) => p.user_id))
+    .in('consent_status', ['pending', 'withdrawn']);
+  const skip = new Set([...(optedOut || []).map((r) => r.id), ...(waitingForParent || []).map((r) => r.user_id)]);
 
   const due = ((prefs || []) as Array<{ user_id: string; last_weekly_report_on: string | null; push_enabled: boolean }>)
     .filter((p) => !skip.has(p.user_id))

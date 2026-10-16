@@ -1,13 +1,20 @@
 // src/app/privacy/page.tsx
 import React from 'react';
 import Link from 'next/link';
+import { aiProviderCompany } from '@/lib/ai/config';
+import { emailConfigured } from '@/lib/email';
+import { operator } from '@/lib/legal';
+import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'September 26, 2026';
+const LAST_UPDATED = 'October 16, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
+  const runBy = operator();
+  // Named from the settings that route the requests, so this cannot drift from where data actually goes
+  const ai = aiProviderCompany() || 'Our AI provider';
 
   return (
     <div className="flex-1 bg-zinc-950 px-6 py-12">
@@ -18,10 +25,42 @@ export default function PrivacyPage() {
         <p>This policy covers Deadeye Basketball Training (&ldquo;Deadeye&rdquo;), the app and website.</p>
 
         <section className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Who runs Deadeye</h2>
+          <p>
+            {runBy ? (
+              <>
+                Deadeye is run by {runBy.name}
+                {runBy.address ? `, ${runBy.address}` : ''}, who is responsible for your data (the &ldquo;controller&rdquo;
+                under the GDPR).
+              </>
+            ) : (
+              <>Deadeye is run from Ireland.</>
+            )}
+            {contactEmail && (
+              <>
+                {' '}
+                Contact us about your data at{' '}
+                <a className="text-orange-400 underline" href={`mailto:${contactEmail}`}>
+                  {contactEmail}
+                </a>
+                .
+              </>
+            )}
+          </p>
+        </section>
+
+        <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">Who Deadeye is for</h2>
           <p>
             Deadeye is for players aged 13 and over. We do not knowingly collect information from children under 13.
             If you believe a child under 13 has created an account, contact us and we will delete it.
+          </p>
+          <p>
+            Players aged 13 to 15 need a parent or guardian to approve their account before they can use it. Until a
+            parent approves, the account holds only the email address, display name and age answer, and is deleted after{' '}
+            {UNAPPROVED_ACCOUNT_DAYS} days if nobody approves. A parent can withdraw their approval at any time from the
+            link they approved with; the account is then locked, and deleted after {UNAPPROVED_ACCOUNT_DAYS} days unless
+            they approve it again.
           </p>
         </section>
 
@@ -29,6 +68,11 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-white">What we collect</h2>
           <ul className="list-disc pl-5 space-y-1">
             <li>Account details: your email address and display name.</li>
+            <li>Whether you are 16 or over, which you tell us when you sign up.</li>
+            <li>
+              If you are under 16: your parent or guardian&apos;s name and email address, and when they approved or
+              withdrew approval.
+            </li>
             <li>Player profile: age bracket, height, position, dominant hand, playing level, goals and focus areas.</li>
             <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests.</li>
             <li>Study activity: quiz scores and lesson progress.</li>
@@ -51,10 +95,31 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-2">
-          <h2 className="text-lg font-bold text-white">How we use it</h2>
+          <h2 className="text-lg font-bold text-white">How we use it, and why we are allowed to</h2>
           <p>
             To run the app: show your progress, calculate streaks and leaderboard points, and generate coaching
             feedback when you ask for it. We do not sell your data or show ads.
+          </p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>
+              Running your account and the features you use is needed to provide the service you signed up for (the
+              GDPR calls this &ldquo;contract&rdquo;).
+            </li>
+            <li>
+              For players under 16, we also rely on their parent or guardian&apos;s consent, given on the approval page.
+            </li>
+            <li>
+              Things you switch on yourself, such as the public leaderboard, sharing training details with a coach and
+              reminders, rely on your choice, and you can switch them off at any time in Settings.
+            </li>
+            <li>
+              Crash reports and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+            </li>
+            <li>Payment records are kept because tax law requires it.</li>
+          </ul>
+          <p>
+            We keep your data for as long as you have an account. When you delete your account, everything is deleted
+            straight away, apart from crash reports (deleted within 90 days) and the payment records Stripe must keep.
           </p>
         </section>
 
@@ -64,11 +129,14 @@ export default function PrivacyPage() {
             <li>Supabase stores your account, training data and videos.</li>
             <li>Vercel hosts the app.</li>
             <li>
-              OpenAI receives the details of a session (type, duration, intensity, shooting numbers, drills and your
+              {ai} receives the details of a session (type, duration, intensity, shooting numbers, drills and your
               notes), the video numbers you choose to share, or your style match results, only when you ask for AI
-              feedback, to write the report. Videos are never sent to OpenAI.
+              feedback, to write the report. Videos are never sent to {ai === 'Our AI provider' ? 'them' : ai}.
             </li>
             <li>Stripe processes Pro payments.</li>
+            {emailConfigured() && (
+              <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>
+            )}
             <li>Your browser&apos;s push service (for example Google or Apple) delivers training reminders you turn on.</li>
           </ul>
         </section>
@@ -107,8 +175,9 @@ export default function PrivacyPage() {
           <p>
             You can download a copy of your data at any time from Profile → Download my data, and permanently delete
             your account and all of its data, including uploaded videos, from Profile → Delete account. Under the GDPR
-            you can also ask us to correct your data or restrict how we use it, and you can complain to the Irish Data
-            Protection Commission (dataprotection.ie).
+            you can also ask us to correct your data or restrict how we use it, object to how we use it, and withdraw
+            any choice or consent at any time (this does not undo what was done before). You can complain to the Irish
+            Data Protection Commission (dataprotection.ie).
           </p>
           <p>
             Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the

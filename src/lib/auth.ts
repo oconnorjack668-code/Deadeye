@@ -5,6 +5,7 @@ import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { createClient } from './supabase/server';
 import type { Database } from './supabase/types';
+import { ageGate, type AgeGate } from './parentApproval';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
@@ -54,6 +55,52 @@ export const getCurrentProfile = cache(async (): Promise<Profile | null> => {
 
   return profile;
 });
+
+export type AgeCheckRow = Database['public']['Tables']['age_checks']['Row'];
+
+const loadAgeCheck = cache(async (): Promise<{ check: AgeCheckRow | null; failed: boolean }> => {
+  const user = await getCurrentUser();
+  if (!user) return { check: null, failed: false };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.from('age_checks').select('*').eq('user_id', user.id).maybeSingle();
+  if (error) {
+    console.error('Age check lookup failed', error);
+    return { check: null, failed: true };
+  }
+  return { check: data, failed: false };
+});
+
+/** The player's under/over-16 answer and parent approval, or null if they have not answered. */
+export async function getCurrentAgeCheck(): Promise<AgeCheckRow | null> {
+  return (await loadAgeCheck()).check;
+}
+
+/**
+ * Where the age check sends this player: into the app, to the age question, or
+ * to wait for a parent.
+ *
+ * A failed lookup lets them in. Migrations are run by hand in the Supabase
+ * editor and code deploys on push, so for a while the code can be live before
+ * the age_checks table exists. Treating that error as "not answered" would
+ * send every player to a question whose answer cannot be saved, locking
+ * everyone out; letting them in leaves the gate off until 00036 is run.
+ */
+export async function getAgeGate(): Promise<AgeGate> {
+  const { check, failed } = await loadAgeCheck();
+  return failed ? 'ok' : ageGate(check);
+}
+
+/**
+ * True while an under-16 is waiting for a parent, or had approval withdrawn.
+ * The app layout redirects them away from every page; API routes that send
+ * their data anywhere check this too, because a direct POST skips the layout.
+ */
+export async function awaitingParentApproval(): Promise<boolean> {
+  return (await getAgeGate()) !== 'ok';
+}
+
+export const PARENT_APPROVAL_NEEDED = 'A parent or guardian needs to approve your account first.';
 
 /**
  * Server check for owner entitlement.

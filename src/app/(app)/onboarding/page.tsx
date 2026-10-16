@@ -21,6 +21,15 @@ import {
 } from 'lucide-react';
 import type { AgeBracket, BasketballPosition, DominantHand, PlayingLevel } from '@/lib/supabase/types';
 import { asMeasurementSystem, cmToFeetInches, feetInchesToCm, type MeasurementSystem } from '@/lib/units';
+import { allowedAgeBrackets } from '@/lib/parentApproval';
+
+const AGE_BRACKET_LABELS: Record<AgeBracket, string> = {
+  '13': '13',
+  '14-17': '14 - 17 (High School)',
+  '18-22': '18 - 22 (College / Academy)',
+  '23-30': '23 - 30 (Amateur / Adult)',
+  '30+': '30+ (Masters / Rec)',
+};
 
 const GOAL_OPTIONS = [
   'Consistent Training Habit',
@@ -63,6 +72,8 @@ export default function OnboardingPage() {
   // Form State
   const [displayName, setDisplayName] = useState('');
   const [ageBracket, setAgeBracket] = useState<AgeBracket>('18-22');
+  // The under/over-16 answer from sign-up limits which brackets make sense
+  const [is16Plus, setIs16Plus] = useState<boolean | null>(null);
   // Height is kept in cm (what's stored); imperial players type feet + inches
   const [heightCm, setHeightCm] = useState<number | ''>(185);
   const [units, setUnits] = useState<MeasurementSystem>('imperial');
@@ -91,7 +102,15 @@ export default function OnboardingPage() {
         return;
       }
 
-      const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+      const [{ data: profile }, { data: ageCheck }] = await Promise.all([
+        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('age_checks').select('is_16_plus').eq('user_id', user.id).maybeSingle(),
+      ]);
+
+      const allowed = allowedAgeBrackets(ageCheck?.is_16_plus ?? null);
+      if (ageCheck) setIs16Plus(ageCheck.is_16_plus);
+      // The 18-22 default is wrong for an under-16
+      if (!allowed.includes('18-22')) setAgeBracket(allowed[allowed.length - 1]);
 
       if (profile) {
         if (profile.onboarding_completed && !editing) {
@@ -99,7 +118,7 @@ export default function OnboardingPage() {
           return;
         }
         if (profile.display_name) setDisplayName(profile.display_name);
-        if (profile.age_bracket) setAgeBracket(profile.age_bracket as AgeBracket);
+        if (profile.age_bracket && allowed.includes(profile.age_bracket as AgeBracket)) setAgeBracket(profile.age_bracket as AgeBracket);
         if (profile.measurement_system) setUnits(asMeasurementSystem(profile.measurement_system));
         if (profile.height_cm) {
           setHeightCm(profile.height_cm);
@@ -414,13 +433,7 @@ export default function OnboardingPage() {
                   label="Age Bracket"
                   value={ageBracket}
                   onChange={(e) => setAgeBracket(e.target.value as AgeBracket)}
-                  options={[
-                    { value: '13', label: '13' },
-                    { value: '14-17', label: '14 - 17 (High School)' },
-                    { value: '18-22', label: '18 - 22 (College / Academy)' },
-                    { value: '23-30', label: '23 - 30 (Amateur / Adult)' },
-                    { value: '30+', label: '30+ (Masters / Rec)' },
-                  ]}
+                  options={allowedAgeBrackets(is16Plus).map((value) => ({ value, label: AGE_BRACKET_LABELS[value] }))}
                 />
               </div>
             </CardContent>

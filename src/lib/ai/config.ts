@@ -29,6 +29,21 @@ export function inferProvider(apiKey: string): string {
   return 'anthropic';
 }
 
+const PROVIDER_COMPANIES: Record<string, string> = { anthropic: 'Anthropic', openai: 'OpenAI' };
+
+/**
+ * The company that receives AI requests, for the privacy policy and the parent
+ * approval page. Read from the same settings that route the requests, so what
+ * the policy says cannot drift from where the data actually goes. null when AI
+ * is not configured.
+ */
+export function aiProviderCompany(): string | null {
+  const apiKey = (process.env.AI_API_KEY || '').trim();
+  if (!apiKey) return null;
+  const name = (process.env.AI_PROVIDER || '').trim().toLowerCase() || inferProvider(apiKey);
+  return PROVIDER_COMPANIES[name] ?? null;
+}
+
 /**
  * Resolves the configured AI provider and its call config.
  * Throws AINotConfiguredError if AI_API_KEY is missing, or if AI_PROVIDER names

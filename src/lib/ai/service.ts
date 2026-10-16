@@ -2,7 +2,7 @@
 // SERVER-ONLY: generates post-session coaching reports and manages AI credits.
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { checkIsOwner } from '@/lib/auth';
+import { awaitingParentApproval, checkIsOwner, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { getConfiguredAI, AINotConfiguredError } from './config';
 import type { CoachingEvidence, CoachingOutput } from './provider';
 import type { Database } from '@/lib/supabase/types';
@@ -165,6 +165,7 @@ async function assertAiEnabled(supabase: Awaited<ReturnType<typeof createClient>
   if (data?.ai_coaching_enabled === false) {
     throw new AICoachError('AI coaching is switched off in your settings.', 403);
   }
+  if (await awaitingParentApproval()) throw new AICoachError(PARENT_APPROVAL_NEEDED, 403);
 }
 
 export async function generateSessionReport(userId: string, sessionId: string): Promise<GeneratedReport> {

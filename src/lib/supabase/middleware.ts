@@ -51,7 +51,10 @@ export async function updateSession(request: NextRequest) {
     pathname === '/' || pathname.startsWith('/about') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') ||
     pathname.startsWith('/.well-known') ||
     pathname.startsWith('/account-deletion') ||
-    pathname === '/api/errors';
+    pathname === '/api/errors' ||
+    // A parent approving an under-16 has no account; the token in the link is the access
+    pathname.startsWith('/parents/') ||
+    pathname.startsWith('/api/parents/');
 
   // If user is not authenticated and trying to access protected routes
   if (!user && !isAuthPath && !isPublicMarketingPath) {

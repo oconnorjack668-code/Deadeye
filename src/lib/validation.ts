@@ -43,8 +43,9 @@ export const signUpSchema = z.object({
   email: z.email('Please enter a valid email address'),
   password: newPassword(),
   displayName: z.string().check(z.minLength(2, 'Display name must be at least 2 characters'), z.maxLength(50)),
-  // Deadeye is for players aged 13 and over
-  ageConfirmed: z.boolean().check(z.refine((v) => v, 'You must be 13 or older to use Deadeye')),
+  // Deadeye is for players aged 13 and over; under 16 needs a parent (00036)
+  age: z.enum(['16-plus', '13-15'], 'Please tell us how old you are'),
+  termsAccepted: z.boolean().check(z.refine((v) => v, 'Please agree to the privacy policy and terms')),
 });
 
 export const signInSchema = z.object({

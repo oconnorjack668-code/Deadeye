@@ -11,13 +11,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
+import { AgeChoice, type AgeAnswer } from '@/components/AgeChoice';
 
 export default function SignUpPage() {
   const router = useRouter();
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [ageConfirmed, setAgeConfirmed] = useState(false);
+  const [age, setAge] = useState<AgeAnswer | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +33,8 @@ export default function SignUpPage() {
       displayName,
       email: email.trim(),
       password,
-      ageConfirmed,
+      age,
+      termsAccepted,
     });
 
     if (!result.success) {
@@ -55,7 +58,8 @@ export default function SignUpPage() {
         options: {
           data: {
             display_name: displayName.trim(),
-            age_confirmed_13_plus: true,
+            // Read by the handle_new_user trigger into age_checks (00036)
+            age_16_plus: age === '16-plus',
           },
           emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
         },
@@ -142,16 +146,18 @@ export default function SignUpPage() {
                 autoComplete="new-password"
               />
 
+              <AgeChoice value={age} onChange={setAge} error={errors.age} />
+
               <div>
                 <label className="flex items-start gap-2.5 text-sm text-zinc-300 cursor-pointer">
                   <input
                     type="checkbox"
-                    checked={ageConfirmed}
-                    onChange={(e) => setAgeConfirmed(e.target.checked)}
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
                     className="mt-0.5 h-4 w-4 accent-red-500"
                   />
                   <span>
-                    I am 13 or older and agree to the{' '}
+                    I agree to the{' '}
                     <Link href="/privacy" target="_blank" className="text-red-400 underline hover:text-red-300">
                       privacy policy
                     </Link>{' '}
@@ -161,7 +167,7 @@ export default function SignUpPage() {
                     </Link>
                   </span>
                 </label>
-                {errors.ageConfirmed && <p className="mt-1 text-xs text-red-400">{errors.ageConfirmed}</p>}
+                {errors.termsAccepted && <p className="mt-1 text-xs text-red-400">{errors.termsAccepted}</p>}
               </div>
             </CardContent>
 

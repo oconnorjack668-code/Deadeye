@@ -8,12 +8,16 @@ const firstMessage = (r: { success: boolean; error?: { issues: Array<{ message: 
 
 describe('form validation', () => {
   it('sign up', () => {
-    const ok = { displayName: 'Al', email: 'a@b.co', password: 'Password1', ageConfirmed: true };
+    const ok = { displayName: 'Al', email: 'a@b.co', password: 'Password1', age: '16-plus', termsAccepted: true };
     expect(signUpSchema.safeParse(ok).success).toBe(true);
+    expect(signUpSchema.safeParse({ ...ok, age: '13-15' }).success).toBe(true);
     expect(firstMessage(signUpSchema.safeParse({ ...ok, email: 'nope' }))).toBe('Please enter a valid email address');
     expect(firstMessage(signUpSchema.safeParse({ ...ok, password: 'password1' }))).toBe('Password must contain at least one uppercase letter');
     expect(firstMessage(signUpSchema.safeParse({ ...ok, password: 'Pass1' }))).toBe('Password must be at least 8 characters');
-    expect(firstMessage(signUpSchema.safeParse({ ...ok, ageConfirmed: false }))).toBe('You must be 13 or older to use Deadeye');
+    // Unanswered arrives as null from the form
+    expect(firstMessage(signUpSchema.safeParse({ ...ok, age: null }))).toBe('Please tell us how old you are');
+    expect(firstMessage(signUpSchema.safeParse({ ...ok, age: '12' }))).toBe('Please tell us how old you are');
+    expect(firstMessage(signUpSchema.safeParse({ ...ok, termsAccepted: false }))).toBe('Please agree to the privacy policy and terms');
   });
 
   // Written with the rest of the auth forms but never imported until

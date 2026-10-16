@@ -12,6 +12,7 @@ export type Json =
 export type UserRole = 'player' | 'owner' | 'admin';
 export type PlanType = 'free' | 'pro' | 'owner';
 export type AgeBracket = '13' | '14-17' | '18-22' | '23-30' | '30+';
+export type ConsentStatus = 'not_needed' | 'pending' | 'approved' | 'withdrawn';
 export type BasketballPosition = 'PG' | 'SG' | 'SF' | 'PF' | 'C' | 'G' | 'F' | 'multi';
 export type DominantHand = 'left' | 'right' | 'ambidextrous';
 export type PlayingLevel = 'beginner' | 'intermediate' | 'advanced' | 'elite' | 'college_pro';
@@ -152,6 +153,41 @@ export interface Database {
     // again it has to be declared here or its queries will type as `never`.
     Views: Record<string, never>;
     Tables: {
+      // Players read their own row; only the server writes (00036)
+      age_checks: {
+        Row: {
+          user_id: string;
+          is_16_plus: boolean;
+          answered_at: string;
+          consent_status: ConsentStatus;
+          request_token: string | null;
+          parent_name: string | null;
+          parent_email: string | null;
+          confirm_token: string | null;
+          confirm_sent_at: string | null;
+          approved_at: string | null;
+          approval_method: 'email' | 'link' | null;
+          withdrawn_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          is_16_plus: boolean;
+          answered_at?: string;
+          consent_status?: ConsentStatus;
+          request_token?: string | null;
+        };
+        Update: {
+          consent_status?: ConsentStatus;
+          parent_name?: string | null;
+          parent_email?: string | null;
+          confirm_token?: string | null;
+          confirm_sent_at?: string | null;
+          approved_at?: string | null;
+          approval_method?: 'email' | 'link' | null;
+          withdrawn_at?: string | null;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;

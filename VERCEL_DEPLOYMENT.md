@@ -1,6 +1,6 @@
-# HoopIQ - Vercel Deployment Guide
+# Deadeye - Vercel Deployment Guide
 
-**Target**: Deploy HoopIQ to production via Vercel  
+**Target**: Deploy Deadeye to production via Vercel  
 **Time**: ~10-15 minutes  
 **Requirements**: GitHub account, Vercel account, environment variables
 
@@ -13,7 +13,7 @@
 cd /c/Users/Vivobook\ S16/Documents/hoopiq
 git init
 git add .
-git commit -m "chore: initial HoopIQ implementation
+git commit -m "chore: initial Deadeye implementation
 
 - Complete basketball player development platform
 - Next.js 16 + Supabase + TypeScript
@@ -120,7 +120,7 @@ Click "Add New" for each variable and fill in the values.
 Once complete, you'll see:
 - ✅ Build successful
 - ✅ Deployment complete
-- 🌐 Production URL: `https://hoopiq.vercel.app` (or your custom domain)
+- 🌐 Production URL: `https://deadeye.ie` (or your custom domain)
 
 ---
 
@@ -150,7 +150,7 @@ Once complete, you'll see:
 
 ### 6.1 Visit Your Site
 ```
-https://hoopiq.vercel.app
+https://deadeye.ie
 ```
 
 ### 6.2 Test Core Flows
@@ -195,7 +195,7 @@ https://hoopiq.vercel.app
 
 ### 7.1 Add Domain
 1. Vercel Dashboard → Project Settings → Domains
-2. Enter your domain (e.g., `hoopiq.app`)
+2. Enter your domain (e.g., `deadeye.ie`)
 3. Follow DNS configuration instructions
 4. Usually takes 5-30 minutes to propagate
 
@@ -274,7 +274,7 @@ Enable Vercel Analytics in Project Settings → Analytics
 ### 1. Invite Beta Testers
 Share your production URL:
 ```
-https://hoopiq.vercel.app
+https://deadeye.ie
 ```
 
 Create test accounts for testers to use.
@@ -359,7 +359,7 @@ npm run start
 
 ## Production URLs
 
-**Live Site**: https://hoopiq.vercel.app  
+**Live Site**: https://deadeye.ie  
 **Vercel Dashboard**: https://vercel.com/dashboard  
 **Supabase Console**: https://app.supabase.com  
 **OpenAI Dashboard**: https://platform.openai.com  

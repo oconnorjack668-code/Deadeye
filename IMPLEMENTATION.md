@@ -1,8 +1,8 @@
-# HoopIQ - Complete Implementation Guide
+# Deadeye - Complete Implementation Guide
 
 ## Project Overview
 
-HoopIQ is a comprehensive basketball player development operating system (PWA) built with Next.js 16, TypeScript, Supabase, and Tailwind CSS. It enables players to track training sessions, workouts, performance tests, and receive AI-powered coaching feedback.
+Deadeye is a comprehensive basketball player development operating system (PWA) built with Next.js 16, TypeScript, Supabase, and Tailwind CSS. It enables players to track training sessions, workouts, performance tests, and receive AI-powered coaching feedback.
 
 **Live Features:**
 - ✅ Authentication with email/password & OAuth

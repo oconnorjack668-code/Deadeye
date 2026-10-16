@@ -1,6 +1,7 @@
 // src/app/(app)/layout.tsx
 import React from 'react';
-import { requireUser, checkIsOwner, getCurrentProfile } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { requireUser, checkIsOwner, getCurrentProfile, getAgeGate } from '@/lib/auth';
 import { Navbar } from '@/components/layout/Navbar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { QuickLog } from '@/components/layout/QuickLog';
@@ -18,8 +19,12 @@ export default async function AppLayout({
 }) {
   await requireUser();
 
-  // Both are cached per request, so pages that also need them don't query again
-  const [profile, isOwner] = await Promise.all([getCurrentProfile(), checkIsOwner()]);
+  // All cached per request, so pages that also need them don't query again
+  const [profile, isOwner, gate] = await Promise.all([getCurrentProfile(), checkIsOwner(), getAgeGate()]);
+
+  // Under-16s wait for a parent before anything else (00036), onboarding included
+  if (gate === 'ask-age') redirect('/age-check');
+  if (gate === 'needs-parent') redirect('/parent-approval');
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">

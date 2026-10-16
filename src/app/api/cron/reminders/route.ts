@@ -5,6 +5,30 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { pushConfigured, sendPush } from '@/lib/push';
 import { reminderDue, type ReminderPrefs } from '@/lib/reminders';
+import { deleteAccount } from '@/lib/accountDeletion';
+import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
+
+async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClient>): Promise<number> {
+  const { data: waiting, error } = await admin
+    .from('age_checks')
+    .select('user_id, consent_status, answered_at, withdrawn_at')
+    .in('consent_status', ['pending', 'withdrawn'])
+    .order('answered_at', { ascending: true })
+    .limit(500);
+  if (error) throw error;
+
+  const now = new Date();
+  const due = (waiting || []).filter((c) =>
+    olderThanDays(c.consent_status === 'withdrawn' ? c.withdrawn_at : c.answered_at, UNAPPROVED_ACCOUNT_DAYS, now)
+  );
+  let removed = 0;
+  // A few per run keeps the job well inside its time limit; the rest go tomorrow
+  for (const c of due.slice(0, 25)) {
+    const result = await deleteAccount(admin, c.user_id);
+    if (result.ok) removed++;
+  }
+  return removed;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -25,7 +49,14 @@ export async function GET(request: Request) {
       () => undefined
     );
 
-  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing' }, { status: 503 });
+  // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
+  // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)
+  const removed = await removeUnapprovedAccounts(admin).catch((err) => {
+    console.error('Unapproved account clean-up failed', err);
+    return 0;
+  });
+
+  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed }, { status: 503 });
 
   const { data: prefs, error } = await admin
     .from('notification_preferences')
@@ -34,10 +65,19 @@ export async function GET(request: Request) {
     .eq('push_enabled', true);
   if (error) return Response.json({ error: error.message }, { status: 500 });
 
+  // A locked under-16 (00036) cannot open the app, so a nudge to train in it is noise
+  const { data: locked } = await admin
+    .from('age_checks')
+    .select('user_id')
+    .in('user_id', (prefs || []).map((p) => p.user_id))
+    .in('consent_status', ['pending', 'withdrawn']);
+  const lockedIds = new Set((locked || []).map((r) => r.user_id));
+
   const now = new Date();
   let sent = 0;
   let skipped = 0;
   for (const p of (prefs || []) as Array<ReminderPrefs & { user_id: string }>) {
+    if (lockedIds.has(p.user_id)) continue;
     const { due, localDate } = reminderDue(p, now);
     if (!due) continue;
 
@@ -64,5 +104,5 @@ export async function GET(request: Request) {
       if (result === 'gone') await admin.from('push_subscriptions').delete().eq('endpoint', s.endpoint);
     }
   }
-  return Response.json({ checked: prefs?.length || 0, sent, skipped });
+  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed });
 }

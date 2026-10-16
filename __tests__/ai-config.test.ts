@@ -4,7 +4,7 @@
 // an OpenAI key with no AI_PROVIDER set was sent to Anthropic, which answered
 // "401 invalid x-api-key" and sent the user looking at their key.
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getConfiguredAI, inferProvider, AINotConfiguredError } from '@/lib/ai/config';
+import { aiProviderCompany, getConfiguredAI, inferProvider, AINotConfiguredError } from '@/lib/ai/config';
 
 const OPENAI_KEY = 'sk-proj-abc123';
 const ANTHROPIC_KEY = 'sk-ant-api03-abc123';
@@ -104,5 +104,22 @@ describe('getConfiguredAI', () => {
   it('passes maxTokens through', () => {
     process.env.AI_API_KEY = ANTHROPIC_KEY;
     expect(getConfiguredAI(1234).config.maxTokens).toBe(1234);
+  });
+});
+
+// The privacy policy and the parent approval page name this company. Reading it
+// from the same settings that route requests is what stops the policy naming
+// one vendor while data goes to another. It used to say OpenAI whatever the
+// settings were, though an Anthropic key sends everything to Anthropic.
+describe('aiProviderCompany', () => {
+  it('names the company the requests actually go to', () => {
+    expect(aiProviderCompany()).toBeNull();
+    process.env.AI_API_KEY = ANTHROPIC_KEY;
+    expect(aiProviderCompany()).toBe('Anthropic');
+    process.env.AI_API_KEY = OPENAI_KEY;
+    expect(aiProviderCompany()).toBe('OpenAI');
+    process.env.AI_PROVIDER = 'anthropic';
+    process.env.AI_API_KEY = 'some-other-key';
+    expect(aiProviderCompany()).toBe('Anthropic');
   });
 });

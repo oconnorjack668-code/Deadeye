@@ -1,7 +1,7 @@
 // src/app/api/video/feedback/route.ts
 // AI feedback on on-device video analysis. The player chooses whether the AI
 // sees their shooting data, their mechanics data, or both. Video never leaves the phone.
-import { getCurrentUser, getCurrentProfile } from '@/lib/auth';
+import { getCurrentUser, getCurrentProfile, awaitingParentApproval, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { AICoachError, reserveCredit, refundCredit } from '@/lib/ai/service';
@@ -20,6 +20,7 @@ function num(v: unknown, min: number, max: number): number | null {
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
+  if (await awaitingParentApproval()) return Response.json({ error: PARENT_APPROVAL_NEEDED }, { status: 403 });
 
   let ai: ReturnType<typeof getConfiguredAI>;
   try {
