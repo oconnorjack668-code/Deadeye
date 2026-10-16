@@ -265,6 +265,48 @@ describe('ShotDetector', () => {
     });
   });
 
+  // The hoop crop necessarily contains whoever is under the basket. On the
+  // measured clip a friend was passing the ball back after every shot, so
+  // there was a second moving, ball-sized thing below the rim for most of the
+  // session - and the detector paired the real ball above the rim with that
+  // below it, deciding a made shot was a miss through a point the ball never
+  // went near. No make threshold could have caught it: that bogus crossing
+  // landed at 2.85 half-rims, between genuine misses at 2.87 and 3.43.
+  it('will not pair the ball with something else that appears below the rim', () => {
+    const d = new ShotDetector(RIM);
+    // Ball descending towards the hoop, still above it
+    d.push({ t: 0, ball: { x: 0.42, y: 0.20 } });
+    d.push({ t: 33, ball: { x: 0.44, y: 0.24 } });
+    // Next frame, a rebounder's head appears below the rim and far to the
+    // right. No ball covers that ground in 33ms.
+    expect(d.push({ t: 66, ball: { x: 0.80, y: 0.42 } })).toBeNull();
+    expect(d.shots).toHaveLength(0);
+
+    // The real ball arrives and is still judged on its own merits
+    d.push({ t: 99, ball: { x: 0.46, y: 0.28 } });
+    const shot = d.push({ t: 132, ball: { x: 0.48, y: 0.32 } });
+    expect(shot?.made).toBe(true);
+  });
+
+  it('still accepts a ball that genuinely covered the ground', () => {
+    // The guard must not reject a real descent, which would trade one error
+    // for another. This is the same speed a shot actually falls at.
+    const d = new ShotDetector(RIM);
+    d.push({ t: 0, ball: { x: 0.46, y: 0.22 } });
+    d.push({ t: 33, ball: { x: 0.48, y: 0.26 } });
+    const shot = d.push({ t: 66, ball: { x: 0.50, y: 0.30 } });
+    expect(shot?.made).toBe(true);
+  });
+
+  it('reports how far from centre the ball crossed', () => {
+    const d = new ShotDetector(RIM);
+    d.push({ t: 0, ball: { x: 0.5, y: 0.1 } });
+    for (let i = 1; i <= 12; i++) d.push({ t: i * 33, ball: { x: 0.5, y: 0.1 + i * 0.02 } });
+    const shot = d.shots[0];
+    // Straight down the middle, so barely off centre at all
+    expect(shot.crossMargin).toBeLessThan(0.2);
+  });
+
   it('ignores the ball when it is nowhere near the hoop (dribbling, passing)', () => {
     const dribbling: BallObservation[] = Array.from({ length: 90 }, (_, i) => ({
       t: i * 33,

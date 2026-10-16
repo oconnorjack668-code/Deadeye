@@ -212,10 +212,13 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       ...(scored
         ? [
             `make/miss        ${correct} of ${scored.length} correct`,
-            ...scored.map(
-              (s) =>
-                `  ${s.at.toFixed(1)}s called ${s.called ? 'MAKE' : 'MISS'}, was ${s.trulyMade ? 'MAKE' : 'MISS'}  ${s.right ? 'ok' : '<-- WRONG'}`
-            ),
+            ...scored.map((s, i) => {
+              // How far from the rim centre it crossed, in half-rim widths.
+              // A wrong call at 1.2 and a wrong call at 4 need different fixes.
+              const m = shots[i]?.crossMargin;
+              const where = m === undefined ? 'not seen crossing' : `crossed at ${m.toFixed(2)} half-rims`;
+              return `  ${s.at.toFixed(1)}s called ${s.called ? 'MAKE' : 'MISS'}, was ${s.trulyMade ? 'MAKE' : 'MISS'}  ${s.right ? 'ok' : '<-- WRONG'}  (${where})`;
+            }),
           ]
         : shots.map((s) => `  ${(s.t / 1000).toFixed(1)}s ${s.made ? 'MAKE' : 'MISS'}${s.confident ? '' : ' (inferred)'}`)),
       `took            ${((Date.now() - startedAt) / 1000).toFixed(0)}s`,

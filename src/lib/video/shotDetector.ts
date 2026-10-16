@@ -116,7 +116,56 @@ export interface DetectedShot {
   t: number; // time the shot was decided (ms)
   made: boolean;
   confident: boolean; // false when the result was inferred without seeing the ball cross the rim
+  /**
+   * How far from the rim's centre the ball crossed, in half-rim widths.
+   *
+   * 0 is dead centre, 1 is the ring itself, and the make test accepts up to
+   * MAKE_MARGIN. Absent when no crossing was seen, which is the same case as
+   * confident: false.
+   *
+   * Kept because "called a miss by a hair" and "called a miss by a metre" are
+   * completely different events and the app could not previously tell them
+   * apart - see BORDERLINE_MARGIN below.
+   */
+  crossMargin?: number;
 }
+
+/**
+ * How far out a crossing can be and still count as a make.
+ *
+ * Slightly over 1 because the ball has width and the measured rim is two taps
+ * rather than a survey.
+ */
+export const MAKE_MARGIN = 1.1;
+
+// A "borderline" band was tried here, marking crossings just outside the ring
+// as unclear for the player to decide. It was added while chasing a wrong call
+// that turned out to have a different cause entirely, and once that was fixed
+// the measured margins separated cleanly - makes at 0.18 to 0.64 half-rims,
+// misses at 1.21 and above. The band only ever flagged correct misses, so it
+// cost the player taps and bought nothing. Removed rather than kept "just in
+// case": if a mis-tapped rim turns out to blur that gap on other footage, it
+// can come back with evidence behind it.
+
+/**
+ * Fastest a ball may appear to travel, in rim widths per second.
+ *
+ * A rim is 45cm, so 25 rim widths a second is about 11 m/s on screen - well
+ * above a jump shot and generous enough for a close camera, a fast break or a
+ * blurred frame. Its job is not to model ball physics but to reject a jump no
+ * ball could make.
+ *
+ * This exists because the hoop crop necessarily contains the player, whose head
+ * and shoulders are a round, moving, roughly ball-sized blob below the rim
+ * line. On the measured clip that cost a made shot: the detector decided at
+ * 20.1s, when the ball was still high and to the left and had not reached the
+ * rim, by pairing the ball above the rim with something else below it. The
+ * crossing came out 2.85 half-rims wide - indistinguishable from the genuine
+ * misses at 2.87 and 3.43, so no make threshold could ever have separated them.
+ * The fix is upstream of the make test: the thing that crossed has to plausibly
+ * be the thing that was tracked.
+ */
+export const MAX_BALL_RIMS_PER_SEC = 25;
 
 const COOLDOWN_MS = 1200; // ignore rim bounces / put-backs right after a decision
 const LOST_BALL_MS = 1500; // armed shot with the ball out of view this long -> miss
@@ -171,6 +220,17 @@ export class ShotDetector {
     // Ball has come down to rim level: did it pass through the rim?
     if (depth >= 0 && this.lastAbove) {
       const prev = this.lastAbove;
+      // Is this plausibly the same ball? The crop contains the player, and
+      // pairing the ball above the rim with a shoulder below it produces a
+      // confident crossing through a point the ball never went near. Measured
+      // in rim widths so it holds at any distance or resolution.
+      const travelled = Math.hypot(x - prev.x, y - prev.y);
+      const reachable = (MAX_BALL_RIMS_PER_SEC * Math.max(obs.t - prev.t, 1)) / 1000;
+      if (rim.width > 0 && travelled > reachable * rim.width) {
+        // Not the ball. Leave the shot armed: the real one may still arrive,
+        // and LOST_BALL_MS and MAX_FLIGHT_MS still bound how long that can run.
+        return null;
+      }
       // Both the ball's path and the rim line are straight, so `depth` runs
       // linearly along this step and the crossing is where it reaches zero.
       const prevDepth = prev.y - rimYAt(rim, prev.x);
@@ -186,9 +246,10 @@ export class ShotDetector {
       // into the crossing. Locality beats smoothing when the motion being
       // measured is not smooth. See README; do not re-add without labels.
       const crossX = prev.x + (x - prev.x) * Math.min(1, Math.max(0, fraction));
-      const throughRim = Math.abs(crossX - rim.x) <= halfRim * 1.1;
+      const margin = halfRim > 0 ? Math.abs(crossX - rim.x) / halfRim : Infinity;
+      const throughRim = margin <= MAKE_MARGIN;
       const confident = obs.t - prev.t <= 250;
-      return this.decide(obs.t, throughRim, confident);
+      return this.decide(obs.t, throughRim, confident, margin);
     }
 
     if (sideways > rim.width * (APPROACH_WIDTHS + 1) || obs.t - this.armedAt > MAX_FLIGHT_MS) {
@@ -197,8 +258,8 @@ export class ShotDetector {
     return null;
   }
 
-  private decide(t: number, made: boolean, confident: boolean): DetectedShot {
-    const shot = { t, made, confident };
+  private decide(t: number, made: boolean, confident: boolean, crossMargin?: number): DetectedShot {
+    const shot: DetectedShot = { t, made, confident, ...(crossMargin === undefined ? {} : { crossMargin }) };
     this.shots.push(shot);
     this.armedAt = null;
     this.lastAbove = null;

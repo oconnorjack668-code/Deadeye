@@ -229,10 +229,24 @@ mask also covers where the ball *was* — where the current frame shows wall, so
 the colour reads back as a blend (measured at 0.33 similarity to a ball that was
 a perfect match).
 
-With the ten shots hand-labelled, make/miss comes out at **9 of 10 correct**.
-The one error is a make called a miss — the conservative direction, which the
-review step catches. The rim was placed carefully by hand and this is one clip
-in one hall with one ball, so it is a real number but a narrow one.
+With the ten shots hand-labelled, make/miss is **10 of 10 correct**. The rim was
+placed carefully by hand and this is one clip in one hall with one ball, so it
+is a real number but a narrow one.
+
+Getting the last one right needed a fix upstream of the make test, and the
+diagnosis is worth keeping. A made shot was being called a miss, and the
+crossing came out **2.85 half-rims** from centre — sitting between genuine
+misses at 2.87 and 3.43, so no make threshold could ever have separated them.
+The frames showed why: a friend was passing the ball back after every shot, so
+there was a second moving, ball-sized object below the rim for most of the
+session, and the detector was pairing the real ball above the rim with *him*
+below it. `MAX_BALL_RIMS_PER_SEC` now rejects a crossing the ball could not
+physically have reached. Afterwards the margins separate cleanly: makes at 0.18
+to 0.64, misses at 1.21 and up.
+
+`DetectedShot.crossMargin` records that distance, which is what made the
+diagnosis possible — "wrong by a hair" and "wrong by a metre" need completely
+different fixes and the app previously could not tell them apart.
 
 **A failed experiment worth not repeating.** The crossing rests on just two
 sightings, the last above the rim line and the first at or below it, so one
@@ -245,10 +259,13 @@ a ball clipping the rim or dragging through the net deflects, and a fit reaching
 The code is in git history at `ba3c0c0`; don't re-add it without labelled clips
 to test against.
 
-**Do not tune the make/miss gate on this clip.** The remaining error is one
-borderline shot, and `halfRim * 1.1` could be widened to catch it — at the risk
-of the five misses it currently gets right. That is overfitting to ten shots in
-one gym. More labelled clips first.
+**Do not tune `MAKE_MARGIN` to fix a bad call.** Both times a call looked like
+a threshold problem it was not: fitting the crossing to a track measured worse,
+and the last wrong call was a rebounder being mistaken for the ball. Check
+`crossMargin` first — a wrong call well outside the ring is a tracking fault,
+not a threshold one. A "borderline" band marking near-misses as unclear was
+tried and removed: once the real bug was fixed it only ever flagged correct
+misses.
 
 Overall counting accuracy still has not been measured against labelled footage.
 Treat the counts as assistive rather than authoritative, and keep the review
