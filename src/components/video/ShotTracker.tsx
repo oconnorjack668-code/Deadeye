@@ -8,13 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { expectedBallDiameter } from '@/lib/video/motionBall';
-import {
-  announceShot,
-  loadSoundChoice,
-  storeSoundChoice,
-  SOUND_CHOICES,
-  type SoundChoice,
-} from '@/lib/video/trackerSound';
+import { announceShot, loadSound, DEFAULT_SOUND, type SoundSettings } from '@/lib/video/trackerSound';
+import { SoundPicker } from './SoundPicker';
 import { createBallTracker, type BallTracker } from '@/lib/video/ballTracker';
 import {
   loadSavedRims,
@@ -88,7 +83,7 @@ export function ShotTracker({
   // id forces a fresh element per shot, so the flash animation restarts on a
   // quick second make rather than sitting there already finished.
   const [flash, setFlash] = useState<{ id: number; made: boolean; confident: boolean; makes: number; attempts: number } | null>(null);
-  const [sound, setSound] = useState<SoundChoice>('off');
+  const [sound, setSound] = useState<SoundSettings>(DEFAULT_SOUND);
   const ballVisibleRef = useRef(false);
   const lastElapsedPushRef = useRef(0);
 
@@ -214,7 +209,7 @@ export function ShotTracker({
     // Read here rather than on mount: localStorage does not exist while this
     // renders on the server, and seeding state from it would hydrate to a
     // different value than the server sent.
-    setSound(loadSoundChoice());
+    setSound(loadSound());
     setSavedRims(loadSavedRims());
     setRimSaved(false);
     setRimName('');
@@ -802,29 +797,7 @@ export function ShotTracker({
               trust is the entire proposition; a faster one that is sometimes
               wrong is worth nothing. */}
 
-          {!calibrating && (
-            <label className="flex items-center gap-2 text-xs text-zinc-400">
-              Call shots out loud
-              <select
-                value={sound}
-                onChange={(e) => {
-                  const choice = e.target.value as SoundChoice;
-                  setSound(choice);
-                  storeSoundChoice(choice);
-                  // Played immediately so the choice can be heard and judged
-                  // here, rather than discovered mid-session from the arc.
-                  announceShot(choice, true, 1, 1);
-                }}
-                className="rounded-lg border border-zinc-800 bg-zinc-900 px-2 py-1 text-white"
-              >
-                {SOUND_CHOICES.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
+          {!calibrating && <SoundPicker value={sound} onChange={setSound} />}
         </div>
       )}
 

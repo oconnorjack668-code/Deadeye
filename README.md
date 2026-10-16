@@ -280,8 +280,12 @@ Treat the counts as assistive rather than authoritative, and keep the review
 step before saving. `/admin/detector-bench` measures a clip and compares
 full-frame against the crop.
 
-The tracker can **call shots out loud** — silent by default, with tones, a
-synthesised swish, or a spoken running score (`src/lib/video/trackerSound.ts`).
+The tracker can **call shots out loud** — silent by default
+(`src/lib/video/trackerSound.ts`). Makes and misses are chosen separately,
+because they are not equally interesting: a make is the thing worth hearing and
+most people want nothing for a miss unless it is funny, so misses default to
+silent. The voice has styles (score only, call and score, hyped, makes only) and
+picks from whichever voices the browser offers.
 A phone on a tripod is several metres away and the player is usually facing the
 hoop, so vibration is useless and a glance costs the next rep; sound is the part
 of the confirmation that actually reaches them. Tones are synthesised through
