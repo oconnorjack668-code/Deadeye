@@ -9,7 +9,7 @@ import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { expectedBallDiameter } from '@/lib/video/motionBall';
 import { announceShot, loadSound, DEFAULT_SOUND, type SoundSettings } from '@/lib/video/trackerSound';
-import { SoundPicker } from './SoundPicker';
+import { SoundStatus } from './SoundPicker';
 import { createBallTracker, type BallTracker } from '@/lib/video/ballTracker';
 import {
   loadSavedRims,
@@ -797,7 +797,10 @@ export function ShotTracker({
               trust is the entire proposition; a faster one that is sometimes
               wrong is worth nothing. */}
 
-          {!calibrating && <SoundPicker value={sound} onChange={setSound} />}
+          {/* The picker itself lives in Settings. It is chosen once and wanted
+              on every session, so what belongs here is confirmation of what
+              will be heard and one button to silence it. */}
+          {!calibrating && <SoundStatus value={sound} onChange={setSound} />}
         </div>
       )}
 

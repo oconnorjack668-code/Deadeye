@@ -8,7 +8,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { IRISH_COUNTIES, cleanRegion, countryOptions, regionLabel } from '@/lib/regions';
 import type { MeasurementSystem } from '@/lib/units';
-import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil, Sparkles } from 'lucide-react';
+import { SoundPicker } from '@/components/video/SoundPicker';
+import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -261,6 +262,14 @@ export function SettingsClient({
           checked={s.ai_coaching_enabled}
           onChange={(v) => void save({ ai_coaching_enabled: v })}
         />
+      </Section>
+
+      {/* The only section on this page that does not save to the account.
+          A sound is judged through whichever speaker is in the gym, so it
+          belongs to the device - and it is set here rather than in the tracker
+          because it is chosen once and then wanted on every session. */}
+      <Section icon={Volume2} title="Shot sounds">
+        <SoundPicker />
       </Section>
 
       <Section icon={Globe} title="Region">
