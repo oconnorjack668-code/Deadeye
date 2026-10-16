@@ -12,23 +12,43 @@
 // default to a swish.
 //
 // Everything is synthesised through the Web Audio API rather than shipped as
-// audio files: no assets to download, nothing to break offline, and a swish is
-// a band-passed noise burst with a falling filter.
-
+// audio files, which is a legal decision as much as a technical one.
+//
+// Technically: no assets to download, nothing to break offline, and a swish is
+// just a band-passed noise burst with a falling filter.
+//
+// Legally: a specific recording is owned by whoever made it - a game's sound
+// effect, a clip of a song, another creator's upload - and being widely shared
+// does not change that, because a licence covering a sound on one platform
+// does not travel to this app. A FORMAT is not owned, though. An airhorn, a
+// record scratch, a rimshot, a sad trombone are comedic gestures anyone may
+// build their own version of, so these sound like the gag and owe nothing to
+// anyone. If recorded audio is ever added here, it has to be recorded by us or
+// carry a licence that covers commercial distribution.
+// Order is celebration first and understated last, with the swish in front
+// because it is the one that sounds like basketball rather than like a game.
 export const MAKE_SOUNDS = [
   { id: 'swish', label: 'Swish' },
-  { id: 'chime', label: 'Chime' },
-  { id: 'arcade', label: 'Arcade' },
-  { id: 'bass', label: 'Bass drop' },
+  { id: 'airhorn', label: 'Airhorn' },
   { id: 'crowd', label: 'Crowd' },
+  { id: 'fanfare', label: 'Fanfare' },
+  { id: 'bass', label: 'Bass drop' },
+  { id: 'arcade', label: 'Arcade' },
+  { id: 'chime', label: 'Chime' },
   { id: 'off', label: 'Silent' },
 ] as const;
 
+// Silent leads because it is the default, and then the jokes, because a funny
+// one is the only reason anyone turns miss sounds on at all. The two flat
+// sounds come last rather than first for the same reason.
 export const MISS_SOUNDS = [
   { id: 'off', label: 'Silent' },
+  { id: 'sad', label: 'Sad trombone' },
+  { id: 'rimshot', label: 'Rimshot' },
+  { id: 'scratch', label: 'Record scratch' },
+  { id: 'boing', label: 'Boing' },
   { id: 'clunk', label: 'Rim clunk' },
   { id: 'buzz', label: 'Buzz' },
-  { id: 'sad', label: 'Sad trombone' },
 ] as const;
 
 export const VOICE_STYLES = [
@@ -117,7 +137,24 @@ export function resumeAudio(): void {
 /** One oscillator note. `at` offsets it, so notes can be built into a phrase. */
 function note(
   c: AudioContext,
-  { from, to, seconds, type, gain, at = 0 }: { from: number; to: number; seconds: number; type: OscillatorType; gain: number; at?: number }
+  {
+    from,
+    to,
+    seconds,
+    type,
+    gain,
+    at = 0,
+    vibrato,
+  }: {
+    from: number;
+    to: number;
+    seconds: number;
+    type: OscillatorType;
+    gain: number;
+    at?: number;
+    /** Wobbles the pitch, which is the difference between a slide and a boing. */
+    vibrato?: { hz: number; depth: number };
+  }
 ): void {
   const start = c.currentTime + at;
   const osc = c.createOscillator();
@@ -125,6 +162,20 @@ function note(
   osc.type = type;
   osc.frequency.setValueAtTime(from, start);
   osc.frequency.exponentialRampToValueAtTime(Math.max(1, to), start + seconds);
+  if (vibrato) {
+    // An oscillator connected to another's frequency adds to it rather than
+    // replacing it, so the ramp above still runs underneath. The depth decays
+    // along with the pitch; held constant it would swamp the low end and the
+    // spring would turn into a siren.
+    const lfo = c.createOscillator();
+    const depth = c.createGain();
+    lfo.frequency.setValueAtTime(vibrato.hz, start);
+    depth.gain.setValueAtTime(vibrato.depth, start);
+    depth.gain.exponentialRampToValueAtTime(Math.max(1, vibrato.depth * 0.1), start + seconds);
+    lfo.connect(depth).connect(osc.frequency);
+    lfo.start(start);
+    lfo.stop(start + seconds + 0.02);
+  }
   // Ramped rather than switched: an abrupt stop clicks
   vol.gain.setValueAtTime(0.0001, start);
   vol.gain.exponentialRampToValueAtTime(gain, start + 0.012);
@@ -134,11 +185,20 @@ function note(
   osc.stop(start + seconds + 0.02);
 }
 
-/** A burst of noise shaped by a sweeping filter: nets, crowds and buzzes. */
+/** A burst of noise shaped by a sweeping filter: nets, crowds and cymbals. */
 function noise(
   c: AudioContext,
-  { seconds, fromHz, toHz, gain, type = 'bandpass', swell = false }: { seconds: number; fromHz: number; toHz: number; gain: number; type?: BiquadFilterType; swell?: boolean }
+  {
+    seconds,
+    fromHz,
+    toHz,
+    gain,
+    type = 'bandpass',
+    swell = false,
+    at = 0,
+  }: { seconds: number; fromHz: number; toHz: number; gain: number; type?: BiquadFilterType; swell?: boolean; at?: number }
 ): void {
+  const start = c.currentTime + at;
   const buffer = c.createBuffer(1, Math.max(1, Math.floor(c.sampleRate * seconds)), c.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < data.length; i++) {
@@ -151,12 +211,12 @@ function noise(
   src.buffer = buffer;
   const filter = c.createBiquadFilter();
   filter.type = type;
-  filter.frequency.setValueAtTime(fromHz, c.currentTime);
-  filter.frequency.exponentialRampToValueAtTime(Math.max(1, toHz), c.currentTime + seconds);
+  filter.frequency.setValueAtTime(fromHz, start);
+  filter.frequency.exponentialRampToValueAtTime(Math.max(1, toHz), start + seconds);
   const vol = c.createGain();
-  vol.gain.setValueAtTime(gain, c.currentTime);
+  vol.gain.setValueAtTime(gain, start);
   src.connect(filter).connect(vol).connect(c.destination);
-  src.start();
+  src.start(start);
 }
 
 export function playMake(sound: MakeSound): void {
@@ -179,6 +239,25 @@ export function playMake(sound: MakeSound): void {
     } else if (sound === 'crowd') {
       // Low broadband noise that swells and falls: a roar, at arm's length
       noise(c, { seconds: 0.85, fromHz: 420, toHz: 900, gain: 0.3, type: 'lowpass', swell: true });
+    } else if (sound === 'airhorn') {
+      // Three blasts, the last one held. Each is two saws a few hertz apart,
+      // because the beating between them is what makes a horn sound like a
+      // horn and not a synth tone, plus a quiet octave for the bite.
+      const blast = (at: number, seconds: number) => {
+        note(c, { from: 420, to: 466, seconds, type: 'sawtooth', gain: 0.16, at });
+        note(c, { from: 428, to: 474, seconds, type: 'sawtooth', gain: 0.13, at });
+        note(c, { from: 840, to: 932, seconds, type: 'sawtooth', gain: 0.06, at });
+      };
+      blast(0, 0.12);
+      blast(0.17, 0.12);
+      blast(0.34, 0.34);
+    } else if (sound === 'fanfare') {
+      // Two short notes into a held fifth with an octave over it: the shape of
+      // every triumph in every film score, in two thirds of a second.
+      note(c, { from: 523, to: 523, seconds: 0.1, type: 'triangle', gain: 0.2 });
+      note(c, { from: 523, to: 523, seconds: 0.1, type: 'triangle', gain: 0.2, at: 0.12 });
+      note(c, { from: 784, to: 784, seconds: 0.4, type: 'triangle', gain: 0.24, at: 0.24 });
+      note(c, { from: 1046, to: 1046, seconds: 0.4, type: 'triangle', gain: 0.1, at: 0.24 });
     }
   } catch {
     // Never let a sound failure interrupt a session
@@ -199,6 +278,22 @@ export function playMiss(sound: MissSound): void {
       note(c, { from: 330, to: 311, seconds: 0.18, type: 'sawtooth', gain: 0.16 });
       note(c, { from: 294, to: 277, seconds: 0.18, type: 'sawtooth', gain: 0.16, at: 0.17 });
       note(c, { from: 262, to: 196, seconds: 0.42, type: 'sawtooth', gain: 0.18, at: 0.34 });
+    } else if (sound === 'scratch') {
+      // A scratch is a sound being dragged one way and then the other, so this
+      // is a down-sweep immediately answered by an up-sweep. Fast enough that
+      // it reads as a single gesture rather than two noises.
+      noise(c, { seconds: 0.13, fromHz: 5000, toHz: 700, gain: 0.26 });
+      note(c, { from: 620, to: 120, seconds: 0.12, type: 'sawtooth', gain: 0.1 });
+      note(c, { from: 140, to: 700, seconds: 0.13, type: 'sawtooth', gain: 0.1, at: 0.13 });
+    } else if (sound === 'boing') {
+      // A spring: pitch dropping fast with a wobble riding on it.
+      note(c, { from: 760, to: 90, seconds: 0.42, type: 'triangle', gain: 0.24, vibrato: { hz: 22, depth: 140 } });
+    } else if (sound === 'rimshot') {
+      // Ba-dum-tss. Two thumps and a cymbal - the sound of a joke landing,
+      // which is about what an air ball deserves.
+      note(c, { from: 210, to: 80, seconds: 0.09, type: 'sine', gain: 0.3 });
+      note(c, { from: 180, to: 70, seconds: 0.09, type: 'sine', gain: 0.3, at: 0.15 });
+      noise(c, { seconds: 0.5, fromHz: 9000, toHz: 3500, gain: 0.14, type: 'highpass', at: 0.3 });
     }
   } catch {
     // As above
