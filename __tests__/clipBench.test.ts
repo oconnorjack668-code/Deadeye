@@ -46,14 +46,18 @@ function eachFrame(
   ffmpeg: string,
   clip: string,
   crop: { sx: number; sy: number; side: number },
-  onFrame: (pixels: Uint8ClampedArray, index: number) => void
+  onFrame: (pixels: Uint8ClampedArray, index: number) => void,
+  // Frames per second of footage to decode. The app's "analysis speed"
+  // selector plays a clip at 2x, which samples about half the frames, so
+  // halving this is how that is measured without a browser.
+  fps = 30
 ): Promise<number> {
   const side = Math.round(crop.side);
   const args = [
     '-hide_banner',
     '-loglevel', 'error',
     '-i', clip,
-    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CROP_CANVAS_PX}:${CROP_CANVAS_PX}`,
+    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CROP_CANVAS_PX}:${CROP_CANVAS_PX},fps=${fps}`,
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
     '-',
@@ -105,7 +109,11 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
 
     const [ax, ay, bx, by] = RIM.split(',').map(Number);
     const rim = rimFromEdges({ x: ax, y: ay }, { x: bx, y: by });
-    const { width, height, fps } = videoInfo(FFMPEG, CLIP);
+    const { width, height, fps: nativeFps } = videoInfo(FFMPEG, CLIP);
+    // DEADEYE_BENCH_SAMPLE_FPS models the app's "analysis speed" selector:
+    // playing a clip at 2x presents about half the frames to the tracker, so
+    // sampling at 15 instead of 30 measures what that setting costs.
+    const fps = Number(process.env.DEADEYE_BENCH_SAMPLE_FPS) || nativeFps;
     const crop = cropRectFor(rim, width, height);
     // The rim is measured in frame pixels; the tracker works in the crop canvas
     const rimOnCanvas = rim.width * width * (CROP_CANVAS_PX / crop.side);
@@ -158,16 +166,22 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     let f0: Uint8ClampedArray | null = null;
     let f1: Uint8ClampedArray | null = null;
 
-    const frames = await eachFrame(FFMPEG, CLIP, crop, (pixels, index) => {
-      if (threeFrame) {
-        if (f0 && f1) measure(f0, f1, index - 1, pixels);
-        f0 = f1;
-        f1 = pixels;
-      } else {
-        if (f1) measure(f1, pixels, index);
-        f1 = pixels;
-      }
-    });
+    const frames = await eachFrame(
+      FFMPEG,
+      CLIP,
+      crop,
+      (pixels, index) => {
+        if (threeFrame) {
+          if (f0 && f1) measure(f0, f1, index - 1, pixels);
+          f0 = f1;
+          f1 = pixels;
+        } else {
+          if (f1) measure(f1, pixels, index);
+          f1 = pixels;
+        }
+      },
+      fps
+    );
 
     const shots = shotDetector.shots;
 
@@ -192,7 +206,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     const lines = [
       '',
       `clip            ${CLIP}`,
-      `video           ${width}x${height} @ ${fps}fps`,
+      `video           ${width}x${height} @ ${nativeFps}fps, sampled at ${fps}`,
       `rim             x=${rim.x.toFixed(4)} y=${rim.y.toFixed(4)} width=${rim.width.toFixed(4)} tilt=${(rim.tilt ?? 0).toFixed(3)}`,
       `crop            ${Math.round(crop.side)}px at (${Math.round(crop.sx)}, ${Math.round(crop.sy)}), ball expected ${expectedDiameter.toFixed(1)}px of ${CROP_CANVAS_PX}`,
       `differencing    ${threeFrame ? 'three frame' : 'two frame'}`,
