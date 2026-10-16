@@ -96,6 +96,8 @@ export function ShotTracker({
   // happened.
   const analysedRef = useRef(0);
   const ballSeenRef = useRef(0);
+  /** Removes the clip-ended listener; see startTracking. */
+  const endedCleanupRef = useRef<(() => void) | null>(null);
   const [quality, setQuality] = useState<{ fps: number; ballSeenPct: number; frames: number } | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -370,6 +372,21 @@ export function ShotTracker({
       await video.play().catch(() => undefined);
     }
 
+    // The end of a clip is an event, and has to be listened for.
+    // requestVideoFrameCallback below only fires while new frames are being
+    // presented for composition; once a clip ends none are, so nothing ever
+    // schedules processFrame again and the video.ended check inside it is
+    // never reached. The run then sat there, finished but not finishing, until
+    // the player pressed "Stop early and review" - which looked exactly like
+    // the analysis being slow. Same deadlock the benchmark had, left behind
+    // here when that one was fixed.
+    if (source === 'file') {
+      endedCleanupRef.current?.();
+      const onEnded = () => finish();
+      video.addEventListener('ended', onEnded);
+      endedCleanupRef.current = () => video.removeEventListener('ended', onEnded);
+    }
+
     const processFrame = () => {
       if (stopRef.current) return;
       if (source === 'file' && video.ended) {
@@ -467,7 +484,13 @@ export function ShotTracker({
   }
 
   function finish() {
+    // Guarded because two things now call this: the ended listener and the
+    // stop button. Without it a clip that ends while the player is reaching
+    // for stop would run the whole teardown twice.
+    if (stopRef.current) return;
     stopRef.current = true;
+    endedCleanupRef.current?.();
+    endedCleanupRef.current = null;
     // Snapshot how the run went before anything is torn down. Seconds come from
     // the clip for a file and from the clock for the camera, which is the same
     // distinction the tracking loop makes.

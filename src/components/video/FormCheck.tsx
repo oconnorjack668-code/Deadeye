@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { getPoseLandmarker } from '@/lib/video/mediapipe';
+import { seekTo } from '@/lib/video/seek';
 import { analyzeShot, angleAt, LM, type PoseFrame, type ShotMechanics } from '@/lib/video/mechanics';
 import type { Database } from '@/lib/supabase/types';
 import { FileVideo, ScanLine } from 'lucide-react';
@@ -19,17 +20,6 @@ interface Props {
   heightCm: number | null;
   hand: 'right' | 'left';
   onResult?: (m: ShotMechanics) => void;
-}
-
-function seek(video: HTMLVideoElement, seconds: number): Promise<void> {
-  return new Promise((resolve) => {
-    const done = () => {
-      video.removeEventListener('seeked', done);
-      resolve();
-    };
-    video.addEventListener('seeked', done);
-    video.currentTime = Math.max(0, Math.min(seconds, (video.duration || seconds) - 0.01));
-  });
 }
 
 export function FormCheck({ initialFile, shotTimeMs, heightCm, hand, onResult }: Props) {
@@ -100,7 +90,7 @@ export function FormCheck({ initialFile, shotTimeMs, heightCm, hand, onResult }:
     const video = videoRef.current;
     const frame = frames[index];
     if (!video || !frame) return;
-    seek(video, frame.t / 1000).then(() => drawSkeleton(frame));
+    void seekTo(video, frame.t / 1000).then(() => drawSkeleton(frame));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [index, frames]);
 
@@ -127,7 +117,10 @@ export function FormCheck({ initialFile, shotTimeMs, heightCm, hand, onResult }:
     const collected: PoseFrame[] = [];
     let ts = 0;
     for (let t = start; t <= end; t += 1 / FPS) {
-      await seek(video, t);
+      // Stop sampling rather than hang if the clip will not seek. Whatever was
+      // collected up to here still goes through analyzeShot below, which has
+      // its own minimum and will say so if there is too little.
+      if (!(await seekTo(video, t))) break;
       ts += 1000 / FPS;
       const result = pose.detectForVideo(video, Math.round(performance.now() + ts));
       const lm = result.landmarks?.[0];

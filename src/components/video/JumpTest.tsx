@@ -10,18 +10,8 @@ import { getPoseLandmarker } from '@/lib/video/mediapipe';
 import { detectJump, flightSeconds, jumpHeightCm, plausibleFlight, type FootSample } from '@/lib/video/jump';
 import type { MeasurementSystem } from '@/lib/units';
 import { localDateString } from '@/lib/dates';
+import { seekTo } from '@/lib/video/seek';
 import { ArrowUpFromLine, ChevronLeft, ChevronRight, FileVideo } from 'lucide-react';
-
-function seek(video: HTMLVideoElement, seconds: number): Promise<void> {
-  return new Promise((resolve) => {
-    const done = () => {
-      video.removeEventListener('seeked', done);
-      resolve();
-    };
-    video.addEventListener('seeked', done);
-    video.currentTime = Math.max(0, Math.min(seconds, (video.duration || seconds) - 0.01));
-  });
-}
 
 const SLOW_MOTION = [
   { factor: 1, label: 'Normal video' },
@@ -92,7 +82,10 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
     const samples: FootSample[] = [];
     let ts = 0;
     for (let t = start; t <= end; t += dt) {
-      await seek(video, t);
+      // Stop sampling rather than hang if the clip will not seek; whatever was
+      // collected still goes through the jump analysis, which has its own
+      // minimum and reports plainly when there is too little.
+      if (!(await seekTo(video, t))) break;
       ts += 20;
       const lm = pose.detectForVideo(video, Math.round(performance.now() + ts)).landmarks?.[0];
       if (lm) {
@@ -112,7 +105,7 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
     }
     setTakeoff(jump.takeoff);
     setLanding(jump.landing);
-    await seek(video, jump.takeoff);
+    await seekTo(video, jump.takeoff);
     setMessage({ tone: 'info', text: 'Found it. Check the takeoff and landing frames below and adjust if needed.' });
   }
 

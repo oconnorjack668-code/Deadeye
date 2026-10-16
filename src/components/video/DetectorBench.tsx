@@ -14,6 +14,7 @@ import {
   type Rim,
 } from '@/lib/video/shotDetector';
 import { sampleTimesMs, seekMadeProgress } from '@/lib/video/frameStep';
+import { seekTo } from '@/lib/video/seek';
 import { findBall, expectedBallDiameter } from '@/lib/video/motionBall';
 import { cropRectFor, ballCentreInFrame, magnification, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { Button } from '@/components/ui/Button';
@@ -29,37 +30,6 @@ type SweepEnd = 'ended' | 'paused' | 'stalled';
 
 /** No frame for this long means the pass is stuck and will never finish. */
 const STALL_MS = 8000;
-
-/** How long to wait for one seek before giving up on the clip. */
-const SEEK_TIMEOUT_MS = 5000;
-
-/**
- * Resolves once the video has settled on `timeSec`.
- *
- * Both listeners are removed on every path, and a timeout rejects rather than
- * leaving the pass waiting forever: a clip the browser cannot seek in - a
- * stream with no index, a partly written file - otherwise hangs on the first
- * sample with no error and no end.
- */
-function seekTo(video: HTMLVideoElement, timeSec: number): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const done = (fail?: Error) => {
-      clearTimeout(timer);
-      video.removeEventListener('seeked', onSeeked);
-      video.removeEventListener('error', onError);
-      if (fail) reject(fail);
-      else resolve();
-    };
-    const onSeeked = () => done();
-    const onError = () => done(new Error('The clip could not be decoded at that point.'));
-    // Declared after done, which closes over it: nothing calls done until the
-    // seek is under way, by which point this is assigned.
-    const timer = setTimeout(() => done(new Error('Seeking timed out.')), SEEK_TIMEOUT_MS);
-    video.addEventListener('seeked', onSeeked);
-    video.addEventListener('error', onError);
-    video.currentTime = timeSec;
-  });
-}
 
 interface Report {
   durationS: number;
@@ -323,11 +293,7 @@ export function DetectorBench() {
     for (let i = 0; i < times.length; i++) {
       if (cancelRef.current) return 'paused';
       const before = video.currentTime * 1000;
-      try {
-        await seekTo(video, times[i] / 1000);
-      } catch {
-        return 'stalled';
-      }
+      if (!(await seekTo(video, times[i] / 1000))) return 'stalled';
       const videoMs = video.currentTime * 1000;
       // A step finer than the clip's real frame interval lands back on the frame
       // just done. One or two is normal; a run of them means the clip will not
