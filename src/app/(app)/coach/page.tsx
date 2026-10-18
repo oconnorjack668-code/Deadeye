@@ -9,6 +9,7 @@ import { FilmQueue } from './FilmQueue';
 import type { FilmQuestion } from '@/lib/filmQuestions';
 import { userCalendarNow } from '@/lib/userTime';
 import { ClipboardCheck, Crown, Flame, Moon, Plus, Shield, Users, Video } from 'lucide-react';
+import { hasPro } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Coach dashboard - Deadeye' };
@@ -16,7 +17,7 @@ export const metadata = { title: 'Coach dashboard - Deadeye' };
 export default async function CoachPage() {
   const user = await requireUser();
   const subscription = await getCurrentSubscription();
-  const isPro = subscription?.plan_type === 'pro' || subscription?.plan_type === 'owner';
+  const isPro = hasPro(subscription);
 
   const header = (
     <div className="flex items-center gap-3">

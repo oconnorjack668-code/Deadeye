@@ -41,8 +41,8 @@ Deadeye is the all-in-one basketball trainer for players who want to get better 
 • Learn their signature moves with drills to copy them
 
 💪 TRAIN WITH A PLAN
-• 10 training programmes and 186 guided sessions for shooting, handles, finishing, athleticism and more
-• 150+ basketball drills with instructions
+• Training programmes for shooting, handles, finishing, athleticism and more (3 free, every one with Pro)
+• 150 basketball drills with instructions
 • Gym logger organised by muscle group with 160+ exercises, rest timer, previous sets and personal records
 • Athletic tests: vertical jump, sprint, agility
 
@@ -55,7 +55,7 @@ Deadeye is the all-in-one basketball trainer for players who want to get better 
 • Goals, streaks, leaderboard and training reminders
 • Works offline in the gym: sessions upload when you're back online
 
-For players aged 13+ (players under 16 need a parent or guardian to approve their account). Deadeye Pro unlocks unlimited AI feedback and the AI development plan.
+For players aged 13+ (players under 16 need a parent or guardian to approve their account). Deadeye is free to start. Deadeye Pro adds unlimited AI coaching, every training programme and Basketball IQ section, your all-time shot chart and form trends, and team coaching.
 ```
 
 **Category:** Sports  **Tags:** Basketball, Fitness, Training

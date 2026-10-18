@@ -2,6 +2,7 @@
 import React from 'react';
 import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
 import { asMeasurementSystem } from '@/lib/units';
+import { hasPro, planLabel } from '@/lib/entitlements';
 import { SettingsClient } from './SettingsClient';
 import { RemindersCard } from '../profile/RemindersCard';
 import { ProfileSettings } from '../profile/ProfileSettings';
@@ -14,7 +15,8 @@ export const metadata = { title: 'Settings - Deadeye' };
 export default async function SettingsPage() {
   const user = await requireUser();
   const [profile, subscription] = await Promise.all([getCurrentProfile(), getCurrentSubscription()]);
-  const plan = subscription?.plan_type || 'free';
+  const plan = planLabel(subscription);
+  const isPro = hasPro(subscription);
 
   return (
     <div className="flex-1 overflow-auto">
@@ -50,7 +52,7 @@ export default async function SettingsPage() {
               timezone: profile.timezone ?? null,
               measurement_system: asMeasurementSystem(profile.measurement_system),
             }}
-            notifications={<RemindersCard />}
+            notifications={<RemindersCard isPro={isPro} />}
             dataControls={<ProfileSettings initialIsPublic={profile.is_public} showLeaderboard={false} />}
             supportEmail={process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL || null}
             version={pkg.version}

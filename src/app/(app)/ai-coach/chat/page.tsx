@@ -7,6 +7,7 @@ import { FREE_CHAT_PER_DAY, todayStartIso } from '@/lib/ai/chat';
 import { getUserTimeZone } from '@/lib/userTime';
 import { CoachChat, type ChatEntry } from './CoachChat';
 import { ArrowLeft, MessageCircle } from 'lucide-react';
+import { hasPro } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Ask Coach - Deadeye' };
@@ -24,7 +25,7 @@ export default async function CoachChatPage() {
       .gte('created_at', todayStartIso(await getUserTimeZone())),
     getCurrentSubscription(),
   ]);
-  const unlimited = subscription?.plan_type === 'pro' || subscription?.plan_type === 'owner';
+  const unlimited = hasPro(subscription);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">

@@ -7,6 +7,7 @@ import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { formatHeight, asMeasurementSystem } from '@/lib/units';
 import { coachPrompt } from '@/lib/ai/persona';
 import type { Database } from '@/lib/supabase/types';
+import { hasPro } from '@/lib/entitlements';
 
 const SYSTEM_PROMPT = coachPrompt(`Your task: the player has been matched to NBA players with similar height and
 play style. Write a practical development plan based on what those NBA players do well. Do not invent personal
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
   if (await awaitingParentApproval()) return Response.json({ error: PARENT_APPROVAL_NEEDED }, { status: 403 });
 
   const subscription = await getCurrentSubscription();
-  if (subscription?.plan_type !== 'owner' && subscription?.plan_type !== 'pro') {
+  if (!hasPro(subscription)) {
     return Response.json({ error: 'The AI style report is a Pro feature.' }, { status: 403 });
   }
 

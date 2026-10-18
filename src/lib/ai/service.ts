@@ -6,6 +6,7 @@ import { awaitingParentApproval, checkIsOwner, PARENT_APPROVAL_NEEDED } from '@/
 import { getConfiguredAI, AINotConfiguredError } from './config';
 import type { CoachingEvidence, CoachingOutput } from './provider';
 import type { Database } from '@/lib/supabase/types';
+import { aiReportsLeft, creditMonth, FREE_MONTHLY_AI_REPORTS, hasPro, type PlanFields } from '@/lib/entitlements';
 
 export const CREDITS_PER_REPORT = 1;
 const PROMPT_VERSION = '1.1';
@@ -30,9 +31,9 @@ function aiConfig() {
   }
 }
 
-/** Unlimited for owners (role or OWNER_EMAIL) and pro/owner plans. */
-export async function hasUnlimitedCredits(planType: string | undefined): Promise<boolean> {
-  return planType === 'pro' || planType === 'owner' || (await checkIsOwner());
+/** Unlimited for Pro (paid, owner or founding member) and owners by role or OWNER_EMAIL. */
+export async function hasUnlimitedCredits(sub: PlanFields | null | undefined): Promise<boolean> {
+  return hasPro(sub) || (await checkIsOwner());
 }
 
 /**
@@ -54,25 +55,37 @@ export async function reserveCredit(userId: string): Promise<'unlimited' | 'rese
   const supabase = await createClient();
   const { data: sub, error } = await supabase
     .from('subscriptions')
-    .select('plan_type, ai_credits_remaining')
+    .select('plan_type, founding_pro_until, ai_credits_remaining, ai_credits_period')
     .eq('user_id', userId)
     .maybeSingle();
   if (error) throw new AICoachError('Could not load your AI credits.', 500);
 
-  if (await hasUnlimitedCredits(sub?.plan_type)) return 'unlimited';
+  if (await hasUnlimitedCredits(sub)) return 'unlimited';
 
-  const remaining: number = sub?.ai_credits_remaining ?? 0;
+  // A balance from an earlier month is this month's allowance refilled. The
+  // refill and the spend are one write, guarded on the old balance and period,
+  // so two requests at the start of a month cannot both refill.
+  const month = creditMonth();
+  const remaining = aiReportsLeft(sub);
   if (remaining < CREDITS_PER_REPORT) {
-    throw new AICoachError('You have no AI credits left.', 402);
+    throw new AICoachError(
+      `You have used your ${FREE_MONTHLY_AI_REPORTS} free AI reports this month. They refill on the 1st, or get unlimited with Deadeye Pro.`,
+      402
+    );
   }
 
   const admin = adminClientOrThrow();
-  const { data: updated, error: updateError } = await admin
+  let spend = admin
     .from('subscriptions')
-    .update({ ai_credits_remaining: remaining - CREDITS_PER_REPORT, updated_at: new Date().toISOString() })
+    .update({
+      ai_credits_remaining: remaining - CREDITS_PER_REPORT,
+      ai_credits_period: month,
+      updated_at: new Date().toISOString(),
+    })
     .eq('user_id', userId)
-    .eq('ai_credits_remaining', remaining)
-    .select('id');
+    .eq('ai_credits_remaining', sub?.ai_credits_remaining ?? 0);
+  spend = sub?.ai_credits_period ? spend.eq('ai_credits_period', sub.ai_credits_period) : spend.is('ai_credits_period', null);
+  const { data: updated, error: updateError } = await spend.select('id');
   if (updateError) throw new AICoachError('Could not use an AI credit.', 500);
   if (!updated || updated.length === 0) {
     throw new AICoachError('Your credits changed while generating. Please try again.', 409);
@@ -84,13 +97,19 @@ export async function refundCredit(userId: string): Promise<void> {
   const admin = adminClientOrThrow();
   const { data: sub } = await admin
     .from('subscriptions')
-    .select('ai_credits_remaining')
+    .select('ai_credits_remaining, ai_credits_period')
     .eq('user_id', userId)
     .maybeSingle();
   if (!sub) return;
+  // Only into this month's allowance: a refund landing after the 1st would
+  // otherwise add to a balance the refill is about to replace anyway
+  if (sub.ai_credits_period !== creditMonth()) return;
   await admin
     .from('subscriptions')
-    .update({ ai_credits_remaining: sub.ai_credits_remaining + CREDITS_PER_REPORT, updated_at: new Date().toISOString() })
+    .update({
+      ai_credits_remaining: Math.min(FREE_MONTHLY_AI_REPORTS, sub.ai_credits_remaining + CREDITS_PER_REPORT),
+      updated_at: new Date().toISOString(),
+    })
     .eq('user_id', userId)
     .eq('ai_credits_remaining', sub.ai_credits_remaining);
 }

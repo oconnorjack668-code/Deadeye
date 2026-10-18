@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 16, 2026';
+const LAST_UPDATED = 'October 18, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -86,7 +86,11 @@ export default function PrivacyPage() {
             <li>Game stats you log (box scores, opponent name, score) and teams you create or join.</li>
             <li>Settings you choose: country, county/region, time zone, whether you use Deadeye as a player or coach, and your privacy choices.</li>
             <li>Reminder settings (time, days, time zone) and, if you turn reminders on, your browser&apos;s push address.</li>
-            <li>If you buy Pro: your plan and billing status. Card details are handled by Stripe and never reach us.</li>
+            <li>
+              Your plan: Free or Pro, how many AI reports you have used this month, and if you claim the founding member
+              offer, when you claimed it and when it ends. If you buy Pro, your billing status. Card details are handled by
+              Stripe and never reach us.
+            </li>
             <li>
               Crash reports when something breaks: the error, the page, your device type and your account id, kept for
               90 days and used only to fix bugs.

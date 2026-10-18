@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import type { ShotMechanics } from '@/lib/video/mechanics';
 import { Sparkles, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { FREE_MONTHLY_AI_REPORTS } from '@/lib/entitlements';
 
 export interface ShootingSummary {
   makes: number;
@@ -72,8 +73,11 @@ export function VideoAIFeedback({ shooting, mechanics }: { shooting: ShootingSum
             ))}
           </div>
           <Button variant="primary" isLoading={busy} onClick={run}>
-            Get AI feedback (1 credit)
+            Get AI feedback
           </Button>
+          <p className="text-xs text-zinc-500">
+            On Free this uses one of your {FREE_MONTHLY_AI_REPORTS} AI reports for the month. Unlimited with Pro.
+          </p>
           {error && <p className="text-xs text-red-400">{error}</p>}
         </>
       ) : (

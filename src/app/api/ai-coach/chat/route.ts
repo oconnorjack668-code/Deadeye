@@ -52,7 +52,7 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const timeZone = await getUserTimeZone();
   const [{ data: sub }, { count: usedToday }, { data: history, error: historyError }] = await Promise.all([
-    supabase.from('subscriptions').select('plan_type').eq('user_id', user.id).maybeSingle(),
+    supabase.from('subscriptions').select('plan_type, founding_pro_until').eq('user_id', user.id).maybeSingle(),
     supabase
       .from('coach_messages')
       .select('id', { count: 'exact', head: true })
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Coach chat isn’t switched on yet (run migration 00021 in Supabase).' }, { status: 503 });
   }
 
-  const unlimited = await hasUnlimitedCredits(sub?.plan_type);
+  const unlimited = await hasUnlimitedCredits(sub);
   const used = usedToday || 0;
   if (!unlimited && used >= FREE_CHAT_PER_DAY) {
     return Response.json(

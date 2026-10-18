@@ -1,4 +1,3 @@
-// src/app/(app)/pro/ProActions.tsx
 'use client';
 
 import React, { useState, useSyncExternalStore } from 'react';
@@ -7,17 +6,34 @@ import { isPlayStoreApp } from '@/lib/platform';
 
 const noSubscribe = () => () => undefined;
 
-export function ProActions({ isPro, hasYearly }: { isPro: boolean; hasYearly: boolean }) {
+export function ProActions({
+  isPaying,
+  hasYearly,
+  monthlyLabel,
+  yearlyLabel,
+  isFounder,
+  chargeFrom,
+}: {
+  /** Has a paid Stripe subscription to manage (not just founding member months). */
+  isPaying: boolean;
+  hasYearly: boolean;
+  monthlyLabel: string | null;
+  yearlyLabel: string | null;
+  /** Founding members check out monthly at the founder price. */
+  isFounder: boolean;
+  /** Founding members still in their free months are not charged until this date. */
+  chargeFrom: string | null;
+}) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Server render: false; on the phone: read the flag set at launch
   const playApp = useSyncExternalStore(noSubscribe, isPlayStoreApp, () => false);
 
   // Google Play rules: no Stripe checkout inside the Play Store app
-  if (playApp && !isPro) {
+  if (playApp && !isPaying) {
     return (
       <p className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3 text-sm text-zinc-400">
-        Upgrading to Pro isn&apos;t available in this version of the app yet.
+        Buying Pro isn&apos;t available in this version of the app yet.
       </p>
     );
   }
@@ -42,19 +58,25 @@ export function ProActions({ isPro, hasYearly }: { isPro: boolean; hasYearly: bo
 
   return (
     <div className="space-y-2">
-      {isPro ? (
+      {isPaying ? (
         <Button variant="secondary" size="lg" className="w-full" isLoading={busy === 'portal'} onClick={() => go('/api/billing/portal', undefined, 'portal')}>
           Manage subscription
         </Button>
       ) : (
         <>
           <Button variant="primary" size="lg" className="w-full" isLoading={busy === 'month'} onClick={() => go('/api/billing/checkout', { interval: 'month' }, 'month')}>
-            Upgrade monthly
+            {isFounder ? 'Founder price, monthly' : 'Pro monthly'}
+            {monthlyLabel ? ` · ${monthlyLabel}` : ''}
           </Button>
           {hasYearly && (
             <Button variant="outline" size="lg" className="w-full" isLoading={busy === 'year'} onClick={() => go('/api/billing/checkout', { interval: 'year' }, 'year')}>
-              Upgrade yearly (best value)
+              Pro yearly{yearlyLabel ? ` · ${yearlyLabel}` : ''}
             </Button>
+          )}
+          {chargeFrom && (
+            <p className="text-xs text-zinc-400">
+              Subscribing now keeps Pro running when your founding member months end. Nothing is charged until {chargeFrom}.
+            </p>
           )}
         </>
       )}

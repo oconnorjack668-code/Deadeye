@@ -2,9 +2,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getHasPro } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { GOAL_LABELS, getActiveProgram, sortDays, weekSummaries, type ProgramDay } from '@/lib/programs';
+import {
+  GOAL_LABELS,
+  canUseProgram,
+  getActiveProgram,
+  sortDays,
+  startedProgramIds,
+  weekSummaries,
+  type ProgramDay,
+} from '@/lib/programs';
+import { ProLock } from '@/components/ProGate';
 import { EnrollButton } from './EnrollButton';
 import { ArrowLeft, CheckCircle2, Circle, Clock } from 'lucide-react';
 
@@ -20,10 +29,15 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
   const { data: program } = await supabase.from('training_programs').select('*').eq('slug', slug).maybeSingle();
   if (!program) notFound();
 
-  const [{ data: dayRows }, active] = await Promise.all([
+  const [{ data: dayRows }, active, isPro, started] = await Promise.all([
     supabase.from('program_days').select('*').eq('program_id', program.id),
     getActiveProgram(supabase, user.id),
+    getHasPro(),
+    startedProgramIds(supabase, user.id),
   ]);
+  // The outline stays visible either way: what a programme covers week by week
+  // is how a player decides whether it is worth it
+  const unlocked = canUseProgram(program, isPro, started);
   const days = sortDays((dayRows || []) as ProgramDay[]);
   const isActive = active?.program.id === program.id;
   const completed = isActive ? active!.completedIds : new Set<string>();
@@ -48,6 +62,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
         </p>
 
         <div className="my-6">
+          {unlocked ? (
           <EnrollButton
             programId={program.id}
             programName={program.name}
@@ -56,6 +71,15 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
             otherName={active && !isActive ? active.program.name : undefined}
             nextHref={isActive && active!.next ? `/programs/${program.slug}/day/${active!.next.id}` : undefined}
           />
+          ) : (
+            <ProLock title="This programme is part of Deadeye Pro">
+              <p>
+                Pro includes every programme: structured plans that build week by week toward a goal or a position.
+                Three programmes are free to follow from start to finish, and you can see the full outline of this one
+                below.
+              </p>
+            </ProLock>
+          )}
         </div>
 
         <div className="space-y-4">
@@ -84,7 +108,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
                 {weekDays.map((d) => (
                   <Link
                     key={d.id}
-                    href={`/programs/${program.slug}/day/${d.id}`}
+                    href={unlocked ? `/programs/${program.slug}/day/${d.id}` : '/pro'}
                     className="flex items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900/70 px-4 py-3 hover:bg-zinc-900"
                   >
                     {completed.has(d.id) ? (

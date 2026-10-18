@@ -305,6 +305,12 @@ export interface Database {
           current_period_end: string | null;
           video_credits_remaining: number;
           ai_credits_remaining: number;
+          /** The month ai_credits_remaining belongs to (00037); another month means a refill is due. */
+          ai_credits_period: string | null;
+          /** Founding member offer (00037). Claimed is never cleared: it also marks the founder price. */
+          founding_claimed_at: string | null;
+          founding_pro_until: string | null;
+          founding_reminded_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -331,6 +337,8 @@ export interface Database {
           current_period_end?: string | null;
           video_credits_remaining?: number;
           ai_credits_remaining?: number;
+          ai_credits_period?: string | null;
+          founding_reminded_at?: string | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -795,6 +803,8 @@ export interface Database {
           icon_name: string | null;
           display_order: number;
           is_active: boolean;
+          /** One of the sections open on Free (00037). */
+          is_free: boolean;
           created_at: string;
         };
         Insert: {
@@ -1243,6 +1253,8 @@ export interface Database {
           sessions_per_week: number;
           season: string;
           display_order: number;
+          /** One of the programmes open on Free (00037). */
+          is_free: boolean;
           created_at: string;
         };
         Insert: {
@@ -1836,6 +1848,8 @@ export interface Database {
       coach_player_detail: { Args: { p_team: string; p_user: string }; Returns: Json };
       player_card: { Args: { p_user: string }; Returns: Json };
       my_shot_totals: { Args: Record<string, never>; Returns: { shot_zone: string; makes: number; attempts: number }[] };
+      // Service role only (00037)
+      claim_founding_pro: { Args: { p_user: string; p_limit: number; p_months: number }; Returns: 'claimed' | 'already' | 'has_pro' | 'full' };
       my_training_streaks: { Args: { p_today: string }; Returns: { longest_streak: number; current_streak: number }[] };
       leaderboard_page: {
         Args: { p_scope?: string; p_age?: string; p_team?: string | null; p_limit?: number };

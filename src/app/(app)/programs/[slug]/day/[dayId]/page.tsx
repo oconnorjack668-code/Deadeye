@@ -2,9 +2,18 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getHasPro } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { courtLink, getActiveProgram, gymLink, type ProgramDay, type ProgramItem } from '@/lib/programs';
+import {
+  canUseProgram,
+  courtLink,
+  getActiveProgram,
+  gymLink,
+  startedProgramIds,
+  type ProgramDay,
+  type ProgramItem,
+} from '@/lib/programs';
+import { ProLock } from '@/components/ProGate';
 import { Button } from '@/components/ui/Button';
 import { CompleteDayButton } from './CompleteDayButton';
 import { ArrowLeft, Target, Dumbbell, BookOpen, Award, Info, Clock } from 'lucide-react';
@@ -30,10 +39,31 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
 
   const { data: day } = (await supabase
     .from('program_days')
-    .select('*, training_programs(id, slug, name, weeks, sessions_per_week)')
+    .select('*, training_programs(id, slug, name, weeks, sessions_per_week, is_free)')
     .eq('id', dayId)
-    .maybeSingle()) as { data: (ProgramDay & { training_programs: { id: string; slug: string; name: string } }) | null };
+    .maybeSingle()) as {
+    data: (ProgramDay & { training_programs: { id: string; slug: string; name: string; is_free: boolean } }) | null;
+  };
   if (!day || day.training_programs.slug !== slug) notFound();
+
+  const [isPro, started] = await Promise.all([getHasPro(), startedProgramIds(supabase, user.id)]);
+  if (!canUseProgram(day.training_programs, isPro, started)) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 md:p-8 max-w-2xl mx-auto space-y-4">
+          <Link href={`/programs/${slug}`} className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200">
+            <ArrowLeft className="h-4 w-4" /> {day.training_programs.name}
+          </Link>
+          <ProLock title={`${day.training_programs.name} is part of Deadeye Pro`}>
+            <p>
+              The full programme library is part of Pro: structured plans that build week by week toward a goal. Three
+              programmes are free to follow from start to finish.
+            </p>
+          </ProLock>
+        </div>
+      </div>
+    );
+  }
 
   const items = (day.items || []) as ProgramItem[];
   const drillSlugs = items.filter((i) => i.type === 'drill').map((i) => (i as { slug: string }).slug);

@@ -76,7 +76,16 @@ that data again.
       non-commercial use only.
 - [ ] Supabase Pro ($25/month) is recommended once there are real users: no
       pausing after a quiet week, and daily backups.
-- [ ] Stripe: live mode, Pro priced in EUR.
+- [ ] Run `supabase/migrations/00037_free_and_pro.sql` in the Supabase SQL editor
+      **before** the code that needs it goes live (see "Free and Pro" below).
+- [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
+      recurring prices, and their ids in Vercel:
+      - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`
+      - €49.99 a year → `STRIPE_PRO_YEARLY_PRICE_ID`
+      - €4.99 a month, the founder price → `STRIPE_FOUNDER_MONTHLY_PRICE_ID`
+      Until then the pages show these prices with "buying Pro opens soon". The
+      first founding members' free months end three months after they claim,
+      so Stripe has to be live before then for anyone to keep Pro.
 - [ ] Register as a sole trader with Revenue (free), and the business name
       "Deadeye" with the CRO (about €20 online) - in the parent's name until 18.
 - [ ] Search "Deadeye" on TMview (free) for trademark conflicts before
@@ -104,3 +113,38 @@ that data again.
   (`aiProviderCompany()`), so it cannot drift from where the data goes.
 - **Cookies**: only the login cookie, so no cookie banner is needed. Adding
   analytics would change that.
+
+## Free and Pro
+
+What each includes is written once, in `src/lib/plans.ts`, and shown on the
+Pro page and the landing page. The thinking: Free keeps everything that brings
+players in and everything that is their own data (the shot tracker, logging,
+history, every drill, form check, friends, the leaderboard). Pro is coaching:
+every programme, every Basketball IQ section, unlimited AI, trends over time
+and teams. AI is the one thing that costs money each time it runs, so Free
+gets an allowance of it (3 reports a month, 3 questions a day).
+
+- Locked features are shown with a Pro tag and explained, never hidden.
+- Anyone who started a programme before it became Pro can finish it.
+- A Basketball IQ section opens while it is part of the programme a player is
+  following, so a free programme never stops at a lock.
+- Starting a programme and creating a team are also checked in the database
+  (00037), because the phone writes those directly.
+
+## Founding member offer
+
+The first 100 players to claim it get 3 months of Pro free (`FOUNDING_PLACES`
+and `FOUNDING_MONTHS` in `src/lib/founding.ts`). Players claim it with a
+button on the dashboard or the Pro page; no card is asked for, and it ends by
+itself. Founding members keep the €4.99 founder price for as long as they stay
+subscribed.
+
+- The cap is enforced by the database under a lock, so the 101st claim fails
+  even if two players tap at once.
+- Landing page and dashboard show "only N places left" once 25 or fewer remain.
+- A week before a founding member's free months end, the dashboard says so, and
+  they get one push notification if they have reminders on.
+- To close the offer early: set `FOUNDING_OFFER_CLOSED=true` in Vercel and
+  redeploy. Claims already made are kept.
+- To see how many have claimed, run in the Supabase SQL editor:
+  `select count(*) from subscriptions where founding_claimed_at is not null;`

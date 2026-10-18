@@ -156,6 +156,25 @@ export const getShotsSince = cache(async (userId: string, sinceIso: string): Pro
   );
 });
 
+/**
+ * Makes/attempts per zone over the last `days` days. The shot chart on Free
+ * covers the last 30; the all-time chart (getShotTotals) is Pro.
+ */
+export const getRecentZoneTotals = cache(async (userId: string, days: number): Promise<ZoneTotal[]> => {
+  const sinceIso = new Date(Date.now() - days * 86_400_000).toISOString();
+  const supabase = await createClient();
+  const rows = await fetchAllRows<{ shot_zone: string; makes: number; attempts: number }>((from, to) =>
+    supabase
+      .from('shooting_entries')
+      .select('shot_zone, makes, attempts')
+      .eq('user_id', userId)
+      .gte('created_at', sinceIso)
+      .order('id')
+      .range(from, to)
+  );
+  return totalsByZone(rows);
+});
+
 /** Personal records across gym sets and athletic tests. */
 export const getPersonalRecordCount = cache(async (userId: string): Promise<number> => {
   const supabase = await createClient();

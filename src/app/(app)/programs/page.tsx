@@ -1,9 +1,10 @@
 // src/app/(app)/programs/page.tsx
 import React from 'react';
 import Link from 'next/link';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getHasPro } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { GOAL_LABELS, getActiveProgram } from '@/lib/programs';
+import { GOAL_LABELS, canUseProgram, getActiveProgram, startedProgramIds } from '@/lib/programs';
+import { ProBadge, ProNote } from '@/components/ProGate';
 import { CalendarCheck, ChevronRight, Play } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -18,7 +19,12 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
 
   let query = supabase.from('training_programs').select('*').order('display_order');
   if (selectedGoal) query = query.eq('goal', selectedGoal);
-  const [{ data }, active] = await Promise.all([query, getActiveProgram(supabase, user.id)]);
+  const [{ data }, active, isPro, started] = await Promise.all([
+    query,
+    getActiveProgram(supabase, user.id),
+    getHasPro(),
+    startedProgramIds(supabase, user.id),
+  ]);
   const programs = data || [];
 
   return (
@@ -75,11 +81,21 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
           ))}
         </div>
 
+        {!isPro && (
+          <ProNote className="mb-3">
+            Programmes without a Pro tag are free to follow from start to finish. The rest, the longer plans built
+            around a goal or a position, are part of Pro.
+          </ProNote>
+        )}
+
         <div className="space-y-2">
           {programs.map((p) => (
             <Link key={p.id} href={`/programs/${p.slug}`} className="flex items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900">
               <div>
-                <div className="font-semibold text-white">{p.name}</div>
+                <div className="flex items-center gap-2 font-semibold text-white">
+                  {p.name}
+                  {!canUseProgram(p, isPro, started) && <ProBadge />}
+                </div>
                 <div className="text-xs text-zinc-500 mt-0.5 capitalize">
                   {GOAL_LABELS[p.goal]} · {p.level} · {p.position === 'any' ? 'all positions' : `${p.position}s`} · {p.weeks} weeks ·{' '}
                   {p.sessions_per_week}x/week

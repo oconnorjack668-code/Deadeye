@@ -2,10 +2,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { operator } from '@/lib/legal';
+import { FOUNDING_MONTHS, FOUNDING_PLACES } from '@/lib/founding';
 
 export const metadata = { title: 'Terms of Use - Deadeye' };
 
-const LAST_UPDATED = 'October 16, 2026';
+const LAST_UPDATED = 'October 18, 2026';
 
 export default function TermsPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -65,6 +66,33 @@ export default function TermsPage() {
               {contactEmail ? ` at ${contactEmail}` : ''}. Pro ends when you withdraw, and we confirm by email.
             </li>
             <li>We will tell you before changing the price of your subscription, and you can cancel before it applies.</li>
+            <li>
+              What Free and Pro each include is listed on the Pro page. We may change what each includes; if a change
+              takes away something you pay for, we will tell you before it applies and you can cancel.
+            </li>
+          </ul>
+        </section>
+
+        <section className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Founding member offer</h2>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>
+              The first {FOUNDING_PLACES} accounts to claim the offer get Deadeye Pro free for {FOUNDING_MONTHS} months,
+              counted from the day they claim it. One claim per account, and only by the account holder.
+            </li>
+            <li>
+              No payment details are needed. When the {FOUNDING_MONTHS} months end, the account goes back to Free
+              automatically and nothing is charged. We tell you a week before it ends.
+            </li>
+            <li>
+              Founding members can subscribe to Pro monthly at the founder price shown on the Pro page, for as long as that
+              subscription continues. If it is cancelled, the founder price ends with it. Subscribing during the free months
+              keeps Pro running when they end, and nothing is charged until then.
+            </li>
+            <li>
+              We may close the offer before every place is claimed. Places already claimed are kept for their full{' '}
+              {FOUNDING_MONTHS} months.
+            </li>
           </ul>
         </section>
 

@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from './supabase/server';
 import type { Database } from './supabase/types';
 import { ageGate, type AgeGate } from './parentApproval';
+import { hasPro } from './entitlements';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
@@ -148,6 +149,10 @@ export const getCurrentSubscription = cache(async (): Promise<Subscription | nul
       current_period_end: null,
       video_credits_remaining: 9999,
       ai_credits_remaining: 9999,
+      ai_credits_period: null,
+      founding_claimed_at: null,
+      founding_pro_until: null,
+      founding_reminded_at: null,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -161,4 +166,13 @@ export const getCurrentSubscription = cache(async (): Promise<Subscription | nul
     .maybeSingle();
 
   return subscription;
+});
+
+/**
+ * Whether the signed-in player has Pro: paying, owner, or inside founding
+ * member months. Every page and route that gates on Pro asks this, so the
+ * rule lives in one place (hasPro in src/lib/entitlements.ts).
+ */
+export const getHasPro = cache(async (): Promise<boolean> => {
+  return hasPro(await getCurrentSubscription());
 });

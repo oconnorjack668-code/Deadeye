@@ -3,6 +3,7 @@ import React from 'react';
 import { requireUser, getCurrentSubscription, getCurrentProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { CREDITS_PER_REPORT } from '@/lib/ai/service';
+import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
@@ -74,13 +75,13 @@ export default async function AICoachPage() {
       .from('ai_reports')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
-      .neq('report_type', 'weekly_summary') // weekly reports are free
+      .neq('report_type', 'weekly_summary') // weekly reports do not use the allowance
       .gte('created_at', monthStart.toISOString()),
     // Owner entitlement (role or OWNER_EMAIL) is resolved here
     getCurrentSubscription(),
   ]);
-  const isUnlimited = subscription?.plan_type === 'pro' || subscription?.plan_type === 'owner';
-  const remainingCredits = subscription?.ai_credits_remaining ?? 0;
+  const isUnlimited = hasPro(subscription);
+  const remainingCredits = aiReportsLeft(subscription);
   const outOfCredits = !isUnlimited && remainingCredits < CREDITS_PER_REPORT;
   const monthlyUsage = (monthReportCount || 0) * CREDITS_PER_REPORT;
 
@@ -139,7 +140,7 @@ export default async function AICoachPage() {
               <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">This Month</div>
               <div className="flex items-baseline justify-between">
                 <span className="text-2xl font-black text-red-400">{monthlyUsage}</span>
-                <span className="text-xs text-zinc-500">credits used</span>
+                <span className="text-xs text-zinc-500">reports written</span>
               </div>
             </CardContent>
           </Card>
@@ -150,7 +151,7 @@ export default async function AICoachPage() {
               <div className="flex items-baseline justify-between">
                 <span className="text-2xl font-black text-cyan-400">{isUnlimited ? '∞' : remainingCredits}</span>
                 <span className="text-xs text-zinc-500">
-                  {CREDITS_PER_REPORT} credit per report
+                  {isUnlimited ? 'unlimited with Pro' : `of ${FREE_MONTHLY_AI_REPORTS} this month · refills on the 1st`}
                 </span>
               </div>
             </CardContent>
@@ -161,11 +162,11 @@ export default async function AICoachPage() {
               <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">Plan</div>
               <div className="flex items-center gap-2">
                 <Badge variant={isUnlimited ? 'success' : 'default'} className="text-xs">
-                  {subscription?.plan_type || 'free'}
+                  {isUnlimited ? 'Pro' : 'Free'}
                 </Badge>
               </div>
               <div className="text-xs text-zinc-500 mt-2">
-                {isUnlimited ? 'Unlimited access' : 'Free plan credits'}
+                {isUnlimited ? 'Unlimited AI coaching' : `${FREE_MONTHLY_AI_REPORTS} AI reports a month on Free`}
               </div>
             </CardContent>
           </Card>
@@ -179,7 +180,10 @@ export default async function AICoachPage() {
               Recent Sessions
             </h2>
             {outOfCredits && (
-              <p className="text-sm text-amber-400">You&apos;ve used all your free AI credits. <Link href="/pro" className="underline">Get unlimited with Pro</Link></p>
+              <p className="text-sm text-amber-400">
+                You&apos;ve used this month&apos;s {FREE_MONTHLY_AI_REPORTS} free AI reports. They refill on the 1st, or{' '}
+                <Link href="/pro" className="underline">see Deadeye Pro</Link> for unlimited coaching.
+              </p>
             )}
             {/* Said before they spend a credit, not after they read a thin
                 report: with one session there is nothing to compare against,

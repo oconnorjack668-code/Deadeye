@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Bell } from 'lucide-react';
+import Link from 'next/link';
+import { ProBadge } from '@/components/ProGate';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -15,7 +17,7 @@ function vapidKeyToBytes(base64: string): Uint8Array {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
-export function RemindersCard() {
+export function RemindersCard({ isPro = false }: { isPro?: boolean }) {
   const [loaded, setLoaded] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [days, setDays] = useState<number[]>([1, 3, 5]);
@@ -227,7 +229,7 @@ export function RemindersCard() {
             </div>
           </>
         )}
-        {weekly !== null && (
+        {weekly !== null && isPro && (
           <label className="flex items-center justify-between gap-4 border-t border-zinc-800 pt-4 text-sm text-zinc-200">
             <span>
               Weekly AI report
@@ -241,6 +243,21 @@ export function RemindersCard() {
               className="h-5 w-5 accent-orange-500"
             />
           </label>
+        )}
+        {/* Shown, not hidden: on Free the switch is replaced by what the report is
+            and that it comes with Pro, so a player knows it exists */}
+        {!isPro && (
+          <div className="flex items-start justify-between gap-4 border-t border-zinc-800 pt-4 text-sm text-zinc-200">
+            <span>
+              Weekly AI report
+              <span className="block text-xs text-zinc-500">
+                Every Sunday: your week in review and next week&apos;s focus, written by the AI coach.
+              </span>
+            </span>
+            <Link href="/pro" className="flex-shrink-0">
+              <ProBadge />
+            </Link>
+          </div>
         )}
         {message && <p className="text-xs text-zinc-300">{message}</p>}
       </CardContent>

@@ -7,6 +7,7 @@ import { pushConfigured, sendPush } from '@/lib/push';
 import { reminderDue, type ReminderPrefs } from '@/lib/reminders';
 import { deleteAccount } from '@/lib/accountDeletion';
 import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
+import { FOUNDING_REMINDER_DAYS } from '@/lib/founding';
 
 async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClient>): Promise<number> {
   const { data: waiting, error } = await admin
@@ -104,5 +105,55 @@ export async function GET(request: Request) {
       if (result === 'gone') await admin.from('push_subscriptions').delete().eq('endpoint', s.endpoint);
     }
   }
-  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed });
+
+  const foundingReminders = await remindFoundingEndings(admin, lockedIds).catch((err) => {
+    console.error('Founding reminder failed', err);
+    return 0;
+  });
+
+  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, foundingReminders });
+}
+
+/**
+ * Tells founding members once, a week before, that their free months end -
+ * so nobody is surprised to find Pro gone. Worded as information rather than a
+ * push to buy: many of these players are under 18 (see src/components/ProGate.tsx).
+ * The dashboard shows the same heads-up for anyone without notifications on.
+ */
+async function remindFoundingEndings(admin: ReturnType<typeof createAdminClient>, lockedIds: Set<string>): Promise<number> {
+  const now = new Date();
+  const soon = new Date(now.getTime() + FOUNDING_REMINDER_DAYS * 86_400_000);
+  const { data: ending, error } = await admin
+    .from('subscriptions')
+    .select('user_id, founding_pro_until')
+    .not('founding_claimed_at', 'is', null)
+    .is('founding_reminded_at', null)
+    .neq('plan_type', 'pro')
+    .gt('founding_pro_until', now.toISOString())
+    .lte('founding_pro_until', soon.toISOString())
+    .limit(200);
+  if (error) throw error;
+
+  let reminded = 0;
+  for (const row of ending || []) {
+    if (lockedIds.has(row.user_id) || !row.founding_pro_until) continue;
+    const day = new Date(row.founding_pro_until).toLocaleDateString('en-IE', {
+      day: 'numeric',
+      month: 'long',
+      timeZone: process.env.APP_TIME_ZONE || 'Europe/Dublin',
+    });
+    const { data: subs } = await admin.from('push_subscriptions').select('endpoint, p256dh, auth').eq('user_id', row.user_id);
+    for (const s of subs || []) {
+      const result = await sendPush(s, {
+        title: 'Your founding member Pro ends soon',
+        body: `It ends on ${day}. You go back to Free automatically and nothing is charged. The founder price is on the Pro page if you want to keep it.`,
+        url: '/pro',
+      });
+      if (result === 'gone') await admin.from('push_subscriptions').delete().eq('endpoint', s.endpoint);
+    }
+    // Marked whether or not a phone was reachable: once is the promise
+    await admin.from('subscriptions').update({ founding_reminded_at: now.toISOString() }).eq('user_id', row.user_id);
+    reminded++;
+  }
+  return reminded;
 }

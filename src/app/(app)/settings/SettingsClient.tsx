@@ -383,7 +383,7 @@ export function SettingsClient({
       <Section icon={Crown} title="Subscription">
         <Link href="/pro" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           <span>
-            Plan: <span className="font-semibold capitalize">{plan === 'owner' ? 'Owner (everything unlimited)' : plan}</span>
+            Plan: <span className="font-semibold">{plan}</span>
           </span>
           <ChevronRight className="h-4 w-4 text-zinc-600" />
         </Link>

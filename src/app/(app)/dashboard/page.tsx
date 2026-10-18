@@ -1,9 +1,16 @@
 // src/app/(app)/dashboard/page.tsx
 import React from 'react';
-import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getCurrentSubscription, checkIsOwner } from '@/lib/auth';
+import { foundingState, FOUNDING_REMINDER_DAYS } from '@/lib/founding';
+import { proPriceLabels } from '@/lib/stripe';
+import { getFoundingOffer } from '@/lib/foundingServer';
+import { FoundingCard } from '@/components/FoundingCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { calculateDashboardMetrics, getShootingByZone } from '@/lib/dashboard';
+import { calculateDashboardMetrics, getShootingByZone, rankZones } from '@/lib/dashboard';
+import { getRecentZoneTotals } from '@/lib/player-activity';
+import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
+import { ProNote } from '@/components/ProGate';
 import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -89,6 +96,18 @@ export default async function DashboardPage() {
     supabase.rpc('friends_overview'),
   ]);
   const squadLine = squadActivityLine((squad.data || []) as unknown as FriendRow[]);
+  const isPro = hasPro(subscription);
+  const [offer, isOwner] = await Promise.all([getFoundingOffer(), checkIsOwner()]);
+  const founding = foundingState(subscription, { claimed: offer.claimed, closed: !offer.open, isOwner });
+  // Stripe is only asked for the founder price when the card is going to name it
+  const foundingCardShown =
+    founding.kind === 'can-claim' || (founding.kind === 'active' && founding.daysLeft <= FOUNDING_REMINDER_DAYS);
+  const founderPrice = foundingCardShown ? (await proPriceLabels()).founder : null;
+  // The all-time chart is Pro; Free shows the last 30 days, which is the
+  // part that says what to work on this week anyway
+  const chartZones = isPro
+    ? shootingByZone
+    : rankZones(await getRecentZoneTotals(user.id, 30));
 
   const weeklyGoalPercentage = Math.round((metrics.weeklyGoalProgress / metrics.weeklyGoalTarget) * 100);
   const recommendedGoal = recommendedProgramGoal(profile?.goals, profile?.focus_areas);
@@ -170,6 +189,11 @@ export default async function DashboardPage() {
             </>
           )}
         </div>
+
+        {/* The founding member offer while it can still be claimed, or the
+            heads-up in the last week of a founding member's free months. Under
+            Today, because it is an offer rather than training. */}
+        <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
 
         {/* Workload. Every other number here only moves when you train, so there
             is nothing to come back for on a rest day. This one still says
@@ -295,19 +319,17 @@ export default async function DashboardPage() {
 
         {/* AI credits: useful to know, but it is billing, not training */}
         <Link
-          href={subscription?.plan_type === 'free' ? '/pro' : '/ai-coach'}
+          href={isPro ? '/ai-coach' : '/pro'}
           className="mb-8 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-2.5 text-sm hover:bg-zinc-900"
         >
           <span className="text-zinc-400">
-            AI credits:{' '}
+            AI reports:{' '}
             <span className="font-bold text-zinc-200">
-              {subscription?.plan_type === 'pro' || subscription?.plan_type === 'owner'
-                ? 'unlimited'
-                : subscription?.ai_credits_remaining || 0}
+              {isPro ? 'unlimited' : `${aiReportsLeft(subscription)} of ${FREE_MONTHLY_AI_REPORTS} left this month`}
             </span>
-            <span className="ml-2 text-xs text-zinc-500">{subscription?.plan_type || 'free'} plan</span>
+            <span className="ml-2 text-xs text-zinc-500">{isPro ? 'Pro' : 'Free'}</span>
           </span>
-          <span className="text-xs text-zinc-500">{subscription?.plan_type === 'free' ? 'See Pro →' : 'AI Coach →'}</span>
+          <span className="text-xs text-zinc-500">{isPro ? 'AI Coach →' : 'See Pro →'}</span>
         </Link>
 
         {/* Quick actions, carrying the same colours the Hoops and Gym tabs use.
@@ -369,13 +391,21 @@ export default async function DashboardPage() {
         {shootingByZone.length > 0 && (
           <Card className="border-zinc-800 bg-zinc-900/70 mb-8">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex flex-wrap items-center gap-2">
                 <Target className="h-5 w-5 text-orange-400" />
                 Your shot chart
+                <span className="text-xs font-semibold text-zinc-500">{isPro ? 'all time' : 'last 30 days'}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ShotHeatMap zones={shootingByZone} />
+              {chartZones.length > 0 ? (
+                <ShotHeatMap zones={chartZones} />
+              ) : (
+                <p className="text-sm text-zinc-400">No shots logged in the last 30 days.</p>
+              )}
+              {!isPro && (
+                <ProNote className="mt-3">Your all-time shot chart, across every shot you have logged, is part of Pro.</ProNote>
+              )}
             </CardContent>
           </Card>
         )}

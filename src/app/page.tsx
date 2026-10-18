@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Crown,
   Dumbbell,
+  Gift,
   ScanEye,
   ShieldCheck,
   Sparkles,
@@ -23,8 +24,10 @@ import {
 import { Logo } from '@/components/Logo';
 import { InstallGuide } from '@/components/InstallGuide';
 import { getCurrentUser } from '@/lib/auth';
-import { FREE_PLAN, PRO_PLAN } from '@/lib/plans';
-import { proPriceLabels } from '@/lib/stripe';
+import { FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
+import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
+import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
+import { getFoundingOffer } from '@/lib/foundingServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,7 +63,7 @@ const FEATURES = [
   {
     icon: ClipboardList,
     title: 'Training programmes',
-    desc: '10 programmes and 186 guided sessions for shooting, handles, finishing and athleticism, plus 150+ drills.',
+    desc: 'Plans that build week by week for shooting, handles, finishing and athleticism: 3 free, 10 with Pro. Plus 150 drills.',
   },
   {
     icon: Dumbbell,
@@ -70,7 +73,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: 'Basketball IQ',
-    desc: '12 study sections on offence, defence, reads and rules, with quizzes and a question every day.',
+    desc: 'Study sections on offence, defence, reads and rules, with quizzes and a free question every day.',
   },
   {
     icon: Trophy,
@@ -89,8 +92,10 @@ export default async function Home() {
   const user = await getCurrentUser();
   if (user) redirect('/dashboard');
 
-  const { monthly, yearly } = await proPriceLabels();
-  const proPrice = [monthly, yearly].filter(Boolean).join(' or ');
+  const [{ monthly, yearly, founder }, offer] = await Promise.all([proPriceLabels(), getFoundingOffer()]);
+  const proPrice = [monthly, yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
+  const buyingOpen = stripeConfigured();
+  const foundingLine = `The first ${FOUNDING_PLACES} players get ${FOUNDING_MONTHS} months of Pro free`;
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
 
   return (
@@ -151,6 +156,18 @@ export default async function Home() {
               </a>
             </div>
             <p className="mt-4 text-xs text-zinc-500">Free to start · For players aged 13 and over · No ads</p>
+            {offer.open && (
+              <a
+                href="#pricing"
+                className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-full border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/15"
+              >
+                <Gift className="h-4 w-4 flex-shrink-0" />
+                <span>
+                  Founding offer: {foundingLine.charAt(0).toLowerCase() + foundingLine.slice(1)}
+                  {offer.counted && showPlacesLeft(offer.placesLeft) ? ` · only ${offer.placesLeft} left` : ''}
+                </span>
+              </a>
+            )}
           </div>
         </section>
 
@@ -249,7 +266,8 @@ export default async function Home() {
                   <Crown className="h-5 w-5 text-amber-400" /> {PRO_PLAN.name}
                 </div>
                 <div className="text-sm text-amber-200">{PRO_PLAN.tagline}</div>
-                <div className="mt-4 text-xl font-black text-white">{proPrice || 'Coming soon'}</div>
+                <div className="mt-4 text-xl font-black text-white">{proPrice}</div>
+                {!buyingOpen && <div className="text-xs text-amber-200/80">Buying Pro opens soon</div>}
                 <ul className="mt-5 space-y-2 text-sm text-zinc-200">
                   {PRO_PLAN.features.map((f) => (
                     <li key={f} className="flex gap-2">
@@ -259,6 +277,37 @@ export default async function Home() {
                   ))}
                 </ul>
               </div>
+            </div>
+
+            {offer.open && (
+              <div className="mt-4 rounded-2xl border border-amber-500/50 bg-gradient-to-br from-amber-500/15 to-transparent p-6">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+                  <Gift className="h-4 w-4" /> Founding member offer
+                </p>
+                <p className="mt-1 text-xl font-black text-white">{foundingLine}</p>
+                <p className="mt-2 text-sm text-zinc-300">
+                  Every Pro feature for {FOUNDING_MONTHS} months, with no card and nothing to cancel: it simply ends, and you
+                  go back to Free. Founding members can then keep Pro for {founder || FOUNDER_PRICE_FALLBACK}, for as long
+                  as they stay subscribed. Create a free account and claim it from your dashboard.
+                </p>
+                {offer.counted && showPlacesLeft(offer.placesLeft) && (
+                  <p className="mt-2 text-sm font-bold text-amber-300">
+                    Only {offer.placesLeft} place{offer.placesLeft === 1 ? '' : 's'} left
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
+              <h3 className="font-bold text-white">Why Pro costs money</h3>
+              <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+                {WHY_PRO_COSTS.map((w) => (
+                  <li key={w.title} className="text-sm">
+                    <span className="block font-semibold text-zinc-100">{w.title}</span>
+                    <span className="text-zinc-400">{w.text}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </section>

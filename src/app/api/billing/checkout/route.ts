@@ -2,7 +2,7 @@
 // Starts a Stripe Checkout for Deadeye Pro (monthly or yearly).
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getStripe, priceIdFor, stripeConfigured } from '@/lib/stripe';
+import { getStripe, monthlyPriceFor, priceIdFor, stripeConfigured, trialEndFor } from '@/lib/stripe';
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -11,15 +11,22 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as { interval?: string } | null;
   const interval = body?.interval === 'year' ? 'year' : 'month';
-  const price = priceIdFor(interval);
-  if (!price) return Response.json({ error: `The ${interval}ly plan is not available.` }, { status: 400 });
 
   const stripe = getStripe();
   const admin = createAdminClient();
-  const { data: sub } = await admin.from('subscriptions').select('stripe_customer_id, plan_type').eq('user_id', user.id).maybeSingle();
+  const { data: sub } = await admin
+    .from('subscriptions')
+    .select('stripe_customer_id, plan_type, founding_claimed_at, founding_pro_until')
+    .eq('user_id', user.id)
+    .maybeSingle();
   if (sub?.plan_type === 'pro' || sub?.plan_type === 'owner') {
     return Response.json({ error: 'You already have Pro.' }, { status: 409 });
   }
+
+  const isFoundingMember = !!sub?.founding_claimed_at;
+  const price = interval === 'month' ? monthlyPriceFor(isFoundingMember) : priceIdFor('year');
+  if (!price) return Response.json({ error: `The ${interval}ly plan is not available.` }, { status: 400 });
+  const trialEnd = trialEndFor(sub?.founding_pro_until);
 
   // One Stripe customer per player, remembered on their subscription row
   let customerId: string | null = sub?.stripe_customer_id || null;
@@ -35,7 +42,10 @@ export async function POST(request: Request) {
     customer: customerId,
     client_reference_id: user.id,
     line_items: [{ price, quantity: 1 }],
-    subscription_data: { metadata: { user_id: user.id } },
+    subscription_data: {
+      metadata: { user_id: user.id, ...(isFoundingMember ? { founding_member: 'true' } : {}) },
+      ...(trialEnd ? { trial_end: trialEnd } : {}),
+    },
     allow_promotion_codes: true,
     success_url: `${origin}/pro?success=1`,
     cancel_url: `${origin}/pro`,

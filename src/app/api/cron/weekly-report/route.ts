@@ -4,6 +4,7 @@
 // Free for everyone (no credits). At most one report per player per week.
 // Protected by CRON_SECRET ("Authorization: Bearer <CRON_SECRET>", sent by Vercel Cron).
 import { createAdminClient } from '@/lib/supabase/admin';
+import { hasPro } from '@/lib/entitlements';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { buildPlayerContext } from '@/lib/ai/context';
 import { coachPrompt } from '@/lib/ai/persona';
@@ -76,7 +77,21 @@ export async function GET(request: Request) {
     .in('consent_status', ['pending', 'withdrawn']);
   const skip = new Set([...(optedOut || []).map((r) => r.id), ...(waitingForParent || []).map((r) => r.user_id)]);
 
+  // The weekly report is part of Pro (src/lib/plans.ts): paying, founding
+  // members inside their free months, and owners. Asked with the same rule as
+  // every page, so a founding member gets it and a lapsed one stops getting it.
+  const ids = (prefs || []).map((p) => p.user_id);
+  const [{ data: subs }, { data: owners }] = await Promise.all([
+    admin.from('subscriptions').select('user_id, plan_type, founding_pro_until').in('user_id', ids),
+    admin.from('user_roles').select('user_id').in('user_id', ids).eq('role', 'owner'),
+  ]);
+  const withPro = new Set([
+    ...(subs || []).filter((s) => hasPro(s)).map((s) => s.user_id),
+    ...(owners || []).map((r) => r.user_id),
+  ]);
+
   const due = ((prefs || []) as Array<{ user_id: string; last_weekly_report_on: string | null; push_enabled: boolean }>)
+    .filter((p) => withPro.has(p.user_id))
     .filter((p) => !skip.has(p.user_id))
     .filter((p) => !p.last_weekly_report_on || p.last_weekly_report_on < lastWeek)
     .slice(0, MAX_PER_RUN);

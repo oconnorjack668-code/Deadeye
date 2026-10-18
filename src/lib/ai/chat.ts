@@ -3,7 +3,8 @@
 import { calendarNow } from '@/lib/dates';
 import { coachPrompt } from '@/lib/ai/persona';
 
-export const FREE_CHAT_PER_DAY = 5;
+// 3 a day on Free (src/lib/plans.ts): enough to see what the coach is like, with Pro for a conversation
+export const FREE_CHAT_PER_DAY = 3;
 export const MAX_CHAT_MESSAGE = 1000;
 /** Earlier messages sent back to the model for context */
 export const CHAT_HISTORY_TURNS = 12;

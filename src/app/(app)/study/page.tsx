@@ -1,5 +1,7 @@
 import React from 'react';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getHasPro } from '@/lib/auth';
+import { ProBadge, ProNote } from '@/components/ProGate';
+import { getActiveProgram, studySlugsIn } from '@/lib/programs';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -32,7 +34,7 @@ export default async function StudyPage() {
   const [{ data: topics }, { data: completed }, { data: dailyRows }] = (await Promise.all([
     supabase
       .from('study_topics')
-      .select('id, title, description, study_items(id, title, display_order, quiz_questions)')
+      .select('id, slug, title, description, is_free, study_items(id, title, display_order, quiz_questions)')
       .eq('is_active', true)
       .order('display_order', { ascending: true }),
     supabase.from('study_progress').select('item_id').eq('user_id', user.id).not('completed_at', 'is', null),
@@ -49,6 +51,8 @@ export default async function StudyPage() {
         id: string;
         title: string;
         description: string;
+        slug: string;
+        is_free: boolean;
         study_items: Array<{ id: string; title: string; display_order: number; quiz_questions: unknown[] }>;
       }> | null;
     },
@@ -57,6 +61,9 @@ export default async function StudyPage() {
   ];
 
   const done = new Set((completed || []).map((c) => c.item_id));
+  const [isPro, active] = await Promise.all([getHasPro(), getActiveProgram(supabase, user.id)]);
+  const inProgramme = active ? studySlugsIn(active.days) : new Set<string>();
+  const opensFor = (topic: { is_free: boolean; slug: string }) => isPro || topic.is_free || inProgramme.has(topic.slug);
   const sections = topics || [];
   const totalLessons = sections.reduce((n, t) => n + t.study_items.length, 0);
   const totalQuestions = sections.reduce(
@@ -109,6 +116,8 @@ export default async function StudyPage() {
   // entry point, so returning players do not have to remember where they were.
   let next: { topicId: string; topicTitle: string; lessonTitle: string; index: number } | null = null;
   for (const topic of sections) {
+    // Never point "continue" at a section that would only show a Pro lock
+    if (!opensFor(topic)) continue;
     const ordered = [...topic.study_items].sort((a, b) => a.display_order - b.display_order);
     const idx = ordered.findIndex((i) => !done.has(i.id));
     if (idx !== -1) {
@@ -211,6 +220,13 @@ export default async function StudyPage() {
         </Link>
 
         <h2 className="text-lg font-bold text-white mb-3">Sections</h2>
+        {!isPro && (
+          <ProNote className="mb-3">
+            The question of the day and the sections without a Pro tag are free, and so is any section that is part of
+            the programme you are following. All {sections.length} sections, with every lesson and quiz, are part of
+            Pro.
+          </ProNote>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {sections.map((topic) => {
             const lessons = topic.study_items.length;
@@ -222,7 +238,9 @@ export default async function StudyPage() {
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-bold text-white">{topic.title}</h3>
-                      {lessons > 0 && finished === lessons ? (
+                      {!opensFor(topic) ? (
+                        <ProBadge />
+                      ) : lessons > 0 && finished === lessons ? (
                         <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
                       ) : (
                         <span className="text-sm font-bold text-blue-400 flex-shrink-0">{percent}%</span>

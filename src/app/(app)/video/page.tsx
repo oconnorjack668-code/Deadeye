@@ -1,13 +1,14 @@
 // src/app/(app)/video/page.tsx
 import React from 'react';
-import { requireUser, getCurrentProfile } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getHasPro } from '@/lib/auth';
+import { ProLock } from '@/components/ProGate';
 import { VideoHub } from './VideoHub';
 import { FormTrends } from './FormTrends';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem } from '@/lib/units';
 import { Video } from 'lucide-react';
 import type { ShotMechanics } from '@/lib/video/mechanics';
-import type { FormCheckRecord } from '@/lib/video/formTrend';
+import { MIN_CHECKS, type FormCheckRecord } from '@/lib/video/formTrend';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,7 @@ export const metadata = { title: 'Video AI - Deadeye' };
 
 export default async function VideoPage() {
   const user = await requireUser();
-  const profile = await getCurrentProfile();
+  const [profile, isPro] = await Promise.all([getCurrentProfile(), getHasPro()]);
 
   // Form checks have been saved here since the feature shipped; this is the
   // first thing to read them back. Bounded, because a trend is about the recent
@@ -53,7 +54,21 @@ export default async function VideoPage() {
           hand={profile?.dominant_hand === 'left' ? 'left' : 'right'}
           units={asMeasurementSystem(profile?.measurement_system)}
         />
-        <FormTrends records={records} />
+        {/* Each form check is free; how your form changes across them is Pro.
+            Only mentioned once there are enough checks for a trend to exist,
+            so a new player is not shown a lock on something they cannot use yet. */}
+        {isPro ? (
+          <FormTrends records={records} />
+        ) : (
+          records.length >= MIN_CHECKS && (
+            <ProLock title="Your form over time is part of Pro" className="mt-6">
+              <p>
+                You have {records.length} form checks saved. Pro lines them up to show what has actually changed in your
+                release angle, elbow, knee bend and timing, and what has stayed the same.
+              </p>
+            </ProLock>
+          )
+        )}
       </div>
     </div>
   );

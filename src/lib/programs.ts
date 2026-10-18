@@ -148,3 +148,39 @@ export async function getActiveProgram(supabase: SupabaseClient<Database>, userI
     next: nextDay(allDays, completedIds),
   };
 }
+
+/**
+ * Whether a player can start or follow a programme: it is one of the Free
+ * three, they have Pro, or they had already started it (00037 lets anyone
+ * finish, or restart, a programme they began before it became Pro). The same
+ * rule enforce_programme_access() applies in the database.
+ */
+export function canUseProgram(program: { id: string; is_free: boolean }, isPro: boolean, startedIds: Set<string>): boolean {
+  return program.is_free || isPro || startedIds.has(program.id);
+}
+
+/** Every programme this player has ever started, whatever its status. */
+export async function startedProgramIds(supabase: SupabaseClient<Database>, userId: string): Promise<Set<string>> {
+  const { data } = await supabase.from('program_enrollments').select('program_id').eq('user_id', userId);
+  return new Set((data || []).map((r) => r.program_id));
+}
+
+/**
+ * Basketball IQ sections a run of programme days sends the player to.
+ *
+ * Programmes link to lessons, and the three free programmes between them use
+ * eight of the twelve sections. Opening all eight on Free would undo the point
+ * of Pro sections, and leaving them locked would break a free programme
+ * halfway through a session. So a section also opens while it is part of the
+ * programme the player is following.
+ */
+export function studySlugsIn(days: Array<{ items: ProgramItem[] | unknown }>): Set<string> {
+  const slugs = new Set<string>();
+  for (const day of days) {
+    if (!Array.isArray(day.items)) continue;
+    for (const item of day.items as ProgramItem[]) {
+      if (item.type === 'study') slugs.add(item.topic_slug);
+    }
+  }
+  return slugs;
+}

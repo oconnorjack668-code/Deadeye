@@ -7,6 +7,7 @@ import { asMeasurementSystem } from '@/lib/units';
 import { StyleMatchClient, type SavedResult } from './StyleMatchClient';
 import { getShotTotals } from '@/lib/player-activity';
 import { Users } from 'lucide-react';
+import { hasPro } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,7 +31,7 @@ export default async function StyleMatchPage() {
 
   const shotProfile = shotProfileFromZones(zoneTotals.map((z) => ({ shot_zone: z.zone, attempts: z.attempts })));
   const totalShots = zoneTotals.reduce((n, z) => n + z.attempts, 0);
-  const canUseAi = subscription?.plan_type === 'owner' || subscription?.plan_type === 'pro';
+  const canUseAi = hasPro(subscription);
 
   return (
     <div className="flex-1 overflow-auto">

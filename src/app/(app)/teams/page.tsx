@@ -5,6 +5,7 @@ import { requireUser, getCurrentSubscription } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { TeamsActions } from './TeamsActions';
 import { Shield, ChevronRight } from 'lucide-react';
+import { hasPro } from '@/lib/entitlements';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Teams - Deadeye' };
@@ -17,7 +18,7 @@ export default async function TeamsPage() {
     getCurrentSubscription(),
   ]);
   const teams = ((data || []) as unknown as Array<{ role: string; teams: { id: string; name: string } | null }>).filter((m) => m.teams);
-  const canCreate = subscription?.plan_type === 'pro' || subscription?.plan_type === 'owner';
+  const canCreate = hasPro(subscription);
 
   return (
     <div className="flex-1 overflow-auto">
