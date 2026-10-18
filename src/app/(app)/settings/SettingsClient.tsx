@@ -394,6 +394,18 @@ export function SettingsClient({
       </Section>
 
       <Section icon={Info} title="About">
+        {/* ?site=1: opened on purpose, so the installed app shows the website
+            instead of bouncing back to the dashboard (StandaloneRedirect) */}
+        <Link href="/?site=1" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
+          Deadeye website <ChevronRight className="h-4 w-4 text-zinc-600" />
+        </Link>
+        <Link href="/install" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
+          <span>
+            How to get the app
+            <span className="block text-xs text-zinc-500">A page to send to friends and teammates</span>
+          </span>
+          <ChevronRight className="h-4 w-4 text-zinc-600" />
+        </Link>
         <Link href="/terms" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           Terms of Use <ChevronRight className="h-4 w-4 text-zinc-600" />
         </Link>

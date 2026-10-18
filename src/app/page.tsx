@@ -1,10 +1,12 @@
 // src/app/page.tsx
 // The landing page: what Deadeye is, what it does, what it costs and how to
-// get it onto a phone. Signed-in players never see it - the installed app
-// opens at "/" and goes straight to the dashboard.
+// get it onto a phone. It is the website, so it shows to everyone, signed in
+// or not - it used to send signed-in players straight to their dashboard,
+// which meant the person running Deadeye could never see their own website.
+// Signed-in visitors get "Open Deadeye" where everyone else gets "Start free".
+// The installed app still opens on the dashboard: see StandaloneRedirect.
 import React from 'react';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 import {
   Activity,
   Brain,
@@ -25,6 +27,7 @@ import { Logo } from '@/components/Logo';
 import { InstallGuide } from '@/components/InstallGuide';
 import { InAppBrowserNotice } from '@/components/InAppBrowserNotice';
 import { LandingHeader } from '@/components/LandingHeader';
+import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
 import { FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
@@ -90,9 +93,7 @@ const FEATURES = [
 ];
 
 export default async function Home() {
-  // Signed-in players (including the installed app, which opens at "/") go straight in
-  const user = await getCurrentUser();
-  if (user) redirect('/dashboard');
+  const signedIn = !!(await getCurrentUser());
 
   const [{ monthly, yearly, founder }, offer] = await Promise.all([proPriceLabels(), getFoundingOffer()]);
   const proPrice = [monthly, yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
@@ -102,7 +103,8 @@ export default async function Home() {
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
-      <LandingHeader />
+      <StandaloneRedirect signedIn={signedIn} />
+      <LandingHeader signedIn={signedIn} />
 
       <main>
         {/* Hero */}
@@ -121,10 +123,10 @@ export default async function Home() {
             </p>
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
               <Link
-                href="/signup"
+                href={signedIn ? '/dashboard' : '/signup'}
                 className="flex h-12 items-center justify-center rounded-xl bg-orange-600 px-8 font-semibold text-white hover:bg-orange-500"
               >
-                Create a free account
+                {signedIn ? 'Open Deadeye' : 'Create a free account'}
               </Link>
               <a
                 href="#get-the-app"
@@ -345,10 +347,10 @@ export default async function Home() {
             <h2 className="text-3xl font-black tracking-tight text-white">Aim is earned</h2>
             <p className="mt-2 text-zinc-300">Start tracking your shots today. It&apos;s free.</p>
             <Link
-              href="/signup"
+              href={signedIn ? '/dashboard' : '/signup'}
               className="mx-auto mt-6 flex h-12 max-w-xs items-center justify-center rounded-xl bg-orange-600 font-semibold text-white hover:bg-orange-500"
             >
-              Create a free account
+              {signedIn ? 'Open Deadeye' : 'Create a free account'}
             </Link>
           </div>
         </section>
