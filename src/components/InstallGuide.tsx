@@ -5,7 +5,7 @@
 
 import React, { useState, useSyncExternalStore } from 'react';
 import { Bell, Check, Copy, Download, EllipsisVertical, Maximize2, Share, SquarePlus, WifiOff } from 'lucide-react';
-import { detectInstallPlatform, type InstallPlatform } from '@/lib/installPlatform';
+import { detectInstallPlatform, inAppBrowserName, type InstallPlatform } from '@/lib/installPlatform';
 import { INSTALLABLE_EVENT } from '@/components/ServiceWorkerRegistrar';
 
 const noSubscribe = () => () => {};
@@ -29,6 +29,7 @@ export function InstallGuide({ showWhy = true }: { showWhy?: boolean }) {
   const platform = useSyncExternalStore<InstallPlatform | null>(noSubscribe, readPlatform, () => null);
   const canPrompt = useSyncExternalStore(subscribeInstallable, () => !!window.__deadeyeInstallPrompt, () => false);
   const origin = useSyncExternalStore(noSubscribe, () => window.location.origin, () => '');
+  const appName = useSyncExternalStore(noSubscribe, () => inAppBrowserName(navigator.userAgent) || '', () => '');
   const [picked, setPicked] = useState<Phone | null>(null);
   const [copied, setCopied] = useState(false);
 
@@ -67,7 +68,7 @@ export function InstallGuide({ showWhy = true }: { showWhy?: boolean }) {
         <div className="space-y-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-100">
           <p className="font-bold text-white">Open this page in Safari or Chrome first</p>
           <p>
-            You are inside another app&apos;s browser, like Instagram or Snapchat, and apps can&apos;t be installed from
+            You are inside {appName ? `${appName}'s` : "another app's"} browser, and apps can&apos;t be installed from
             there. Tap the <strong>⋯</strong> or <strong>⋮</strong> menu and choose <strong>Open in browser</strong>{' '}
             (or Open in Safari / Chrome), then follow the steps below.
           </p>

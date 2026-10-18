@@ -35,3 +35,18 @@ export function detectInstallPlatform(
   }
   return 'desktop';
 }
+
+/**
+ * Which app's built-in browser this is, for telling the player by name -
+ * "you are in TikTok's browser" is understood at once, "an in-app browser" is
+ * not. null when it is not one of the apps people mostly arrive from.
+ */
+export function inAppBrowserName(userAgent: string): string | null {
+  if (/musical_ly|TikTok|BytedanceWebview/i.test(userAgent)) return 'TikTok';
+  if (/Instagram/i.test(userAgent)) return 'Instagram';
+  if (/Snapchat/i.test(userAgent)) return 'Snapchat';
+  if (/FBAN|FBAV|FB_IAB/i.test(userAgent)) return 'Facebook';
+  if (/LinkedInApp/i.test(userAgent)) return 'LinkedIn';
+  if (/Twitter/i.test(userAgent)) return 'X';
+  return null;
+}

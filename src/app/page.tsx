@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { InstallGuide } from '@/components/InstallGuide';
+import { InAppBrowserNotice } from '@/components/InAppBrowserNotice';
+import { LandingHeader } from '@/components/LandingHeader';
 import { getCurrentUser } from '@/lib/auth';
 import { FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
@@ -100,38 +102,14 @@ export default async function Home() {
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
-      {/* Header */}
-      <header className="sticky top-0 z-20 border-b border-zinc-900 bg-zinc-950/90 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className="flex items-center gap-2">
-            <Logo size={28} />
-            <span className="text-lg font-black uppercase tracking-tight text-white">Deadeye</span>
-          </Link>
-          <nav className="flex items-center gap-1 text-sm">
-            <a href="#features" className="hidden rounded-lg px-3 py-1.5 text-zinc-400 hover:text-white sm:block">
-              Features
-            </a>
-            <a href="#pricing" className="hidden rounded-lg px-3 py-1.5 text-zinc-400 hover:text-white sm:block">
-              Pricing
-            </a>
-            <a href="#get-the-app" className="hidden rounded-lg px-3 py-1.5 text-zinc-400 hover:text-white sm:block">
-              Get the app
-            </a>
-            <Link href="/login" className="rounded-lg px-3 py-1.5 text-zinc-300 hover:text-white">
-              Log in
-            </Link>
-            <Link href="/signup" className="rounded-lg bg-orange-600 px-3 py-1.5 font-semibold text-white hover:bg-orange-500">
-              Start free
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <LandingHeader />
 
       <main>
         {/* Hero */}
         <section className="relative overflow-hidden px-4 pb-16 pt-14 sm:pt-20">
           <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-red-600/10 blur-3xl" />
           <div className="relative mx-auto max-w-3xl text-center">
+            <InAppBrowserNotice />
             <Logo size={72} className="mx-auto" />
             <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-red-400">Aim is earned</p>
             <h1 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-6xl">
@@ -171,8 +149,27 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Get the app. Straight after the hero, because most new players arrive
+            from a link in TikTok or Instagram and the next thing they need is how
+            to put Deadeye on their phone, not more reasons to want it. */}
+        <section id="get-the-app" className="scroll-mt-28 border-y border-zinc-900 bg-zinc-900/40 px-4 py-14">
+          <div className="mx-auto max-w-2xl">
+            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-orange-400">
+              <Activity className="h-4 w-4" /> Get the app
+            </p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Add Deadeye to your home screen</h2>
+            <p className="mt-3 text-zinc-400">
+              Deadeye runs in your phone&apos;s browser, so there is nothing to download from an app store. Add it to your
+              home screen once and it opens full screen, like any other app.
+            </p>
+            <div className="mt-6">
+              <InstallGuide />
+            </div>
+          </div>
+        </section>
+
         {/* Shot tracker spotlight */}
-        <section className="border-y border-zinc-900 bg-zinc-900/40 px-4 py-14">
+        <section className="px-4 py-14">
           <div className="mx-auto grid max-w-5xl gap-8 sm:grid-cols-2 sm:items-center">
             <div>
               <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-orange-400">
@@ -196,7 +193,7 @@ export default async function Home() {
         </section>
 
         {/* Features */}
-        <section id="features" className="scroll-mt-20 px-4 py-16">
+        <section id="features" className="scroll-mt-28 border-y border-zinc-900 bg-zinc-900/40 px-4 py-16">
           <div className="mx-auto max-w-5xl">
             <h2 className="text-center text-3xl font-black tracking-tight text-white">Everything in one app</h2>
             <p className="mx-auto mt-3 max-w-2xl text-center text-zinc-400">
@@ -219,13 +216,13 @@ export default async function Home() {
         </section>
 
         {/* How it works */}
-        <section className="border-y border-zinc-900 bg-zinc-900/40 px-4 py-16">
+        <section className="px-4 py-16">
           <div className="mx-auto max-w-5xl">
             <h2 className="text-center text-3xl font-black tracking-tight text-white">Up and running in two minutes</h2>
             <ol className="mt-10 grid gap-4 sm:grid-cols-3">
               {[
                 ['Create a free account', 'Email and a password. Under 16? A parent approves your account from a link.'],
-                ['Add it to your home screen', 'Deadeye is a web app: no app store, no download, and it opens full screen.'],
+                ['Add it to your home screen', 'Deadeye is a web app: no app store, no download, and it opens full screen. The steps are near the top of this page.'],
                 ['Train', 'Track your shots, follow a programme, log the gym, and watch your numbers move.'],
               ].map(([title, desc], i) => (
                 <li key={title} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-5">
@@ -241,7 +238,7 @@ export default async function Home() {
         </section>
 
         {/* Pricing */}
-        <section id="pricing" className="scroll-mt-20 px-4 py-16">
+        <section id="pricing" className="scroll-mt-28 border-y border-zinc-900 bg-zinc-900/40 px-4 py-16">
           <div className="mx-auto max-w-3xl">
             <h2 className="text-center text-3xl font-black tracking-tight text-white">Free to start</h2>
             <p className="mx-auto mt-3 max-w-xl text-center text-zinc-400">
@@ -313,7 +310,7 @@ export default async function Home() {
         </section>
 
         {/* Parents */}
-        <section className="border-y border-zinc-900 bg-zinc-900/40 px-4 py-16">
+        <section id="parents" className="scroll-mt-28 px-4 py-16">
           <div className="mx-auto max-w-3xl">
             <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-orange-400">
               <ShieldCheck className="h-4 w-4" /> For parents
@@ -339,23 +336,6 @@ export default async function Home() {
               </Link>
               .
             </p>
-          </div>
-        </section>
-
-        {/* Get the app */}
-        <section id="get-the-app" className="scroll-mt-20 px-4 py-16">
-          <div className="mx-auto max-w-2xl">
-            <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-orange-400">
-              <Activity className="h-4 w-4" /> Get the app
-            </p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-white">Add Deadeye to your home screen</h2>
-            <p className="mt-3 text-zinc-400">
-              Deadeye runs in your phone&apos;s browser, so there is nothing to download from an app store. Add it to your
-              home screen once and it opens full screen, like any other app.
-            </p>
-            <div className="mt-6">
-              <InstallGuide />
-            </div>
           </div>
         </section>
 

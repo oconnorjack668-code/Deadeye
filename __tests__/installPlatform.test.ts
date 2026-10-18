@@ -4,7 +4,7 @@
 // there at all, and Safari-style steps would leave them looking for a Share
 // button that does nothing.
 import { describe, it, expect } from 'vitest';
-import { detectInstallPlatform } from '@/lib/installPlatform';
+import { detectInstallPlatform, inAppBrowserName } from '@/lib/installPlatform';
 
 const UA = {
   iphoneSafari:
@@ -50,4 +50,23 @@ describe('detectInstallPlatform', () => {
     expect(detectInstallPlatform(UA.androidChrome)).toBe('android');
     expect(detectInstallPlatform(UA.windowsChrome)).toBe('desktop');
   });
+});
+
+describe('inAppBrowserName', () => {
+  it('names the app, so the warning can say whose browser this is', () => {
+    expect(inAppBrowserName(UA.iphoneInstagram)).toBe('Instagram');
+    expect(inAppBrowserName(UA.iphoneSnapchat)).toBe('Snapchat');
+    expect(
+      inAppBrowserName(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 musical_ly_38.1.0 JsSdk/2.0 NetType/WIFI Channel/App Store ByteLocale/en'
+      )
+    ).toBe('TikTok');
+    expect(inAppBrowserName(UA.iphoneSafari)).toBeNull();
+  });
+});
+
+it('treats a TikTok bio link as an in-app browser, the case the landing page warns about first', () => {
+  const tiktok =
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 18_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 musical_ly_38.1.0 JsSdk/2.0 NetType/WIFI Channel/App Store ByteLocale/en';
+  expect(detectInstallPlatform(tiktok)).toBe('in-app');
 });
