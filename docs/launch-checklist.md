@@ -36,7 +36,7 @@ values when the founder turns 18 and the accounts move over.
 1. Buy both domains.
 2. Vercel → Settings → Domains: add `deadeye.ie`, `www.deadeye.ie` and
    `deadeyebasketball.com`. Make `deadeye.ie` primary and redirect the others
-   to it, `hoopiq.vercel.app` included. Create the DNS records Vercel shows at
+   to it, the old `hoopiq-hoop-iq.vercel.app` and `deadeye-hoop-iq.vercel.app` included. Create the DNS records Vercel shows at
    the registrar. HTTPS is automatic.
 3. Supabase → Authentication → URL Configuration: Site URL
    `https://deadeye.ie`, and add it to the redirect URLs. **Skip this and
@@ -61,17 +61,17 @@ that data again.
 
 ## Before launch
 
-- [ ] Run `supabase/migrations/00036_parent_approval.sql` in the Supabase SQL editor.
-- [ ] Set `LEGAL_NAME`, `LEGAL_ADDRESS`, `SUPPORT_EMAIL`.
+- [x] `LEGAL_NAME` and `LEGAL_ADDRESS` set (18 October 2026). Add the town, county and Eircode to the address.
+- [ ] Set `SUPPORT_EMAIL` to an address at `deadeye.ie` once the domain is bought.
 - [ ] Set up email (step 4 above). Until then, parents approve straight from the
       link with no email check, which is weaker. Approvals made that way are
       marked `approval_method = 'link'` in `age_checks`, so they can be found and
       asked to confirm by email once it works.
-- [ ] Check the Supabase region (Project Settings → General). It should be
-      `eu-west-1` (Ireland). If it is, add `"regions": ["dub1"]` to
-      `vercel.json` so the server runs next to the database; Vercel defaults to
-      Washington DC. A Supabase project cannot change region; moving means a new
-      project and copying the data, so do it before there are real users.
+- [x] Supabase is in `eu-west-1` (Ireland), so `vercel.json` sets
+      `"regions": ["dub1"]` and the server runs in Dublin next to the database.
+      Before that it ran in Vercel's default, Washington DC, and every query
+      crossed the Atlantic and back.
+- [x] Run `00036_parent_approval.sql` (done 18 October 2026).
 - [ ] Vercel Pro ($20/month) before taking real payments. The free plan is for
       non-commercial use only.
 - [ ] Supabase Pro ($25/month) is recommended once there are real users: no
