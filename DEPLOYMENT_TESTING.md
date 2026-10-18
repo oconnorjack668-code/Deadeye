@@ -87,7 +87,7 @@ git push origin production/v1.0.0
 
 **Step 4: Configure Domain**
 - In Vercel dashboard: Settings → Domains
-- Add custom domain or use `deadeye-deadeyeapp.vercel.app`
+- Add custom domain or use `deadeyeapp.vercel.app`
 - Configure DNS records if custom domain
 - Enable automatic HTTPS
 
