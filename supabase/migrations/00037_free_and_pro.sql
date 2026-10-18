@@ -26,7 +26,7 @@
 --                       so it also marks who is entitled to the founder price)
 -- founding_pro_until    Pro without paying until this moment
 -- founding_reminded_at  when the "your founding Pro ends soon" nudge went out
--- ai_credits_period     the month ai_credits_remaining belongs to; a different
+-- ai_credits_period     the month ai_credits_remaining belongs to. A different
 --                       month means the allowance is due a refill
 ALTER TABLE public.subscriptions
   ADD COLUMN IF NOT EXISTS founding_claimed_at timestamptz,
