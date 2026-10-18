@@ -36,7 +36,7 @@ values when the founder turns 18 and the accounts move over.
 1. Buy both domains.
 2. Vercel → Settings → Domains: add `deadeye.ie`, `www.deadeye.ie` and
    `deadeyebasketball.com`. Make `deadeye.ie` primary and redirect the others
-   to it, the old `hoopiq-hoop-iq.vercel.app` and `deadeye-hoop-iq.vercel.app` included. Create the DNS records Vercel shows at
+   to it. The live address is `deadeye-deadeyeapp.vercel.app`; the older `deadeye-hoop-iq` and `hoopiq-hoop-iq` addresses stopped updating when the Vercel team was renamed. Create the DNS records Vercel shows at
    the registrar. HTTPS is automatic.
 3. Supabase → Authentication → URL Configuration: Site URL
    `https://deadeye.ie`, and add it to the redirect URLs. **Skip this and

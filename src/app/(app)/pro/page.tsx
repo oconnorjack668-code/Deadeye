@@ -1,41 +1,19 @@
 // src/app/(app)/pro/page.tsx
 import React from 'react';
 import { requireUser, getCurrentSubscription } from '@/lib/auth';
-import { getStripe, stripeConfigured } from '@/lib/stripe';
+import { getStripe, proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { withdrawalDeadline, withinWithdrawalPeriod } from '@/lib/withdrawal';
 import { ProActions } from './ProActions';
 import { WithdrawFromContract } from './WithdrawFromContract';
 import { Crown, Check } from 'lucide-react';
+import { FREE_PLAN, PRO_PLAN } from '@/lib/plans';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'Deadeye Pro' };
 
-const FREE = [
-  'Shot tracking, workouts, programs and all 150 drills',
-  'Full IQ Study: 12 sections, 252 questions',
-  'Video AI: shot tracker, form check, game film',
-  'Play Style Match (your NBA comparisons)',
-  '3 AI coaching credits to try it out',
-];
-const PRO = [
-  'Unlimited AI coaching on sessions and video',
-  'AI development plan from your NBA style match',
-  'Everything in Free',
-  'Support Deadeye and shape what gets built next',
-];
-
-async function priceLabel(priceId: string | undefined): Promise<string | null> {
-  if (!priceId) return null;
-  try {
-    const p = await getStripe().prices.retrieve(priceId);
-    if (!p.unit_amount) return null;
-    const amount = new Intl.NumberFormat('en-IE', { style: 'currency', currency: p.currency.toUpperCase() }).format(p.unit_amount / 100);
-    return `${amount}/${p.recurring?.interval === 'year' ? 'year' : 'month'}`;
-  } catch {
-    return null;
-  }
-}
+const FREE = FREE_PLAN.features;
+const PRO = PRO_PLAN.features;
 
 /** When the 14-day withdrawal window closes, formatted, or null once it has (or if Stripe can't say). */
 async function withdrawalDeadlineFor(subscriptionId: string | null | undefined): Promise<string | null> {
@@ -58,9 +36,7 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
   const { success } = await searchParams;
   const subscription = await getCurrentSubscription();
   const configured = stripeConfigured();
-  const [monthly, yearly] = configured
-    ? await Promise.all([priceLabel(process.env.STRIPE_PRO_MONTHLY_PRICE_ID), priceLabel(process.env.STRIPE_PRO_YEARLY_PRICE_ID)])
-    : [null, null];
+  const { monthly, yearly } = await proPriceLabels();
   const plan = subscription?.plan_type || 'free';
   const withdrawBy = plan === 'pro' && configured ? await withdrawalDeadlineFor(subscription?.stripe_subscription_id) : null;
 
@@ -87,7 +63,7 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5">
             <div className="text-lg font-bold text-white">Free</div>
-            <div className="text-sm text-zinc-400 mb-3">Everything you need to train</div>
+            <div className="text-sm text-zinc-400 mb-3">{FREE_PLAN.tagline}</div>
             <ul className="space-y-2 text-sm text-zinc-300">
               {FREE.map((f) => (
                 <li key={f} className="flex gap-2"><Check className="h-4 w-4 text-emerald-400 mt-0.5 flex-shrink-0" />{f}</li>

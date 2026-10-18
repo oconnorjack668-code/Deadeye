@@ -4,6 +4,7 @@
 // so input is trimmed, duplicates are skipped and each server instance rate-limits by IP.
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { isIgnoredError } from '@/lib/reportError';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
   const message = clip(body?.message, 1000);
   const source = typeof body?.source === 'string' && SOURCES.has(body.source) ? body.source : null;
   if (!message || !source) return Response.json({ error: 'Invalid report' }, { status: 400 });
+  // Checked here as well as in the browser: copies of the app cached on phones
+  // keep running the old reporter, whose filter could not match "Script error."
+  if (isIgnoredError(message)) return new Response(null, { status: 204 });
 
   const user = await getCurrentUser().catch(() => null);
   const admin = createAdminClient();

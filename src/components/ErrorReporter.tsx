@@ -15,7 +15,11 @@ export function ErrorReporter() {
   }, []);
 
   useEffect(() => {
-    const onError = (event: ErrorEvent) => reportError('client', event.error || event.message);
+    // With no error object, where the browser says it happened is the only location there is
+    const onError = (event: ErrorEvent) =>
+      reportError('client', event.error || event.message, {
+        at: event.filename ? `${event.filename}:${event.lineno}:${event.colno}` : undefined,
+      });
     const onRejection = (event: PromiseRejectionEvent) => reportError('client', event.reason);
     window.addEventListener('error', onError);
     window.addEventListener('unhandledrejection', onRejection);

@@ -21,6 +21,7 @@ import {
   type SavedRim,
 } from '@/lib/video/rimMemory';
 import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
+import { createPacer } from '@/lib/video/pace';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import type { ShootingSummary } from '@/components/video/VideoAIFeedback';
@@ -103,6 +104,10 @@ export function ShotTracker({
   /** Removes the clip-ended listener; see startTracking. */
   const endedCleanupRef = useRef<(() => void) | null>(null);
   const [quality, setQuality] = useState<{ fps: number; ballSeenPct: number; frames: number } | null>(null);
+  // Playback speed of an uploaded clip, which the pacer lowers when this device
+  // cannot score every frame at full speed
+  const [speed, setSpeed] = useState(1);
+  const speedRef = useRef(1);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Release the camera, screen lock and any pending flash timer when leaving
@@ -376,7 +381,8 @@ export function ShotTracker({
 
     if (source === 'file') {
       video.currentTime = 0;
-      // Always real time: see the note where the 2x selector used to be
+      // Never faster than real time (see the note where the 2x selector used to
+      // be); the pacer below goes slower when that is what scoring every frame takes
       video.playbackRate = 1;
       await video.play().catch(() => undefined);
     }
@@ -396,7 +402,14 @@ export function ShotTracker({
       endedCleanupRef.current = () => video.removeEventListener('ended', onEnded);
     }
 
-    const processFrame = () => {
+    // A clip is played as fast as this device can score every frame of it and
+    // no faster (src/lib/video/pace.ts). The camera has no such option: it is
+    // live, and real time is the only speed there is.
+    const pacer = source === 'file' ? createPacer() : null;
+    setSpeed(1);
+    speedRef.current = 1;
+
+    const processFrame = (_now?: number, meta?: { mediaTime?: number }) => {
       if (stopRef.current) return;
       if (source === 'file' && video.ended) {
         finish();
@@ -422,7 +435,18 @@ export function ShotTracker({
           ballTracker = createBallTracker({ expectedDiameter: expectedBallDiameter(rimOnCanvas) });
         }
 
-        const now = source === 'file' ? video.currentTime * 1000 : performance.now() - startedAt;
+        // mediaTime is the time of the frame actually presented, where
+        // currentTime can already have moved on to the next one
+        const now = source === 'file' ? (meta?.mediaTime ?? video.currentTime) * 1000 : performance.now() - startedAt;
+        if (pacer) {
+          const rate = pacer.next(now);
+          if (Math.abs(video.playbackRate - rate) > 0.01) video.playbackRate = rate;
+          // Shown to the player, so only on a visible change
+          if (Math.abs(rate - speedRef.current) >= 0.05) {
+            speedRef.current = rate;
+            setSpeed(rate);
+          }
+        }
         const pixels = ctx.getImageData(0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX).data;
         const ready = Boolean(older && held);
         const found =
@@ -495,7 +519,9 @@ export function ShotTracker({
         }
         if (source === 'file' && video.duration) setProgress(video.currentTime / video.duration);
       }
-      const v = video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number };
+      const v = video as HTMLVideoElement & {
+        requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime?: number }) => void) => number;
+      };
       if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(processFrame);
       else requestAnimationFrame(processFrame);
     };
@@ -810,6 +836,12 @@ export function ShotTracker({
             <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
               <div className="h-full bg-orange-500" style={{ width: `${Math.round(progress * 100)}%` }} />
             </div>
+          )}
+          {source === 'file' && speed < 0.95 && (
+            <p className="text-xs text-zinc-500">
+              Playing at {Math.round(speed * 100)}% speed so no frame is skipped. A longer clip takes a little longer
+              than its own length to check.
+            </p>
           )}
           <p className="text-xs text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />

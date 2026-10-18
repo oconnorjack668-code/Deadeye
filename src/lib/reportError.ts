@@ -18,14 +18,29 @@ export function isIgnoredError(text: string): boolean {
 
 const sent = new Set<string>();
 
-export function reportError(source: 'client' | 'boundary', error: unknown, extra: { digest?: string } = {}) {
+export function reportError(
+  source: 'client' | 'boundary',
+  error: unknown,
+  extra: { digest?: string; at?: string } = {}
+) {
   if (typeof window === 'undefined') return;
   if (navigator.onLine === false) return;
 
-  const err = error instanceof Error ? error : new Error(typeof error === 'string' ? error : 'Unknown error');
-  const message = `${err.name && err.name !== 'Error' ? `${err.name}: ` : ''}${err.message || 'Unknown error'}`;
-  const text = `${message}\n${err.stack || ''}`;
-  if (isIgnoredError(text)) return;
+  // A bare message - an error event the browser stripped of its error object,
+  // which is what "Script error." always is - has no stack. It used to be
+  // wrapped in new Error() here, and that gave it one: this function's own,
+  // pointing at the line that made the Error rather than anything that failed.
+  // Worse, the stack was appended to the text the ignore list is checked
+  // against, so the anchored /^Script error\.?$/ could never match and every
+  // one was stored: 6 from iPhones on the home and sign-in pages by 17 Oct 2026.
+  const err = error instanceof Error ? error : null;
+  const message = err
+    ? `${err.name && err.name !== 'Error' ? `${err.name}: ` : ''}${err.message || 'Unknown error'}`
+    : typeof error === 'string' && error
+      ? error
+      : 'Unknown error';
+  const stack = err?.stack || extra.at || null;
+  if (isIgnoredError(message) || isIgnoredError(`${message}\n${stack || ''}`)) return;
 
   // One report per distinct error per page load
   const key = `${message}|${location.pathname}`;
@@ -35,7 +50,7 @@ export function reportError(source: 'client' | 'boundary', error: unknown, extra
   const body = JSON.stringify({
     source,
     message,
-    stack: err.stack || null,
+    stack,
     digest: extra.digest || null,
     url: location.pathname + location.search,
   });

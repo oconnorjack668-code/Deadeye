@@ -14,6 +14,7 @@ import { loadAchievements } from '@/lib/achievements-server';
 import { ShotHeatMap } from '@/components/basketball/ShotHeatMap';
 import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
 import { squadActivityLine, type FriendRow } from '@/lib/friends';
+import { InstallNudge } from '@/components/InstallNudge';
 
 export const dynamic = 'force-dynamic';
 
@@ -119,6 +120,8 @@ export default async function DashboardPage() {
             <span className="min-w-0 truncate">{squadLine}</span>
           </Link>
         )}
+
+        <InstallNudge />
 
         {/* Today. Deliberately the first thing under the greeting: you open the
             app to decide what to train, not to look at a reward meter. */}

@@ -51,6 +51,7 @@ export async function updateSession(request: NextRequest) {
     pathname === '/' || pathname.startsWith('/about') || pathname.startsWith('/privacy') || pathname.startsWith('/terms') ||
     pathname.startsWith('/.well-known') ||
     pathname.startsWith('/account-deletion') ||
+    pathname === '/install' ||
     pathname === '/api/errors' ||
     // A parent approving an under-16 has no account; the token in the link is the access
     pathname.startsWith('/parents/') ||
