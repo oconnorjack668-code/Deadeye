@@ -26,6 +26,8 @@ import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import type { ShootingSummary } from '@/components/video/VideoAIFeedback';
 import { HighlightReel } from '@/components/video/HighlightReel';
+import { RimAdjuster } from '@/components/video/RimAdjuster';
+import { leftFirst, type Point } from '@/lib/video/rimAdjust';
 import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
@@ -192,10 +194,14 @@ export function ShotTracker({
     });
   }
 
-  // Tap the ring's left and right edges. Tracking starts on the second tap -
-  // no ring to drag, no size slider, no separate "start" step.
+  // Tap the ring's left and right edges, then fine-tune both in a magnified
+  // view before tracking starts. Tracking used to start on the second tap, with
+  // nothing to adjust - and on a clip where the ring was 18 points wide on the
+  // screen, where the taps landed moved the count between 22 and 31 shots
+  // right out of 31. See src/lib/video/rimAdjust.ts.
   const [calibrating, setCalibrating] = useState(false);
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
+  const [edges, setEdges] = useState<[Point, Point] | null>(null);
 
   // Hoops measured before, so a returning player taps nothing. Read when the
   // calibrate step opens rather than on mount: localStorage does not exist while
@@ -214,6 +220,8 @@ export function ShotTracker({
     setSavedRims(loadSavedRims());
     setRimSaved(false);
     setRimName('');
+    setFirstEdge(null);
+    setEdges(null);
     setStep('calibrate');
   }
 
@@ -258,7 +266,8 @@ export function ShotTracker({
   }
 
   function tapRim(e: React.MouseEvent<HTMLCanvasElement>) {
-    if (step !== 'calibrate' || calibrating) return;
+    // While adjusting, the magnified view below is where the ends move
+    if (step !== 'calibrate' || calibrating || edges) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const point = {
       x: (e.clientX - rect.left) / rect.width,
@@ -270,24 +279,36 @@ export function ShotTracker({
       return;
     }
 
+    setError(null);
+    setEdges(leftFirst(firstEdge, point));
+    setFirstEdge(null);
+  }
+
+  /** Starts tracking on the ends as adjusted in the magnified view. */
+  function confirmEdges() {
+    if (!edges) return;
     // Checked before anything starts: a clamped rim is the worst thing that can
     // happen to detection accuracy, and starting a whole session on one wastes
-    // the player's time far more than asking for the two taps again.
-    const problem = rimTapProblem(firstEdge, point);
+    // the player's time far more than asking for the ends to be moved.
+    const problem = rimTapProblem(edges[0], edges[1]);
     if (problem) {
       setError(problem);
-      setFirstEdge(null);
       return;
     }
     setError(null);
-
-    const measured = rimFromEdges(firstEdge, point);
+    const measured = rimFromEdges(edges[0], edges[1]);
     setRim(measured);
-    setFirstEdge(null);
+    setEdges(null);
     // Pass the measured rim directly instead of relying on the `rim` state,
     // which would still read null on this render (state is not synchronous).
     setCalibrating(true);
     startTracking(measured).finally(() => setCalibrating(false));
+  }
+
+  function redoEdges() {
+    setEdges(null);
+    setFirstEdge(null);
+    setError(null);
   }
 
   // Draws a small, fixed marker at the rim (while tracking) and the detected ball
@@ -650,10 +671,22 @@ export function ShotTracker({
 
       {step === 'source' && (
         <div className="space-y-3">
-          <p className="text-sm text-zinc-300">
-            Put your phone on a tripod or against a wall with the <strong>whole hoop in view</strong>, side-on or behind you. Good light helps.
-            Your video stays on your phone.
-          </p>
+          {/* Where the phone is matters more than anything the tracker does
+              afterwards. Each of these was a measured cause of wrong calls on
+              the test sessions: a hoop too small in the picture, a camera
+              side-on and low, bright windows behind the ring, and a copy of the
+              video at half the resolution of the original. */}
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+            <p className="mb-2 text-sm font-semibold text-white">For the most accurate count</p>
+            <ul className="space-y-1.5 text-sm text-zinc-300">
+              <li>• Phone on a tripod or propped up, not in your hand</li>
+              <li>• 3 to 6 metres from the hoop, at an angle rather than side-on, at head height or higher</li>
+              <li>• The whole ring and net in shot, big in the picture, with room above for the ball</li>
+              <li>• Not facing bright windows or the sun</li>
+              <li>• Upload the original video, not a screen recording or one sent through a messaging app</li>
+            </ul>
+            <p className="mt-2 text-xs text-zinc-500">Your video stays on your phone.</p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button type="button" onClick={openCamera} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-left hover:bg-zinc-900">
               <Camera className="h-6 w-6 text-orange-400" />
@@ -678,20 +711,22 @@ export function ShotTracker({
         <div className="relative w-full overflow-hidden rounded-2xl bg-black">
           <video ref={videoRef} playsInline muted className="w-full h-auto" />
           <canvas ref={canvasRef} onClick={tapRim} className="absolute inset-0 h-full w-full touch-manipulation" />
-          {step === 'calibrate' && firstEdge && (
-            /* A crosshair rather than a 14px dot, which covered the rim edge it
-               was marking. This tap sets the rim width and tilt, which feed the
-               detection crop and the crossing test, so hitting the edge
-               precisely is worth more than a marker you can see from afar. */
-            <div
-              className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${firstEdge.x * 100}%`, top: `${firstEdge.y * 100}%` }}
-            >
-              <div className="absolute left-1/2 top-1/2 h-px w-7 -translate-x-1/2 -translate-y-1/2 bg-white/80" />
-              <div className="absolute left-1/2 top-1/2 h-7 w-px -translate-x-1/2 -translate-y-1/2 bg-white/80" />
-              <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-1 ring-white" />
-            </div>
-          )}
+          {step === 'calibrate' &&
+            (edges ?? (firstEdge ? [firstEdge] : [])).map((edge, i) => (
+              /* A crosshair rather than a 14px dot, which covered the rim edge it
+                 was marking. These set the rim width and tilt, which feed the
+                 detection crop and the crossing test, so hitting the edge
+                 precisely is worth more than a marker you can see from afar. */
+              <div
+                key={i}
+                className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${edge.x * 100}%`, top: `${edge.y * 100}%` }}
+              >
+                <div className="absolute left-1/2 top-1/2 h-px w-7 -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+                <div className="absolute left-1/2 top-1/2 h-7 w-px -translate-x-1/2 -translate-y-1/2 bg-white/80" />
+                <div className="absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500 ring-1 ring-white" />
+              </div>
+            ))}
           {step === 'tracking' && (
             <>
               {/* Scrim so the readout stays legible against a bright gym or sky */}
@@ -767,15 +802,19 @@ export function ShotTracker({
         </div>
       )}
 
-      {step === 'calibrate' && (
+      {step === 'calibrate' && edges && !calibrating && (
+        <RimAdjuster videoRef={videoRef} edges={edges} onChange={setEdges} onStart={confirmEdges} onRedo={redoEdges} />
+      )}
+
+      {step === 'calibrate' && !edges && (
         <div className="space-y-3">
           <p className="text-sm text-zinc-300 flex items-center gap-2">
             <Crosshair className="h-4 w-4 flex-shrink-0 text-orange-400" />
             {calibrating
               ? 'Starting…'
               : firstEdge
-                ? 'Now tap the opposite side, straight across the ring from your first tap.'
-                : 'Tap the left and right edges of the ring — its widest points across, not the front and back of it. The hoop can be anywhere in the frame.'}
+                ? 'Now tap the right-hand edge, straight across the ring from your first tap.'
+                : 'Tap the far left of the metal ring, then the far right - its widest points across, not the front and back of it. You can fine-tune both in a zoomed view next.'}
           </p>
           {firstEdge && !calibrating && (
             <button type="button" onClick={() => setFirstEdge(null)} className="text-xs text-zinc-500 underline">
