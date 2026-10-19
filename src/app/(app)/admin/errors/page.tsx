@@ -1,5 +1,6 @@
 // src/app/(app)/admin/errors/page.tsx
-// Owner-only crash report viewer (reports come from /api/errors and src/instrumentation.ts).
+// Owner-only viewer for what goes wrong: problems players report themselves
+// (/api/reports, 00038) and crash reports (/api/errors and src/instrumentation.ts).
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
@@ -20,6 +21,28 @@ interface ErrorRow {
   digest: string | null;
   url: string | null;
   user_agent: string | null;
+}
+
+interface ReportRow {
+  id: string;
+  created_at: string;
+  message: string;
+  context: string | null;
+  url: string | null;
+  user_agent: string | null;
+}
+
+async function markReportRead(formData: FormData) {
+  'use server';
+  if (!(await checkIsOwner())) return;
+  const id = String(formData.get('id') || '');
+  if (!id) return;
+  await createAdminClient().from('player_reports').update({ resolved: true }).eq('id', id);
+  revalidatePath('/admin/errors');
+}
+
+function when(iso: string): string {
+  return new Date(iso).toLocaleString('en-IE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 async function markResolved(formData: FormData) {
@@ -58,6 +81,22 @@ export default async function AdminErrorsPage() {
     loadError = e instanceof Error ? e.message : 'Could not load errors';
   }
 
+  // Loaded separately, so a missing 00038 does not hide the crash reports
+  let reports: ReportRow[] = [];
+  let reportsError: string | null = null;
+  try {
+    const { data, error } = await createAdminClient()
+      .from('player_reports')
+      .select('id, created_at, message, context, url, user_agent')
+      .eq('resolved', false)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) reportsError = error.message;
+    reports = (data || []) as ReportRow[];
+  } catch (e) {
+    reportsError = e instanceof Error ? e.message : 'Could not load reports';
+  }
+
   // Group identical messages so one bug hitting many players shows once
   const groups = new Map<string, { latest: ErrorRow; count: number; players: Set<string>; pages: Set<string> }>();
   for (const row of rows) {
@@ -78,9 +117,44 @@ export default async function AdminErrorsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-white">App errors</h1>
-            <p className="text-sm text-zinc-400">Crashes players hit, newest reports kept for 90 days. Only you can see this.</p>
+            <p className="text-sm text-zinc-400">
+              Problems players report, and crashes they hit. Both are kept for 90 days. Only you can see this.
+            </p>
           </div>
         </div>
+
+        {/* Player reports first: each is one person who took the time to say
+            what went wrong, so they are listed one by one, never grouped */}
+        <section className="space-y-2">
+          <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-400">Player reports</h2>
+          {reportsError ? (
+            <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
+              Could not load player reports: {reportsError}. Has migration 00038_player_reports.sql been run in Supabase?
+            </p>
+          ) : reports.length === 0 ? (
+            <p className="text-sm text-zinc-500">No new reports. Players send them from Settings, or from the crash screen.</p>
+          ) : (
+            reports.map((r) => (
+              <div key={r.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+                <p className="whitespace-pre-wrap break-words text-sm text-zinc-100">{r.message}</p>
+                {r.context && <p className="mt-2 break-words text-xs text-zinc-400">{r.context}</p>}
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs text-zinc-500">
+                    {(r.url || 'unknown page').split('?')[0]} · {when(r.created_at)} · {device(r.user_agent)}
+                  </p>
+                  <form action={markReportRead}>
+                    <input type="hidden" name="id" value={r.id} />
+                    <button type="submit" className="rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-700">
+                      Mark read
+                    </button>
+                  </form>
+                </div>
+              </div>
+            ))
+          )}
+        </section>
+
+        <h2 className="pt-2 text-sm font-bold uppercase tracking-wide text-zinc-400">Crashes</h2>
 
         {loadError && (
           <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
@@ -103,8 +177,7 @@ export default async function AdminErrorsPage() {
                 <div className="min-w-0">
                   <p className="font-mono text-sm text-red-300 break-words">{latest.message}</p>
                   <p className="mt-1 text-xs text-zinc-500">
-                    {latest.source} · {[...pages].slice(0, 3).join(', ') || 'unknown page'} · last{' '}
-                    {new Date(latest.created_at).toLocaleString('en-IE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })} ·{' '}
+                    {latest.source} · {[...pages].slice(0, 3).join(', ') || 'unknown page'} · last {when(latest.created_at)} ·{' '}
                     {device(latest.user_agent)}
                   </p>
                 </div>

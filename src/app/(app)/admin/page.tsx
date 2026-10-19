@@ -25,7 +25,7 @@ const TOOLS = [
     href: '/admin/errors',
     icon: Bug,
     title: 'App errors',
-    desc: 'Crash reports from players, newest first',
+    desc: 'Problems players report, and crash reports, newest first',
     tile: 'bg-red-600/20',
     iconColor: 'text-red-400',
   },

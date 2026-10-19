@@ -40,15 +40,18 @@ export async function GET(request: Request) {
   }
   const admin = createAdminClient();
 
-  // Housekeeping: crash reports are kept for 90 days
-  await admin
-    .from('app_errors')
-    .delete()
-    .lt('created_at', new Date(Date.now() - 90 * 86_400_000).toISOString())
-    .then(
-      () => undefined,
-      () => undefined
-    );
+  // Housekeeping: crash reports and player reports are kept for 90 days
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 86_400_000).toISOString();
+  for (const table of ['app_errors', 'player_reports'] as const) {
+    await admin
+      .from(table)
+      .delete()
+      .lt('created_at', ninetyDaysAgo)
+      .then(
+        () => undefined,
+        () => undefined
+      );
+  }
 
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
   // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)

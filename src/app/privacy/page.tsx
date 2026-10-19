@@ -95,6 +95,11 @@ export default function PrivacyPage() {
               Crash reports when something breaks: the error, the page, your device type and your account id, kept for
               90 days and used only to fix bugs.
             </li>
+            <li>
+              Problem reports, if you send one from Settings or the crash screen: what you write, the page, your device
+              type and your account id, kept for 90 days and used only to fix problems. Deleting your account deletes
+              them straight away.
+            </li>
           </ul>
         </section>
 
@@ -117,7 +122,8 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, and keeping the service secure rely on our legitimate interest in
+              Deadeye working properly.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>

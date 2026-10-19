@@ -4,6 +4,7 @@
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { reportError } from '@/lib/reportError';
+import { ReportProblem } from '@/components/ReportProblem';
 
 export default function Error({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
@@ -31,6 +32,14 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
             Go to dashboard
           </Link>
         </div>
+        {/* The crash report says where it broke; only the player can say what
+            they were doing when it did */}
+        <ReportProblem
+          label="Tell us what you were doing"
+          context={`After a crash${error.digest ? ` (error code ${error.digest})` : ''}: ${error.message}`}
+          className="mt-4 text-xs text-zinc-500 underline"
+          panelClassName="mt-4 border-t border-zinc-800 pt-4"
+        />
       </div>
     </div>
   );

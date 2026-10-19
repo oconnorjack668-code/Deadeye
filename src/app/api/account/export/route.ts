@@ -39,6 +39,7 @@ const USER_TABLES = [
   'games',
   'team_members',
   'team_assignment_completions',
+  'player_reports',
 ] as const;
 
 // Browser push keys are secrets, not personal data worth handing out

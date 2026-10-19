@@ -76,8 +76,11 @@ that data again.
       non-commercial use only.
 - [ ] Supabase Pro ($25/month) is recommended once there are real users: no
       pausing after a quiet week, and daily backups.
-- [ ] Run `supabase/migrations/00037_free_and_pro.sql` in the Supabase SQL editor
+- [x] Run `supabase/migrations/00037_free_and_pro.sql` in the Supabase SQL editor
       **before** the code that needs it goes live (see "Free and Pro" below).
+- [ ] Run `supabase/migrations/00038_player_reports.sql` in the Supabase SQL
+      editor. Until then "Report a problem" says the report could not be sent,
+      and the errors tab says the migration is missing.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

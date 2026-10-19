@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { IRISH_COUNTIES, cleanRegion, countryOptions, regionLabel } from '@/lib/regions';
 import type { MeasurementSystem } from '@/lib/units';
 import { SoundPicker } from '@/components/video/SoundPicker';
+import { ReportProblem } from '@/components/ReportProblem';
 import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
 
 type Role = 'player' | 'coach' | 'both';
@@ -412,6 +413,19 @@ export function SettingsClient({
         <Link href="/privacy" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           Privacy Policy <ChevronRight className="h-4 w-4 text-zinc-600" />
         </Link>
+        <ReportProblem
+          className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-zinc-100 hover:bg-zinc-900"
+          panelClassName="px-4 py-3"
+          label={
+            <>
+              <span>
+                Report a problem
+                <span className="block text-xs text-zinc-500">The tracker got a shot wrong, or something does not work</span>
+              </span>
+              <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+            </>
+          }
+        />
         {supportEmail && (
           <a href={`mailto:${supportEmail}?subject=Deadeye%20support`} className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
             Contact support <ChevronRight className="h-4 w-4 text-zinc-600" />

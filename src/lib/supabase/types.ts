@@ -1544,6 +1544,30 @@ export interface Database {
         Update: { resolved?: boolean };
         Relationships: [];
       };
+      player_reports: {
+        Row: {
+          id: string;
+          created_at: string;
+          user_id: string;
+          message: string;
+          context: string | null;
+          url: string | null;
+          user_agent: string | null;
+          resolved: boolean;
+        };
+        Insert: {
+          id?: string;
+          created_at?: string;
+          user_id: string;
+          message: string;
+          context?: string | null;
+          url?: string | null;
+          user_agent?: string | null;
+          resolved?: boolean;
+        };
+        Update: { resolved?: boolean };
+        Relationships: [];
+      };
       friendships: {
         Row: {
           id: string;
