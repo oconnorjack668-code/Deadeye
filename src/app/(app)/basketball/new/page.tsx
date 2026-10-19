@@ -38,15 +38,36 @@ interface Drill {
   shots: TrackedShot[];
 }
 
+interface Spot {
+  x: number;
+  y: number;
+  zone: CourtZone;
+}
+
 interface Draft {
   startedAt: number;
   sessionDate: string;
   sessionType: string;
   drills: Drill[];
   activeKey: string;
+  // Kept with the draft so a player who leaves mid-session comes back to MAKE
+  // and MISS ready to tap, not disabled until they find their spot again
+  spot?: Spot | null;
+}
+
+/** How this player likes to log, remembered on the device between sessions */
+interface Prefs {
+  mode: 'track' | 'totals';
+  attempts: number;
 }
 
 const DRAFT_KEY = 'hoopiq-hoops-draft-v1';
+const PREFS_KEY = 'hoopiq-hoops-prefs-v1';
+
+// Shots per spot in "Enter totals". Up to TAP_MAKES_MAX, the makes are a row of
+// numbers to tap, so a spot is two taps: the court, then how many went in.
+const ATTEMPT_CHOICES = [5, 10, 20];
+const TAP_MAKES_MAX = 20;
 
 const SHOOTING_PRESETS = ['Spot shooting', '5-spot 3s', 'Free throws', 'Mid-range pull-ups', 'Catch & shoot', 'Game shots'];
 const OTHER_CATEGORIES = [
@@ -85,21 +106,27 @@ function formatClock(totalSeconds: number): string {
 
 function freshDraft(): Draft {
   const first = newDrill('Spot shooting');
-  return { startedAt: Date.now(), sessionDate: localDateString(), sessionType: 'shooting', drills: [first], activeKey: first.key };
+  return { startedAt: Date.now(), sessionDate: localDateString(), sessionType: 'shooting', drills: [first], activeKey: first.key, spot: null };
+}
+
+function validAttempts(n: unknown): n is number {
+  return typeof n === 'number' && Number.isInteger(n) && n >= 1 && n <= 1000;
 }
 
 export default function NewBasketballSessionPage() {
   const router = useRouter();
   const [draft, setDraft] = useState<Draft>(freshDraft);
   const [ready, setReady] = useState(false);
-  const [mode, setMode] = useState<'track' | 'totals'>('track');
-  const [spot, setSpot] = useState<{ x: number; y: number; zone: CourtZone } | null>(null);
+  const [mode, setMode] = useState<Prefs['mode']>('track');
   const [error, setError] = useState<string | null>(null);
 
-  // Manual totals entry
-  const [totalsZone, setTotalsZone] = useState<CourtZone>('three-top');
+  // Manual totals entry. The spot is the same one the court map sets for
+  // tracking; the shots per spot stay put, because a player usually takes the
+  // same number from every spot.
+  const [attemptsChoice, setAttemptsChoice] = useState(10);
+  const [attemptsOther, setAttemptsOther] = useState('');
   const [totalsMakes, setTotalsMakes] = useState('');
-  const [totalsAttempts, setTotalsAttempts] = useState('');
+  const [lastAdded, setLastAdded] = useState<{ drillKey: string; count: number; text: string } | null>(null);
 
   // Timed challenge
   const [challengeEndsAt, setChallengeEndsAt] = useState<number | null>(null);
@@ -129,6 +156,17 @@ export default function NewBasketballSessionPage() {
   // Restore an unfinished session, then add a drill started from the drill library
   useEffect(() => {
     (async () => {
+      try {
+        const prefs = JSON.parse(localStorage.getItem(PREFS_KEY) || 'null') as Partial<Prefs> | null;
+        if (prefs?.mode === 'track' || prefs?.mode === 'totals') setMode(prefs.mode);
+        if (validAttempts(prefs?.attempts)) {
+          if (ATTEMPT_CHOICES.includes(prefs.attempts)) setAttemptsChoice(prefs.attempts);
+          else setAttemptsOther(String(prefs.attempts));
+        }
+      } catch {
+        // storage unavailable or unreadable: the defaults are fine
+      }
+
       let base: Draft | null = null;
       try {
         const raw = localStorage.getItem(DRAFT_KEY);
@@ -206,6 +244,9 @@ export default function NewBasketballSessionPage() {
   }, []);
 
   const active = draft.drills.find((d) => d.key === draft.activeKey) || draft.drills[0];
+  const spot = draft.spot ?? null;
+  const attempts = attemptsOther ? Number(attemptsOther) : attemptsChoice;
+  const attemptsValid = validAttempts(attempts);
   const allShots = useMemo(() => draft.drills.flatMap((d) => d.shots), [draft.drills]);
   // Refs are read inside the challenge-countdown interval (an event-driven callback,
   // not render), so they're synced here, after render, rather than written during it.
@@ -235,8 +276,46 @@ export default function NewBasketballSessionPage() {
     setDraft((d) => ({ ...d, drills: d.drills.map((x) => (x.key === d.activeKey ? change(x) : x)) }));
   }
 
+  function setSpot(next: Spot) {
+    setDraft((d) => ({ ...d, spot: next }));
+  }
+
   function handleTap(x: number, y: number) {
     setSpot({ x, y, zone: classifyZone(x, y) });
+  }
+
+  // The list is there for when a tap lands in the wrong zone: the corner 3 is a
+  // strip about 20px wide on a phone
+  function pickZone(zone: CourtZone) {
+    setSpot({ ...ZONE_SPOTS[zone], zone });
+  }
+
+  function savePrefs(next: Partial<Prefs>) {
+    try {
+      localStorage.setItem(PREFS_KEY, JSON.stringify({ mode, attempts: attemptsValid ? attempts : 10, ...next }));
+    } catch {
+      // storage unavailable
+    }
+  }
+
+  function changeMode(next: Prefs['mode']) {
+    setMode(next);
+    setLastAdded(null);
+    savePrefs({ mode: next });
+  }
+
+  function chooseAttempts(n: number) {
+    setAttemptsChoice(n);
+    setAttemptsOther('');
+    savePrefs({ attempts: n });
+  }
+
+  function typeAttempts(value: string) {
+    setAttemptsOther(value);
+    const n = Number(value);
+    // Clearing the box goes back to the highlighted choice
+    if (!value) savePrefs({ attempts: attemptsChoice });
+    else if (validAttempts(n)) savePrefs({ attempts: n });
   }
 
   /**
@@ -260,6 +339,7 @@ export default function NewBasketballSessionPage() {
       return;
     }
     setError(null);
+    setLastAdded(null);
     // Small jitter so repeated shots from one spot stay visible on the chart
     const jitter = () => (Math.random() - 0.5) * 0.8;
     updateActive((d) => ({
@@ -270,6 +350,7 @@ export default function NewBasketballSessionPage() {
   }
 
   function undo() {
+    setLastAdded(null);
     updateActive((d) => ({ ...d, shots: d.shots.slice(0, -1) }));
   }
 
@@ -278,24 +359,37 @@ export default function NewBasketballSessionPage() {
     setDraft((d) => ({ ...d, drills: [...d.drills, drill], activeKey: drill.key }));
   }
 
-  function addTotals() {
-    const makes = Number(totalsMakes);
-    const attempts = Number(totalsAttempts);
-    if (!Number.isInteger(makes) || !Number.isInteger(attempts) || makes < 0 || attempts < 1 || makes > attempts || attempts > 1000) {
-      fail('Enter whole numbers, with makes no more than attempts.');
+  function addTotals(makes: number) {
+    if (!spot) {
+      fail('Tap the court where you are shooting from first.');
+      return;
+    }
+    if (!attemptsValid || !Number.isInteger(makes) || makes < 0 || makes > attempts) {
+      fail('Enter whole numbers, with makes no more than shots.');
       return;
     }
     setError(null);
-    const s = ZONE_SPOTS[totalsZone];
     const added: TrackedShot[] = Array.from({ length: attempts }, (_, i) => ({
-      zone: totalsZone,
+      zone: spot.zone,
       made: i < makes,
-      x: s.x + (Math.random() - 0.5) * 2,
-      y: s.y + (Math.random() - 0.5) * 2,
+      x: spot.x + (Math.random() - 0.5) * 2,
+      y: spot.y + (Math.random() - 0.5) * 2,
     }));
     updateActive((d) => ({ ...d, shots: [...d.shots, ...added] }));
+    // One tap logs a whole spot, so a wrong tap needs a one-tap way back
+    setLastAdded({ drillKey: active.key, count: attempts, text: `${makes}/${attempts} from ${ZONE_LABELS[spot.zone]}` });
     setTotalsMakes('');
-    setTotalsAttempts('');
+    navigator.vibrate?.(25);
+  }
+
+  function undoTotals() {
+    if (!lastAdded) return;
+    const { drillKey, count } = lastAdded;
+    setDraft((d) => ({
+      ...d,
+      drills: d.drills.map((x) => (x.key === drillKey ? { ...x, shots: x.shots.slice(0, Math.max(0, x.shots.length - count)) } : x)),
+    }));
+    setLastAdded(null);
   }
 
   function addOtherDrill() {
@@ -529,7 +623,8 @@ export default function NewBasketballSessionPage() {
             <button
               key={m}
               type="button"
-              onClick={() => setMode(m)}
+              onClick={() => changeMode(m)}
+              aria-pressed={mode === m}
               className={`rounded-lg py-2 text-xs font-semibold ${mode === m ? 'bg-zinc-800 text-white' : 'text-zinc-500'}`}
             >
               {m === 'track' ? 'Track every shot' : 'Enter totals'}
@@ -537,28 +632,39 @@ export default function NewBasketballSessionPage() {
           ))}
         </div>
 
-        <CourtMap shots={active.shots} selected={mode === 'track' ? spot : null} onTap={handleTap} />
+        <CourtMap shots={active.shots} selected={spot} onTap={handleTap} />
+
+        {spot ? (
+          <div className="flex items-center justify-between gap-2 text-xs text-zinc-400 mt-2 mb-3">
+            <label className="flex min-w-0 items-center gap-1">
+              Spot:
+              <select
+                value={spot.zone}
+                onChange={(e) => pickZone(e.target.value as CourtZone)}
+                className="min-w-0 rounded-md bg-transparent py-1 font-semibold text-zinc-200 underline decoration-zinc-600 underline-offset-4"
+              >
+                {(Object.keys(ZONE_SPOTS) as CourtZone[]).map((z) => (
+                  <option key={z} value={z} className="bg-zinc-900">
+                    {ZONE_LABELS[z]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <span className="flex flex-shrink-0 items-center gap-1">
+              {streak >= 3 && <Flame className="h-3.5 w-3.5 text-orange-400" />}
+              {active.name}: {activeMakes}/{active.shots.length} ({pct(activeMakes, active.shots.length)})
+            </span>
+          </div>
+        ) : (
+          // Sits directly above the logging buttons because those are disabled
+          // until a spot is picked - the page-level error Alert is off-screen here.
+          <p className="mt-2 mb-3 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-center text-xs font-semibold text-orange-300">
+            Tap the court above to set where you are shooting from
+          </p>
+        )}
 
         {mode === 'track' ? (
           <>
-            {spot ? (
-              <div className="flex items-center justify-between text-xs text-zinc-400 mt-2 mb-3">
-                <span>
-                  Spot: <span className="font-semibold text-zinc-200">{ZONE_LABELS[spot.zone]}</span>
-                </span>
-                <span className="flex items-center gap-1">
-                  {streak >= 3 && <Flame className="h-3.5 w-3.5 text-orange-400" />}
-                  {active.name}: {activeMakes}/{active.shots.length} ({pct(activeMakes, active.shots.length)})
-                </span>
-              </div>
-            ) : (
-              // Sits directly above MAKE/MISS because those are disabled until a
-              // spot is picked - the page-level error Alert is off-screen here.
-              <p className="mt-2 mb-3 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-center text-xs font-semibold text-orange-300">
-                Tap the court above to set where you are shooting from
-              </p>
-            )}
-
             <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
               <button
                 type="button"
@@ -617,27 +723,88 @@ export default function NewBasketballSessionPage() {
             </div>
           </>
         ) : (
-          <div className="mt-3 space-y-2 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
-            <p className="text-xs text-zinc-400">Counted in your head? Add your totals for a spot.</p>
-            <select
-              value={totalsZone}
-              onChange={(e) => setTotalsZone(e.target.value as CourtZone)}
-              aria-label="Zone"
-              className="w-full rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white"
-            >
-              {(Object.keys(ZONE_SPOTS) as CourtZone[]).map((z) => (
-                <option key={z} value={z}>
-                  {ZONE_LABELS[z]}
-                </option>
-              ))}
-            </select>
-            <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
-              <input inputMode="numeric" value={totalsMakes} onChange={(e) => setTotalsMakes(e.target.value)} placeholder="Makes" aria-label="Makes" className="rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white" />
-              <input inputMode="numeric" value={totalsAttempts} onChange={(e) => setTotalsAttempts(e.target.value)} placeholder="Attempts" aria-label="Attempts" className="rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white" />
-              <Button variant="primary" size="sm" onClick={addTotals}>
-                Add
-              </Button>
+          <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
+            <div className="flex items-center gap-1.5">
+              <span className="mr-1 text-xs font-semibold text-zinc-400">Shots per spot</span>
+              {ATTEMPT_CHOICES.map((n) => {
+                const on = !attemptsOther && attemptsChoice === n;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => chooseAttempts(n)}
+                    aria-pressed={on}
+                    className={`h-9 min-w-10 rounded-lg px-2.5 text-sm font-bold tabular-nums ${on ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-zinc-300'}`}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+              <input
+                inputMode="numeric"
+                value={attemptsOther}
+                onChange={(e) => typeAttempts(e.target.value)}
+                placeholder="Other"
+                aria-label="Other number of shots per spot"
+                className={`h-9 w-16 rounded-lg px-2 text-center text-sm text-white placeholder:text-zinc-500 ${
+                  attemptsOther ? 'bg-orange-600/20 ring-1 ring-orange-500' : 'bg-zinc-800'
+                }`}
+              />
             </div>
+
+            {!attemptsValid ? (
+              <p className="text-xs text-zinc-500">Shots per spot is a whole number from 1 to 1000.</p>
+            ) : attempts <= TAP_MAKES_MAX ? (
+              <div>
+                <p className="mb-1.5 text-xs font-semibold text-zinc-400">How many went in?</p>
+                <div className={`grid gap-1.5 ${attempts <= 10 ? 'grid-cols-6' : 'grid-cols-7'}`}>
+                  {Array.from({ length: attempts + 1 }, (_, n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => addTotals(n)}
+                      disabled={!spot}
+                      aria-label={`${n} of ${attempts} made`}
+                      className="h-11 rounded-lg bg-zinc-800 text-base font-bold text-white tabular-nums transition-transform active:scale-95 active:bg-emerald-600 disabled:opacity-40 disabled:active:scale-100"
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-[1fr_auto] gap-2">
+                <input
+                  inputMode="numeric"
+                  value={totalsMakes}
+                  onChange={(e) => setTotalsMakes(e.target.value)}
+                  placeholder={`Made, out of ${attempts}`}
+                  aria-label="Makes"
+                  className="rounded-xl bg-zinc-800 px-3 py-2 text-sm text-white"
+                />
+                <Button
+                  variant="primary"
+                  size="sm"
+                  disabled={!spot}
+                  onClick={() => addTotals(totalsMakes.trim() ? Number(totalsMakes) : NaN)}
+                >
+                  Add
+                </Button>
+              </div>
+            )}
+
+            {lastAdded && (
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="min-w-0 truncate font-semibold text-emerald-400">Added {lastAdded.text}</span>
+                <button
+                  type="button"
+                  onClick={undoTotals}
+                  className="flex flex-shrink-0 items-center gap-1 rounded-lg px-2 py-1.5 font-semibold text-zinc-300 hover:text-white"
+                >
+                  <Undo2 className="h-3.5 w-3.5" /> Undo
+                </button>
+              </div>
+            )}
           </div>
         )}
 
