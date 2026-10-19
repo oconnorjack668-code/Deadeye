@@ -381,9 +381,10 @@ describe('ShotDetector after the rim', () => {
   it('calls a miss for a ball that reaches the ring and bounces away, at the time it hit', () => {
     const shots = run([
       ...approach(),
-      // On the ring, then up and away to the right, shaking the net as it goes
-      ...after(165, [{ x: 0.52, y: 0.297 }, { x: 0.55, y: 0.27 }, { x: 0.58, y: 0.24 }, { x: 0.63, y: 0.2 }, { x: 0.7, y: 0.17 }], 0.15),
-      ...quiet(330, 30, 0),
+      // On the ring, then up and away to the right at the speed a ball comes
+      // off it, shaking the net as it goes
+      ...after(165, [{ x: 0.52, y: 0.297 }, { x: 0.535, y: 0.285 }, { x: 0.55, y: 0.27 }, { x: 0.565, y: 0.255 }, { x: 0.58, y: 0.24 }, { x: 0.6, y: 0.23 }, { x: 0.62, y: 0.22 }, { x: 0.64, y: 0.21 }, { x: 0.66, y: 0.2 }, { x: 0.68, y: 0.19 }, { x: 0.7, y: 0.18 }], 0.15),
+      ...quiet(528, 30, 0),
     ]);
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(false);
@@ -403,7 +404,9 @@ describe('ShotDetector after the rim', () => {
   });
 
   it('calls a make the net hid, when the net moved far more than a rim hit moves it', () => {
-    const shots = run([...approach(), ...quiet(165, 25, 0.3)]);
+    // Still swinging well over half a second later, as a net does after a
+    // ball has gone through it
+    const shots = run([...approach(), ...quiet(165, 45, 0.3)]);
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(true);
     expect(shots[0].confident).toBe(false);
@@ -427,5 +430,75 @@ describe('ShotDetector after the rim', () => {
     for (let i = 0; i < 150; i++) d.push({ t: 200 + i * 33, ball: { x: 0.44, y: i % 2 ? 0.22 : 0.26 } });
     expect(d.shots).toHaveLength(1);
     expect(d.shots[0].made).toBe(false);
+  });
+});
+
+// Found by running a player's session through the bench the way the app feeds
+// it frames, with the rim tapped eleven slightly different ways.
+describe('ShotDetector, cases from a real session', () => {
+  function approach(): BallObservation[] {
+    return Array.from({ length: 6 }, (_, i) => ({ t: i * 33, ball: { x: 0.62 - 0.02 * i, y: 0.12 + 0.03 * i } }));
+  }
+  const after = (from: number, balls: Array<{ x: number; y: number } | null>, net: number, under = false): BallObservation[] =>
+    balls.map((ball, i) => ({ t: from + (i + 1) * 33, ball, net, under }));
+  const quiet = (from: number, frames: number, net = 0) => after(from, Array(frames).fill(null), net);
+  const run = (obs: BallObservation[]) => {
+    const d = new ShotDetector(RIM);
+    for (const o of obs) d.push(o);
+    return d.shots;
+  };
+
+  it('calls a make that the net pushes off to the side as it drops out', () => {
+    // Under the ring twice, then beside it three times on the way out
+    const shots = run([
+      ...approach(),
+      ...after(165, [{ x: 0.5, y: 0.3 }, { x: 0.49, y: 0.32 }, { x: 0.485, y: 0.33 }, { x: 0.45, y: 0.36 }, { x: 0.44, y: 0.37 }, { x: 0.43, y: 0.38 }], 0.2),
+      ...quiet(363, 20, 0.2),
+    ]);
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(true);
+  });
+
+  it('calls a make whose first sighting out of the net is just beside it, when the next ones are under it', () => {
+    // How a make reads with the rim tapped a little narrow
+    const shots = run([
+      ...approach(),
+      ...after(165, [{ x: 0.5, y: 0.3 }, { x: 0.548, y: 0.32 }, { x: 0.51, y: 0.33 }, { x: 0.505, y: 0.35 }, { x: 0.5, y: 0.37 }], 0.2),
+      ...quiet(330, 20, 0.2),
+    ]);
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(true);
+  });
+
+  it('counts something ball-like coming out of the bottom of the net as the ball under it', () => {
+    const shots = run([...approach(), ...after(165, [null, null, null, null], 0.2, true), ...quiet(297, 20, 0.2)]);
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(true);
+  });
+
+  it('calls a make for a ball that hit the ring, vanished, and came back down through the net', () => {
+    const shots = run([
+      ...approach(),
+      // The ring shakes the net, which then settles...
+      ...quiet(165, 10, 0.12),
+      ...quiet(495, 12, 0),
+      // ...and swings again as the ball comes back through, unseen
+      ...quiet(891, 30, 0.25),
+    ]);
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(true);
+  });
+
+  it('does not let one flicker above the rim start a shot that swallows the next one', () => {
+    const d = new ShotDetector(RIM);
+    // A single glint above the rim, then nothing for a second and a half
+    d.push({ t: 0, ball: { x: 0.44, y: 0.2 } });
+    for (let t = 33; t < 1500; t += 33) d.push({ t, ball: null, net: 0 });
+    // The real shot
+    for (const o of approach()) d.push({ ...o, t: o.t + 1500 });
+    for (const o of after(1665, [{ x: 0.5, y: 0.3 }, { x: 0.5, y: 0.32 }, { x: 0.5, y: 0.34 }], 0.2)) d.push(o);
+    for (const o of quiet(1764, 20, 0.2)) d.push(o);
+    expect(d.shots).toHaveLength(1);
+    expect(d.shots[0].made).toBe(true);
   });
 });

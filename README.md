@@ -144,13 +144,25 @@ DEADEYE_BENCH_ATTEMPTS=5.25,10.45,15.65,23.6,28.5,39.4,43.55,49.4,53.8,58.0,62.9
 
 The labels were made frame by frame. The clearest sign of a make there is the
 net moving. On that clip the tracker as it was before called 27 of the 31
-attempts and got 17 right, with 9 calls where there was no shot. Watching the
-net, following each ball separately and waiting to see what happens after the
-rim took it to all 31 called, 28 right and 1 extra call. The first clip stayed
-at 10 of 10. The three still wrong are hard cases. One ball hit the rim,
-bounced towards the camera and fell past the front of the net while the net
-was still shaking from the hit. The other two were makes that bounced a metre
-up off the ring and dropped back in.
+attempts and got 17 right, with 9 calls where there was no shot.
+
+Measure the way the app runs, not the way ffmpeg likes to decode.
+`DEADEYE_BENCH_APP=1`, with `DEADEYE_BENCH_SAMPLE_FPS` set to the clip's own
+rate, feeds every frame through the same thinning and repeat-dropping as
+`ShotTracker`. It also scales the crop the way a browser does. A phone run on
+the second clip matched it closely: the same 32 calls, 8 of them unclear, and
+the ball seen on the same share of frames. Results also depend on where the
+rim was tapped, and a player's taps are not the bench's. So the second clip is
+scored with the rim tapped eleven ways: up to 14px up, down, in and out on a
+rim 50px wide. Across all eleven it calls 307 of 341 right (90%), with 7 calls
+where there was no shot. With the taps on the ring's edges it gets 30 of 31.
+The first clip stays at 10 of 10. `DEADEYE_BENCH_START` and `_END`, in
+seconds, run one stretch of a clip, for trying variations on a single shot.
+
+The one still wrong whatever the taps is a ball that hit the rim, bounced
+back towards the camera and fell past the front of the net while the net was
+still shaking from the hit. On screen that looks exactly like a make. The
+other errors come with taps a long way off the ring.
 
 ## Three deliberate design decisions
 

@@ -18,6 +18,7 @@ import { expectedBallDiameter } from '@/lib/video/motionBall';
 import { createBallTracker } from '@/lib/video/ballTracker';
 import { cropRectFor, ballCentreInFrame, netBoxOnCanvas, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { ShotDetector, rimFromEdges } from '@/lib/video/shotDetector';
+import { createWorkload, isRepeat } from '@/lib/video/workload';
 
 vi.setConfig({ testTimeout: 1_800_000 });
 
@@ -28,6 +29,10 @@ const RIM = process.env.DEADEYE_BENCH_RIM;
 // pictures a slow phone is given (CANVAS_LEVELS in workload.ts) are measured
 const CANVAS = Number(process.env.DEADEYE_BENCH_CANVAS) || CROP_CANVAS_PX;
 const LOST_BALL_MS = 1500;
+// DEADEYE_BENCH_START and _END, in seconds, run part of a clip: for trying
+// many variations on one shot without decoding the whole session each time
+const START = Number(process.env.DEADEYE_BENCH_START) || 0;
+const END = Number(process.env.DEADEYE_BENCH_END) || 0;
 
 function videoInfo(ffmpeg: string, clip: string) {
   // ffmpeg reports the stream on stderr and exits non-zero with no output file,
@@ -59,8 +64,10 @@ function eachFrame(
   const args = [
     '-hide_banner',
     '-loglevel', 'error',
+    ...(START ? ['-ss', String(START)] : []),
+    ...(END ? ['-to', String(END)] : []),
     '-i', clip,
-    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CANVAS}:${CANVAS},fps=${fps}`,
+    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CANVAS}:${CANVAS}:flags=${process.env.DEADEYE_BENCH_APP === '1' ? 'bilinear' : 'bicubic'},fps=${fps}`,
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
     '-',
@@ -153,17 +160,17 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     const measure = (
       prev: Uint8ClampedArray,
       cur: Uint8ClampedArray,
-      index: number,
+      videoMs: number,
       next?: Uint8ClampedArray
     ) => {
-      const videoMs = (index * 1000) / fps;
       const began = performance.now();
       const found = tracker.track(prev, cur, CANVAS, CANVAS, next, videoMs);
       trackerMs += performance.now() - began;
       const net = watchNet ? (tracker.netMotion() ?? undefined) : undefined;
+      const under = watchNet ? tracker.underNet() : undefined;
       if (netTrace) netTrace.push(`${Math.round(videoMs)},${(tracker.netMotion() ?? 0).toFixed(3)}`);
       if (!found) {
-        shotDetector.push({ t: videoMs, ball: null, net });
+        shotDetector.push({ t: videoMs, ball: null, net, under });
         return;
       }
       framesWithBall++;
@@ -182,7 +189,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       };
       const centre = ballCentreInFrame(box, crop, width, height, CANVAS);
       trace.push(`${Math.round(videoMs)},${centre.x.toFixed(4)},${centre.y.toFixed(4)},${found.score.toFixed(3)},${(found.diameter / rimOnCanvas).toFixed(2)}`);
-      shotDetector.push({ t: videoMs, ball: centre, net });
+      shotDetector.push({ t: videoMs, ball: centre, net, under });
     };
 
     // Three-frame differencing reports where the ball is rather than where it
@@ -190,20 +197,33 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     const threeFrame = process.env.DEADEYE_BENCH_3FRAME === '1';
     let f0: Uint8ClampedArray | null = null;
     let f1: Uint8ClampedArray | null = null;
+    let t1 = 0;
+
+    // DEADEYE_BENCH_APP=1 feeds frames the way the app does: every frame the
+    // clip has, at its own rate, thinned and with repeats dropped by the same
+    // workload code ShotTracker uses, rather than ffmpeg resampling to 30
+    const asApp = process.env.DEADEYE_BENCH_APP === '1';
+    const workload = createWorkload();
 
     const frames = await eachFrame(
       FFMPEG,
       CLIP,
       crop,
       (pixels, index) => {
-        if (threeFrame) {
-          if (f0 && f1) measure(f0, f1, index - 1, pixels);
-          f0 = f1;
-          f1 = pixels;
-        } else {
-          if (f1) measure(f1, pixels, index);
-          f1 = pixels;
+        const videoMs = START * 1000 + (index * 1000) / fps;
+        if (asApp) {
+          if (!workload.wants(videoMs)) return;
+          if (f1 && isRepeat(pixels, f1)) return;
+          workload.scored(videoMs);
         }
+        if (threeFrame) {
+          if (f0 && f1) measure(f0, f1, t1, pixels);
+          f0 = f1;
+        } else if (f1) {
+          measure(f1, pixels, videoMs);
+        }
+        f1 = pixels;
+        t1 = videoMs;
       },
       fps
     );
@@ -242,7 +262,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       .map((s) => s.trim())
       .filter(Boolean)
       .map(Number)
-      .filter((n) => Number.isFinite(n));
+      .filter((n) => Number.isFinite(n) && n >= START && (!END || n <= END));
     const ATTEMPT_MATCH_S = 1.5;
     const attemptLines: string[] = [];
     if (attemptTimes.length) {

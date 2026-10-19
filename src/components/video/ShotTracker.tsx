@@ -477,7 +477,9 @@ export function ShotTracker({
             }
           : null;
       // Nothing has been scored until three frames have arrived
-      const shot = ready ? shotDetector.push({ t, ball: centre, net: ballTracker.netMotion() ?? undefined }) : null;
+      const shot = ready
+        ? shotDetector.push({ t, ball: centre, net: ballTracker.netMotion() ?? undefined, under: ballTracker.underNet() })
+        : null;
       if (shot) {
         setShots((cur) => [...cur, { ...shot, id: nextId++ }]);
         navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);

@@ -104,11 +104,29 @@ const FLIGHT_WINDOW = 4;
 const STRAIGHTNESS = 0.75;
 
 /**
- * Largest a ball in flight may be, in expected ball widths. Measured balls at
- * the hoop ran at 0.8 to 1.0 of the expected width; a pass coming back past
- * the camera at 1.3 and up.
+ * Largest a ball in flight may be, as a multiple of the ball's size, before it
+ * is taken to be much nearer the camera than the hoop.
+ *
+ * The size is learned, as the colour is, from balls followed in flight above
+ * the rim. Until there are enough of those it is the size the rim says a ball
+ * should be, with a wider allowance - and the rim can be wrong. Two taps a few
+ * pixels inside the ring's edges made the real ball 1.27 times the expected
+ * size, and a fixed limit of 1.25 then threw away every shot.
  */
-const OVERSIZE = 1.25;
+const OVERSIZE = 1.3;
+const OVERSIZE_UNLEARNED = 1.6;
+const SIZE_SAMPLES = 15;
+
+/**
+ * Where, under the rim line, a ball coming out of the net is looked for, in
+ * rim widths: from the lower half of the net to about a ball's drop below it.
+ * Rebounders' heads under the measured hoop were nearer three rim widths down.
+ */
+const UNDER_FROM = 0.6;
+const UNDER_TO = 1.8;
+
+/** How ball-like something under the net must look to count. Above the reporting floor, as the net's own strings are there too. */
+const UNDER_NET_SCORE = 0.55;
 
 /** Ground, in ball widths, a followed thing must have covered in all before it is the ball. */
 const RANGE = 3.5;
@@ -176,6 +194,19 @@ export interface BallTracker {
    * out, or null when no net box was given. See netMotion in motionBall.
    */
   netMotion(): number | null;
+  /**
+   * Whether something ball-like moved just under the net, within the ring's
+   * width, on the frame last tracked. False when no net box was given.
+   *
+   * Separate from the ball itself because a made ball dropping out of the net
+   * is the one ball the tracker is worst at following: the net hid it on the
+   * way in, so there is nothing to follow, and the net is still swinging
+   * where it reappears, which bars anything new from being picked up there.
+   * On the measured clip two clean makes were called misses that way. Whether
+   * it is the ball does not matter here - only whether a ball-shaped thing
+   * came out of the bottom of the net.
+   */
+  underNet(): boolean;
 }
 
 interface Sighting {
@@ -203,8 +234,16 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
   const net = options.net ?? null;
   const D = options.expectedDiameter;
   const samples: Rgb[] = [];
+  // Diameters of balls followed in flight above the rim, newest last
+  const sizes: number[] = [];
+  const largestBall = () => {
+    if (sizes.length < SIZE_SAMPLES) return D * OVERSIZE_UNLEARNED;
+    const sorted = [...sizes].sort((a, b) => a - b);
+    return sorted[Math.floor(sorted.length / 2)] * OVERSIZE;
+  };
   let learned: Rgb | null = null;
   let lastNet: number | null = null;
+  let lastUnder = false;
 
   const current = (): Rgb | null => learned ?? options.initialColour ?? null;
 
@@ -273,10 +312,9 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         heatCols = cols;
       }
       for (let i = 0; i < heat.length; i++) heat[i] *= HEAT_DECAY;
-      const heatAt = (c: { x: number; y: number }) =>
-        heat![
-          Math.min(rows - 1, Math.max(0, Math.floor(c.y / cell))) * cols + Math.min(cols - 1, Math.max(0, Math.floor(c.x / cell)))
-        ];
+      const cellIndex = (c: { x: number; y: number }) =>
+        Math.min(rows - 1, Math.max(0, Math.floor(c.y / cell))) * cols + Math.min(cols - 1, Math.max(0, Math.floor(c.x / cell)));
+      const heatAt = (c: { x: number; y: number }) => heat![cellIndex(c)];
 
       // Let go of what has not been seen for a while, and of anything that has
       // stopped moving: a "ball" that stays put for six sightings is a fixture
@@ -365,9 +403,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         claimed.add(c);
       }
 
-      for (const c of candidates) heat[
-        Math.min(rows - 1, Math.max(0, Math.floor(c.y / cell))) * cols + Math.min(cols - 1, Math.max(0, Math.floor(c.x / cell)))
-      ] += 1;
+      for (const c of candidates) heat[cellIndex(c)] += 1;
 
       // The ball: the thing in flight seen this frame. In flight means moving
       // like a thrown ball - covering ground, smoothly. The backboard flicker
@@ -392,7 +428,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         // A ball much bigger than one at the hoop is much nearer the camera
         // than the hoop: a pass back to the shooter, not a shot. One blob's
         // size is noisy, so it is the median of the last few that counts.
-        if (net && medianDiameter(tr) > OVERSIZE * D) continue;
+        if (net && medianDiameter(tr) > largestBall()) continue;
         // And somewhere that flickers all the time, it has come from
         // elsewhere. The flicker on the measured clip was confined to a patch
         // two and a half ball widths tall for the whole session, and inside
@@ -407,7 +443,23 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         }
       }
 
+      // Learn the ball's size from a ball in flight above the rim: the same
+      // place, and so the same distance from the camera, as the hoop
+      if (net && found && isAbove(found)) {
+        sizes.push(found.diameter);
+        if (sizes.length > MAX_SAMPLES) sizes.shift();
+      }
+
       lastNet = net ? netMotionIn(before, width, height, net, found) : null;
+      lastUnder = net
+        ? candidates.some((c) => {
+            if (c.score < UNDER_NET_SCORE || c.diameter > largestBall()) return false;
+            // The net's own width and no wider: a ball that came off the
+            // side of the ring falls just beside it
+            const below = c.y - rimLine(c.x);
+            return c.x >= net.x0 && c.x <= net.x1 && below >= net.depth * UNDER_FROM && below <= net.depth * UNDER_TO;
+          })
+        : false;
 
       // Three conditions, each for its own reason.
       //
@@ -435,5 +487,6 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
     colour: current,
     samples: () => samples.length,
     netMotion: () => lastNet,
+    underNet: () => lastUnder,
   };
 }
