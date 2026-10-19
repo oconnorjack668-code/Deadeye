@@ -78,11 +78,32 @@ describe('saveBasketballSession', () => {
     expect(result).toEqual({ id: 'session-1' });
     expect(ops[0]).toMatchObject({ table: 'training_sessions', op: 'insert', rows: { id: 'session-1', user_id: 'user-1' } });
     const drills = ops.filter((o) => o.table === 'session_drills');
-    expect(drills).toHaveLength(2);
+    expect(drills).toHaveLength(1);
+    const drillRows = drills[0].rows as Array<{ id: string; drill_name: string; display_order: number }>;
+    expect(drillRows.map((d) => [d.drill_name, d.display_order])).toEqual([
+      ['Spot shooting', 0],
+      ['Ball handling', 1],
+    ]);
     const shots = ops.find((o) => o.table === 'shooting_entries')!;
-    const drillRow = drills[0].rows as { id: string };
-    expect(shots.rows).toEqual([{ drill_id: drillRow.id, user_id: 'user-1', shot_zone: 'three-top', makes: 6, attempts: 10 }]);
+    expect(shots.rows).toEqual([{ drill_id: drillRows[0].id, user_id: 'user-1', shot_zone: 'three-top', makes: 6, attempts: 10 }]);
     expect(ops.some((o) => o.op === 'delete')).toBe(false);
+  });
+
+  it('takes three requests however many drills there are', async () => {
+    const { client, ops } = fakeSupabase();
+    const shooting = hoops.drills[0];
+    const many = { ...hoops, drills: [shooting, { ...shooting, name: '5-spot 3s' }, { ...shooting, name: 'Free throws' }, hoops.drills[1]] };
+    await saveBasketballSession(client, 'user-1', many);
+    expect(ops.map((o) => o.table)).toEqual(['training_sessions', 'session_drills', 'shooting_entries']);
+    const shots = ops[2].rows as Array<{ drill_id: string }>;
+    const drillIds = (ops[1].rows as Array<{ id: string }>).map((d) => d.id);
+    expect(shots.map((s) => s.drill_id)).toEqual(drillIds.slice(0, 3));
+  });
+
+  it('skips the shots request when no drill has shots', async () => {
+    const { client, ops } = fakeSupabase();
+    await saveBasketballSession(client, 'user-1', { ...hoops, drills: [hoops.drills[1]] });
+    expect(ops.map((o) => o.table)).toEqual(['training_sessions', 'session_drills']);
   });
 
   it('undoes the session when a drill fails, and reports a normal error', async () => {

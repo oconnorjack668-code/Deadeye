@@ -155,28 +155,31 @@ export async function saveBasketballSession(
   const { error: sessionError } = await supabase.from('training_sessions').insert({ id: p.id, user_id: userId, ...p.session });
   if (sessionError) return fail(sessionError.message, 'Could not save the session');
 
-  for (const [i, drill] of p.drills.entries()) {
-    const drillId = newId();
-    const { error: drillError } = await supabase.from('session_drills').insert({
-      id: drillId,
+  // Drill ids are made here, so every drill goes in one request and every
+  // shot in a second. One pair of requests per drill made a four-drill session
+  // nine round trips, which is a long wait on mobile data at a court.
+  const drills = p.drills.map((drill, i) => ({ id: newId(), drill, order: i }));
+  let { error } = await supabase.from('session_drills').insert(
+    drills.map(({ id, drill, order }) => ({
+      id,
       session_id: p.id,
       user_id: userId,
       drill_name: drill.name.slice(0, 120),
       drill_category: drill.category,
       duration_minutes: drill.minutes,
-      display_order: i,
-    });
-    let error = drillError;
-    if (!error && drill.zones.length > 0) {
-      ({ error } = await supabase
-        .from('shooting_entries')
-        .insert(drill.zones.map((z) => ({ drill_id: drillId, user_id: userId, shot_zone: z.zone, makes: z.makes, attempts: z.attempts }))));
-    }
-    if (error) {
-      // Undo the partial session (drills and shots cascade)
-      await supabase.from('training_sessions').delete().eq('id', p.id);
-      return fail(error.message, `Could not save "${drill.name}"`);
-    }
+      display_order: order,
+    }))
+  );
+  const shots = drills.flatMap(({ id, drill }) =>
+    drill.zones.map((z) => ({ drill_id: id, user_id: userId, shot_zone: z.zone, makes: z.makes, attempts: z.attempts }))
+  );
+  if (!error && shots.length > 0) {
+    ({ error } = await supabase.from('shooting_entries').insert(shots));
+  }
+  if (error) {
+    // Undo the partial session (drills and shots cascade)
+    await supabase.from('training_sessions').delete().eq('id', p.id);
+    return fail(error.message, 'Could not save your drills');
   }
   return { id: p.id };
 }
