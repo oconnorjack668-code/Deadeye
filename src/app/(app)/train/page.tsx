@@ -22,46 +22,60 @@ interface Item {
  * Sixteen equally-weighted cards in one flat grid made this page a wall. The
  * features are grouped by what the player is actually trying to do, so the page
  * can be scanned by intent rather than read end to end.
+ *
+ * Every tile takes its group's colour, so the colour says which group a card
+ * is in before its title is read. Each colour was chosen for what the group is
+ * for. Plan is the brand orange: action, and the first thing on the page. Learn
+ * is blue, calm and focused, for reading. Compete is gold, the colour of
+ * medals. Coaching is violet rather than red, because red already means MISS
+ * in the shot tracker. The one exception is Deadeye Pro, which stays gold
+ * wherever it appears, so that premium always looks the same.
  */
+const PLAN = { tile: 'bg-orange-600/20', iconColor: 'text-orange-400' };
+const LEARN = { tile: 'bg-blue-600/20', iconColor: 'text-blue-400' };
+const COMPETE = { tile: 'bg-amber-600/20', iconColor: 'text-amber-400' };
+const COACHING = { tile: 'bg-violet-600/20', iconColor: 'text-violet-400' };
+const PREMIUM = { tile: 'bg-amber-600/20', iconColor: 'text-amber-300' };
+
 const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
   {
     label: 'Plan',
     labelColor: 'text-orange-400',
     items: [
-      { href: '/programs', icon: CalendarCheck, title: 'Programs', desc: 'Multi-week plans', tile: 'bg-orange-600/20', iconColor:'text-orange-400' },
-      { href: '/train/generate', icon: Wand2, title: 'Workout builder', desc: 'Pick time and focus', tile: 'bg-amber-600/20', iconColor:'text-amber-400' },
-      { href: '/goals', icon: Crosshair, title: 'Goals', desc: 'Set weekly targets', tile: 'bg-orange-600/20', iconColor:'text-orange-300' },
+      { href: '/programs', icon: CalendarCheck, title: 'Programs', desc: 'Multi-week plans', ...PLAN },
+      { href: '/train/generate', icon: Wand2, title: 'Workout builder', desc: 'Pick time and focus', ...PLAN },
+      { href: '/goals', icon: Crosshair, title: 'Goals', desc: 'Set weekly targets', ...PLAN },
     ],
   },
   {
     label: 'Learn',
     labelColor: 'text-blue-400',
     items: [
-      { href: '/drills', icon: ListChecks, title: 'Drill library', desc: 'Steps, cues and mistakes', tile: 'bg-orange-600/20', iconColor:'text-orange-400' },
-      { href: '/style-match', icon: Users, title: 'Play style match', desc: 'NBA players you play like', tile: 'bg-cyan-600/20', iconColor:'text-cyan-400' },
-      { href: '/guides', icon: BookHeart, title: 'Guides', desc: 'Mindset, recovery, nutrition', tile: 'bg-emerald-600/20', iconColor:'text-emerald-400' },
+      { href: '/drills', icon: ListChecks, title: 'Drill library', desc: 'Steps, cues and mistakes', ...LEARN },
+      { href: '/style-match', icon: Users, title: 'Play style match', desc: 'NBA players you play like', ...LEARN },
+      { href: '/guides', icon: BookHeart, title: 'Guides', desc: 'Mindset, recovery, nutrition', ...LEARN },
     ],
   },
   {
     label: 'Compete',
     labelColor: 'text-amber-400',
     items: [
-      { href: '/games', icon: ClipboardList, title: 'Game stats', desc: 'Live tracking, averages', tile: 'bg-amber-600/20', iconColor:'text-amber-400' },
-      { href: '/achievements', icon: Medal, title: 'Achievements', desc: 'Challenges, badges, rank', tile: 'bg-amber-600/20', iconColor:'text-amber-300' },
-      { href: '/friends', icon: UserPlus, title: 'Friends', desc: 'Weekly leaderboard', tile: 'bg-cyan-600/20', iconColor:'text-cyan-400' },
-      { href: '/leaderboard', icon: Trophy, title: 'Leaderboard', desc: 'Season points and streaks', tile: 'bg-amber-600/20', iconColor:'text-amber-300' },
+      { href: '/games', icon: ClipboardList, title: 'Game stats', desc: 'Live tracking, averages', ...COMPETE },
+      { href: '/achievements', icon: Medal, title: 'Achievements', desc: 'Challenges, badges, rank', ...COMPETE },
+      { href: '/friends', icon: UserPlus, title: 'Friends', desc: 'Weekly leaderboard', ...COMPETE },
+      { href: '/leaderboard', icon: Trophy, title: 'Leaderboard', desc: 'Season points and streaks', ...COMPETE },
     ],
   },
   {
     label: 'Coaching',
-    labelColor: 'text-red-400',
+    labelColor: 'text-violet-400',
     items: [
-      { href: '/ai-coach', icon: Sparkles, title: 'AI coach', desc: 'Feedback on your sessions', tile: 'bg-red-600/20', iconColor:'text-red-400' },
-      { href: '/ai-coach/chat', icon: MessageCircle, title: 'Ask coach', desc: 'Chat, knows your numbers', tile: 'bg-red-600/20', iconColor:'text-red-300' },
-      { href: '/video', icon: Video, title: 'Video AI', desc: 'Shot tracking, form check, jump test', tile: 'bg-red-600/20', iconColor:'text-red-400' },
-      { href: '/teams', icon: Shield, title: 'Teams', desc: 'Join a team, roster', tile: 'bg-blue-600/20', iconColor:'text-blue-400' },
-      { href: '/coach', icon: ClipboardCheck, title: 'Coach dashboard', desc: 'All your teams', tile: 'bg-indigo-600/20', iconColor:'text-indigo-400', badge: 'PRO' },
-      { href: '/pro', icon: Crown, title: 'Deadeye Pro', desc: 'Unlimited AI coaching', tile: 'bg-amber-600/20', iconColor:'text-amber-300' },
+      { href: '/ai-coach', icon: Sparkles, title: 'AI coach', desc: 'Feedback on your sessions', ...COACHING },
+      { href: '/ai-coach/chat', icon: MessageCircle, title: 'Ask coach', desc: 'Chat, knows your numbers', ...COACHING },
+      { href: '/video', icon: Video, title: 'Video AI', desc: 'Shot tracking, form check, jump test', ...COACHING },
+      { href: '/teams', icon: Shield, title: 'Teams', desc: 'Join a team, roster', ...COACHING },
+      { href: '/coach', icon: ClipboardCheck, title: 'Coach dashboard', desc: 'All your teams', ...COACHING, badge: 'PRO' },
+      { href: '/pro', icon: Crown, title: 'Deadeye Pro', desc: 'Unlimited AI coaching', ...PREMIUM },
     ],
   },
 ];
