@@ -157,6 +157,31 @@ export default async function DashboardPage() {
                 <Button variant="primary" size="sm">Start today&apos;s session</Button>
               </Link>
             </>
+          ) : !activeProgram && metrics.totalSessions === 0 ? (
+            // A player who has never logged anything is sent to log shots, the
+            // thing the landing page promised, rather than to sign up for a
+            // weeks-long program. On 19 Oct 2026, 12 of the 17 players who had
+            // finished setup had done nothing at all, and 1 had started a program.
+            <>
+              <div className="mt-1 text-xl font-black text-white">Log your first shots</div>
+              <div className="text-sm text-zinc-300">
+                Tap where you shoot from, then how many went in. Your shot chart starts with the first spot.
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/basketball/new">
+                  <Button variant="primary" size="sm">Log shots</Button>
+                </Link>
+                <Link href="/video">
+                  <Button variant="outline" size="sm">Track with the camera</Button>
+                </Link>
+              </div>
+              <Link
+                href={recommendedGoal ? `/programs?goal=${recommendedGoal}` : '/programs'}
+                className="mt-3 inline-block text-xs font-semibold text-orange-300 hover:text-orange-200"
+              >
+                {recommendedLabel ? `Or see ${recommendedLabel.toLowerCase()} programs →` : 'Or follow a program →'}
+              </Link>
+            </>
           ) : (
             <>
               <div className="mt-1 text-lg font-bold text-white">
