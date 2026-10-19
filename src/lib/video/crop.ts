@@ -11,6 +11,7 @@
 // when the ball is above rim level and within a few rim widths of it, so the
 // ball's position at half court was never used.
 import type { Rim } from './shotDetector';
+import type { NetBox } from './motionBall';
 
 /** Model input is square; matching it avoids a second resize and any stretch. */
 export const CROP_CANVAS_PX = 320;
@@ -69,6 +70,29 @@ export function ballCentreInFrame(
     x: (crop.sx + (box.originX + box.width / 2) * fraction) / videoWidth,
     y: (crop.sy + (box.originY + box.height / 2) * fraction) / videoHeight,
   };
+}
+
+/**
+ * Where the net hangs on the crop canvas: the rim's span, from the rim line
+ * down one rim width, following the rim's tilt.
+ *
+ * One rim width because that is about how far a net hangs: 45cm of ring and a
+ * net of 40 to 45cm.
+ */
+export function netBoxOnCanvas(
+  rim: Rim,
+  crop: CropRect,
+  videoWidth: number,
+  videoHeight: number,
+  canvasPx: number = CROP_CANVAS_PX
+): NetBox {
+  const scale = canvasPx / crop.side;
+  const rimPx = rim.width * videoWidth * scale;
+  const cx = (rim.x * videoWidth - crop.sx) * scale;
+  const cy = (rim.y * videoHeight - crop.sy) * scale;
+  // tilt is dy/dx in fractions of the frame; on the canvas both axes share a scale
+  const slope = (rim.tilt ?? 0) * (videoHeight / videoWidth);
+  return { x0: cx - rimPx / 2, x1: cx + rimPx / 2, top: cy - (rimPx / 2) * slope, slope, depth: rimPx };
 }
 
 /** How much bigger the ball appears to the model than it would full-frame. */

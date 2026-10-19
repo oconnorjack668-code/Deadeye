@@ -16,7 +16,7 @@ import { spawnSync, spawn } from 'node:child_process';
 import { existsSync, writeFileSync } from 'node:fs';
 import { expectedBallDiameter } from '@/lib/video/motionBall';
 import { createBallTracker } from '@/lib/video/ballTracker';
-import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
+import { cropRectFor, ballCentreInFrame, netBoxOnCanvas, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { ShotDetector, rimFromEdges } from '@/lib/video/shotDetector';
 
 vi.setConfig({ testTimeout: 1_800_000 });
@@ -24,6 +24,9 @@ vi.setConfig({ testTimeout: 1_800_000 });
 const CLIP = process.env.DEADEYE_BENCH_CLIP;
 const FFMPEG = process.env.DEADEYE_BENCH_FFMPEG || 'ffmpeg';
 const RIM = process.env.DEADEYE_BENCH_RIM;
+// DEADEYE_BENCH_CANVAS draws the crop at another size, which is how the smaller
+// pictures a slow phone is given (CANVAS_LEVELS in workload.ts) are measured
+const CANVAS = Number(process.env.DEADEYE_BENCH_CANVAS) || CROP_CANVAS_PX;
 const LOST_BALL_MS = 1500;
 
 function videoInfo(ffmpeg: string, clip: string) {
@@ -57,12 +60,12 @@ function eachFrame(
     '-hide_banner',
     '-loglevel', 'error',
     '-i', clip,
-    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CROP_CANVAS_PX}:${CROP_CANVAS_PX},fps=${fps}`,
+    '-vf', `crop=${side}:${side}:${Math.round(crop.sx)}:${Math.round(crop.sy)},scale=${CANVAS}:${CANVAS},fps=${fps}`,
     '-f', 'rawvideo',
     '-pix_fmt', 'rgba',
     '-',
   ];
-  const frameBytes = CROP_CANVAS_PX * CROP_CANVAS_PX * 4;
+  const frameBytes = CANVAS * CANVAS * 4;
 
   return new Promise((resolve, reject) => {
     const proc = spawn(ffmpeg, args, { stdio: ['ignore', 'pipe', 'pipe'] });
@@ -116,19 +119,35 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     const fps = Number(process.env.DEADEYE_BENCH_SAMPLE_FPS) || nativeFps;
     const crop = cropRectFor(rim, width, height);
     // The rim is measured in frame pixels; the tracker works in the crop canvas
-    const rimOnCanvas = rim.width * width * (CROP_CANVAS_PX / crop.side);
+    const rimOnCanvas = rim.width * width * (CANVAS / crop.side);
     const expectedDiameter = expectedBallDiameter(rimOnCanvas);
 
-    const shotDetector = new ShotDetector(rim);
+    const shotDetector = new ShotDetector(rim, { aspect: height / width });
     const scores: number[] = [];
     let framesWithBall = 0;
     let maxGapMs = 0;
     let gapsOverLimit = 0;
     let lastBallMs: number | null = null;
     const startedAt = Date.now();
+    // Time spent in the tracker itself, without ffmpeg's decoding, which is
+    // the part a phone has to fit inside each frame
+    let trackerMs = 0;
+    // One line per frame the ball was found in: time, centre in frame
+    // fractions, score. For seeing where a wrong call went wrong.
+    const trace: string[] = ['t_ms,x,y,score,diameter_rims'];
+
+    // How much of the net moved on each frame, ball excluded, for tuning the
+    // make confirmation against labelled shots
+    const netTrace: string[] | null = process.env.DEADEYE_BENCH_NETTRACE ? ['t_ms,net'] : null;
+    // DEADEYE_BENCH_NONET=1 runs without watching the net, to measure what it adds
+    const watchNet = process.env.DEADEYE_BENCH_NONET !== '1';
 
     const learnColour = process.env.DEADEYE_BENCH_LEARN === '1';
-    const tracker = createBallTracker({ expectedDiameter, learn: learnColour });
+    const tracker = createBallTracker({
+      expectedDiameter,
+      learn: learnColour,
+      net: { ...netBoxOnCanvas(rim, crop, width, height, CANVAS), from: Number(process.env.DEADEYE_BENCH_NETFROM) || undefined },
+    });
 
     /** Scores one frame against its neighbours and feeds the shot detector. */
     const measure = (
@@ -138,9 +157,13 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       next?: Uint8ClampedArray
     ) => {
       const videoMs = (index * 1000) / fps;
-      const found = tracker.track(prev, cur, CROP_CANVAS_PX, CROP_CANVAS_PX, next);
+      const began = performance.now();
+      const found = tracker.track(prev, cur, CANVAS, CANVAS, next, videoMs);
+      trackerMs += performance.now() - began;
+      const net = watchNet ? (tracker.netMotion() ?? undefined) : undefined;
+      if (netTrace) netTrace.push(`${Math.round(videoMs)},${(tracker.netMotion() ?? 0).toFixed(3)}`);
       if (!found) {
-        shotDetector.push({ t: videoMs, ball: null });
+        shotDetector.push({ t: videoMs, ball: null, net });
         return;
       }
       framesWithBall++;
@@ -157,7 +180,9 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
         width: found.diameter,
         height: found.diameter,
       };
-      shotDetector.push({ t: videoMs, ball: ballCentreInFrame(box, crop, width, height) });
+      const centre = ballCentreInFrame(box, crop, width, height, CANVAS);
+      trace.push(`${Math.round(videoMs)},${centre.x.toFixed(4)},${centre.y.toFixed(4)},${found.score.toFixed(3)},${(found.diameter / rimOnCanvas).toFixed(2)}`);
+      shotDetector.push({ t: videoMs, ball: centre, net });
     };
 
     // Three-frame differencing reports where the ball is rather than where it
@@ -189,9 +214,14 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     // that matters: a run can report "4 of 5 makes" while having two of them
     // wrong in opposite directions, which is exactly how a change that made
     // the calls worse once looked like it had changed nothing.
+    // Blank entries are dropped before parsing: Number('') is 0, so an unset
+    // DEADEYE_BENCH_MAKES used to label a make at 0s and score every call
+    // against it as though the clip had been labelled.
     const makeTimes = (process.env.DEADEYE_BENCH_MAKES || '')
       .split(',')
-      .map((s) => Number(s.trim()))
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map(Number)
       .filter((n) => Number.isFinite(n));
     const MATCH_S = 1.0;
     const scored = makeTimes.length
@@ -203,12 +233,53 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       : null;
     const correct = scored ? scored.filter((s) => s.right).length : 0;
 
+    // DEADEYE_BENCH_ATTEMPTS lists every shot taken, made or not, so a run is
+    // also scored on shots it never called and calls with no shot behind them.
+    // Scoring only the calls made cannot see either: a tracker that called
+    // nothing at all would be "100% correct".
+    const attemptTimes = (process.env.DEADEYE_BENCH_ATTEMPTS || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .map(Number)
+      .filter((n) => Number.isFinite(n));
+    const ATTEMPT_MATCH_S = 1.5;
+    const attemptLines: string[] = [];
+    if (attemptTimes.length) {
+      const claimed = new Set<number>();
+      const rows = attemptTimes.map((a) => {
+        let best = -1;
+        shots.forEach((s, i) => {
+          if (claimed.has(i)) return;
+          const gap = Math.abs(s.t / 1000 - a);
+          if (gap <= ATTEMPT_MATCH_S && (best < 0 || gap < Math.abs(shots[best].t / 1000 - a))) best = i;
+        });
+        if (best >= 0) claimed.add(best);
+        const made = makeTimes.some((m) => Math.abs(m - a) <= MATCH_S);
+        return { a, made, shot: best >= 0 ? shots[best] : null };
+      });
+      const called = rows.filter((r) => r.shot);
+      const right = called.filter((r) => r.shot!.made === r.made);
+      const phantoms = shots.filter((_, i) => !claimed.has(i));
+      attemptLines.push(
+        `attempts        ${attemptTimes.length} labelled, ${called.length} called, ${right.length} called right, ${phantoms.length} calls with no shot`,
+        ...rows.map((r) => {
+          const truth = r.made ? 'MAKE' : 'miss';
+          if (!r.shot) return `  ${r.a.toFixed(1)}s ${truth}  never called  <-- MISSED`;
+          const ok = r.shot.made === r.made;
+          const m = r.shot.crossMargin;
+          return `  ${r.a.toFixed(1)}s ${truth}  called ${r.shot.made ? 'MAKE' : 'miss'} at ${(r.shot.t / 1000).toFixed(1)}s${r.shot.confident ? '' : ' (inferred)'}${m === undefined ? '' : ` crossed ${m.toFixed(2)}`}  ${ok ? 'ok' : '<-- WRONG'}`;
+        }),
+        ...phantoms.map((s) => `  ${(s.t / 1000).toFixed(1)}s no shot, called ${s.made ? 'MAKE' : 'miss'}  <-- PHANTOM`)
+      );
+    }
+
     const lines = [
       '',
       `clip            ${CLIP}`,
       `video           ${width}x${height} @ ${nativeFps}fps, sampled at ${fps}`,
       `rim             x=${rim.x.toFixed(4)} y=${rim.y.toFixed(4)} width=${rim.width.toFixed(4)} tilt=${(rim.tilt ?? 0).toFixed(3)}`,
-      `crop            ${Math.round(crop.side)}px at (${Math.round(crop.sx)}, ${Math.round(crop.sy)}), ball expected ${expectedDiameter.toFixed(1)}px of ${CROP_CANVAS_PX}`,
+      `crop            ${Math.round(crop.side)}px at (${Math.round(crop.sx)}, ${Math.round(crop.sy)}), ball expected ${expectedDiameter.toFixed(1)}px of ${CANVAS}`,
       `differencing    ${threeFrame ? 'three frame' : 'two frame'}`,
       `colour          ${
         learnColour
@@ -235,6 +306,8 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
             }),
           ]
         : shots.map((s) => `  ${(s.t / 1000).toFixed(1)}s ${s.made ? 'MAKE' : 'MISS'}${s.confident ? '' : ' (inferred)'}`)),
+      ...attemptLines,
+      `tracker         ${(trackerMs / Math.max(frames, 1)).toFixed(2)} ms a frame on this machine`,
       `took            ${((Date.now() - startedAt) / 1000).toFixed(0)}s`,
       '',
     ];
@@ -243,6 +316,8 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     // Vitest can swallow console output depending on reporter; a file always
     // survives, and makes runs easy to keep and compare.
     if (process.env.DEADEYE_BENCH_OUT) writeFileSync(process.env.DEADEYE_BENCH_OUT, text, 'utf8');
+    if (process.env.DEADEYE_BENCH_TRACE) writeFileSync(process.env.DEADEYE_BENCH_TRACE, trace.join('\n'), 'utf8');
+    if (netTrace && process.env.DEADEYE_BENCH_NETTRACE) writeFileSync(process.env.DEADEYE_BENCH_NETTRACE, netTrace.join('\n'), 'utf8');
 
     expect(frames).toBeGreaterThan(0);
   });

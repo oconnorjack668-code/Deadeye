@@ -20,8 +20,8 @@ import {
   MAX_RIM_NAME,
   type SavedRim,
 } from '@/lib/video/rimMemory';
-import { cropRectFor, ballCentreInFrame, CROP_CANVAS_PX } from '@/lib/video/crop';
-import { createPacer } from '@/lib/video/pace';
+import { cropRectFor, ballCentreInFrame, netBoxOnCanvas } from '@/lib/video/crop';
+import { createWorkload, isRepeat } from '@/lib/video/workload';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import type { ShootingSummary } from '@/components/video/VideoAIFeedback';
@@ -104,10 +104,6 @@ export function ShotTracker({
   /** Removes the clip-ended listener; see startTracking. */
   const endedCleanupRef = useRef<(() => void) | null>(null);
   const [quality, setQuality] = useState<{ fps: number; ballSeenPct: number; frames: number } | null>(null);
-  // Playback speed of an uploaded clip, which the pacer lowers when this device
-  // cannot score every frame at full speed
-  const [speed, setSpeed] = useState(1);
-  const speedRef = useRef(1);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Release the camera, screen lock and any pending flash timer when leaving
@@ -358,14 +354,9 @@ export function ShotTracker({
     const nav = navigator as Navigator & { wakeLock?: { request: (t: 'screen') => Promise<{ release: () => Promise<void> }> } };
     nav.wakeLock?.request('screen').then((l) => (lockRef.current = l)).catch(() => undefined);
 
-    if (!cropCanvasRef.current) {
-      const c = document.createElement('canvas');
-      c.width = CROP_CANVAS_PX;
-      c.height = CROP_CANVAS_PX;
-      cropCanvasRef.current = c;
-    }
+    // The canvas is sized per frame from the workload below
+    if (!cropCanvasRef.current) cropCanvasRef.current = document.createElement('canvas');
 
-    const shotDetector = new ShotDetector(calibratedRim);
     const startedAt = performance.now();
     let nextId = 1;
 
@@ -376,13 +367,16 @@ export function ShotTracker({
     let older: Uint8ClampedArray | null = null;
     let held: { pixels: Uint8ClampedArray; t: number } | null = null;
     // Built on the first frame that has real dimensions: videoWidth is 0 until
-    // metadata loads, and the expected ball size is derived from it.
+    // metadata loads, and the expected ball size and the frame's shape are
+    // derived from it. The tracker is rebuilt if the canvas changes size.
     let ballTracker: BallTracker | null = null;
+    let trackerCanvas = 0;
+    let shotDetector: ShotDetector | null = null;
 
     if (source === 'file') {
       video.currentTime = 0;
-      // Never faster than real time (see the note where the 2x selector used to
-      // be); the pacer below goes slower when that is what scoring every frame takes
+      // Always real time: never faster (see the note where the 2x selector
+      // used to be), and never slower either - see src/lib/video/workload.ts
       video.playbackRate = 1;
       await video.play().catch(() => undefined);
     }
@@ -402,12 +396,128 @@ export function ShotTracker({
       endedCleanupRef.current = () => video.removeEventListener('ended', onEnded);
     }
 
-    // A clip is played as fast as this device can score every frame of it and
-    // no faster (src/lib/video/pace.ts). The camera has no such option: it is
-    // live, and real time is the only speed there is.
-    const pacer = source === 'file' ? createPacer() : null;
-    setSpeed(1);
-    speedRef.current = 1;
+    // Thins 60 fps to the 30 the tracker was measured at, and gives a device
+    // that cannot keep up a smaller picture to work on instead of slowing the
+    // clip (src/lib/video/workload.ts). The camera is live, so the same applies.
+    const workload = createWorkload();
+
+    /** Scores one presented frame. Returns early, without scoring, for frames that are not wanted. */
+    const scoreFrame = (meta?: { mediaTime?: number }) => {
+      // mediaTime is the time of the frame actually presented, where
+      // currentTime can already have moved on to the next one
+      const now = source === 'file' ? (meta?.mediaTime ?? video.currentTime) * 1000 : performance.now() - startedAt;
+      // 60 fps is thinned to 30 before any pixel work is done
+      if (!workload.wants(now)) return;
+
+      // Work on a crop around the hoop rather than the whole frame: it is
+      // what makes the ball big enough to measure, and it keeps the pixel
+      // work to a small square however large the footage is.
+      const crop = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight);
+      const px = workload.canvas();
+      const canvas = cropCanvasRef.current;
+      if (!canvas) return;
+      if (canvas.width !== px) {
+        canvas.width = px;
+        canvas.height = px;
+      }
+      // willReadFrequently because the tracker calls getImageData on this
+      // canvas every single frame. A 2d context is GPU-backed by default and
+      // each read forces a readback across that boundary; this asks for a
+      // CPU-backed one instead, which is the cheap half of keeping the pixel
+      // work inside a phone's frame budget.
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) return;
+      ctx.drawImage(video, crop.sx, crop.sy, crop.side, crop.side, 0, 0, px, px);
+
+      if (!ballTracker || trackerCanvas !== px) {
+        // A new size means new pixels to compare, so the frames held for
+        // differencing start again too
+        const rimOnCanvas = calibratedRim.width * video.videoWidth * (px / crop.side);
+        ballTracker = createBallTracker({
+          expectedDiameter: expectedBallDiameter(rimOnCanvas),
+          net: netBoxOnCanvas(calibratedRim, crop, video.videoWidth, video.videoHeight, px),
+        });
+        trackerCanvas = px;
+        older = null;
+        held = null;
+      }
+      shotDetector ??= new ShotDetector(calibratedRim, { aspect: video.videoHeight / video.videoWidth });
+
+      const pixels = ctx.getImageData(0, 0, px, px).data;
+      // A frame shown twice has no motion in it to find, and comparing
+      // against the copy would hide the ball on exactly that frame
+      if (held && isRepeat(pixels, held.pixels)) return;
+      workload.scored(now);
+      const ready = Boolean(older && held);
+      const found = older && held ? ballTracker.track(older, held.pixels, px, px, pixels, held.t) : null;
+      // The moment just scored is the middle frame's, not this one's
+      const t = held ? held.t : now;
+      older = held?.pixels ?? null;
+      held = { pixels, t: now };
+
+      // Crop pixels back to whole-frame fractions, so everything downstream
+      // keeps working in the coordinate space it always used.
+      const scale = crop.side / px;
+      const box = found
+        ? {
+            originX: found.x - found.diameter / 2,
+            originY: found.y - found.diameter / 2,
+            width: found.diameter,
+            height: found.diameter,
+          }
+        : null;
+      const centre = box ? ballCentreInFrame(box, crop, video.videoWidth, video.videoHeight, px) : null;
+      const ball =
+        box && centre
+          ? {
+              w: (box.width * scale) / video.videoWidth,
+              h: (box.height * scale) / video.videoHeight,
+              x: centre.x - (box.width * scale) / video.videoWidth / 2,
+              y: centre.y - (box.height * scale) / video.videoHeight / 2,
+            }
+          : null;
+      // Nothing has been scored until three frames have arrived
+      const shot = ready ? shotDetector.push({ t, ball: centre, net: ballTracker.netMotion() ?? undefined }) : null;
+      if (shot) {
+        setShots((cur) => [...cur, { ...shot, id: nextId++ }]);
+        navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
+        // Big transient MAKE/MISS badge: a tripod phone's buzz is useless from
+        // the arc, so the confirmation has to be visual.
+        //
+        // Counted from the detector rather than from `shots` state, which has
+        // not re-rendered yet, and rather than from the id counter, which is
+        // incremented inside a state updater React may replay.
+        const attempts = shotDetector.shots.length;
+        const made = shotDetector.shots.filter((s) => s.made).length;
+        setFlash({ id: attempts, made: shot.made, confident: shot.confident, makes: made, attempts });
+        // A phone on a tripod is metres away and the player is usually facing
+        // the hoop, so sound is the part of the confirmation that reaches
+        // them. Silent unless they asked for it.
+        announceShot(sound, shot.made, made, attempts);
+        if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+        flashTimerRef.current = setTimeout(() => setFlash(null), 1400);
+      }
+      draw(ball);
+
+      // Only re-render on the edge, not every frame - this runs at up to 60fps
+      // on a phone that is also doing ball detection on each frame.
+      const seen = ball !== null;
+      // Only frames that were actually scored: the first two of a run have no
+      // middle frame to measure, and counting them would flatter the rate.
+      if (ready) {
+        analysedRef.current += 1;
+        if (seen) ballSeenRef.current += 1;
+      }
+      if (seen !== ballVisibleRef.current) {
+        ballVisibleRef.current = seen;
+        setBallVisible(seen);
+      }
+      if (t - lastElapsedPushRef.current > 250) {
+        lastElapsedPushRef.current = t;
+        setElapsedMs(t);
+      }
+      if (source === 'file' && video.duration) setProgress(video.currentTime / video.duration);
+    };
 
     const processFrame = (_now?: number, meta?: { mediaTime?: number }) => {
       if (stopRef.current) return;
@@ -415,110 +525,7 @@ export function ShotTracker({
         finish();
         return;
       }
-      if (video.readyState >= 2 && video.videoWidth > 0) {
-        // Work on a crop around the hoop rather than the whole frame: it is
-        // what makes the ball big enough to measure, and it keeps the pixel
-        // work to a 320px square however large the footage is.
-        const crop = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight);
-        const canvas = cropCanvasRef.current;
-        // willReadFrequently because the tracker calls getImageData on this
-        // canvas every single frame. A 2d context is GPU-backed by default and
-        // each read forces a readback across that boundary; this asks for a
-        // CPU-backed one instead, which is the cheap half of keeping the pixel
-        // work inside a phone's frame budget.
-        const ctx = canvas?.getContext('2d', { willReadFrequently: true });
-        if (!canvas || !ctx) return;
-        ctx.drawImage(video, crop.sx, crop.sy, crop.side, crop.side, 0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX);
-
-        if (!ballTracker) {
-          const rimOnCanvas = calibratedRim.width * video.videoWidth * (CROP_CANVAS_PX / crop.side);
-          ballTracker = createBallTracker({ expectedDiameter: expectedBallDiameter(rimOnCanvas) });
-        }
-
-        // mediaTime is the time of the frame actually presented, where
-        // currentTime can already have moved on to the next one
-        const now = source === 'file' ? (meta?.mediaTime ?? video.currentTime) * 1000 : performance.now() - startedAt;
-        if (pacer) {
-          const rate = pacer.next(now);
-          if (Math.abs(video.playbackRate - rate) > 0.01) video.playbackRate = rate;
-          // Shown to the player, so only on a visible change
-          if (Math.abs(rate - speedRef.current) >= 0.05) {
-            speedRef.current = rate;
-            setSpeed(rate);
-          }
-        }
-        const pixels = ctx.getImageData(0, 0, CROP_CANVAS_PX, CROP_CANVAS_PX).data;
-        const ready = Boolean(older && held);
-        const found =
-          older && held ? ballTracker.track(older, held.pixels, CROP_CANVAS_PX, CROP_CANVAS_PX, pixels) : null;
-        // The moment just scored is the middle frame's, not this one's
-        const t = held ? held.t : now;
-        older = held?.pixels ?? null;
-        held = { pixels, t: now };
-
-        // Crop pixels back to whole-frame fractions, so everything downstream
-        // keeps working in the coordinate space it always used.
-        const scale = crop.side / CROP_CANVAS_PX;
-        const box = found
-          ? {
-              originX: found.x - found.diameter / 2,
-              originY: found.y - found.diameter / 2,
-              width: found.diameter,
-              height: found.diameter,
-            }
-          : null;
-        const centre = box ? ballCentreInFrame(box, crop, video.videoWidth, video.videoHeight) : null;
-        const ball =
-          box && centre
-            ? {
-                w: (box.width * scale) / video.videoWidth,
-                h: (box.height * scale) / video.videoHeight,
-                x: centre.x - (box.width * scale) / video.videoWidth / 2,
-                y: centre.y - (box.height * scale) / video.videoHeight / 2,
-              }
-            : null;
-        // Nothing has been scored until three frames have arrived
-        const shot = ready ? shotDetector.push({ t, ball: centre }) : null;
-        if (shot) {
-          setShots((cur) => [...cur, { ...shot, id: nextId++ }]);
-          navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
-          // Big transient MAKE/MISS badge: a tripod phone's buzz is useless from
-          // the arc, so the confirmation has to be visual.
-          //
-          // Counted from the detector rather than from `shots` state, which has
-          // not re-rendered yet, and rather than from the id counter, which is
-          // incremented inside a state updater React may replay.
-          const attempts = shotDetector.shots.length;
-          const made = shotDetector.shots.filter((s) => s.made).length;
-          setFlash({ id: attempts, made: shot.made, confident: shot.confident, makes: made, attempts });
-          // A phone on a tripod is metres away and the player is usually facing
-          // the hoop, so sound is the part of the confirmation that reaches
-          // them. Silent unless they asked for it.
-          announceShot(sound, shot.made, made, attempts);
-          if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
-          flashTimerRef.current = setTimeout(() => setFlash(null), 1400);
-        }
-        draw(ball);
-
-        // Only re-render on the edge, not every frame - this runs at up to 60fps
-        // on a phone that is also doing ball detection on each frame.
-        const seen = ball !== null;
-        // Only frames that were actually scored: the first two of a run have no
-        // middle frame to measure, and counting them would flatter the rate.
-        if (ready) {
-          analysedRef.current += 1;
-          if (seen) ballSeenRef.current += 1;
-        }
-        if (seen !== ballVisibleRef.current) {
-          ballVisibleRef.current = seen;
-          setBallVisible(seen);
-        }
-        if (t - lastElapsedPushRef.current > 250) {
-          lastElapsedPushRef.current = t;
-          setElapsedMs(t);
-        }
-        if (source === 'file' && video.duration) setProgress(video.currentTime / video.duration);
-      }
+      if (video.readyState >= 2 && video.videoWidth > 0) scoreFrame(meta);
       const v = video as HTMLVideoElement & {
         requestVideoFrameCallback?: (cb: (now: number, meta: { mediaTime?: number }) => void) => number;
       };
@@ -836,12 +843,6 @@ export function ShotTracker({
             <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
               <div className="h-full bg-orange-500" style={{ width: `${Math.round(progress * 100)}%` }} />
             </div>
-          )}
-          {source === 'file' && speed < 0.95 && (
-            <p className="text-xs text-zinc-500">
-              Playing at {Math.round(speed * 100)}% speed so no frame is skipped. A longer clip takes a little longer
-              than its own length to check.
-            </p>
           )}
           <p className="text-xs text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />

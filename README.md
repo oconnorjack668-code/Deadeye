@@ -117,9 +117,40 @@ puts the sighting below the rim *after* the ball has deflected off it, which is
 lost information rather than a tuning problem. It failed toward inventing
 makes, so there was no honest way to keep both the speed and the accuracy.
 
+`DEADEYE_BENCH_ATTEMPTS` is the times of every shot taken, made or not. With
+it the run is also scored on shots it never called and calls with no shot
+behind them, which scoring only the calls cannot see.
+
+`DEADEYE_BENCH_CANVAS` draws the hoop crop at a smaller size, which is how the
+smaller pictures a slow phone falls back to are measured (see
+`src/lib/video/workload.ts`). `DEADEYE_BENCH_NONET=1` runs without watching the
+net. `DEADEYE_BENCH_TRACE` and `DEADEYE_BENCH_NETTRACE` write the ball's
+position and the net's movement on every frame to CSV files.
+
 `DEADEYE_BENCH_RIM` is the two rim taps as `x,y,x,y` normalised to the frame.
 The test skips without those variables, so the normal gates are unaffected. Set
 `DEADEYE_BENCH_FFMPEG` if ffmpeg is not on PATH.
+
+There are two labelled clips. The first is the one above: 51s, 10 attempts,
+filmed from the side. The second is a 2:39 session with two rebounders and a
+second ball, filmed from far away and low down with the hoop side-on. It has
+31 attempts, 10 of them made:
+
+```bash
+DEADEYE_BENCH_RIM=0.3574,0.4479,0.4037,0.4479 DEADEYE_BENCH_SAMPLE_FPS=30 \
+DEADEYE_BENCH_MAKES=23.6,43.55,49.4,53.8,90.45,98.25,109.3,128.9,136.8,154.75 \
+DEADEYE_BENCH_ATTEMPTS=5.25,10.45,15.65,23.6,28.5,39.4,43.55,49.4,53.8,58.0,62.9,66.55,71.6,78.05,84.9,90.45,95.2,98.25,101.9,109.3,112.7,116.7,121.5,128.9,132.5,136.8,140.4,144.8,149.15,154.75,158.4
+```
+
+The labels were made frame by frame. The clearest sign of a make there is the
+net moving. On that clip the tracker as it was before called 27 of the 31
+attempts and got 17 right, with 9 calls where there was no shot. Watching the
+net, following each ball separately and waiting to see what happens after the
+rim took it to all 31 called, 28 right and 1 extra call. The first clip stayed
+at 10 of 10. The three still wrong are hard cases. One ball hit the rim,
+bounced towards the camera and fell past the front of the net while the net
+was still shaking from the hit. The other two were makes that bounced a metre
+up off the ring and dropped back in.
 
 ## Three deliberate design decisions
 

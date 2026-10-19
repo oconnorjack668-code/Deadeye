@@ -93,12 +93,21 @@ export function diffMask(
   threshold: number = DEFAULT_DIFF_THRESHOLD
 ): Uint8Array {
   const mask = new Uint8Array(width * height);
+  const channel = threshold * 1.5;
+  // This runs over every pixel of every frame on a phone, so the arithmetic is
+  // written out rather than calling luma() twice per pixel. The brightness
+  // difference is the luma of the per-channel differences, which is the same
+  // number by linearity and saves computing two lumas.
   for (let i = 0, p = 0; i < mask.length; i++, p += 4) {
-    const dr = Math.abs(cur[p] - prev[p]);
-    const dg = Math.abs(cur[p + 1] - prev[p + 1]);
-    const db = Math.abs(cur[p + 2] - prev[p + 2]);
-    const dLuma = Math.abs(luma(cur[p], cur[p + 1], cur[p + 2]) - luma(prev[p], prev[p + 1], prev[p + 2]));
-    if (dLuma > threshold || Math.max(dr, dg, db) > threshold * 1.5) mask[i] = 1;
+    const r = cur[p] - prev[p];
+    const g = cur[p + 1] - prev[p + 1];
+    const b = cur[p + 2] - prev[p + 2];
+    const dLuma = 0.299 * r + 0.587 * g + 0.114 * b;
+    if (dLuma > threshold || dLuma < -threshold) {
+      mask[i] = 1;
+      continue;
+    }
+    if (r > channel || r < -channel || g > channel || g < -channel || b > channel || b < -channel) mask[i] = 1;
   }
   return mask;
 }
@@ -137,12 +146,16 @@ export function motionMask(
 export function labelBlobs(mask: Uint8Array, width: number, height: number, minArea = 4): Blob[] {
   const seen = new Uint8Array(mask.length);
   const blobs: Blob[] = [];
-  const stack: number[] = [];
+  // A typed stack, because a pixel is pushed at most once (it is marked seen
+  // as it goes on) so mask.length is the most it can ever hold, and an
+  // array that grows and shrinks on every pixel is slow on a phone.
+  const stack = new Int32Array(mask.length);
+  let top = 0;
 
   for (let start = 0; start < mask.length; start++) {
     if (!mask[start] || seen[start]) continue;
     seen[start] = 1;
-    stack.push(start);
+    stack[top++] = start;
 
     let area = 0;
     let sumX = 0;
@@ -152,8 +165,8 @@ export function labelBlobs(mask: Uint8Array, width: number, height: number, minA
     let maxX = -1;
     let maxY = -1;
 
-    while (stack.length) {
-      const i = stack.pop()!;
+    while (top > 0) {
+      const i = stack[--top];
       const x = i % width;
       const y = (i - x) / width;
       area++;
@@ -175,7 +188,7 @@ export function labelBlobs(mask: Uint8Array, width: number, height: number, minA
           const n = ny * width + nx;
           if (mask[n] && !seen[n]) {
             seen[n] = 1;
-            stack.push(n);
+            stack[top++] = n;
           }
         }
       }
@@ -314,21 +327,106 @@ export function findBall(
   const mask = next
     ? motionMask(prev, cur, next, width, height, threshold)
     : diffMask(prev, cur, width, height, threshold);
+  return ballCandidates(mask, cur, width, height, options)[0] ?? null;
+}
 
+/**
+ * Every ball-like moving thing in a motion mask, most ball-like first.
+ *
+ * findBall keeps only the best of these, which is right for one frame on its
+ * own and wrong for a clip. Under a hoop there is usually more than one moving,
+ * round, ball-sized thing - a second ball being passed back, a rebounder's
+ * head, people moving behind a glass backboard - and the best-scoring blob on a
+ * given frame is often not the ball being followed. The tracker chooses among
+ * all of them by where the ball was going, which needs the whole list.
+ */
+export function ballCandidates(
+  mask: Uint8Array,
+  cur: Uint8ClampedArray,
+  width: number,
+  height: number,
+  options: FindBallOptions
+): BallCandidate[] {
   // A blob smaller than a quarter of the expected ball cannot be it, and
   // skipping those keeps the labeller off sensor noise
   const minArea = Math.max(4, Math.floor((options.expectedDiameter * options.expectedDiameter) / 16));
   const blobs = labelBlobs(mask, width, height, minArea);
+  const minScore = options.minScore ?? DEFAULT_MIN_SCORE;
 
-  let best: BallCandidate | null = null;
+  const found: BallCandidate[] = [];
   for (const blob of blobs) {
+    // Size first: it is free, and most blobs fail it before the colour, which
+    // walks the blob's pixels, is ever read
+    if (sizeScore(blobDiameter(blob), options.expectedDiameter) === 0) continue;
     const colour = blobColour(cur, width, blob, mask);
     const score = scoreBlob(blob, options, colour);
-    if (!best || score > best.score) {
-      best = { x: blob.cx, y: blob.cy, diameter: blobDiameter(blob), score, blob, colour };
+    if (score >= minScore) found.push({ x: blob.cx, y: blob.cy, diameter: blobDiameter(blob), score, blob, colour });
+  }
+  return found.sort((a, b) => b.score - a.score);
+}
+
+/**
+ * The region of the crop canvas the net hangs in, below the rim line.
+ *
+ * In canvas pixels. `top` is the rim line's height at `x0`, and it follows the
+ * rim's slope across to `x1`.
+ */
+export interface NetBox {
+  x0: number;
+  x1: number;
+  top: number;
+  /** dy/dx of the rim line, in canvas pixels. */
+  slope: number;
+  /** How far below the rim line the box reaches. */
+  depth: number;
+  /** Share of the depth, from the rim line, left out at the top. 0.1 when absent. */
+  from?: number;
+}
+
+/**
+ * The share of the net that moved between two frames, the ball itself left out.
+ *
+ * This is the one thing that tells a make from a ball passing just in front of
+ * the rim when the camera sees the hoop side-on. Projected onto the screen the
+ * two are the same: the ball comes down through the rim's width and out under
+ * the net. Measured on a 2:39 clip with 31 hand-labelled attempts, the crossing
+ * point could not separate them at all - three misses that fell in front of the
+ * ring crossed at 0.1 to 0.6 half-rims, as central as the makes. But a ball that goes
+ * through the net drags it, and the net keeps swinging after the ball is gone,
+ * while one that falls past it leaves it still. Every make moved the net on six
+ * or more of the following frames; every ball that fell in front of it, on four
+ * or fewer.
+ *
+ * Pixels within 0.8 ball widths of the ball are excluded, so the ball's own
+ * motion through the box is not counted as the net moving.
+ */
+export function netMotion(
+  mask: Uint8Array,
+  width: number,
+  height: number,
+  net: NetBox,
+  ball?: { x: number; y: number; diameter: number } | null
+): number {
+  let moved = 0;
+  let total = 0;
+  const reach = ball ? ball.diameter * 0.8 : 0;
+  const x0 = Math.max(0, Math.round(net.x0));
+  const x1 = Math.min(width - 1, Math.round(net.x1));
+  for (let x = x0; x <= x1; x++) {
+    const rimY = net.top + (x - net.x0) * net.slope;
+    // The top tenth is the rim itself, which shakes on every shot that hits
+    // it, make or miss
+    const y0 = Math.max(0, Math.round(rimY + net.depth * (net.from ?? 0.1)));
+    const y1 = Math.min(height - 1, Math.round(rimY + net.depth));
+    for (let y = y0; y <= y1; y++) {
+      if (ball) {
+        const dx = x - ball.x;
+        const dy = y - ball.y;
+        if (dx * dx + dy * dy < reach * reach) continue;
+      }
+      total++;
+      moved += mask[y * width + x];
     }
   }
-
-  const minScore = options.minScore ?? DEFAULT_MIN_SCORE;
-  return best && best.score >= minScore ? best : null;
+  return total ? moved / total : 0;
 }

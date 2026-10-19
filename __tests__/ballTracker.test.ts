@@ -159,3 +159,79 @@ describe('createBallTracker', () => {
     expect(tracker.colour()).toBeNull();
   });
 });
+
+// With the rim known, the tracker reports only what moves like a ball in
+// flight. Each case here is a thing that fooled the best-blob tracker on the
+// 2:39 session that prompted this.
+describe('createBallTracker with a rim', () => {
+  // The rim line at y = 50 across x 30..50: a 20px rim, ball 10px
+  const net = { x0: 30, x1: 50, top: 50, slope: 0, depth: 20 };
+  const D = 10;
+  const R = 5;
+
+  function scene(balls: Array<{ x: number; y: number; r?: number }>): Uint8ClampedArray {
+    const f = frame(HALL);
+    for (const b of balls) disc(f, Math.round(b.x), Math.round(b.y), b.r ?? R, MAROON);
+    return f;
+  }
+
+  /** Runs frames through the tracker three at a time, as the app does. */
+  function feed(frames: Uint8ClampedArray[]) {
+    const tracker = createBallTracker({ expectedDiameter: D, learn: false, net });
+    const out: Array<{ x: number; y: number } | null> = [];
+    for (let i = 1; i + 1 < frames.length; i++) {
+      const found = tracker.track(frames[i - 1], frames[i], W, H, frames[i + 1], i * 33);
+      out.push(found ? { x: found.x, y: found.y } : null);
+    }
+    return out;
+  }
+
+  /** A shot coming down from the upper right towards the rim, 11px a frame. */
+  const shot = (i: number) => ({ x: 76 - i * 7, y: 6 + i * 8.5 });
+
+  it('follows a shot down to the rim', () => {
+    const seen = feed(Array.from({ length: 7 }, (_, i) => scene([shot(i)])));
+    const reported = seen.filter(Boolean);
+    expect(reported.length).toBeGreaterThanOrEqual(2);
+    // And what it reports is the ball, where the ball is
+    const last = seen[seen.length - 1]!;
+    expect(Math.abs(last.x - shot(seen.length).x)).toBeLessThan(3);
+  });
+
+  it('never reports something hopping between two spots above the rim', () => {
+    // The glass-backboard flicker: lit on alternate frames in two places two
+    // ball widths apart, above the rim, for as long as you like
+    const frames = Array.from({ length: 40 }, (_, i) => scene([{ x: 14, y: i % 2 ? 18 : 38 }]));
+    expect(feed(frames).every((s) => s === null)).toBe(true);
+  });
+
+  it('keeps the ball when the flicker is nearer to where it was than it is now', () => {
+    // A shot arriving while the flicker hops beside it. Best-blob tracking
+    // jumped to the flicker as the ball reached the ring.
+    const frames = Array.from({ length: 7 }, (_, i) => scene([shot(i), { x: 14, y: i % 2 ? 18 : 38 }]));
+    const seen = feed(frames).filter(Boolean) as Array<{ x: number; y: number }>;
+    expect(seen.length).toBeGreaterThan(0);
+    for (const s of seen) expect(s.x).toBeGreaterThan(25);
+  });
+
+  it('ignores a ball much nearer the camera than the hoop', () => {
+    // A pass coming back past the phone: nearer, so bigger and faster on screen
+    const frames = Array.from({ length: 6 }, (_, i) => scene([{ x: 76 - i * 12, y: 4 + i * 14, r: 8 }]));
+    expect(feed(frames).every((s) => s === null)).toBe(true);
+  });
+
+  it('reports how much of the net moved, leaving the ball out', () => {
+    const tracker = createBallTracker({ expectedDiameter: D, learn: false, net });
+    const still = scene([]);
+    tracker.track(still, still, W, H, still, 0);
+    expect(tracker.netMotion()).toBe(0);
+    // Something net-shaped swinging in the net box
+    const swung = frame(HALL);
+    for (let y = 55; y < 68; y++) for (let x = 32; x < 48; x += 3) {
+      const p = (y * W + x) * 4;
+      swung[p] = 30; swung[p + 1] = 30; swung[p + 2] = 30;
+    }
+    tracker.track(still, swung, W, H, still, 33);
+    expect(tracker.netMotion()!).toBeGreaterThan(0.1);
+  });
+});
