@@ -125,7 +125,7 @@ export default async function AdminErrorsPage() {
 
         {/* Player reports first: each is one person who took the time to say
             what went wrong, so they are listed one by one, never grouped */}
-        <section className="space-y-2">
+        <section id="reports" className="scroll-mt-4 space-y-2">
           <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-400">Player reports</h2>
           {reportsError ? (
             <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
@@ -154,7 +154,7 @@ export default async function AdminErrorsPage() {
           )}
         </section>
 
-        <h2 className="pt-2 text-sm font-bold uppercase tracking-wide text-zinc-400">Crashes</h2>
+        <h2 id="crashes" className="scroll-mt-4 pt-2 text-sm font-bold uppercase tracking-wide text-zinc-400">Crashes</h2>
 
         {loadError && (
           <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
