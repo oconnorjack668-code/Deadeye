@@ -81,6 +81,10 @@ that data again.
 - [ ] Run `supabase/migrations/00038_player_reports.sql` in the Supabase SQL
       editor. Until then "Report a problem" says the report could not be sent,
       and the errors tab says the migration is missing.
+- [ ] Run `supabase/migrations/00039_more_programs.sql` in the Supabase SQL
+      editor. It adds eight programmes, five of them Athleticism, and makes
+      Basketball Strength Foundations the fourth free one. The pricing and
+      landing pages already say four free and 18 with Pro.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

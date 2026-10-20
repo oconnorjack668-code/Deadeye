@@ -34,7 +34,7 @@ export const FREE_PLAN: Plan = {
     'Automatic shot tracking from your camera or a video, with no limit',
     'Log every session, workout and test, and keep your full history',
     'All 150 drills, and form check whenever you want',
-    '3 complete training programmes',
+    '4 complete training programmes, including Basketball Strength Foundations',
     'Basketball IQ: the question of the day and the first 3 sections',
     'Your shot chart for the last 30 days',
     `${FREE_MONTHLY_AI_REPORTS} AI coaching reports a month and ${FREE_CHAT_PER_DAY} questions to the coach a day`,

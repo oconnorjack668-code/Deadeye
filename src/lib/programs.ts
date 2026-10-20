@@ -168,8 +168,8 @@ export async function startedProgramIds(supabase: SupabaseClient<Database>, user
 /**
  * Basketball IQ sections a run of programme days sends the player to.
  *
- * Programmes link to lessons, and the three free programmes between them use
- * eight of the twelve sections. Opening all eight on Free would undo the point
+ * Programmes link to lessons, and the free programmes between them use most
+ * of the twelve sections. Opening all eight on Free would undo the point
  * of Pro sections, and leaving them locked would break a free programme
  * halfway through a session. So a section also opens while it is part of the
  * programme the player is following.

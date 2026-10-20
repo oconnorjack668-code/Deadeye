@@ -68,7 +68,7 @@ const FEATURES = [
   {
     icon: ClipboardList,
     title: 'Training programmes',
-    desc: 'Plans that build week by week for shooting, handles, finishing and athleticism: 3 free, 10 with Pro. Plus 150 drills.',
+    desc: 'Plans that build week by week for shooting, handles, finishing and athleticism: 4 free, 18 with Pro. Plus 150 drills.',
   },
   {
     icon: Dumbbell,
