@@ -9,7 +9,7 @@
 // So this stands a fake AudioContext in front of the module and asks two
 // questions of every advertised sound - does it schedule anything audible, and
 // does it land in the same loudness bracket as the rest.
-import { describe, it, expect, beforeAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, vi } from 'vitest';
 import {
   MAKE_SOUNDS,
   MISS_SOUNDS,
@@ -22,6 +22,7 @@ import {
   isAudible,
   soundSummary,
   DEFAULT_SOUND,
+  preloadRecordings,
   type MakeSound,
   type MissSound,
 } from '@/lib/video/trackerSound';
@@ -265,16 +266,50 @@ beforeEach(() => {
 
 const makeIds = MAKE_SOUNDS.filter((s) => s.id !== 'off').map((s) => s.id);
 const missIds = MISS_SOUNDS.filter((s) => s.id !== 'off').map((s) => s.id);
+// The two real recordings are files, not synthesis, so the checks on what the
+// synthesis schedules do not apply to them; they have their own below
+const RECORDED = ['net', 'rim'];
+const synthMakeIds = makeIds.filter((id) => !RECORDED.includes(id));
+const synthMissIds = missIds.filter((id) => !RECORDED.includes(id));
 
 describe('every sound in the picker actually makes a sound', () => {
   // The point of the whole file: a label with no branch behind it is silence
   // where the player expected a swish.
-  it.each(makeIds)('plays something for the make sound %s', (id) => {
+  it.each(synthMakeIds)('plays something for the make sound %s', (id) => {
     expect(scheduledFor(() => playMake(id as MakeSound)).length).toBeGreaterThan(0);
   });
 
-  it.each(missIds)('plays something for the miss sound %s', (id) => {
+  it.each(synthMissIds)('plays something for the miss sound %s', (id) => {
     expect(scheduledFor(() => playMiss(id as MissSound)).length).toBeGreaterThan(0);
+  });
+
+  it('fetches the real swish and rim clank recordings', async () => {
+    const fetchMock = vi.fn(async () => ({ ok: false, arrayBuffer: async () => new ArrayBuffer(0) }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      playMake('net');
+      playMiss('rim');
+      await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+      const urls = fetchMock.mock.calls.map((c) => (c as unknown as [string])[0]);
+      expect(urls).toEqual(expect.arrayContaining(['/sounds/swish.mp3', '/sounds/rim-clank.mp3']));
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('downloads only the recordings the settings use, and nothing when muted', async () => {
+    const fetchMock = vi.fn(async () => ({ ok: false, arrayBuffer: async () => new ArrayBuffer(0) }));
+    vi.stubGlobal('fetch', fetchMock);
+    try {
+      preloadRecordings({ ...DEFAULT_SOUND, muted: true });
+      preloadRecordings({ ...DEFAULT_SOUND, make: 'airhorn', miss: 'off' });
+      await Promise.resolve();
+      expect(fetchMock).not.toHaveBeenCalled();
+      preloadRecordings({ ...DEFAULT_SOUND, miss: 'off' });
+      await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledWith('/sounds/swish.mp3'));
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it('stays silent when asked to', () => {
@@ -282,10 +317,11 @@ describe('every sound in the picker actually makes a sound', () => {
     expect(scheduledFor(() => playMiss('off'))).toHaveLength(0);
   });
 
-  it('defaults to silence, because nobody expects noise unasked', () => {
-    expect(DEFAULT_SOUND.make).toBe('off');
-    expect(DEFAULT_SOUND.miss).toBe('off');
+  it('defaults to the real swish and rim clank, and no voice', () => {
+    expect(DEFAULT_SOUND.make).toBe('net');
+    expect(DEFAULT_SOUND.miss).toBe('rim');
     expect(DEFAULT_SOUND.voice).toBe('off');
+    expect(DEFAULT_SOUND.muted).toBe(false);
   });
 });
 
@@ -303,11 +339,11 @@ describe('loudness', () => {
     expect(level, `${id} peaks at ${level.toFixed(3)}`).toBeLessThanOrEqual(CEILING);
   };
 
-  it.each(makeIds)('keeps the make sound %s in the same bracket as the others', (id) => {
+  it.each(synthMakeIds)('keeps the make sound %s in the same bracket as the others', (id) => {
     inBracket(id, () => playMake(id as MakeSound));
   });
 
-  it.each(missIds)('keeps the miss sound %s in the same bracket as the others', (id) => {
+  it.each(synthMissIds)('keeps the miss sound %s in the same bracket as the others', (id) => {
     inBracket(id, () => playMiss(id as MissSound));
   });
 });
@@ -324,9 +360,9 @@ describe('spectrum', () => {
   // is deliberately its quietest partial for exactly this reason.
   const SPEAKER_FLOOR = 400;
 
-  it.each([...makeIds, ...missIds])('puts %s where a phone can reproduce it', (id) => {
+  it.each([...synthMakeIds, ...synthMissIds])('puts %s where a phone can reproduce it', (id) => {
     scheduledFor(() => {
-      if ((makeIds as string[]).includes(id)) playMake(id as MakeSound);
+      if ((synthMakeIds as string[]).includes(id)) playMake(id as MakeSound);
       else playMiss(id as MissSound);
     });
     const audible = fake.spectrum.filter((hz) => hz >= SPEAKER_FLOOR);
@@ -448,8 +484,10 @@ describe('saved settings', () => {
     expect(isAudible({ ...back, muted: false })).toBe(true);
   });
 
-  it('is silent when nothing is chosen, muted or not', () => {
-    expect(isAudible(DEFAULT_SOUND)).toBe(false);
+  it('is heard by default, and silent once muted or all off', () => {
+    expect(isAudible(DEFAULT_SOUND)).toBe(true);
+    expect(isAudible({ ...DEFAULT_SOUND, muted: true })).toBe(false);
+    expect(isAudible({ ...DEFAULT_SOUND, make: 'off', miss: 'off' })).toBe(false);
   });
 
   it('describes the choice in a line for the tracker', () => {
@@ -460,10 +498,11 @@ describe('saved settings', () => {
       'Swish · Sad trombone on a miss · hyped'
     );
     expect(soundSummary({ ...DEFAULT_SOUND, muted: true })).toBe('Muted');
-    expect(soundSummary(DEFAULT_SOUND)).toBe('Silent');
+    expect(soundSummary({ ...DEFAULT_SOUND, make: 'off', miss: 'off' })).toBe('Silent');
+    expect(soundSummary(DEFAULT_SOUND)).toBe('Net swish (real) · Rim clank (real) on a miss');
   });
 
-  it('falls back to silence rather than trusting a stale id', () => {
+  it('falls back to the defaults rather than trusting a stale id', () => {
     // An id can disappear between releases, and a saved value naming a sound
     // that no longer exists must not reach playMake
     window.localStorage.setItem(

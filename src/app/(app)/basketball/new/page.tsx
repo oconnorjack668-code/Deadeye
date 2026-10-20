@@ -12,6 +12,7 @@ import { CourtMap } from '@/components/basketball/CourtMap';
 import { classifyZone, ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import { localDateString } from '@/lib/dates';
 import { sessionCategoryForSkill } from '@/lib/drills';
+import { announceShot, loadSound, preloadRecordings } from '@/lib/video/trackerSound';
 import {
   enqueue,
   getUserIdForSave,
@@ -252,6 +253,11 @@ export default function NewBasketballSessionPage() {
     };
   }, []);
 
+  // Fetch the make and miss recordings now, so the first shot is not silent
+  useEffect(() => {
+    preloadRecordings(loadSound());
+  }, []);
+
   const active = draft.drills.find((d) => d.key === draft.activeKey) || draft.drills[0];
   const spot = draft.spot ?? null;
   const attempts = attemptsOther ? Number(attemptsOther) : attemptsChoice;
@@ -356,6 +362,9 @@ export default function NewBasketballSessionPage() {
       shots: [...d.shots, { zone: spot.zone, made, x: spot.x + jitter(), y: spot.y + jitter() }],
     }));
     navigator.vibrate?.(made ? 25 : [15, 40, 15]);
+    // The same sounds (and voice, if chosen) as the video tracker, set once in
+    // Settings. Played inside the tap, the only moment iOS lets audio start.
+    announceShot(loadSound(), made, active.shots.filter((s) => s.made).length + (made ? 1 : 0), active.shots.length + 1);
   }
 
   function undo() {

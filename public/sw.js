@@ -11,7 +11,8 @@
 // The 'hoopiq-' prefix is deliberate and is not part of the rename: PAGE_CACHE
 // and the localStorage keys hold a player's unsynced work, and renaming them
 // would strand it on every device that already has the app.
-const CACHE_NAME = 'hoopiq-v4';
+// v5 precaches the make and miss sounds, so a session logged offline is not silent.
+const CACHE_NAME = 'hoopiq-v5';
 const PAGE_CACHE = 'hoopiq-pages-v1';
 const OFFLINE_PAGES = ['/basketball/new', '/workouts/new', '/games/new'];
 
@@ -20,6 +21,8 @@ const ASSETS_TO_CACHE = [
   '/icon-192.png',
   '/icon-512.png',
   '/manifest.json',
+  '/sounds/swish.mp3',
+  '/sounds/rim-clank.mp3',
 ];
 
 // Install event - cache the offline page and icons

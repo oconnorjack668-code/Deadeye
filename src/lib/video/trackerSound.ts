@@ -1,5 +1,7 @@
 // src/lib/video/trackerSound.ts
-// What the tracker does out loud when it calls a shot.
+// What the app does out loud when a shot is called: by the video tracker, or
+// by a player tapping make or miss in the hoops logger. One choice, made once
+// in Settings, for both.
 //
 // A phone on a tripod is several metres away and the player is usually facing
 // the hoop, so the badge on screen is only half the confirmation - vibration
@@ -8,11 +10,11 @@
 //
 // Makes and misses are chosen separately, because they are not equally
 // interesting: a make is the thing worth hearing, and most people want nothing
-// at all for a miss unless it is funny. So misses default to silent while makes
-// default to a swish.
+// at all for a miss unless it is funny. The defaults are two real recordings,
+// a net swish and a rim clank, because those sound like basketball.
 //
-// Everything is synthesised rather than shipped as audio files, which is a
-// licensing decision as much as a technical one. A recording is owned by
+// Almost everything is synthesised rather than shipped as audio files, which is
+// a licensing decision as much as a technical one. A recording is owned by
 // whoever made it - a game's sound effect, a clip of a song, another creator's
 // upload - and being widely shared does not change that, because a licence
 // covering a sound on one platform does not travel to this app. A FORMAT is not
@@ -20,10 +22,18 @@
 // comedic gestures anyone may build their own version of, so these sound like
 // the gag and owe nothing to anyone. If recorded audio is ever added here, it
 // has to be recorded by us or carry a licence covering commercial distribution.
+//
+// The two recordings do: both are CC0 (public domain dedication) on Freesound,
+// which allows commercial use with no attribution, each trimmed to one shot.
+//   /sounds/swish.mp3      the third swish in "Basketball Net Swish Sound.wav"
+//                          by Hann90, https://freesound.org/people/Hann90/sounds/518048/
+//   /sounds/rim-clank.mp3  the first brick in "Sports Basketball Hit Basket Missed"
+//                          by amsaenz03, https://freesound.org/people/amsaenz03/sounds/788261/
 
 // Order is celebration first and understated last, with the swish in front
 // because it is the one that sounds like basketball rather than like a game.
 export const MAKE_SOUNDS = [
+  { id: 'net', label: 'Net swish (real)' },
   { id: 'swish', label: 'Swish' },
   { id: 'airhorn', label: 'Airhorn' },
   { id: 'crowd', label: 'Crowd roar' },
@@ -43,6 +53,7 @@ export const MAKE_SOUNDS = [
 // one is the only reason anyone turns miss sounds on at all. The two flat
 // sounds come last rather than first for the same reason.
 export const MISS_SOUNDS = [
+  { id: 'rim', label: 'Rim clank (real)' },
   { id: 'off', label: 'Silent' },
   { id: 'sad', label: 'Sad trombone' },
   { id: 'wah', label: 'Wah wah' },
@@ -87,8 +98,8 @@ export interface SoundSettings {
 }
 
 export const DEFAULT_SOUND: SoundSettings = {
-  make: 'off',
-  miss: 'off',
+  make: 'net',
+  miss: 'rim',
   voice: 'off',
   voiceUri: null,
   muted: false,
@@ -100,7 +111,11 @@ const isMake = (v: unknown): v is MakeSound => MAKE_SOUNDS.some((s) => s.id === 
 const isMiss = (v: unknown): v is MissSound => MISS_SOUNDS.some((s) => s.id === v);
 const isVoice = (v: unknown): v is VoiceStyle => VOICE_STYLES.some((s) => s.id === v);
 
-/** Reads saved settings. Everything off by default: nobody expects noise unasked. */
+/**
+ * Reads saved settings. Until a player chooses, a make swishes and a miss
+ * clanks, quietly: a player who wants silence turns it off once in Settings or
+ * with the mute button, and a player who chose silence before keeps it.
+ */
 export function loadSound(): SoundSettings {
   try {
     const raw = window.localStorage.getItem(KEY);
@@ -487,11 +502,90 @@ const BRASS: readonly Overtone[] = [
   [2, 0.3],
 ];
 
+// ---------------------------------------------------------------------------
+// The two recordings (licences at the top of this file)
+// ---------------------------------------------------------------------------
+
+// Kept well under full volume and level with each other: the swish peaks about
+// 5 dB under the clank, so it is turned down less
+const RECORDINGS = {
+  net: { url: '/sounds/swish.mp3', gain: 0.6 },
+  rim: { url: '/sounds/rim-clank.mp3', gain: 0.35 },
+} as const;
+type Recording = keyof typeof RECORDINGS;
+
+const downloads = new Map<Recording, Promise<ArrayBuffer | null>>();
+const decoded = new Map<Recording, Promise<AudioBuffer | null>>();
+
+/** Fetches a recording once. A failure is forgotten, so the next shot tries again. */
+function download(id: Recording): Promise<ArrayBuffer | null> {
+  let pending = downloads.get(id);
+  if (!pending) {
+    pending = Promise.resolve()
+      .then(() => fetch(RECORDINGS[id].url))
+      .then((res) => (res.ok ? res.arrayBuffer() : null))
+      .catch(() => null)
+      .then((data) => {
+        if (!data) downloads.delete(id);
+        return data;
+      });
+    downloads.set(id, pending);
+  }
+  return pending;
+}
+
+function recording(c: AudioContext, id: Recording): Promise<AudioBuffer | null> {
+  let pending = decoded.get(id);
+  if (!pending) {
+    pending = download(id)
+      .then((data) => (data ? c.decodeAudioData(data) : null))
+      .catch(() => null)
+      .then((buffer) => {
+        // Decoding takes the downloaded bytes with it, so a retry starts over
+        downloads.delete(id);
+        if (!buffer) decoded.delete(id);
+        return buffer;
+      });
+    decoded.set(id, pending);
+  }
+  return pending;
+}
+
+/**
+ * Starts downloading the recordings these settings use, so the first shot of
+ * a session is not silent. Only the files: decoding needs an audio context,
+ * which waits for the player's first tap.
+ */
+export function preloadRecordings(settings: SoundSettings): void {
+  if (settings.muted) return;
+  if (settings.make === 'net') void download('net');
+  if (settings.miss === 'rim') void download('rim');
+}
+
+function playRecording(r: Rig, id: Recording): void {
+  void recording(r.c, id).then((buffer) => {
+    if (!buffer) return;
+    try {
+      const source = r.c.createBufferSource();
+      source.buffer = buffer;
+      const gain = r.c.createGain();
+      gain.gain.setValueAtTime(RECORDINGS[id].gain, r.c.currentTime);
+      // Through the limiter, but not the reverb: a recording has its own room
+      source.connect(gain).connect(r.master);
+      source.start();
+    } catch {
+      // Context closed underneath us
+    }
+  });
+}
+
 export function playMake(sound: MakeSound): void {
   const r = engine();
   if (!r || sound === 'off') return;
   try {
-    if (sound === 'swish') {
+    if (sound === 'net') {
+      playRecording(r, 'net');
+    } else if (sound === 'swish') {
       // Two layers, because a net is a hiss with a snap on the front
       hit(r, { seconds: 0.24, fromHz: 3000, toHz: 1100, gain: 0.3, q: 0.8, wet: 0.25 });
       hit(r, { seconds: 0.07, fromHz: 900, toHz: 500, gain: 0.1, shape: 'burst', wet: 0.15 });
@@ -640,7 +734,9 @@ export function playMiss(sound: MissSound): void {
   const r = engine();
   if (!r || sound === 'off') return;
   try {
-    if (sound === 'sad') {
+    if (sound === 'rim') {
+      playRecording(r, 'rim');
+    } else if (sound === 'sad') {
       // Three notes down, each one bending as it goes, with the slow vibrato a
       // player would put on it. Entirely unserious, and the whole reason
       // anyone would turn miss sounds on at all.
