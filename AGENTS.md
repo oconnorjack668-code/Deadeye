@@ -31,6 +31,9 @@ instead.
 - Keep durable project decisions in repository documentation, not only in an
   agent conversation. `CLAUDE.md` imports this file, so these rules apply to
   both agents.
+- Session handoffs: before picking up earlier work, read
+  `docs/handoffs/INDEX.md`; when a session ends, write one, following
+  `.claude/skills/handoff/SKILL.md`.
 - Never read, print, commit, or modify `.env.local`. Use `.env.example` for
   configuration requirements.
 - Before handing work over, run the smallest relevant verification, report the

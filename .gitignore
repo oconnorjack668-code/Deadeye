@@ -43,5 +43,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Claude Code session artifacts and scratch worktrees
-.claude/
+# Claude Code session artifacts and scratch worktrees (project skills are shared)
+.claude/*
+!.claude/skills/
