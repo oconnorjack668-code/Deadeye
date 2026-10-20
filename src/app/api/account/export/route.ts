@@ -40,19 +40,32 @@ const USER_TABLES = [
   'team_members',
   'team_assignment_completions',
   'player_reports',
+  'fuel_logs',
+  'daily_iq_answers',
+  'drill_favorites',
+  // The parent consent record, which is about this account
+  'age_checks',
+  // Crash reports sent from this account
+  'app_errors',
 ] as const;
 
 // Browser push keys are secrets, not personal data worth handing out
-const STRIP_COLUMNS: Record<string, string[]> = { push_subscriptions: ['p256dh', 'auth'] };
+// and the consent links are keys to the approval, not information about anyone
+const STRIP_COLUMNS: Record<string, string[]> = {
+  push_subscriptions: ['p256dh', 'auth'],
+  age_checks: ['request_token', 'confirm_token'],
+};
 
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
 
   const admin = createAdminClient();
-  const [authUser, friendships, profile, ...tables] = await Promise.all([
+  const [authUser, friendships, filmQuestions, profile, ...tables] = await Promise.all([
     admin.auth.admin.getUserById(user.id),
     admin.from('friendships').select('*').or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`),
+    // Keyed by player_id rather than user_id
+    admin.from('film_questions').select('*').eq('player_id', user.id),
     admin.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     ...USER_TABLES.map((table) => admin.from(table).select('*').eq('user_id', user.id)),
   ]);
@@ -74,6 +87,7 @@ export async function GET() {
   });
 
   data.friendships = friendships.error ? { error: 'unavailable' } : friendships.data || [];
+  data.film_questions = filmQuestions.error ? { error: 'unavailable' } : filmQuestions.data || [];
 
   const body = {
     exported_at: new Date().toISOString(),

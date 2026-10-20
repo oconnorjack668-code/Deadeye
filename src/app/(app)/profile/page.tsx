@@ -1,5 +1,6 @@
 import React from 'react';
-import { requireUser, getCurrentProfile } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
+import { planLabel } from '@/lib/entitlements';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { User, Pencil, Settings } from 'lucide-react';
@@ -35,7 +36,7 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const profile = await getCurrentProfile();
+  const [profile, subscription] = await Promise.all([getCurrentProfile(), getCurrentSubscription()]);
   const units = asMeasurementSystem(profile?.measurement_system);
 
   return (
@@ -74,7 +75,7 @@ export default async function ProfilePage() {
             <Field label="Level" value={profile?.playing_level ? LEVEL_LABELS[profile.playing_level] : null} />
             <Field label="Age" value={profile?.age_bracket} />
             <Field label="Dominant hand" value={profile?.dominant_hand ? HAND_LABELS[profile.dominant_hand] : null} />
-            <Field label="Plan" value={<Link href="/pro" className="underline">See Deadeye Pro</Link>} />
+            <Field label="Plan" value={<Link href="/pro" className="underline">{planLabel(subscription)}</Link>} />
             <Field label="Units" value={units === 'metric' ? 'Metric (cm, kg)' : 'Imperial (ft, lbs)'} />
           </div>
           {profile?.goals && profile.goals.length > 0 && (

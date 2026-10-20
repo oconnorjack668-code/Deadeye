@@ -270,10 +270,13 @@ export function SettingsClient({
           belongs to the device - and it is set here rather than in the tracker
           because it is chosen once and then wanted on every session. */}
       <Section icon={Volume2} title="Shot sounds">
-        <p className="mb-3 text-xs text-zinc-400">
-          Played when you tap make or miss in a hoops session, and when the video tracker calls a shot.
-        </p>
-        <SoundPicker />
+        {/* One child, so the section draws no divider between the note and the picker */}
+        <div>
+          <p className="px-4 pt-1 text-xs text-zinc-400">
+            Played when you tap make or miss in a hoops session, and when the video tracker calls a shot.
+          </p>
+          <SoundPicker />
+        </div>
       </Section>
 
       <Section icon={Globe} title="Region">

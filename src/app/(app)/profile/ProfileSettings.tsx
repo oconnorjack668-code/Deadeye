@@ -122,8 +122,8 @@ export function ProfileSettings({ initialIsPublic, showLeaderboard = true }: { i
         <CardHeader>
           <CardTitle>Delete account</CardTitle>
           <CardDescription>
-            Permanently deletes your account, training history, AI reports, quiz results and uploaded videos. This
-            cannot be undone.
+            Permanently deletes your account, training history, AI reports, quiz results and uploaded videos, and
+            cancels Pro straight away if you have it. This cannot be undone.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
