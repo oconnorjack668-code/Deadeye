@@ -7,19 +7,21 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
 import { Plus, TrendingUp, Award, Zap } from 'lucide-react';
+import { asMeasurementSystem } from '@/lib/units';
+import { LENGTH_TESTS, TIMED_TESTS, convertResult, lengthUnit } from '@/lib/performanceTests';
 
 export const metadata = {
   title: 'Performance Tests - Deadeye',
 };
 
 const TEST_TYPES = [
-  { id: 'standing_vertical', label: 'Standing Vertical', unit: 'inches', icon: '📈' },
-  { id: 'approach_vertical', label: 'Approach Vertical', unit: 'inches', icon: '🚀' },
-  { id: 'sprint_three_quarter', label: '3/4 Court Sprint', unit: 'seconds', icon: '⚡' },
-  { id: 'sprint_40yd', label: '40 Yard Dash', unit: 'seconds', icon: '💨' },
-  { id: 'lane_agility', label: 'Lane Agility', unit: 'seconds', icon: '🔄' },
-  { id: 'pro_agility_5_10_5', label: 'Pro Agility (5-10-5)', unit: 'seconds', icon: '↔️' },
-  { id: 'standing_broad_jump', label: 'Standing Broad Jump', unit: 'inches', icon: '🦘' },
+  { id: 'standing_vertical', label: 'Standing Vertical', icon: '📈' },
+  { id: 'approach_vertical', label: 'Approach Vertical', icon: '🚀' },
+  { id: 'sprint_three_quarter', label: '3/4 Court Sprint', icon: '⚡' },
+  { id: 'sprint_40yd', label: '40 Yard Dash', icon: '💨' },
+  { id: 'lane_agility', label: 'Lane Agility', icon: '🔄' },
+  { id: 'pro_agility_5_10_5', label: 'Pro Agility (5-10-5)', icon: '↔️' },
+  { id: 'standing_broad_jump', label: 'Standing Broad Jump', icon: '🦘' },
 ];
 
 export default async function PerformanceTestsPage() {
@@ -27,21 +29,28 @@ export default async function PerformanceTestsPage() {
   const supabase = await createClient();
 
   // Fetch all performance tests grouped by type
-  const { data: tests } = await supabase
-    .from('performance_tests')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('test_date', { ascending: false })
-    .returns<Array<{
-      id: string;
-      test_type: string;
-      test_date: string;
-      value: number;
-      unit: string;
-      custom_test_name: string | null;
-      is_personal_record: boolean;
-      notes: string | null;
-    }>>();
+  const [{ data: tests }, { data: profile }] = await Promise.all([
+    supabase
+      .from('performance_tests')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('test_date', { ascending: false })
+      .returns<Array<{
+        id: string;
+        test_type: string;
+        test_date: string;
+        value: number;
+        unit: string;
+        custom_test_name: string | null;
+        is_personal_record: boolean;
+        notes: string | null;
+      }>>(),
+    supabase.from('profiles').select('measurement_system').eq('id', user.id).maybeSingle(),
+  ]);
+
+  // Jumps are shown in the player's own unit, whatever unit each was logged in
+  const system = asMeasurementSystem(profile?.measurement_system);
+  const unitFor = (type: string) => (LENGTH_TESTS.includes(type) ? lengthUnit(system) : 'seconds');
 
   // Group tests by type and find PRs
   const testsByType = (tests || []).reduce(
@@ -66,14 +75,19 @@ export default async function PerformanceTestsPage() {
 
   // Calculate best (PR) and trend for each test type
   const getMetrics = (type: string) => {
-    const typeTests = testsByType[type] || [];
+    // Every result in the card's unit, so 60 cm is not taken as better than 30 inches
+    const unit = unitFor(type);
+    const typeTests = (testsByType[type] || []).flatMap((t) => {
+      const value = convertResult(t, unit);
+      return value === null ? [] : [{ ...t, value }];
+    });
     if (typeTests.length === 0) return null;
 
     const testDef = TEST_TYPES.find((t) => t.id === type);
     if (!testDef) return null;
 
     // For time-based tests, lower is better; for distance, higher is better
-    const isTime = ['sprint_three_quarter', 'sprint_40yd', 'lane_agility', 'pro_agility_5_10_5'].includes(type);
+    const isTime = TIMED_TESTS.includes(type);
     const best = isTime
       ? typeTests.reduce((min, t) => (t.value < min.value ? t : min))
       : typeTests.reduce((max, t) => (t.value > max.value ? t : max));
@@ -87,7 +101,7 @@ export default async function PerformanceTestsPage() {
         ? earlier.every((t) => recent.value < t.value)
         : earlier.every((t) => recent.value > t.value));
 
-    return { best, recent, improved, isTime, testDef };
+    return { best, recent, improved, isTime, testDef, unit };
   };
 
   return (
@@ -129,7 +143,7 @@ export default async function PerformanceTestsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="space-y-1">
                       <h3 className="font-bold text-white">{testType.label}</h3>
-                      <p className="text-xs text-zinc-400">Measured in {testType.unit}</p>
+                      <p className="text-xs text-zinc-400">Measured in {unitFor(testType.id)}</p>
                     </div>
                     <span className="text-2xl">{testType.icon}</span>
                   </div>
@@ -139,13 +153,13 @@ export default async function PerformanceTestsPage() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-zinc-400">Personal Best</span>
                         <span className="font-bold text-emerald-400">
-                          {metrics.best.value} {testType.unit}
+                          {metrics.best.value} {metrics.unit}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-zinc-400">Latest</span>
                         <span className={`font-bold ${metrics.improved ? 'text-orange-400' : 'text-zinc-300'}`}>
-                          {metrics.recent.value} {testType.unit}
+                          {metrics.recent.value} {metrics.unit}
                         </span>
                       </div>
                       {metrics.improved && (
@@ -184,6 +198,9 @@ export default async function PerformanceTestsPage() {
                 {tests.slice(0, 10).map((test) => {
                   const testDef = TEST_TYPES.find((t) => t.id === test.test_type);
                   const isPR = test.is_personal_record;
+                  // Custom tests stay in the unit they were logged in
+                  const converted = testDef ? convertResult(test, unitFor(test.test_type)) : null;
+                  const shown = converted === null ? test : { value: converted, unit: unitFor(test.test_type) };
 
                   return (
                     <div
@@ -212,7 +229,7 @@ export default async function PerformanceTestsPage() {
                       </div>
                       <div className="text-right">
                         <span className="text-lg font-bold text-orange-400">
-                          {test.value} {test.unit}
+                          {shown.value} {shown.unit}
                         </span>
                         {test.notes && (
                           <p className="text-xs text-zinc-500 mt-0.5">{test.notes}</p>

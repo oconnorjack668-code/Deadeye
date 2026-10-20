@@ -36,6 +36,8 @@ interface Drill {
   category: string;
   minutes: number | '';
   shots: TrackedShot[];
+  /** Makes are tracked on the court, but it is not a shooting drill (a layup series). */
+  tracked?: boolean;
 }
 
 interface Spot {
@@ -93,6 +95,11 @@ const CHALLENGE_MINUTES = [1, 3, 5, 10];
 
 function newDrill(name: string, category = 'shooting'): Drill {
   return { key: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, name, category, minutes: '', shots: [] };
+}
+
+/** Drills logged shot by shot on the court, rather than in minutes. */
+function tracksShots(d: Drill): boolean {
+  return d.category === 'shooting' || !!d.tracked;
 }
 
 function pct(makes: number, attempts: number): string {
@@ -198,8 +205,10 @@ export default function NewBasketballSessionPage() {
           .map((s) => bySlug.get(s))
           .filter((d): d is NonNullable<typeof d> => !!d)
           .map((d) =>
+            // A layup or post series still tracks makes, but is saved as the
+            // finishing drill it is rather than as shooting
             d.tracks_makes
-              ? newDrill(d.name)
+              ? { ...newDrill(d.name, sessionCategoryForSkill(d.skill)), tracked: true }
               : { ...newDrill(d.name, sessionCategoryForSkill(d.skill)), minutes: d.duration_minutes }
           );
         if (added.length) {
@@ -207,9 +216,9 @@ export default function NewBasketballSessionPage() {
           // A brand-new session replaces its empty default drill with the chosen ones
           const keep = base ? start.drills : start.drills.filter((d) => d.shots.length > 0);
           const drills = [...keep, ...added];
-          const firstShooting = added.find((d) => d.category === 'shooting');
+          const firstShooting = added.find(tracksShots);
           base = { ...start, drills, activeKey: firstShooting?.key || keep[0]?.key || drills[0].key };
-          if (drills.every((d) => d.category !== 'shooting')) {
+          if (!drills.some(tracksShots)) {
             const shooting = newDrill('Spot shooting');
             base = { ...base, drills: [shooting, ...base.drills], activeKey: shooting.key };
           }
@@ -225,7 +234,7 @@ export default function NewBasketballSessionPage() {
   useEffect(() => {
     if (!ready) return;
     try {
-      const hasContent = draft.drills.some((d) => d.shots.length > 0 || d.category !== 'shooting');
+      const hasContent = draft.drills.some((d) => d.shots.length > 0 || !tracksShots(d));
       if (hasContent) localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
       else localStorage.removeItem(DRAFT_KEY);
     } catch {
@@ -427,7 +436,7 @@ export default function NewBasketballSessionPage() {
   }
 
   function openFinish() {
-    const hasContent = draft.drills.some((d) => d.shots.length > 0 || (d.category !== 'shooting' && d.minutes !== ''));
+    const hasContent = draft.drills.some((d) => d.shots.length > 0 || (!tracksShots(d) && d.minutes !== ''));
     if (!hasContent) {
       setError('Track at least one shot or add a drill before finishing.');
       return;
@@ -480,7 +489,7 @@ export default function NewBasketballSessionPage() {
         notes: notes || null,
       },
       drills: draft.drills
-        .filter((d) => d.shots.length > 0 || d.category !== 'shooting')
+        .filter((d) => d.shots.length > 0 || !tracksShots(d))
         .map((drill) => {
           // One row per zone with the drill's makes and attempts
           const byZone = new Map<CourtZone, { makes: number; attempts: number }>();
@@ -558,7 +567,7 @@ export default function NewBasketballSessionPage() {
   }
 
   const challengeRemaining = challengeEndsAt ? (challengeEndsAt - now) / 1000 : 0;
-  const shootingDrills = draft.drills.filter((d) => d.category === 'shooting');
+  const shootingDrills = draft.drills.filter(tracksShots);
 
   return (
     <div className="flex-1 overflow-auto pb-24">
@@ -828,7 +837,7 @@ export default function NewBasketballSessionPage() {
         {/* Other drills */}
         <div className="mt-4 space-y-2">
           {draft.drills
-            .filter((d) => d.category !== 'shooting')
+            .filter((d) => !tracksShots(d))
             .map((d) => (
               <div key={d.key} className="flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/70 px-3 py-2 text-sm">
                 <span className="text-white">

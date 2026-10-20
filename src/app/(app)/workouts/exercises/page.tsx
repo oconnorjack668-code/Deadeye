@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { MUSCLE_GROUPS, type LibraryExercise } from '@/lib/exercises';
+import { exerciseLevel } from '@/lib/generator';
 import { ArrowLeft, Flame } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -70,6 +71,11 @@ export default async function ExerciseLibraryPage({
                   <div className="font-semibold text-white flex items-center gap-1.5">
                     {e.name}
                     {e.is_basketball_specific && <Flame className="h-3.5 w-3.5 text-orange-400" aria-label="Basketball specific" />}
+                    {exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) === 'advanced' ? (
+                      <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-300">ADVANCED</span>
+                    ) : exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) === 'intermediate' ? (
+                      <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">NOT FOR BEGINNERS</span>
+                    ) : null}
                   </div>
                   <div className="text-xs text-zinc-500">
                     {MUSCLE_GROUPS.find((m) => m.id === e.primary_muscle)?.label || 'Other'}
@@ -79,6 +85,14 @@ export default async function ExerciseLibraryPage({
                 <span className="text-zinc-600 text-xs group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="mt-3 space-y-2 text-sm">
+                {/* The library says nothing else about who an exercise is for, and
+                    many players here are 13 to 15 */}
+                {exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) !== 'beginner' && (
+                  <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                    Learn this one with a coach first, and build up from the easier exercises in this group. Stop if anything
+                    hurts.
+                  </p>
+                )}
                 {e.description && <p className="text-zinc-300">{e.description}</p>}
                 {e.cues?.length > 0 && (
                   <ul className="list-disc pl-5 text-zinc-400 space-y-0.5">

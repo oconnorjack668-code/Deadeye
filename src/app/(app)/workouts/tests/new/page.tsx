@@ -1,7 +1,7 @@
 // src/app/(app)/workouts/tests/new/page.tsx
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { performanceTestSchema } from '@/lib/validation';
@@ -14,15 +14,17 @@ import { Alert } from '@/components/ui/Alert';
 import { ArrowLeft, Award } from 'lucide-react';
 import Link from 'next/link';
 import type { PerformanceTestType } from '@/lib/supabase/types';
+import { asMeasurementSystem, type MeasurementSystem } from '@/lib/units';
+import { LENGTH_TESTS, TIMED_TESTS, isPersonalBest, lengthUnit } from '@/lib/performanceTests';
 
 const TESTS: Array<{ value: PerformanceTestType; label: string }> = [
-  { value: 'standing_vertical', label: 'Standing Vertical (inches)' },
-  { value: 'approach_vertical', label: 'Approach Vertical (inches)' },
-  { value: 'sprint_three_quarter', label: '3/4 Court Sprint (seconds)' },
-  { value: 'sprint_40yd', label: '40 Yard Dash (seconds)' },
-  { value: 'lane_agility', label: 'Lane Agility (seconds)' },
-  { value: 'pro_agility_5_10_5', label: 'Pro Agility 5-10-5 (seconds)' },
-  { value: 'standing_broad_jump', label: 'Standing Broad Jump (inches)' },
+  { value: 'standing_vertical', label: 'Standing Vertical' },
+  { value: 'approach_vertical', label: 'Approach Vertical' },
+  { value: 'sprint_three_quarter', label: '3/4 Court Sprint' },
+  { value: 'sprint_40yd', label: '40 Yard Dash' },
+  { value: 'lane_agility', label: 'Lane Agility' },
+  { value: 'pro_agility_5_10_5', label: 'Pro Agility 5-10-5' },
+  { value: 'standing_broad_jump', label: 'Standing Broad Jump' },
   { value: 'custom', label: 'Custom Test' },
 ];
 
@@ -46,15 +48,29 @@ export default function NewPerformanceTestPage() {
   const [value, setValue] = useState('');
   const [unit, setUnit] = useState('inches');
   const [notes, setNotes] = useState('');
+  const [system, setSystem] = useState<MeasurementSystem>('imperial');
+
+  // Jumps are logged in the player's own unit: metric players measure in cm
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data: profile } = await supabase.from('profiles').select('measurement_system').eq('id', user.id).maybeSingle();
+      if (!cancelled) setSystem(asMeasurementSystem(profile?.measurement_system));
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Determine unit based on test type
   const getUnit = () => {
-    if (['sprint_three_quarter', 'sprint_40yd', 'lane_agility', 'pro_agility_5_10_5'].includes(testType)) {
-      return 'seconds';
-    }
-    if (['standing_vertical', 'approach_vertical', 'standing_broad_jump'].includes(testType)) {
-      return 'inches';
-    }
+    if (TIMED_TESTS.includes(testType)) return 'seconds';
+    if (LENGTH_TESTS.includes(testType)) return lengthUnit(system);
     return unit;
   };
 
@@ -88,22 +104,18 @@ export default function NewPerformanceTestPage() {
         return;
       }
 
-      // PR = best result so far for this test (lower is better for timed tests)
+      // PR = best result so far for this test (lower is better for timed tests),
+      // counting earlier jumps logged in the other unit
       const unitValue = getUnit();
       const lowerIsBetter = unitValue === 'seconds';
       let previousQuery = supabase
         .from('performance_tests')
-        .select('value')
+        .select('value, unit')
         .eq('user_id', user.id)
-        .eq('test_type', testType)
-        .eq('unit', unitValue)
-        .order('value', { ascending: lowerIsBetter })
-        .limit(1);
+        .eq('test_type', testType);
       if (testType === 'custom') previousQuery = previousQuery.eq('custom_test_name', customTestName.trim());
-      const { data: previousBest } = await previousQuery;
-      const bestSoFar = previousBest?.[0]?.value;
-      const isPersonalRecord =
-        bestSoFar === undefined || (lowerIsBetter ? Number(value) < bestSoFar : Number(value) > bestSoFar);
+      const { data: previous } = await previousQuery;
+      const isPersonalRecord = isPersonalBest({ value: Number(value), unit: unitValue }, previous || [], lowerIsBetter);
 
       const insertResponse = await supabase
         .from('performance_tests')

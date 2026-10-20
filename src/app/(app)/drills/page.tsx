@@ -70,11 +70,19 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
         <div className="space-y-2 mb-5">
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
             <Chip href={hrefWith(filters, { skill: undefined })} active={!filters.skill}>All skills</Chip>
-            {DRILL_SKILLS.map((s) => (
-              <Chip key={s.id} href={hrefWith(filters, { skill: s.id })} active={filters.skill === s.id}>
-                {s.label}
-              </Chip>
-            ))}
+            {DRILL_SKILLS.map((s) =>
+              // There are no IQ drills, so the chip opened an empty list. IQ is
+              // trained in the study section instead.
+              s.id === 'iq' ? (
+                <Chip key={s.id} href="/study" active={false}>
+                  {s.label} →
+                </Chip>
+              ) : (
+                <Chip key={s.id} href={hrefWith(filters, { skill: s.id })} active={filters.skill === s.id}>
+                  {s.label}
+                </Chip>
+              )
+            )}
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
             <Chip href={hrefWith(filters, { level: undefined })} active={!filters.level}>Any level</Chip>

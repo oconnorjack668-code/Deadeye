@@ -85,6 +85,10 @@ that data again.
       editor. It adds eight programmes, five of them Athleticism, and makes
       Basketball Strength Foundations the fourth free one. The pricing and
       landing pages already say four free and 18 with Pro.
+- [ ] Run `supabase/migrations/00040_fix_library_tags.sql` in the Supabase SQL
+      editor. It moves the rear delt exercises to pull, makes the Mikan drill a
+      finishing drill and marks the full-court layup drill as needing a hoop.
+      Safe to run more than once.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

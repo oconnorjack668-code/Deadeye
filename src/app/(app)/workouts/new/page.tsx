@@ -110,6 +110,10 @@ export default function NewWorkoutPage() {
     exercises: [],
   }));
 
+  // A routine or plan opened while an unfinished workout was still saved: held
+  // back until the player says which one they want
+  const [waiting, setWaiting] = useState<LoggedExercise[] | null>(null);
+
   const [pickerOpen, setPickerOpen] = useState(false);
   const [finishOpen, setFinishOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -255,9 +259,8 @@ export default function NewWorkoutPage() {
       const routineId = params.get('routine');
       // ?exercises=Name~sets|Name~sets (program day / workout generator)
       const exerciseParam = params.get('exercises');
-      if (saved && saved.exercises.length > 0) {
-        setDraft(saved);
-      } else if (exerciseParam) {
+      let requested: LoggedExercise[] | null = null;
+      if (exerciseParam) {
         const byName = new Map(((lib || []) as LibraryExercise[]).map((e) => [e.name.toLowerCase(), e]));
         const wanted = exerciseParam
           .split('|')
@@ -267,7 +270,7 @@ export default function NewWorkoutPage() {
             return { name: name.trim(), sets: Math.min(10, Math.max(1, Number(sets) || 3)) };
           })
           .filter((w) => w.name);
-        const built = await Promise.all(
+        requested = await Promise.all(
           wanted.map((w) => {
             const match = byName.get(w.name.toLowerCase());
             return buildExercise(
@@ -277,7 +280,6 @@ export default function NewWorkoutPage() {
             );
           })
         );
-        setDraft((d) => ({ ...d, startedAt: Date.now(), exercises: built }));
       } else if (routineId) {
         const { data: routineRows } = await supabase
           .from('routine_exercises')
@@ -285,7 +287,7 @@ export default function NewWorkoutPage() {
           .eq('routine_id', routineId)
           .order('display_order');
         const byId = new Map(((lib || []) as LibraryExercise[]).map((e) => [e.id, e]));
-        const built = await Promise.all(
+        requested = await Promise.all(
           ((routineRows || []) as Array<{ exercise_id: string | null; exercise_name: string; target_sets: number }>).map((r) =>
             buildExercise(
               user.id,
@@ -298,7 +300,15 @@ export default function NewWorkoutPage() {
             )
           )
         );
-        setDraft((d) => ({ ...d, startedAt: Date.now(), exercises: built }));
+      }
+      if (saved && saved.exercises.length > 0) {
+        setDraft(saved);
+        // The unfinished workout used to win without a word, so opening a
+        // program day showed yesterday's exercises instead of today's
+        if (requested && requested.length > 0) setWaiting(requested);
+      } else if (requested) {
+        const exercises = requested;
+        setDraft((d) => ({ ...d, startedAt: Date.now(), exercises }));
       }
       setReady(true);
     })();
@@ -445,6 +455,16 @@ export default function NewWorkoutPage() {
     }
     setLibrary((l) => [...l, data as LibraryExercise].sort((a, b) => a.name.localeCompare(b.name)));
     await pickExercise(data as LibraryExercise);
+  }
+
+  function chooseWorkout(startNew: boolean) {
+    if (!waiting) return;
+    const ticked = draft.exercises.reduce((n, e) => n + e.sets.filter((s) => s.done).length, 0);
+    if (startNew && ticked > 0 && !window.confirm(`Start the new workout? The ${ticked} sets you ticked in the unfinished one will be lost.`)) return;
+    if (startNew) setDraft({ startedAt: Date.now(), workoutDate: localDateString(), workoutType: 'strength', exercises: waiting });
+    setWaiting(null);
+    // Otherwise a reload would ask again
+    window.history.replaceState(null, '', '/workouts/new');
   }
 
   function discardWorkout() {
@@ -615,6 +635,24 @@ export default function NewWorkoutPage() {
             Finish
           </Button>
         </div>
+
+        {waiting && (
+          <div role="status" className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <p className="text-sm font-semibold text-amber-200">You have an unfinished workout</p>
+            <p className="mt-1 text-xs text-zinc-400">
+              Below is the workout you started earlier, with {doneSets} {doneSets === 1 ? 'set' : 'sets'} done. Carry on with it, or start
+              the one you just opened ({waiting.length} {waiting.length === 1 ? 'exercise' : 'exercises'}).
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Button variant="outline" size="sm" onClick={() => chooseWorkout(false)}>
+                Keep this one
+              </Button>
+              <Button variant="primary" size="sm" onClick={() => chooseWorkout(true)}>
+                Start the new one
+              </Button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-2 mb-4">
           <input

@@ -9,6 +9,7 @@ import { Alert } from '@/components/ui/Alert';
 import { getPoseLandmarker } from '@/lib/video/mediapipe';
 import { detectJump, flightSeconds, jumpHeightCm, plausibleFlight, type FootSample } from '@/lib/video/jump';
 import type { MeasurementSystem } from '@/lib/units';
+import { isPersonalBest, lengthUnit } from '@/lib/performanceTests';
 import { localDateString } from '@/lib/dates';
 import { seekTo } from '@/lib/video/seek';
 import { ArrowUpFromLine, ChevronLeft, ChevronRight, FileVideo } from 'lucide-react';
@@ -118,17 +119,15 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
-    const unit = units === 'imperial' ? 'inches' : 'cm';
+    const unit = lengthUnit(units);
     const value = Math.round((units === 'imperial' ? heightCm / 2.54 : heightCm) * 10) / 10;
-    const { data: best } = await supabase
+    // Earlier jumps count whichever unit they were logged in
+    const { data: earlier } = await supabase
       .from('performance_tests')
-      .select('value')
+      .select('value, unit')
       .eq('user_id', user.id)
-      .eq('test_type', testType)
-      .eq('unit', unit)
-      .order('value', { ascending: false })
-      .limit(1);
-    const isPR = best?.[0]?.value === undefined || value > Number(best[0].value);
+      .eq('test_type', testType);
+    const isPR = isPersonalBest({ value, unit }, earlier || [], false);
     const { error } = await supabase.from('performance_tests').insert({
       user_id: user.id,
       test_date: localDateString(),
