@@ -1,6 +1,6 @@
 // src/lib/dashboard.ts
 import { createClient } from '@/lib/supabase/server';
-import { streaks } from '@/lib/achievements';
+import { streakState } from '@/lib/achievements';
 import { addDays } from '@/lib/dates';
 import { userCalendarNow } from '@/lib/userTime';
 import { getPersonalRecordCount, getShotTotals, getStreaksFromDb, getTrainingCounts, getTrainingDates, type ZoneTotal } from '@/lib/player-activity';
@@ -12,6 +12,8 @@ export interface DashboardMetrics {
   currentStreak: number;
   /** A streak is running but today has no training logged yet - still savable. */
   streakAtRisk: boolean;
+  /** Streak freezes ready to cover a missed day. */
+  streakFreezes: number;
   totalSessions: number;
   personalRecords: number;
   weeklyGoalProgress: number;
@@ -55,8 +57,11 @@ export function computeDashboardMetrics(input: MetricsInput): DashboardMetrics {
   // The database knows the whole history; the windowed dates only reach back
   // HISTORY_WINDOW_DAYS. atRisk is answered from the dates either way, since it
   // only looks at the last day or two.
-  const windowed = streaks(trainingDays, today);
-  const current = input.dbStreaks ? input.dbStreaks.current : windowed.current;
+  const windowed = streakState(trainingDays, today);
+  // The larger of the two: the windowed walk knows about freezes even before
+  // migration 00041 teaches them to the database, and the database knows
+  // about anything older than the window
+  const current = Math.max(input.dbStreaks?.current ?? 0, windowed.current);
   // Taken from streaks() rather than recomputed here, so the warning follows
   // the same rest-day rule as the streak it is warning about. It used to fire
   // whenever nothing was logged *yet today*, which now means it would go off
@@ -71,6 +76,7 @@ export function computeDashboardMetrics(input: MetricsInput): DashboardMetrics {
     shootingPercentage: totalAttempts > 0 ? Math.round((totalMakes / totalAttempts) * 1000) / 10 : 0,
     currentStreak: current,
     streakAtRisk: atRisk,
+    streakFreezes: windowed.freezes,
     totalSessions: input.totalSessions,
     personalRecords: input.personalRecords,
     weeklyGoalProgress: weekTrainingDays,

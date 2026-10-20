@@ -292,22 +292,14 @@ export interface StreakRewards {
 /**
  * The XP streaks have paid, from a player's training days.
  *
- * Walks the history with the same rest-day rule as streaks(), so the bonus
- * always matches the streak the player can see. `current` is the live streak
- * as streaks() reports it, which decides what the next day is worth.
+ * Walks the history with the same rules as streaks() - rest day and freezes -
+ * so the bonus always matches the streak the player can see. `current` is the
+ * live streak as streaks() reports it, which decides what the next day is worth.
  */
 export function streakRewards(days: string[], current: number, restDays: number = STREAK_REST_DAYS): StreakRewards {
-  const sorted = [...new Set(days)].sort();
-  const dayMs = 86_400_000;
-  const maxGapMs = (restDays + 1) * dayMs;
   const milestones: Record<number, number> = {};
   let xp = 0;
-  let run = 0;
-  let prev: number | null = null;
-  for (const d of sorted) {
-    const ms = Date.parse(`${d}T00:00:00Z`);
-    run = prev !== null && ms - prev <= maxGapMs ? run + 1 : 1;
-    prev = ms;
+  for (const run of walkStreak(days, { ...TRAINING_STREAK, restDays }).runs) {
     xp += streakDayBonus(run);
     const hit = STREAK_MILESTONES.find((m) => m.days === run);
     if (hit) {
@@ -335,62 +327,164 @@ export function streakRewards(days: string[], current: number, restDays: number 
  * roughly four and a half times longer streaks by three weeks in - and the
  * players here are teenagers with exams, and GAA or soccer the same evening.
  *
- * Two missed days in a row still breaks it. The streak has to mean something.
+ * Two missed days in a row still breaks it, unless a freeze covers one.
  */
 export const STREAK_REST_DAYS = 1;
 
 /**
+ * Streak freezes: every FREEZE_EVERY training days in a streak earns one, and a
+ * player holds up to MAX_FREEZES. When a gap runs past the rest day, a freeze
+ * covers each extra missed day by itself, so a sick week or a school trip does
+ * not wipe out a month of work. Nothing to remember to switch on: a freeze that
+ * has to be bought or equipped in advance is no use to the player who forgot.
+ *
+ * Earned by training, never bought, and capped, so the streak still means
+ * something. Freezes are kept when a streak ends.
+ *
+ * The database walks the same rule in streak_walk() (migration 00041) for the
+ * leaderboard, friends and teams. Change both together.
+ */
+export const FREEZE_EVERY = 7;
+export const MAX_FREEZES = 2;
+
+export interface StreakRule {
+  restDays: number;
+  /** Training days in a streak that earn a freeze; 0 for none. */
+  freezeEvery: number;
+  maxFreezes: number;
+}
+
+export const TRAINING_STREAK: StreakRule = { restDays: STREAK_REST_DAYS, freezeEvery: FREEZE_EVERY, maxFreezes: MAX_FREEZES };
+
+const DAY_MS = 86_400_000;
+const toMs = (d: string) => Date.parse(`${d}T00:00:00Z`);
+const toDay = (ms: number) => new Date(ms).toISOString().slice(0, 10);
+
+/** The days freezes covered in a gap after `from`: those after its rest days. */
+function coveredDays(from: number, count: number, restDays: number): string[] {
+  return Array.from({ length: count }, (_, i) => toDay(from + (restDays + 1 + i) * DAY_MS));
+}
+
+/** A day off that kept a streak going: the rest day, or one a freeze covered. */
+export type KeptDay = 'rest' | 'frozen';
+
+/** Marks the missed days after `from` that a streak survived. */
+function keepGap(kept: Record<string, KeptDay>, from: number, missed: number, restDays: number) {
+  for (let i = 1; i <= missed; i++) kept[toDay(from + i * DAY_MS)] = i <= restDays ? 'rest' : 'frozen';
+}
+
+/**
+ * Every training day in order, with the length of streak it brought the run to,
+ * and the freezes held after the last one. The single walk streaks() and
+ * streakRewards() share, so they cannot drift apart.
+ */
+function walkStreak(days: string[], rule: StreakRule) {
+  const sorted = [...new Set(days)].sort();
+  const runs: number[] = [];
+  let run = 0;
+  let freezes = 0;
+  let longest = 0;
+  let frozen: string[] = [];
+  const kept: Record<string, KeptDay> = {};
+  let last: number | null = null;
+  for (const d of sorted) {
+    const ms = toMs(d);
+    if (last === null) {
+      run = 1;
+    } else {
+      // Missed days beyond the rest day: a gap of 1 is back to back
+      const missed = Math.round((ms - last) / DAY_MS) - 1;
+      const extra = missed - rule.restDays;
+      if (extra <= 0) {
+        keepGap(kept, last, missed, rule.restDays);
+        run += 1;
+      } else if (extra <= freezes) {
+        freezes -= extra;
+        frozen.push(...coveredDays(last, extra, rule.restDays));
+        keepGap(kept, last, missed, rule.restDays);
+        run += 1;
+      } else {
+        run = 1;
+        frozen = [];
+      }
+    }
+    if (rule.freezeEvery > 0 && run % rule.freezeEvery === 0 && freezes < rule.maxFreezes) freezes += 1;
+    longest = Math.max(longest, run);
+    runs.push(run);
+    last = ms;
+  }
+  return { runs, run, freezes, longest, frozen, kept, last };
+}
+
+export interface StreakState {
+  longest: number;
+  current: number;
+  /** The streak ends unless they train today. */
+  atRisk: boolean;
+  /** Freezes ready to use. */
+  freezes: number;
+  /** Days in the current streak that a freeze covered, oldest first. */
+  frozen: string[];
+  /** Training days until the next freeze, or null when holding the most allowed. */
+  nextFreezeIn: number | null;
+  /** Every day off, over the whole history, that a streak survived. */
+  kept: Record<string, KeptDay>;
+}
+
+/**
+ * The full state of a player's streak today, freezes included. Days after
+ * `today` are ignored, as the database does.
+ *
+ * `atRisk` is true when the streak will actually end unless they train today -
+ * that is, the rest day is used and no freeze is left to cover today. Warning
+ * every time someone has not trained *yet today* would cry wolf daily and get
+ * ignored, which is the version of this mechanic that makes people quit.
+ */
+export function streakState(days: string[], today: string, rule: StreakRule = TRAINING_STREAK): StreakState {
+  const w = walkStreak(
+    days.filter((d) => d <= today),
+    rule
+  );
+  const nextIn = (current: number, held: number) =>
+    rule.freezeEvery > 0 && held < rule.maxFreezes ? rule.freezeEvery - (current % rule.freezeEvery) : null;
+  if (w.last === null) return { longest: 0, current: 0, atRisk: false, freezes: 0, frozen: [], nextFreezeIn: nextIn(0, 0), kept: {} };
+
+  const sinceLast = Math.round((toMs(today) - w.last) / DAY_MS);
+  // Missed days before today beyond the rest day; today is still open
+  const extra = sinceLast - 1 - rule.restDays;
+  if (extra > w.freezes) {
+    return { longest: w.longest, current: 0, atRisk: false, freezes: w.freezes, frozen: [], nextFreezeIn: nextIn(0, w.freezes), kept: w.kept };
+  }
+  const used = Math.max(0, extra);
+  const freezes = w.freezes - used;
+  // The days off so far in the gap the streak is in now, not counting today
+  const kept = { ...w.kept };
+  keepGap(kept, w.last, Math.max(0, sinceLast - 1), rule.restDays);
+  return {
+    longest: w.longest,
+    current: w.run,
+    // Missing today too would need one more freeze than they had
+    atRisk: sinceLast >= 1 && sinceLast - rule.restDays > w.freezes,
+    freezes,
+    frozen: [...w.frozen, ...coveredDays(w.last, used, rule.restDays)],
+    nextFreezeIn: nextIn(w.run, freezes),
+    kept,
+  };
+}
+
+/**
  * Longest and current run of training days, plus whether the streak is live
- * but unprotected.
+ * but unprotected. See streakState() for freezes.
  *
  * Counts days trained, not days elapsed: a run of Mon/Wed/Fri is 3, not 5. A
  * number inflated by the days off would be a worse thing to show a player than
  * a smaller honest one.
- *
- * `atRisk` is true when the streak will actually end unless they train today -
- * that is, they have already used their rest day. Warning every time someone
- * has not trained *yet today* would cry wolf daily and get ignored, which is
- * the version of this mechanic that makes people quit.
  */
 export function streaks(
   days: string[],
   today: string,
   restDays: number = STREAK_REST_DAYS
 ): { longest: number; current: number; atRisk: boolean } {
-  const set = new Set(days);
-  const sorted = [...set].sort();
-  const dayMs = 86_400_000;
-  const toMs = (d: string) => Date.parse(`${d}T00:00:00Z`);
-  // A gap this size or smaller keeps a run alive: +1 because consecutive days
-  // are already 1 apart, so one rest day means a gap of 2.
-  const maxGapMs = (restDays + 1) * dayMs;
-
-  let longest = 0;
-  let run = 0;
-  let prev: number | null = null;
-  for (const d of sorted) {
-    const ms = toMs(d);
-    run = prev !== null && ms - prev <= maxGapMs ? run + 1 : 1;
-    longest = Math.max(longest, run);
-    prev = ms;
-  }
-
-  // Walk back from the most recent training day, counting days trained while
-  // the gaps stay inside the allowance.
-  const last = sorted.length ? toMs(sorted[sorted.length - 1]) : null;
-  const sinceLast = last === null ? Infinity : toMs(today) - last;
-  let current = 0;
-  if (last !== null && sinceLast >= 0 && sinceLast <= maxGapMs) {
-    current = 1;
-    let cursor = last;
-    for (let i = sorted.length - 2; i >= 0; i--) {
-      const ms = toMs(sorted[i]);
-      if (cursor - ms > maxGapMs) break;
-      current++;
-      cursor = ms;
-    }
-  }
-
-  // Only once the rest day is spent: train today or the run ends
-  return { longest, current, atRisk: current > 0 && sinceLast === maxGapMs };
+  const { longest, current, atRisk } = streakState(days, today, { ...TRAINING_STREAK, restDays });
+  return { longest, current, atRisk };
 }

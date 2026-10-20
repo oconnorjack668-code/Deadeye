@@ -10,7 +10,8 @@ import {
   challengeProgress,
   levelFor,
   streakRewards,
-  streaks,
+  streakState,
+  MAX_FREEZES,
   xpBreakdown,
   type ChallengeRules,
   type PlayerStats,
@@ -72,8 +73,11 @@ export async function loadAchievements(userId: string) {
   // Prefer the database, which walks the whole history. The windowed dates only
   // reach back HISTORY_WINDOW_DAYS, so before migration 00025 runs the longest
   // streak is capped at that.
-  const windowed = streaks(allDays, today);
-  const { longest, current } = dbStreaks ?? windowed;
+  const windowed = streakState(allDays, today);
+  // The larger of each: the walk here knows about freezes even before
+  // migration 00041 teaches them to the database
+  const longest = Math.max(dbStreaks?.longest ?? 0, windowed.longest);
+  const current = Math.max(dbStreaks?.current ?? 0, windowed.current);
   const lessonRows = (lessons || []) as unknown as Array<{ completed_at: string; study_items: { topic_id: string } | null }>;
 
   const stats: PlayerStats = {
@@ -184,5 +188,12 @@ export async function loadAchievements(userId: string) {
     xpParts,
     level: levelFor(xpParts.total),
     streak,
+    // Worked out from the dates; the database walks the same rule (00041)
+    freeze: {
+      held: windowed.freezes,
+      max: MAX_FREEZES,
+      nextIn: windowed.nextFreezeIn,
+      saved: current > 0 ? windowed.frozen : [],
+    },
   };
 }

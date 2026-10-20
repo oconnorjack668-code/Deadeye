@@ -18,10 +18,11 @@ import {
   Crosshair,
   Lock,
   Check,
+  Snowflake,
 } from 'lucide-react';
 import { requireUser } from '@/lib/auth';
 import { loadAchievements } from '@/lib/achievements-server';
-import { BADGE_XP, STREAK_MILESTONES, STREAK_XP_CAP, STREAK_XP_PER_DAY, TIERS, XP_VALUES, type BadgeGroup } from '@/lib/achievements';
+import { BADGE_XP, FREEZE_EVERY, STREAK_MILESTONES, STREAK_XP_CAP, STREAK_XP_PER_DAY, TIERS, XP_VALUES, type BadgeGroup } from '@/lib/achievements';
 import { TIER_THEME } from '@/lib/tierTheme';
 import { ShareCardButton } from '@/components/ShareCardButton';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
@@ -158,10 +159,47 @@ export default async function AchievementsPage() {
               );
             })}
           </div>
+          {/* Streak freezes: earned by training, used by themselves */}
+          <div className="mt-4 flex items-center gap-3 rounded-xl border border-sky-500/30 bg-sky-500/10 p-3">
+            <div className="flex gap-1" aria-hidden>
+              {Array.from({ length: a.freeze.max }, (_, i) => (
+                <span
+                  key={i}
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${i < a.freeze.held ? 'bg-sky-500/25 text-sky-200' : 'bg-zinc-900 text-zinc-600'}`}
+                >
+                  <Snowflake className="h-5 w-5" />
+                </span>
+              ))}
+            </div>
+            <div className="min-w-0 text-sm">
+              <div className="font-semibold text-white">
+                {a.freeze.held} of {a.freeze.max} streak freezes
+              </div>
+              <div className="text-xs text-zinc-400">
+                {a.freeze.nextIn === null
+                  ? 'Holding the most you can. Keep training to keep them.'
+                  : `Next one in ${a.freeze.nextIn} training day${a.freeze.nextIn === 1 ? '' : 's'}.`}
+              </div>
+            </div>
+          </div>
+          {a.freeze.saved.length > 0 && (
+            <p className="mt-2 text-xs font-semibold text-sky-300">
+              A freeze saved this streak on{' '}
+              {a.freeze.saved
+                .map((d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }))
+                .join(' and ')}
+              .
+            </p>
+          )}
+
           <p className="mt-3 text-xs text-zinc-400">
             Every training day in a streak is worth more than the last, and each milestone pays out every time you reach it. A
-            rest day does not break your streak; missing two days in a row does.
+            rest day does not break your streak. Every {FREEZE_EVERY} training days in a streak earns a freeze, and if you miss
+            more than your rest day, a freeze covers the extra day by itself.
           </p>
+          <Link href="/streak" className="mt-3 inline-block text-sm font-semibold text-orange-300 hover:text-orange-200">
+            See your streak calendar and all your streaks →
+          </Link>
         </section>
 
         {/* Tier road */}

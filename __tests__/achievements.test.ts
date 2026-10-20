@@ -8,10 +8,13 @@ import {
   levelFor,
   streakDayBonus,
   streakRewards,
+  streakState,
   streaks,
   tierFor,
   xpBreakdown,
   xpForLevel,
+  FREEZE_EVERY,
+  MAX_FREEZES,
   MAX_LEVEL,
   STREAK_XP_CAP,
   type PlayerStats,
@@ -165,5 +168,40 @@ describe('achievements', () => {
   it('ignores a date in the future rather than counting it', () => {
     // A clock-skewed device, or a session logged with tomorrow's date
     expect(streaks(['2026-09-30'], '2026-09-25').current).toBe(0);
+  });
+});
+
+describe('streak freezes', () => {
+  const week = (from: number) => Array.from({ length: 7 }, (_, i) => `2026-09-${String(from + i).padStart(2, '0')}`);
+
+  it('earns a freeze for every seven training days, and holds two at most', () => {
+    expect(streakState(week(1).slice(0, 6), '2026-09-06')).toMatchObject({ freezes: 0, nextFreezeIn: 1 });
+    expect(streakState(week(1), '2026-09-07')).toMatchObject({ current: 7, freezes: 1, nextFreezeIn: 7 });
+    const threeWeeks = [...week(1), ...week(8), ...week(15)];
+    expect(streakState(threeWeeks, '2026-09-21')).toMatchObject({ current: 21, freezes: MAX_FREEZES, nextFreezeIn: null });
+    expect(FREEZE_EVERY).toBe(7);
+  });
+
+  it('uses a freeze by itself when a gap runs past the rest day', () => {
+    // Trained 1-7, missed the 8th (rest day) and the 9th (freeze), back on the 10th
+    const s = streakState([...week(1), '2026-09-10'], '2026-09-10');
+    expect(s).toMatchObject({ current: 8, freezes: 0, atRisk: false });
+    expect(s.frozen).toEqual(['2026-09-09']);
+  });
+
+  it('keeps a streak alive while a freeze covers the gap, and warns only when nothing is left', () => {
+    const days = week(1);
+    // Rest day being used, a freeze still in hand: safe
+    expect(streakState(days, '2026-09-09')).toMatchObject({ current: 7, freezes: 1, atRisk: false });
+    // Freeze used for the 9th: today is the last chance
+    expect(streakState(days, '2026-09-10')).toMatchObject({ current: 7, freezes: 0, atRisk: true, frozen: ['2026-09-09'] });
+    // A third missed day with no freeze left ends it, and earned freezes are kept
+    expect(streakState(days, '2026-09-11')).toMatchObject({ current: 0, freezes: 1 });
+  });
+
+  it('pays streak rewards through a frozen day', () => {
+    const days = [...week(1), ...week(10)];
+    expect(streakRewards(days, 14).milestones).toEqual({ 3: 1, 7: 1, 14: 1 });
+    expect(streaks(days, '2026-09-16')).toMatchObject({ longest: 14, current: 14 });
   });
 });

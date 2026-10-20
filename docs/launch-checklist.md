@@ -89,6 +89,10 @@ that data again.
       editor. It moves the rear delt exercises to pull, makes the Mikan drill a
       finishing drill and marks the full-court layup drill as needing a hoop.
       Safe to run more than once.
+- [ ] Run `supabase/migrations/00041_streak_freezes.sql` in the Supabase SQL
+      editor. It teaches the database streak freezes, so the leaderboard,
+      friends list and team pages show the same streak as the dashboard (they
+      also ignored rest days until now). Safe to run more than once.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

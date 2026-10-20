@@ -47,6 +47,7 @@ function StatCard({
   badgeVariant,
   valueClass,
   hint,
+  href,
   children,
 }: {
   label: string;
@@ -55,10 +56,12 @@ function StatCard({
   badgeVariant: React.ComponentProps<typeof Badge>['variant'];
   valueClass: string;
   hint: string;
+  /** Makes the whole card a link. */
+  href?: string;
   children?: React.ReactNode;
 }) {
-  return (
-    <Card className="border-zinc-800 bg-zinc-900/70">
+  const card = (
+    <Card className={`border-zinc-800 bg-zinc-900/70 ${href ? 'h-full transition-colors hover:border-zinc-700' : ''}`}>
       <CardContent className="p-4 md:p-5">
         <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">{label}</div>
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
@@ -71,6 +74,13 @@ function StatCard({
         {children}
       </CardContent>
     </Card>
+  );
+  return href ? (
+    <Link href={href} className="block">
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 
@@ -326,6 +336,7 @@ export default async function DashboardPage() {
               allowed is not every day the player has yet to train. */}
           <StatCard
             label="Streak"
+            href="/streak"
             value={metrics.currentStreak}
             badge="days"
             badgeVariant={metrics.streakAtRisk ? 'warning' : 'success'}
@@ -334,7 +345,9 @@ export default async function DashboardPage() {
               metrics.streakAtRisk
                 ? 'Rest day used - train today to keep it'
                 : metrics.currentStreak > 0
-                  ? 'Safe - a rest day will not break it'
+                  ? metrics.streakFreezes > 0
+                    ? `Safe - ${metrics.streakFreezes} streak freeze${metrics.streakFreezes === 1 ? '' : 's'} ready`
+                    : 'Safe - a rest day will not break it'
                   : 'Train today to start one'
             }
           />
