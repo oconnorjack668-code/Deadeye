@@ -2,6 +2,8 @@
 
 Agent: Claude Code (Opus 5.5, Sonnet 5.5 for one build round) · Commits: 0511ed6, c1a6752, plus this handoff · Status: shipped, pushed, deployed (Vercel production Ready on c1a6752)
 
+The same session (5e7aa9b2) did earlier work, which is in [tracker-streaks-gym-avatars](2026-10-20-tracker-streaks-gym-avatars.md).
+
 ## Outcome
 - New promo in `docs/brand/`: `deadeye-promo-voice.mp4`, `deadeye-promo-silent.mp4` (effects only), `-square` 1080x1080 cuts, old one renamed `deadeye-promo-v1.mp4`. It is the first promo with a voice, new captions, real programmes screen, watermark, grade and sound effects.
 - AI coach replies now render headings, nested lists, bold and italics instead of raw `### ` and `- `.
