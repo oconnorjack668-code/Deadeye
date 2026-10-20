@@ -733,7 +733,18 @@ export default function NewWorkoutPage() {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold text-white">{e.name}</h3>
-                  <p className="text-xs text-zinc-500">{muscleLabel(e.primaryMuscle)}</p>
+                  <p className="text-xs text-zinc-500">
+                    {muscleLabel(e.primaryMuscle)}
+                    {e.history.length > 0 && (
+                      <>
+                        {' · '}
+                        {/* The workout is kept on the phone, so it is all still here on the way back */}
+                        <Link href={`/workouts/exercise?name=${encodeURIComponent(e.name)}`} className="underline hover:text-zinc-300">
+                          history
+                        </Link>
+                      </>
+                    )}
+                  </p>
                   <div role="group" aria-label={`How ${e.name} is measured`} className="mt-1.5 inline-flex rounded-lg bg-zinc-800/70 p-0.5">
                     {(['reps', 'time', 'distance'] as const).map((m) => (
                       <button

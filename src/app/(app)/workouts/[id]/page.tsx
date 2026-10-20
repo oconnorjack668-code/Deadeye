@@ -164,7 +164,11 @@ export default async function WorkoutDetailPage({
               <div className="space-y-4">
                 {groups.map((group) => (
                   <div key={group.name} className="rounded-lg border border-zinc-800/60 bg-zinc-950/50 p-4">
-                    <h3 className="font-bold text-white mb-2">{group.name}</h3>
+                    <h3 className="font-bold text-white mb-2">
+                      <Link href={`/workouts/exercise?name=${encodeURIComponent(group.name)}`} className="hover:text-emerald-300">
+                        {group.name}
+                      </Link>
+                    </h3>
                     <div className="space-y-1">
                       {group.sets.map((set) => (
                         <div key={set.id} className="flex items-center justify-between text-sm">

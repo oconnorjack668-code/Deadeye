@@ -109,6 +109,9 @@ export default async function ExerciseLibraryPage({
                 >
                   Watch how to do it on YouTube
                 </a>
+                <Link href={`/workouts/exercise?name=${encodeURIComponent(e.name)}`} className="ml-4 inline-block text-xs text-zinc-300 underline">
+                  Your history
+                </Link>
               </div>
             </details>
           ))}
