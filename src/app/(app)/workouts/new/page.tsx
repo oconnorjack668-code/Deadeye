@@ -12,10 +12,17 @@ import { Alert } from '@/components/ui/Alert';
 import { ExercisePicker } from '@/components/workouts/ExercisePicker';
 import { localDateString } from '@/lib/dates';
 import {
+  SET_MODE_UNIT,
   categoryForMuscle,
+  defaultSetMode,
+  formatAmount,
+  isAmountRecord,
   isPersonalRecord,
   muscleLabel,
+  setAmount,
+  setModeOf,
   type LibraryExercise,
+  type SetMode,
 } from '@/lib/exercises';
 import {
   asMeasurementSystem,
@@ -40,11 +47,13 @@ import { ArrowLeft, Check, Plus, Trash2, Timer, Trophy, X } from 'lucide-react';
 interface HistorySet {
   weight_kg: number | null;
   reps: number | null;
+  duration_seconds?: number | null;
+  distance_meters?: number | null;
 }
 
 interface LoggedSet {
   weight: string; // in the player's unit
-  reps: string;
+  reps: string; // reps, seconds or metres, by the exercise's mode
   done: boolean;
   isPR: boolean;
 }
@@ -54,6 +63,8 @@ interface LoggedExercise {
   exerciseId: string | null;
   name: string;
   primaryMuscle: string | null;
+  /** Reps, time or distance. Missing on workouts saved before it existed. */
+  mode?: SetMode;
   previous: HistorySet[]; // sets from the last workout with this exercise
   history: HistorySet[]; // all earlier sets (for PR detection)
   sets: LoggedSet[];
@@ -157,7 +168,7 @@ export default function NewWorkoutPage() {
   const loadExerciseHistory = useCallback(async (uid: string, name: string) => {
     const { data } = await getSupabase()
       .from('workout_sets')
-      .select('workout_id, weight_kg, reps, set_number, created_at')
+      .select('workout_id, weight_kg, reps, duration_seconds, distance_meters, set_number, created_at')
       .eq('user_id', uid)
       .eq('exercise_name', name)
       .order('created_at', { ascending: false })
@@ -167,8 +178,11 @@ export default function NewWorkoutPage() {
     const previous = rows
       .filter((r) => r.workout_id === lastWorkoutId)
       .sort((a, b) => a.set_number - b.set_number)
-      .map((r) => ({ weight_kg: r.weight_kg, reps: r.reps }));
-    return { previous, history: rows.map((r) => ({ weight_kg: r.weight_kg, reps: r.reps })) };
+      .map(({ weight_kg, reps, duration_seconds, distance_meters }) => ({ weight_kg, reps, duration_seconds, distance_meters }));
+    return {
+      previous,
+      history: rows.map(({ weight_kg, reps, duration_seconds, distance_meters }) => ({ weight_kg, reps, duration_seconds, distance_meters })),
+    };
   }, []);
 
   const buildExercise = useCallback(
@@ -180,6 +194,9 @@ export default function NewWorkoutPage() {
         exerciseId: exercise.id,
         name: exercise.name,
         primaryMuscle: exercise.primary_muscle,
+        // Measured the way it was last time, so a player who logs a plank in
+        // reps, or switches an exercise to time, keeps their choice
+        mode: previous[0] ? setModeOf(previous[0]) : defaultSetMode(exercise.name),
         previous,
         history,
         sets: Array.from({ length: count }, () => ({ weight: '', reps: '', done: false, isPR: false })),
@@ -367,7 +384,16 @@ export default function NewWorkoutPage() {
   }
 
   function previousFor(e: LoggedExercise, index: number): HistorySet | undefined {
-    return e.previous[index] ?? e.previous[e.previous.length - 1];
+    const mode = e.mode ?? 'reps';
+    // Last time's numbers only help when they were measured the same way
+    const same = e.previous.filter((p) => setModeOf(p) === mode);
+    return same[index] ?? same[same.length - 1];
+  }
+
+  function setMode(e: LoggedExercise, mode: SetMode) {
+    if ((e.mode ?? 'reps') === mode) return;
+    // Numbers typed for reps mean nothing as seconds, so the sets start again
+    updateExercise(e.key, (x) => ({ ...x, mode, sets: x.sets.map((s) => ({ ...s, reps: '', done: false, isPR: false })) }));
   }
 
   function toggleSetDone(e: LoggedExercise, index: number) {
@@ -377,14 +403,24 @@ export default function NewWorkoutPage() {
       return;
     }
     // Empty inputs repeat last time's numbers (one tap for a repeated set)
+    const mode = e.mode ?? 'reps';
     const prev = previousFor(e, index);
+    const prevAmount = prev ? setAmount(prev, mode) : null;
     const weightText = set.weight || (prev?.weight_kg ? String(displayWeight(prev.weight_kg, units)) : '');
-    const repsText = set.reps || (prev?.reps ? String(prev.reps) : '');
+    const repsText = set.reps || (prevAmount ? String(prevAmount) : '');
     const reps = Number(repsText);
     const weight = weightText === '' ? null : Number(weightText);
 
-    if (!Number.isInteger(reps) || reps < 1 || reps > 500) {
+    if (mode === 'reps' && (!Number.isInteger(reps) || reps < 1 || reps > 500)) {
       fail(`${e.name}: enter the reps for set ${index + 1} (a whole number).`);
+      return;
+    }
+    if (mode === 'time' && (!Number.isInteger(reps) || reps < 1 || reps > 3600)) {
+      fail(`${e.name}: enter the seconds for set ${index + 1} (a whole number, up to 3600).`);
+      return;
+    }
+    if (mode === 'distance' && (!Number.isFinite(reps) || reps <= 0 || reps > 10000)) {
+      fail(`${e.name}: enter the metres for set ${index + 1}.`);
       return;
     }
     if (weight !== null && (!Number.isFinite(weight) || weight < 0 || weight > 2000)) {
@@ -394,11 +430,22 @@ export default function NewWorkoutPage() {
     setError(null);
 
     const weightKg = weight === null ? null : inputWeightToKg(weight, units);
-    const pr = isPersonalRecord(weightKg, reps, e.history);
+    // Only compared with earlier sets measured the same way
+    const earlier = e.history.filter((h) => setModeOf(h) === mode);
+    const pr =
+      mode === 'reps'
+        ? isPersonalRecord(weightKg, reps, earlier)
+        : isAmountRecord(
+            weightKg,
+            reps,
+            earlier.map((h) => ({ weight_kg: h.weight_kg, amount: setAmount(h, mode) ?? 0 }))
+          );
     updateSet(e.key, index, { weight: weightText, reps: repsText, done: true, isPR: pr });
     if (pr) {
       setToast(
-        `New PR! ${e.name}: ${weight !== null ? `${weight} ${weightUnitLabel(units)} × ` : ''}${reps} reps`
+        `New PR! ${e.name}: ${weight !== null ? `${weight} ${weightUnitLabel(units)} × ` : ''}${
+          mode === 'reps' ? `${reps} reps` : formatAmount(reps, mode)
+        }`
       );
     }
     setRestEndsAt(Date.now() + restSeconds * 1000);
@@ -530,7 +577,9 @@ export default function NewWorkoutPage() {
             exercise_name: e.name,
             exercise_category: e.primaryMuscle,
             set_number: i + 1,
-            reps: Number(s.reps),
+            reps: (e.mode ?? 'reps') === 'reps' ? Number(s.reps) : null,
+            duration_seconds: e.mode === 'time' ? Number(s.reps) : null,
+            distance_meters: e.mode === 'distance' ? Number(s.reps) : null,
             weight_kg: s.weight === '' ? null : inputWeightToKg(Number(s.weight), units),
             is_personal_record: s.isPR,
           }))
@@ -693,6 +742,21 @@ export default function NewWorkoutPage() {
                 <div>
                   <h3 className="font-bold text-white">{e.name}</h3>
                   <p className="text-xs text-zinc-500">{muscleLabel(e.primaryMuscle)}</p>
+                  <div role="group" aria-label={`How ${e.name} is measured`} className="mt-1.5 inline-flex rounded-lg bg-zinc-800/70 p-0.5">
+                    {(['reps', 'time', 'distance'] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setMode(e, m)}
+                        aria-pressed={(e.mode ?? 'reps') === m}
+                        className={`rounded-md px-2 py-0.5 text-[11px] font-semibold capitalize ${
+                          (e.mode ?? 'reps') === m ? 'bg-zinc-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                        }`}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -708,14 +772,16 @@ export default function NewWorkoutPage() {
                 <span>Set</span>
                 <span>Previous</span>
                 <span className="text-center">{unit}</span>
-                <span className="text-center">Reps</span>
+                <span className="text-center capitalize">{SET_MODE_UNIT[e.mode ?? 'reps']}</span>
                 <span />
               </div>
 
               {e.sets.map((s, i) => {
+                const mode = e.mode ?? 'reps';
                 const prev = previousFor(e, i);
+                const prevAmount = prev ? setAmount(prev, mode) : null;
                 const prevText = prev
-                  ? `${prev.weight_kg ? `${displayWeight(prev.weight_kg, units)}×` : ''}${prev.reps ?? '—'}`
+                  ? `${prev.weight_kg ? `${displayWeight(prev.weight_kg, units)}×` : ''}${formatAmount(prevAmount, mode)}`
                   : '—';
                 return (
                   <div
@@ -738,11 +804,11 @@ export default function NewWorkoutPage() {
                       className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-600"
                     />
                     <input
-                      inputMode="numeric"
+                      inputMode={mode === 'distance' ? 'decimal' : 'numeric'}
                       value={s.reps}
-                      placeholder={prev?.reps ? String(prev.reps) : '0'}
+                      placeholder={prevAmount ? String(prevAmount) : '0'}
                       onChange={(ev) => updateSet(e.key, i, { reps: ev.target.value, done: false, isPR: false })}
-                      aria-label={`${e.name} set ${i + 1} reps`}
+                      aria-label={`${e.name} set ${i + 1} ${mode === 'time' ? 'seconds' : mode === 'distance' ? 'metres' : 'reps'}`}
                       className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-600"
                     />
                     <button

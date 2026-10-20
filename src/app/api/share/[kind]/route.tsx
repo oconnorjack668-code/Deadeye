@@ -12,6 +12,7 @@ import { createClient } from '@/lib/supabase/server';
 import { loadAchievements } from '@/lib/achievements-server';
 import { ZONE_LABELS } from '@/lib/court';
 import { asMeasurementSystem, displayWeight, weightUnitLabel } from '@/lib/units';
+import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
 import { CARD_HEIGHT, CARD_WIDTH, Frame, GameCard, RankCard, SessionCard, WorkoutCard, titleCase } from '@/lib/shareCards';
 
 export const dynamic = 'force-dynamic';
@@ -78,18 +79,27 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
   } else if (kind === 'workout') {
     const { data: workout } = await supabase
       .from('workouts')
-      .select('workout_date, workout_type, duration_minutes, workout_sets(exercise_name, reps, weight_kg, is_personal_record)')
+      .select('workout_date, workout_type, duration_minutes, workout_sets(exercise_name, reps, duration_seconds, distance_meters, weight_kg, is_personal_record)')
       .eq('id', id)
       .eq('user_id', user.id)
       .maybeSingle();
     if (!workout) return new Response('Not found', { status: 404 });
     const units = asMeasurementSystem(profile?.measurement_system);
-    const sets = (workout.workout_sets || []) as unknown as Array<{ exercise_name: string; reps: number; weight_kg: number | null; is_personal_record: boolean }>;
-    const best = new Map<string, { weight: number | null; reps: number; pr: boolean }>();
+    const sets = (workout.workout_sets || []) as unknown as Array<{
+      exercise_name: string;
+      reps: number | null;
+      duration_seconds: number | null;
+      distance_meters: number | null;
+      weight_kg: number | null;
+      is_personal_record: boolean;
+    }>;
+    const best = new Map<string, { weight: number | null; reps: string; pr: boolean }>();
     for (const s of sets) {
       const cur = best.get(s.exercise_name);
       const pr = s.is_personal_record || !!cur?.pr;
-      if (!cur || (s.weight_kg || 0) > (cur.weight || 0)) best.set(s.exercise_name, { weight: s.weight_kg, reps: s.reps, pr });
+      const mode = setModeOf(s);
+      if (!cur || (s.weight_kg || 0) > (cur.weight || 0))
+        best.set(s.exercise_name, { weight: s.weight_kg, reps: formatAmount(setAmount(s, mode), mode), pr });
       else if (pr) cur.pr = true;
     }
     body = (

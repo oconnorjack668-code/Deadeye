@@ -66,3 +66,84 @@ export function isPersonalRecord(
   if (comparable.length === 0) return false; // first time logging it isn't a "record"
   return comparable.every((h) => score > setScore(h.weight_kg, h.reps));
 }
+
+/** How the sets of an exercise are measured. */
+export type SetMode = 'reps' | 'time' | 'distance';
+
+/** Held or done for a time: logging "3 x 8" of a plank means nothing. */
+const TIMED = new Set([
+  'Front Plank',
+  'Side Plank',
+  'Hollow Body Hold',
+  'Copenhagen Plank',
+  'Wall Sit',
+  'Dead Hang',
+  'Plate Pinch Hold',
+  'Deep Squat Hold',
+  'Spanish Squat',
+  'Pigeon Stretch',
+  'Frog Stretch',
+  'Jump Rope',
+  'Air Bike Intervals',
+  'Defensive Slide Intervals',
+  '17s (Sideline-to-Sideline Sprints)',
+  'Suicides (Line Drills)',
+  '5-10-5 Pro Agility Shuttle',
+]);
+
+/** Done for a distance. */
+const DISTANCE = new Set(["Farmer's Carry", 'Suitcase Carry', "Farmer's Walk on Toes", 'Sled Push']);
+
+/** How an exercise is usually measured, before the player has logged it. */
+export function defaultSetMode(name: string): SetMode {
+  if (TIMED.has(name)) return 'time';
+  if (DISTANCE.has(name)) return 'distance';
+  return 'reps';
+}
+
+export interface MeasuredSet {
+  weight_kg: number | null;
+  reps: number | null;
+  duration_seconds?: number | null;
+  distance_meters?: number | null;
+}
+
+/** How a set that was saved was measured. */
+export function setModeOf(s: MeasuredSet): SetMode {
+  if (s.duration_seconds != null && s.reps == null) return 'time';
+  if (s.distance_meters != null && s.reps == null) return 'distance';
+  return 'reps';
+}
+
+/** The reps, seconds or metres of a set, whichever its mode measures. */
+export function setAmount(s: MeasuredSet, mode: SetMode = setModeOf(s)): number | null {
+  const value = mode === 'time' ? s.duration_seconds : mode === 'distance' ? s.distance_meters : s.reps;
+  return value == null ? null : Number(value);
+}
+
+export const SET_MODE_UNIT: Record<SetMode, string> = { reps: 'reps', time: 'sec', distance: 'm' };
+
+/** "12", "45s" or "20 m": the amount of a set, short enough for a table cell. */
+export function formatAmount(amount: number | null, mode: SetMode): string {
+  if (amount == null) return '—';
+  if (mode === 'time') return amount >= 60 ? `${Math.floor(amount / 60)}:${String(amount % 60).padStart(2, '0')}` : `${amount}s`;
+  if (mode === 'distance') return `${amount} m`;
+  return String(amount);
+}
+
+/**
+ * A timed or distance set is a PR when it beats every earlier set of the same
+ * kind (weighted vs bodyweight): at least as long or far with at least as much
+ * weight, and more of one of them. A heavier carry over a shorter distance is
+ * not a record, so neither is a longer one with less weight.
+ */
+export function isAmountRecord(weightKg: number | null, amount: number, history: Array<{ weight_kg: number | null; amount: number }>): boolean {
+  if (!(amount > 0)) return false;
+  const weight = weightKg && weightKg > 0 ? weightKg : 0;
+  const comparable = history.filter((h) => h.amount > 0 && (!!h.weight_kg && h.weight_kg > 0) === weight > 0);
+  if (comparable.length === 0) return false;
+  return comparable.every((h) => {
+    const before = h.weight_kg || 0;
+    return amount >= h.amount && weight >= before && (amount > h.amount || weight > before);
+  });
+}

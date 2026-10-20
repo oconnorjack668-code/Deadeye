@@ -44,7 +44,10 @@ export interface WorkoutSavePayload {
     exercise_name: string;
     exercise_category: string | null;
     set_number: number;
-    reps: number;
+    /** Null for a set done for time or distance. */
+    reps: number | null;
+    duration_seconds?: number | null;
+    distance_meters?: number | null;
     weight_kg: number | null;
     is_personal_record: boolean;
   }>;

@@ -1,5 +1,6 @@
 // src/lib/generator.ts
 // Builds a workout from the drill and exercise libraries for a time budget and focus.
+import { defaultSetMode } from '@/lib/exercises';
 
 export type Focus =
   | 'shooting'
@@ -117,26 +118,16 @@ export function exerciseLevel(e: GenExercise): Level {
   return 'beginner';
 }
 
-/** Exercises done for time, not reps. "Wall Sit 3x6-8" was being prescribed. */
-const HOLDS = new Set([
-  'Front Plank',
-  'Side Plank',
-  'Hollow Body Hold',
-  'Copenhagen Plank',
-  'Wall Sit',
-  'Dead Hang',
-  'Plate Pinch Hold',
-  'Deep Squat Hold',
-  'Spanish Squat',
-]);
-
-/** Exercises done for distance. */
-const CARRIES = new Set(["Farmer's Carry", 'Suitcase Carry', "Farmer's Walk on Toes", 'Sled Push']);
-
-/** What to do for one set of an exercise, given the reps its slot asks for. */
+/**
+ * What to do for one set of an exercise, given the reps its slot asks for.
+ * Holds are done for time and carries for distance: "Wall Sit 3x6-8" was being
+ * prescribed. Which is which comes from the logger's list, so the plan and the
+ * logger measure a set the same way.
+ */
 export function prescriptionFor(name: string, reps: string): string {
-  if (HOLDS.has(name)) return '20-40 sec';
-  if (CARRIES.has(name)) return '20-30 m';
+  const mode = defaultSetMode(name);
+  if (mode === 'time') return '20-40 sec';
+  if (mode === 'distance') return '20-30 m';
   return reps;
 }
 

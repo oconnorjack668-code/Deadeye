@@ -3,6 +3,7 @@ import React from 'react';
 import { requireUser, getCurrentProfile } from '@/lib/auth';
 import { asMeasurementSystem, displayWeight, weightUnitLabel } from '@/lib/units';
 import { fromDateColumn } from '@/lib/dates';
+import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -168,9 +169,9 @@ export default async function WorkoutDetailPage({
                           <span className="text-zinc-500 w-12">Set {set.set_number}</span>
                           <span className="flex-1 font-semibold text-white">
                             {set.weight_kg !== null ? `${displayWeight(set.weight_kg, units)} ${weightUnitLabel(units)} × ` : ''}
-                            {set.reps ?? '—'} reps
-                            {set.duration_seconds !== null ? ` · ${set.duration_seconds}s` : ''}
-                            {set.distance_meters !== null ? ` · ${set.distance_meters} m` : ''}
+                            {setModeOf(set) === 'reps'
+                              ? `${set.reps ?? '—'} reps`
+                              : formatAmount(setAmount(set), setModeOf(set))}
                             {set.rpe !== null ? ` · RPE ${set.rpe}` : ''}
                           </span>
                           {set.is_personal_record && (

@@ -117,7 +117,8 @@ export interface WorkoutCardData {
   volume: number;
   unit: string;
   prs: number;
-  best: Array<{ exercise: string; weight: number | null; reps: number; pr: boolean }>;
+  /** reps: the reps, or a time or distance already formatted ("45s", "20 m"). */
+  best: Array<{ exercise: string; weight: number | null; reps: number | string; pr: boolean }>;
 }
 
 export function WorkoutCard({ date, type, minutes, sets, volume, unit, prs, best }: WorkoutCardData) {

@@ -6,6 +6,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/types';
+import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
 
 // These queries use PostgREST's embedded-resource syntax (e.g. `session_drills(session_id)`),
 // which this hand-written schema doesn't model (that needs real foreign-key metadata from
@@ -23,7 +24,14 @@ interface WorkoutRow {
   workout_type: string;
   duration_minutes: number;
   rpe: number;
-  workout_sets: Array<{ exercise_name: string; reps: number; weight_kg: number | null; is_personal_record: boolean }>;
+  workout_sets: Array<{
+    exercise_name: string;
+    reps: number | null;
+    duration_seconds: number | null;
+    distance_meters: number | null;
+    weight_kg: number | null;
+    is_personal_record: boolean;
+  }>;
 }
 interface EnrollmentRow {
   started_at: string;
@@ -77,7 +85,7 @@ export async function buildPlayerContext(
       .limit(2000),
     supabase
       .from('workouts')
-      .select('id, workout_date, workout_type, duration_minutes, rpe, workout_sets(exercise_name, reps, weight_kg, is_personal_record)')
+      .select('id, workout_date, workout_type, duration_minutes, rpe, workout_sets(exercise_name, reps, duration_seconds, distance_meters, weight_kg, is_personal_record)')
       .eq('user_id', userId)
       .gte('workout_date', since)
       .order('workout_date', { ascending: false })
@@ -178,10 +186,12 @@ export async function buildPlayerContext(
       week.minutes += w.duration_minutes || 0;
       weekDays.add(w.workout_date);
     }
-    const best = new Map<string, { weight: number | null; reps: number; pr: boolean }>();
+    const best = new Map<string, { weight: number | null; reps: string; pr: boolean }>();
     for (const set of w.workout_sets || []) {
       const cur = best.get(set.exercise_name);
-      if (!cur || (set.weight_kg || 0) > (cur.weight || 0)) best.set(set.exercise_name, { weight: set.weight_kg, reps: set.reps, pr: set.is_personal_record });
+      const mode = setModeOf(set);
+      if (!cur || (set.weight_kg || 0) > (cur.weight || 0))
+        best.set(set.exercise_name, { weight: set.weight_kg, reps: formatAmount(setAmount(set, mode), mode), pr: set.is_personal_record });
     }
     const top = [...best.entries()]
       .slice(0, 6)
