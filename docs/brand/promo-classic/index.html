@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <!--
+      The first promo, kept as it was, with these changes:
+      - the logo sting after the first shot is cut (hook 0-2.8s, then straight into the makes and misses)
+      - the "Train smarter" tiles are replaced by the real programmes screen and true numbers
+      - a Deadeye watermark at the top, a light grade, and the end card held for the last voice line
+      Pieces come from scripts/build-classic.mjs; voice and effects are added by scripts/mux-classic.mjs.
+    -->
+    <style>
+      @font-face { font-family: Anton; src: url('assets/fonts/Anton-Regular.ttf') format('truetype'); font-weight: 400; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #09090b; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: Oswald, sans-serif; color: #fff; }
+      .abs { position: absolute; }
+      video.full { left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; z-index: 1; }
+
+      /* programmes scene, in the first promo's style: blurred gym, red pill, big condensed title, one card */
+      #progbg { left: -60px; top: -60px; width: 1200px; height: 2040px; object-fit: cover; z-index: 1; filter: blur(28px) brightness(0.32) saturate(0.8); }
+      .pillchip { left: 0; width: 1080px; top: 262px; z-index: 4; display: flex; justify-content: center; }
+      .pillchip span { font-family: Montserrat, sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0.12em; text-transform: uppercase; background: #e11d2a; padding: 8px 26px 9px; border-radius: 40px; }
+      .bigtitle { left: 0; width: 1080px; top: 318px; z-index: 4; display: flex; flex-direction: column; align-items: center; font-family: Anton, Oswald, sans-serif; text-transform: uppercase; line-height: 1.02; }
+      .bigtitle b { font-weight: 400; font-size: 132px; letter-spacing: 0.005em; }
+      .bigtitle i { font-style: normal; font-size: 74px; color: #ff3b3b; margin-top: 6px; }
+      video.card { z-index: 3; left: 110px; top: 620px; width: 860px; height: 827px; border-radius: 36px; }
+      .cardframe { z-index: 4; left: 110px; top: 620px; width: 860px; height: 827px; border-radius: 36px; border: 2px solid rgba(255, 255, 255, 0.14); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); }
+
+      #darkshade { left: 0; top: 0; width: 1080px; height: 1920px; z-index: 2; background: linear-gradient(180deg, rgba(9, 9, 11, 0.45), rgba(9, 9, 11, 0.7)); }
+      .cl { left: 0; width: 1008px; z-index: 10; display: flex; justify-content: center; }
+      .cl span { display: inline-block; text-align: center; white-space: nowrap; font-family: Anton, Oswald, sans-serif; font-weight: 400; font-size: 108px; text-transform: uppercase; letter-spacing: 0.005em; color: #fff; background: #0b0b0d; padding: 0 32px; border-radius: 6px; }
+      .cl span.r { color: #ff3b3b; }
+      #wm { left: 0; width: 1080px; top: 128px; z-index: 9; display: flex; justify-content: center; align-items: center; gap: 12px; opacity: 0.92; }
+      #wm img { width: 46px; height: 46px; border-radius: 11px; box-shadow: 0 0 16px rgba(255, 45, 45, 0.45); }
+      #wm span { font-size: 34px; font-weight: 700; letter-spacing: 0.16em; }
+      #flash { left: 0; top: 0; width: 1080px; height: 1920px; z-index: 8; background: #fff; opacity: 0; }
+      .vig { left: 0; top: 0; width: 1080px; height: 1920px; z-index: 2; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 42%, rgba(0, 0, 0, 0) 58%, rgba(0, 0, 0, 0.34) 100%); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="24.53" data-width="1080" data-height="1920">
+      <video id="cHook" class="clip abs full" src="assets/classic/hook.mp4" muted playsinline data-start="0" data-duration="2.8" data-track-index="1"></video>
+      <video id="cMiddle" class="clip abs full" src="assets/classic/middle.mp4" muted playsinline data-start="2.8" data-duration="12.23" data-track-index="1"></video>
+
+      <!-- programmes: the real screen, sped up -->
+      <img id="progbg" class="clip abs" src="assets/screens/tap.jpg" alt="" data-start="15.03" data-duration="2.4" data-track-index="2" />
+      <div id="progChip" class="clip abs pillchip" data-start="15.03" data-duration="2.4" data-track-index="4"><span>Built for hoopers</span></div>
+      <div id="progTitle" class="clip abs bigtitle" data-start="15.03" data-duration="2.4" data-track-index="5"><b>18 programmes</b><i>4 free &middot; 150 drills</i></div>
+      <video id="cProg" class="clip abs card" src="assets/screens/programs.mp4" muted playsinline data-start="15.03" data-duration="2.4" data-track-index="3"></video>
+      <div id="progFrame" class="clip abs cardframe" data-start="15.03" data-duration="2.4" data-track-index="6"></div>
+
+      <video id="cClose" class="clip abs full" src="assets/classic/close.mp4" muted playsinline data-start="17.43" data-duration="7.1" data-track-index="1"></video>
+
+      <!-- a quick white flash where the logo sting used to be, as the first promo did going into the makes -->
+      <div id="flash" class="clip abs" data-start="2.7" data-duration="0.35" data-track-index="9"></div>
+      <!-- clean footage for the closing line, over the first promo's "No sensors" shot -->
+      <video id="cDark" class="clip abs full" src="assets/classic/dark.mp4" muted playsinline data-start="17.43" data-duration="2.1" data-track-index="2" style="z-index: 2"></video>
+      <div id="darkshade" class="clip abs" data-start="17.43" data-duration="2.1" data-track-index="3"></div>
+
+      <!-- new captions, each line over the first promo's caption it replaces (blurred out in the footage), timed to the voice -->
+      <div id="hk1" class="clip abs cl" style="top: 1141px" data-start="0.08" data-duration="1.72" data-track-index="10"><span class="" style="height: 162px; line-height: 162px; min-width: 941px">Set your phone down</span></div>
+      <div id="hk2" class="clip abs cl" style="top: 1293px" data-start="0.45" data-duration="1.35" data-track-index="10"><span class="" style="height: 164px; line-height: 164px; min-width: 502px">And shoot.</span></div>
+      <div id="hk3" class="clip abs cl" style="top: 1449px" data-start="0.85" data-duration="0.95" data-track-index="10"><span class="r" style="height: 164px; line-height: 164px; min-width: 553px">It counts for you.</span></div>
+      <div id="hk4" class="clip abs cl" style="top: 1283px" data-start="1.8" data-duration="1" data-track-index="10"><span class="r" style="height: 168px; line-height: 168px; min-width: 641px">It counts for you.</span></div>
+      <div id="sh1" class="clip abs cl" style="top: 1319px" data-start="2.8" data-duration="0.86" data-track-index="10"><span class="" style="height: 164px; line-height: 164px; min-width: 420px">It calls your makes</span></div>
+      <div id="sh2" class="clip abs cl" style="top: 1319px" data-start="3.66" data-duration="0.76" data-track-index="10"><span class="" style="height: 164px; line-height: 164px; min-width: 453px">And misses</span></div>
+      <div id="sh3" class="clip abs cl" style="top: 1319px" data-start="4.42" data-duration="1.28" data-track-index="10"><span class="r" style="height: 164px; line-height: 164px; min-width: 564px">As they happen.</span></div>
+      <div id="sh4a" class="clip abs cl" style="top: 1150px" data-start="5.7" data-duration="2.65" data-track-index="10"><span class="" style="height: 164px; line-height: 164px">You just</span></div>
+      <div id="sh4b" class="clip abs cl" style="top: 1319px" data-start="5.7" data-duration="2.65" data-track-index="10"><span class="r" style="height: 164px; line-height: 164px; min-width: 697px">Keep shooting.</span></div>
+      <div id="ap1" class="clip abs cl" style="top: 241px" data-start="8.35" data-duration="2.12" data-track-index="10"><span class="" style="height: 163px; line-height: 163px; min-width: 612px">Tap both sides</span></div>
+      <div id="ap2" class="clip abs cl" style="top: 391px" data-start="8.35" data-duration="2.12" data-track-index="10"><span class="r" style="height: 162px; line-height: 162px; min-width: 366px">Of the rim.</span></div>
+      <div id="ap3" class="clip abs cl" style="top: 241px" data-start="10.47" data-duration="1" data-track-index="10"><span class="" style="height: 163px; line-height: 163px; min-width: 495px">Any gym.</span></div>
+      <div id="ap4" class="clip abs cl" style="top: 395px" data-start="10.47" data-duration="1" data-track-index="10"><span class="r" style="height: 158px; line-height: 158px; min-width: 563px">Off to one side.</span></div>
+      <div id="ap5" class="clip abs cl" style="top: 303px" data-start="11.5" data-duration="1.9" data-track-index="10"><span class="" style="height: 168px; line-height: 168px; min-width: 761px">Check your form</span></div>
+      <div id="ap6" class="clip abs cl" style="top: 303px" data-start="13.4" data-duration="1.63" data-track-index="10"><span class="" style="height: 168px; line-height: 168px; min-width: 835px">Ask your coach</span></div>
+      <div id="cl1" class="clip abs cl" style="top: 1150px" data-start="17.43" data-duration="2.1" data-track-index="10"><span class="" style="height: 164px; line-height: 164px">All you need is</span></div>
+      <div id="cl2" class="clip abs cl" style="top: 1319px" data-start="17.43" data-duration="2.1" data-track-index="10"><span class="r" style="height: 164px; line-height: 164px">A phone and a hoop.</span></div>
+      <div id="vig" class="clip abs vig" data-start="0" data-duration="19.53" data-track-index="7"></div>
+      <div id="wm" class="clip abs" data-start="0" data-duration="19.53" data-track-index="8"><img src="assets/logo.png" alt="" /><span>DEADEYE</span></div>
+    </div>
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const ease = 'power3.out';
+      tl.fromTo('#progChip span', { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.2, ease }, 15.03);
+      tl.fromTo('#progTitle b', { opacity: 0, y: 40, scale: 1.08 }, { opacity: 1, y: 0, scale: 1, duration: 0.28, ease }, 15.06);
+      tl.fromTo('#progTitle i', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.24, ease }, 15.3);
+      tl.fromTo('#cProg', { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.32, ease }, 15.1);
+      tl.fromTo('#progFrame', { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.32, ease }, 15.1);
+      tl.fromTo('#flash', { opacity: 0 }, { opacity: 0.85, duration: 0.1, ease: 'power1.in' }, 2.7);
+      tl.to('#flash', { opacity: 0, duration: 0.22, ease: 'power2.out' }, 2.8);
+      document.querySelectorAll('.cl span').forEach((el) => {
+        const s = parseFloat(el.parentElement.getAttribute('data-start'));
+        tl.fromTo(el, { scale: 1.1 }, { scale: 1, duration: 0.14, ease: 'power2.out' }, s);
+      });
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

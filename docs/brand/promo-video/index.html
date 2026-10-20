@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/data/hud-data.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #09090b; }
+      :root { --red: #ff2d2d; --green: #22c55e; --ink: #09090b; --card: #14141a; }
+      #root { position: relative; width: 100%; height: 100%; font-family: Oswald, Montserrat, sans-serif; color: #fff; overflow: hidden; }
+      .abs { position: absolute; }
+      /* z-order: bg 0, footage 1, cards 3, tracker HUD 5, captions 8, title cards 10 */
+      #bg { inset: 0; z-index: 0; background: radial-gradient(900px 700px at 50% 30%, #2a0d0f 0%, #0f0a0c 55%, #09090b 100%); }
+      video.foot { left: 0; top: 0; width: 1080px; height: 1920px; z-index: 1; object-fit: cover; }
+
+      /* captions: kept in the middle band, clear of the right-hand buttons and the bottom text */
+      .capwrap { left: 60px; width: 900px; display: flex; justify-content: center; z-index: 8; }
+      .cap { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; font-weight: 700; text-transform: uppercase; font-size: 92px; line-height: 1.08; letter-spacing: 0.01em; }
+      .cap .t { display: inline-block; background: rgba(10, 10, 12, 0.84); padding: 0.06em 0.34em 0.1em; border-radius: 10px; }
+      .cap .r { color: #ff3b3b; }
+      .cap.sm { font-size: 80px; }
+      .cap.plain { line-height: 1.04; font-size: 80px; gap: 4px; }
+      .cap.plain .t { background: none; padding: 0; }
+      .capwrap.mid { left: 0; width: 1080px; }
+      .chip.mid { left: 0; width: 1080px; }
+      .chip { left: 60px; width: 900px; display: flex; justify-content: center; z-index: 8; }
+      .chip span { font-size: 32px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; background: var(--red); color: #fff; padding: 5px 16px 6px; border-radius: 6px; }
+
+      /* app cards */
+      .cardwrap { left: 0; width: 1080px; display: flex; justify-content: center; align-items: center; z-index: 3; }
+      .cardwrap img { display: block; max-width: 980px; max-height: 1000px; border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.16); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); }
+      video.appvid { z-index: 3; border-radius: 30px; }
+      .vframe { z-index: 4; border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.14); pointer-events: none; }
+
+      /* tracker HUD */
+      #wm { left: 0; width: 1080px; top: 196px; z-index: 9; display: flex; justify-content: center; align-items: center; gap: 14px; opacity: 0.92; }
+      #wm img { width: 54px; height: 54px; border-radius: 13px; box-shadow: 0 0 18px rgba(255, 45, 45, 0.45); }
+      #wm span { font-size: 40px; font-weight: 700; letter-spacing: 0.16em; color: #fff; }
+      #hud { inset: 0; z-index: 5; }
+      .vig { position: absolute; inset: 0; z-index: 2; pointer-events: none; background: radial-gradient(ellipse 75% 60% at 50% 42%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.42) 100%); }
+      #hud svg { position: absolute; inset: 0; width: 1080px; height: 1920px; }
+      .ball { left: 0; top: 0; width: 112px; height: 112px; margin: -56px 0 0 -56px; border: 4px solid #4ade80; border-radius: 10px; opacity: 0; box-shadow: 0 0 20px rgba(74, 222, 128, 0.55); }
+      .ball b { position: absolute; left: -4px; top: -30px; background: #16a34a; color: #fff; font-size: 20px; letter-spacing: 0.1em; padding: 1px 8px 2px; border-radius: 4px; }
+      .pill { left: 60px; top: 300px; z-index: 6; display: flex; align-items: center; gap: 14px; font-size: 50px; font-weight: 700; background: rgba(8, 8, 10, 0.82); border: 2px solid rgba(255, 255, 255, 0.18); border-radius: 40px; padding: 6px 24px 8px 18px; letter-spacing: 0.04em; }
+      .pill img { width: 46px; height: 46px; border-radius: 11px; }
+      .pill u { text-decoration: none; color: #4ade80; }
+      .pill em { font-style: normal; color: #a1a1aa; font-size: 28px; }
+      .badge { left: 60px; top: 560px; z-index: 6; font-size: 124px; font-weight: 700; letter-spacing: 0.02em; padding: 4px 30px 8px; border-radius: 14px; color: #fff; transform-origin: left center; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); }
+      .badge.make { background: #16a34a; }
+      .badge.miss { background: #dc2626; }
+
+      /* logo sting and end card */
+      .title { inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(800px 800px at 50% 45%, #2b0b0e 0%, #0b0709 60%, #09090b 100%); }
+      .title img { width: 260px; height: 260px; border-radius: 56px; box-shadow: 0 0 90px rgba(255, 45, 45, 0.55); }
+      .title h1 { font-size: 190px; font-weight: 700; letter-spacing: 0.1em; margin-top: 40px; line-height: 1; padding-left: 0.1em; }
+      .title p { font-size: 42px; font-weight: 700; letter-spacing: 0.32em; color: var(--red); margin-top: 22px; text-transform: uppercase; }
+      .endcard { gap: 0; }
+      .endcard .corner { position: absolute; width: 90px; height: 90px; border: 0 solid var(--red); }
+      .endcard h2 { font-size: 124px; font-weight: 700; letter-spacing: 0.03em; line-height: 1; margin-top: 38px; text-transform: uppercase; }
+      .offer { margin-top: 34px; text-align: center; border: 3px solid var(--red); background: rgba(255, 45, 45, 0.1); border-radius: 14px; padding: 14px 34px 18px; }
+      .offer small { display: block; font-size: 30px; letter-spacing: 0.3em; color: #ff6b6b; font-weight: 700; }
+      .offer span { display: block; font-size: 76px; font-weight: 700; line-height: 1.1; text-transform: uppercase; }
+      .url { margin-top: 34px; background: #fff; color: #09090b; font-size: 54px; font-weight: 700; letter-spacing: 0.02em; padding: 6px 30px 8px; border-radius: 40px; font-family: Montserrat, sans-serif; }
+      .fine { margin-top: 26px; font-size: 32px; color: #a1a1aa; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 400; }
+
+      /* rim set-up card */
+      #tapwrap { left: 90px; top: 642px; width: 900px; height: 900px; z-index: 3; }
+      #tapwrap img { width: 900px; height: 900px; border-radius: 30px; border: 2px solid rgba(255, 255, 255, 0.16); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55); display: block; }
+      .tapdot { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border: 5px solid #fff; border-radius: 50%; background: rgba(255, 45, 45, 0.55); opacity: 0; }
+      .tapsay { position: absolute; left: 0; right: 0; bottom: 18px; text-align: center; font-size: 36px; font-weight: 700; letter-spacing: 0.08em; opacity: 0; }
+      .tapsay span { background: rgba(8, 8, 10, 0.85); padding: 4px 18px 6px; border-radius: 8px; color: #4ade80; }
+      #darkshade { inset: 0; z-index: 2; background: linear-gradient(180deg, rgba(9, 9, 11, 0.55), rgba(9, 9, 11, 0.8)); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="32" data-width="1080" data-height="1920">
+      <div id="bg" class="clip abs" data-start="0" data-duration="32" data-track-index="0"></div>
+      <div id="wm" class="clip abs" data-start="0" data-duration="26.8" data-track-index="9"><img src="assets/logo.png" alt="" /><span>DEADEYE</span></div>
+
+      <!-- ===== 1. Hook and tracker: real footage (16606) with the tracker's own ball track drawn over it ===== -->
+      <div id="footwrap" class="abs" style="inset: 0; z-index: 1">
+      <video id="vA" class="clip abs foot" src="assets/clips/shoot-a.mp4" muted playsinline data-start="0" data-duration="4" data-track-index="1"></video>
+      <video id="vB" class="clip abs foot" src="assets/clips/shoot-b.mp4" muted playsinline data-start="4" data-duration="1.7" data-track-index="1"></video>
+      <video id="vC" class="clip abs foot" src="assets/clips/shoot-c.mp4" muted playsinline data-start="5.7" data-duration="1.7" data-track-index="1"></video>
+      <video id="vD" class="clip abs foot" src="assets/clips/shoot-d.mp4" muted playsinline data-start="7.4" data-duration="1.7" data-track-index="1"></video>
+
+      <div class="vig"></div>
+      <div id="hud" class="clip abs" data-start="0" data-duration="9.1" data-track-index="2">
+        <svg viewBox="0 0 1080 1920">
+          <line x1="582" y1="421" x2="836" y2="382" stroke="rgba(0,0,0,0.35)" stroke-width="11" stroke-linecap="round" />
+          <line x1="582" y1="421" x2="836" y2="382" stroke="#fb923c" stroke-width="7" stroke-linecap="round" />
+          <circle cx="582" cy="421" r="12" fill="#fb923c" stroke="#fff" stroke-width="3" />
+          <circle cx="836" cy="382" r="12" fill="#fb923c" stroke="#fff" stroke-width="3" />
+          <circle id="rimflash" cx="709.2" cy="401.7" r="100" fill="none" stroke="#4ade80" stroke-width="4" opacity="0" />
+          <path id="trA" fill="none" stroke="#ff4d4d" stroke-width="9" style="filter: drop-shadow(0 0 7px rgba(255, 60, 60, 0.85))" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+          <path id="trB" fill="none" stroke="#ff4d4d" stroke-width="9" style="filter: drop-shadow(0 0 7px rgba(255, 60, 60, 0.85))" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+          <path id="trC" fill="none" stroke="#ff4d4d" stroke-width="9" style="filter: drop-shadow(0 0 7px rgba(255, 60, 60, 0.85))" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+          <path id="trD" fill="none" stroke="#ff4d4d" stroke-width="9" style="filter: drop-shadow(0 0 7px rgba(255, 60, 60, 0.85))" stroke-linecap="round" stroke-linejoin="round" opacity="0" />
+        </svg>
+        <div id="bxA" class="ball abs"><b>BALL</b></div>
+        <div id="bxB" class="ball abs"><b>BALL</b></div>
+        <div id="bxC" class="ball abs"><b>BALL</b></div>
+        <div id="bxD" class="ball abs"><b>BALL</b></div>
+      </div>
+      </div>
+
+      <!-- live count: 0/0 then 1/1, 2/2, 2/3, 3/4 as each call lands -->
+      <div class="clip abs pill" data-start="0" data-duration="2.7" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>0/0</b></div>
+      <div class="clip abs pill" data-start="2.7" data-duration="1.3" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>1/1</b> <u>100%</u></div>
+      <div class="clip abs pill" data-start="4" data-duration="1.0" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>1/1</b> <u>100%</u></div>
+      <div class="clip abs pill" data-start="5" data-duration="1.7" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>2/2</b> <u>100%</u></div>
+      <div class="clip abs pill" data-start="6.7" data-duration="1.7" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>2/3</b> <u style="color:#fca5a5">67%</u></div>
+      <div class="clip abs pill" data-start="8.4" data-duration="0.7" data-track-index="3"><img src="assets/logo.png" alt="" />LIVE <b>3/4</b> <u>75%</u></div>
+
+      <div id="bgA" class="clip abs badge make" data-start="2.7" data-duration="1.3" data-track-index="4">&#10003; MAKE</div>
+      <div id="bgB" class="clip abs badge make" data-start="5.1" data-duration="0.6" data-track-index="4">&#10003; MAKE</div>
+      <div id="bgC" class="clip abs badge miss" data-start="6.8" data-duration="0.6" data-track-index="4">&#10005; MISS</div>
+      <div id="bgD" class="clip abs badge make" data-start="8.5" data-duration="0.6" data-track-index="4">&#10003; MAKE</div>
+
+      <div class="clip capwrap abs" style="top: 1130px" data-start="0" data-duration="2.1" data-track-index="5"><div class="cap"><span class="t">Set your phone</span><span class="t">down and shoot.</span></div></div>
+      <div class="clip capwrap abs" style="top: 1130px" data-start="2.1" data-duration="1.9" data-track-index="5"><div class="cap"><span class="t">It counts <span class="r">for you.</span></span></div></div>
+      <div class="clip capwrap abs" style="top: 1130px" data-start="4" data-duration="1.7" data-track-index="5"><div class="cap"><span class="t">Make.</span></div></div>
+      <div class="clip capwrap abs" style="top: 1130px" data-start="5.7" data-duration="1.7" data-track-index="5"><div class="cap"><span class="t">Miss.</span><span class="t"><span class="r">That counts too.</span></span></div></div>
+      <div class="clip capwrap abs" style="top: 1130px" data-start="7.4" data-duration="1.7" data-track-index="5"><div class="cap sm"><span class="t">Live, while you&rsquo;re</span><span class="t"><span class="r">still shooting.</span></span></div></div>
+
+      <!-- ===== rim set-up ===== -->
+      <div class="clip chip mid abs" style="top: 358px" data-start="9.1" data-duration="1.5" data-track-index="5"><span>Set up</span></div>
+      <div class="clip capwrap mid abs" style="top: 428px" data-start="9.1" data-duration="1.5" data-track-index="6"><div class="cap plain"><span class="t">Tap both sides</span><span class="t"><span class="r">of the rim.</span></span></div></div>
+      <div id="tapwrap" class="clip abs" data-start="9.1" data-duration="1.5" data-track-index="7">
+        <img src="assets/screens/tap.jpg" alt="" />
+        <div id="tap1" class="tapdot" style="left: 368px; top: 300px"></div>
+        <div id="tap2" class="tapdot" style="left: 461px; top: 300px"></div>
+        <div id="tapsay" class="tapsay"><span>RIM SET</span></div>
+      </div>
+
+      <!-- ===== form check (real recording, sped up) ===== -->
+      <div class="clip chip mid abs" style="top: 355px" data-start="10.6" data-duration="2.0" data-track-index="5"><span>Form check</span></div>
+      <div class="clip capwrap mid abs" style="top: 425px" data-start="10.6" data-duration="2.0" data-track-index="6"><div class="cap plain"><span class="t">Film a shot.</span><span class="t"><span class="r">It measures your form.</span></span></div></div>
+      <video id="vForm" class="clip abs appvid" src="assets/screens/form.mp4" muted playsinline style="left: 50px; top: 639px; width: 980px; height: 907px" data-start="10.6" data-duration="2.0" data-track-index="7"></video>
+      <div class="clip abs vframe" style="left: 50px; top: 639px; width: 980px; height: 907px" data-start="10.6" data-duration="2.0" data-track-index="8"></div>
+
+      <!-- ===== AI coach ===== -->
+      <div class="clip chip mid abs" style="top: 367px" data-start="12.6" data-duration="2.4" data-track-index="5"><span>AI coach</span></div>
+      <div class="clip capwrap mid abs" style="top: 437px" data-start="12.6" data-duration="2.4" data-track-index="6"><div class="cap plain"><span class="t">Ask the coach about</span><span class="t"><span class="r">your own numbers.</span></span></div></div>
+      <div id="cardCQ" class="clip cardwrap abs" style="top: 651px; height: 882px" data-start="12.6" data-duration="1.2" data-track-index="7"><img src="assets/screens/coach-q.jpg" alt="" /></div>
+      <div id="cardCA" class="clip cardwrap abs" style="top: 651px; height: 882px" data-start="13.8" data-duration="1.2" data-track-index="7"><img src="assets/screens/coach-a.jpg" alt="" /></div>
+
+      <!-- ===== shot chart ===== -->
+      <div class="clip chip mid abs" style="top: 357px" data-start="15" data-duration="1.4" data-track-index="5"><span>Shot chart</span></div>
+      <div class="clip capwrap mid abs" style="top: 427px" data-start="15" data-duration="1.4" data-track-index="6"><div class="cap plain"><span class="t">See where you</span><span class="t"><span class="r">hit from.</span></span></div></div>
+      <div id="cardChart" class="clip cardwrap abs" style="top: 641px; height: 903px" data-start="15" data-duration="1.4" data-track-index="7"><img src="assets/screens/chart.jpg" alt="" /></div>
+
+      <!-- ===== drills ===== -->
+      <div class="clip chip mid abs" style="top: 419px" data-start="16.4" data-duration="1.6" data-track-index="5"><span>Drills</span></div>
+      <div class="clip capwrap mid abs" style="top: 489px" data-start="16.4" data-duration="1.6" data-track-index="6"><div class="cap plain"><span class="t">150 drills.</span><span class="t"><span class="r">All free.</span></span></div></div>
+      <div id="cardDrills" class="clip cardwrap abs" style="top: 703px; height: 778px" data-start="16.4" data-duration="1.6" data-track-index="7"><img src="assets/screens/drills.jpg" alt="" /></div>
+
+      <!-- ===== programmes (real recording, sped up) ===== -->
+      <div class="clip chip mid abs" style="top: 337px" data-start="18" data-duration="2.0" data-track-index="5"><span>Programmes</span></div>
+      <div class="clip capwrap mid abs" style="top: 407px" data-start="18" data-duration="2.0" data-track-index="6"><div class="cap plain"><span class="t">18 programmes.</span><span class="t"><span class="r">4 are free.</span></span></div></div>
+      <video id="vProg" class="clip abs appvid" src="assets/screens/programs.mp4" muted playsinline style="left: 50px; top: 621px; width: 980px; height: 942px" data-start="18" data-duration="2.0" data-track-index="7"></video>
+      <div class="clip abs vframe" style="left: 50px; top: 621px; width: 980px; height: 942px" data-start="18" data-duration="2.0" data-track-index="8"></div>
+
+      <!-- ===== Basketball IQ ===== -->
+      <div class="clip chip mid abs" style="top: 308px" data-start="20" data-duration="1.8" data-track-index="5"><span>Basketball IQ</span></div>
+      <div class="clip capwrap mid abs" style="top: 378px" data-start="20" data-duration="1.8" data-track-index="6"><div class="cap plain"><span class="t">36 lessons and</span><span class="t"><span class="r">a question every day.</span></span></div></div>
+      <div id="cardIQQ" class="clip cardwrap abs" style="top: 592px; height: 1000px" data-start="20" data-duration="1.0" data-track-index="7"><img src="assets/screens/iq-q.jpg" alt="" /></div>
+      <div id="cardIQ" class="clip cardwrap abs" style="top: 592px; height: 1000px; align-items: flex-start" data-start="21" data-duration="0.8" data-track-index="7"><img src="assets/screens/iq.jpg" alt="" /></div>
+
+      <!-- ===== levels ===== -->
+      <div class="clip chip mid abs" style="top: 558px" data-start="21.8" data-duration="1.2" data-track-index="5"><span>Levels</span></div>
+      <div class="clip capwrap mid abs" style="top: 628px" data-start="21.8" data-duration="1.2" data-track-index="6"><div class="cap plain"><span class="t">Level 1 to 50</span><span class="t"><span class="r">as you train.</span></span></div></div>
+      <div id="cardLevel" class="clip cardwrap abs" style="top: 842px; height: 500px" data-start="21.8" data-duration="1.2" data-track-index="7"><img src="assets/screens/level.jpg" alt="" /></div>
+
+      <!-- ===== streak ===== -->
+      <div class="clip chip mid abs" style="top: 597px" data-start="23" data-duration="1.2" data-track-index="5"><span>Streak</span></div>
+      <div class="clip capwrap mid abs" style="top: 667px" data-start="23" data-duration="1.2" data-track-index="6"><div class="cap plain"><span class="t">A rest day won&rsquo;t</span><span class="t"><span class="r">break your streak.</span></span></div></div>
+      <div id="cardStreak" class="clip cardwrap abs" style="top: 881px; height: 423px" data-start="23" data-duration="1.2" data-track-index="7"><img src="assets/screens/streak.jpg" alt="" /></div>
+
+      <!-- ===== gym ===== -->
+      <div class="clip chip mid abs" style="top: 313px" data-start="24.2" data-duration="1.2" data-track-index="5"><span>Gym</span></div>
+      <div class="clip capwrap mid abs" style="top: 383px" data-start="24.2" data-duration="1.2" data-track-index="6"><div class="cap plain"><span class="t">Gym days count too.</span><span class="t"><span class="r">160+ exercises.</span></span></div></div>
+      <div id="cardGym" class="clip cardwrap abs" style="top: 597px; height: 990px" data-start="24.2" data-duration="1.2" data-track-index="7"><img src="assets/screens/gym.jpg" alt="" /></div>
+
+      <!-- ===== close ===== -->
+      <video id="vDark" class="clip abs foot" src="assets/clips/dark.mp4" muted playsinline data-media-start="0.4" data-start="25.4" data-duration="1.4" data-track-index="1"></video>
+      <div id="darkshade" class="clip abs" data-start="25.4" data-duration="1.4" data-track-index="2"></div>
+      <div class="clip capwrap abs" style="top: 1130px" data-start="25.4" data-duration="1.4" data-track-index="5"><div class="cap sm"><span class="t">All you need is</span><span class="t"><span class="r">a phone and a hoop.</span></span></div></div>
+
+      <div id="endcard" class="clip abs title endcard" data-start="26.8" data-duration="5.2" data-track-index="6">
+        <div class="corner" style="left: 60px; top: 330px; border-left-width: 6px; border-top-width: 6px"></div>
+        <div class="corner" style="right: 60px; top: 330px; border-right-width: 6px; border-top-width: 6px"></div>
+        <div class="corner" style="left: 60px; bottom: 330px; border-left-width: 6px; border-bottom-width: 6px"></div>
+        <div class="corner" style="right: 60px; bottom: 330px; border-right-width: 6px; border-bottom-width: 6px"></div>
+        <img src="assets/logo.png" alt="" style="width: 200px; height: 200px; border-radius: 44px" />
+        <h1 style="font-size: 170px; margin-top: 30px">DEADEYE</h1>
+        <h2>Free to start</h2>
+        <div class="offer"><small>First 100 players</small><span>3 months of Pro free</span></div>
+        <div class="url">deadeyeapp.vercel.app</div>
+        <div class="fine">Works in your browser &middot; link in bio</div>
+      </div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const D = window.HUD;
+      const ease = 'power3.out';
+
+      // ---- tracker overlay: ball box and trail replay the detector's own track -------------------
+      const shotStart = { a: 0, b: 4.0, c: 5.7, d: 7.4 };
+      const GAP = 0.15; // a gap longer than this means the ball was lost, so the box hides
+      function trackShot(key) {
+        const G = shotStart[key];
+        const { arc, after, call, result } = D.shots[key];
+        const box = '#bx' + key.toUpperCase();
+        const trail = '#tr' + key.toUpperCase();
+        // the box rides the ball while it is in frame, and goes at the call
+        const vis = arc.filter((p) => p[2] > -20);
+        tl.set(box, { opacity: 1, x: vis[0][1], y: vis[0][2] }, G + vis[0][0]);
+        for (let i = 1; i < vis.length; i++) tl.to(box, { x: vis[i][1], y: vis[i][2], duration: vis[i][0] - vis[i - 1][0], ease: 'none' }, G + vis[i - 1][0]);
+        tl.set(box, { opacity: 0 }, G + call);
+        // the trail draws itself along the arc, then follows the ball through the net or off the rim
+        const path = [...arc, ...after];
+        let L = 0; const cum = [0];
+        for (let i = 1; i < path.length; i++) { L += Math.hypot(path[i][1] - path[i - 1][1], path[i][2] - path[i - 1][2]); cum.push(L); }
+        const el = document.querySelector(trail);
+        el.setAttribute('d', path.map((p, i) => (i ? 'L' : 'M') + p[1] + ' ' + p[2]).join(' '));
+        el.style.strokeDasharray = L + ' ' + L;
+        tl.set(trail, { opacity: 1, strokeDashoffset: L }, G + path[0][0]);
+        for (let i = 1; i < path.length; i++) tl.to(trail, { strokeDashoffset: L - cum[i], duration: path[i][0] - path[i - 1][0], ease: 'none' }, G + path[i - 1][0]);
+        tl.to(trail, { opacity: 0, duration: 0.35 }, G + call + 0.5);
+        // the call: a thin circle pulses off the rim, the badge lands
+        const flashColor = result === 'make' ? '#4ade80' : '#f87171';
+        tl.set('#rimflash', { attr: { stroke: flashColor }, opacity: 0, scale: 1, svgOrigin: '709.2 401.7' }, G + call - 0.02);
+        tl.fromTo('#rimflash', { opacity: 0.9, scale: 0.9 }, { opacity: 0, scale: 2.1, duration: 0.6, ease: 'power2.out', immediateRender: false }, G + call);
+        tl.fromTo('#bg' + key.toUpperCase(), { scale: 1.5, opacity: 0, rotation: -8 }, { scale: 1, opacity: 1, rotation: -3, duration: 0.2, ease: 'back.out(2)' }, G + call + 0.1);
+      }
+      ['a', 'b', 'c', 'd'].forEach(trackShot);
+
+      // ---- caption pops and card entrances ---------------------------------------------------------
+      document.querySelectorAll('.capwrap .cap').forEach((el) => {
+        const start = parseFloat(el.parentElement.getAttribute('data-start'));
+        tl.fromTo(el, { y: 26, opacity: 0, scale: 0.94 }, { y: 0, opacity: 1, scale: 1, duration: 0.2, ease }, start + 0.03);
+      });
+      document.querySelectorAll('.chip span').forEach((el) => {
+        const start = parseFloat(el.parentElement.getAttribute('data-start'));
+        tl.fromTo(el, { opacity: 0, y: -14 }, { opacity: 1, y: 0, duration: 0.18, ease }, start);
+      });
+      document.querySelectorAll('.cardwrap img').forEach((el) => {
+        const start = parseFloat(el.parentElement.getAttribute('data-start'));
+        const dur = parseFloat(el.parentElement.getAttribute('data-duration'));
+        tl.fromTo(el, { y: 70, opacity: 0, scale: 0.96 }, { y: 0, opacity: 1, scale: 1, duration: 0.28, ease }, start + 0.04);
+        tl.to(el, { scale: 1.045, duration: dur - 0.3, ease: 'none', transformOrigin: '50% 30%' }, start + 0.3);
+      });
+      document.querySelectorAll('.pill').forEach((el) => {
+        const start = parseFloat(el.getAttribute('data-start'));
+        tl.fromTo(el, { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.2, ease }, start);
+      });
+
+      // ---- rim taps ------------------------------------------------------------------------------
+      function tap(sel, at) {
+        tl.fromTo(sel, { opacity: 0, scale: 2.4 }, { opacity: 1, scale: 1, duration: 0.22, ease: 'power3.out' }, at);
+      }
+      tap('#tap1', 9.1 + 0.3);
+      tap('#tap2', 9.1 + 0.7);
+      tl.fromTo('#tapsay', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.2 }, 9.1 + 1.0);
+
+      // ---- logo sting and end card ---------------------------------------------------------------
+      tl.fromTo('#endcard > *', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.32, ease, stagger: 0.1 }, 26.85);
+
+      // ---- camera on the footage: settle in, punch in on each call, whip between shots --------------
+      const CAM = { transformOrigin: '709px 402px' };
+      tl.fromTo('#footwrap', { scale: 1.12, filter: 'blur(8px)' }, { scale: 1, filter: 'blur(0px)', duration: 0.45, ease: 'power3.out', ...CAM }, 0);
+      [2.6, 5.0, 6.7, 8.4].forEach((t) => tl.fromTo('#footwrap', { scale: 1 }, { scale: 1.06, duration: 0.22, ease: 'power3.out', immediateRender: false, ...CAM }, t));
+      [4.0, 5.7, 7.4].forEach((t) => tl.fromTo('#footwrap', { scale: 1.18, x: 90, filter: 'blur(14px)' }, { scale: 1, x: 0, filter: 'blur(0px)', duration: 0.2, ease: 'power2.out', immediateRender: false, ...CAM }, t));
+
+      window.__timelines['main'] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+.hyperframes/
+renders/
+node_modules/
+
+# cut from ../deadeye-promo-v1.mp4 by ../promo-video/scripts/build-classic.mjs
+assets/classic/hook.mp4
+assets/classic/middle.mp4
+assets/classic/close.mp4
