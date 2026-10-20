@@ -50,3 +50,46 @@ export function reminderDue(prefs: ReminderPrefs, now: Date): { due: boolean; lo
     prefs.last_reminded_on !== date;
   return { due, localDate: date };
 }
+
+/**
+ * Whether tonight's reminder window is open at all: the chosen hour has come
+ * and nothing was sent today. Unlike reminderDue, any day of the week, because
+ * a streak about to end is worth one message even on a day off.
+ */
+export function reminderWindowOpen(prefs: ReminderPrefs, now: Date): boolean {
+  const { date, hour } = localParts(now, prefs.timezone);
+  const reminderHour = Number(prefs.reminder_time.split(':')[0]);
+  return prefs.reminder_enabled && prefs.push_enabled && hour >= reminderHour && prefs.last_reminded_on !== date;
+}
+
+export interface ReminderPush {
+  title: string;
+  body: string;
+  url: string;
+}
+
+/**
+ * What tonight's push says, if anything, for a player who has not trained today.
+ *
+ * A streak that ends tonight is the one message sent on any day: warning while
+ * it can still be saved is what a streak is for, and finding out the next
+ * morning is the version of this that makes people quit. Only from two days,
+ * because "your 1-day streak" is not worth a buzz. Otherwise, only on the days
+ * the player chose.
+ */
+export function reminderPush(input: {
+  chosenDay: boolean;
+  streak: { current: number; atRisk: boolean };
+  programName?: string | null;
+}): ReminderPush | null {
+  const { current, atRisk } = input.streak;
+  if (atRisk && current >= 2) {
+    return { title: `Your ${current}-day streak ends tonight 🔥`, body: 'Any session or workout today keeps it alive.', url: '/basketball/new' };
+  }
+  if (!input.chosenDay) return null;
+  if (input.programName) return { title: 'Time to train 🏀', body: `Your next ${input.programName} session is ready.`, url: '/dashboard' };
+  if (current >= 2) {
+    return { title: 'Time to train 🏀', body: `You are on a ${current}-day streak. Get some reps in to keep it going.`, url: '/basketball/new' };
+  }
+  return { title: 'Time to train 🏀', body: 'Get some reps in and build your streak.', url: '/basketball/new' };
+}

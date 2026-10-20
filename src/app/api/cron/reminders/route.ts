@@ -4,7 +4,9 @@
 // (Vercel Cron sends it as "Authorization: Bearer <CRON_SECRET>").
 import { createAdminClient } from '@/lib/supabase/admin';
 import { pushConfigured, sendPush } from '@/lib/push';
-import { reminderDue, type ReminderPrefs } from '@/lib/reminders';
+import { reminderDue, reminderPush, reminderWindowOpen, type ReminderPrefs } from '@/lib/reminders';
+import { streakState } from '@/lib/achievements';
+import { addDays } from '@/lib/dates';
 import { deleteAccount } from '@/lib/accountDeletion';
 import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 import { FOUNDING_REMINDER_DAYS } from '@/lib/founding';
@@ -82,8 +84,10 @@ export async function GET(request: Request) {
   let skipped = 0;
   for (const p of (prefs || []) as Array<ReminderPrefs & { user_id: string }>) {
     if (lockedIds.has(p.user_id)) continue;
-    const { due, localDate } = reminderDue(p, now);
-    if (!due) continue;
+    // Any day once the hour has come: a streak about to end is warned about
+    // even on a day the player did not pick. Other reminders keep to their days.
+    if (!reminderWindowOpen(p, now)) continue;
+    const { due: chosenDay, localDate } = reminderDue(p, now);
 
     // Already trained today? Then no nudge needed.
     const [{ count: sessions }, { count: workouts }, { data: subs }, { data: enrollment }] = await Promise.all([
@@ -92,16 +96,16 @@ export async function GET(request: Request) {
       admin.from('push_subscriptions').select('endpoint, p256dh, auth').eq('user_id', p.user_id),
       admin.from('program_enrollments').select('training_programs(name)').eq('user_id', p.user_id).eq('status', 'active').maybeSingle(),
     ]);
-    await admin.from('notification_preferences').update({ last_reminded_on: localDate }).eq('user_id', p.user_id);
     if ((sessions || 0) + (workouts || 0) > 0 || !subs?.length) {
+      if (chosenDay) await admin.from('notification_preferences').update({ last_reminded_on: localDate }).eq('user_id', p.user_id);
       skipped++;
       continue;
     }
 
     const programName = (enrollment as unknown as { training_programs: { name: string } | null } | null)?.training_programs?.name;
-    const payload = programName
-      ? { title: 'Time to train 🏀', body: `Your next ${programName} session is ready.`, url: '/dashboard' }
-      : { title: 'Time to train 🏀', body: 'Get some reps in and build your streak.', url: '/basketball/new' };
+    const payload = reminderPush({ chosenDay, streak: await streakFor(admin, p.user_id, localDate), programName });
+    if (!payload) continue;
+    await admin.from('notification_preferences').update({ last_reminded_on: localDate }).eq('user_id', p.user_id);
     for (const s of subs) {
       const result = await sendPush(s, payload);
       if (result === 'sent') sent++;
@@ -115,6 +119,22 @@ export async function GET(request: Request) {
   });
 
   return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, foundingReminders });
+}
+
+/**
+ * The player's streak tonight, from their training days, with the same rest
+ * day and freezes the app shows them. A year back is plenty for any streak
+ * that could end tonight.
+ */
+async function streakFor(admin: ReturnType<typeof createAdminClient>, userId: string, today: string) {
+  const since = addDays(today, -400);
+  const [{ data: sessions }, { data: workouts }] = await Promise.all([
+    admin.from('training_sessions').select('session_date').eq('user_id', userId).gte('session_date', since),
+    admin.from('workouts').select('workout_date').eq('user_id', userId).gte('workout_date', since),
+  ]);
+  const days = [...(sessions || []).map((s) => s.session_date), ...(workouts || []).map((w) => w.workout_date)];
+  const { current, atRisk } = streakState(days, today);
+  return { current, atRisk };
 }
 
 /**

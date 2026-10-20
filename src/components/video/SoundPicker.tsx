@@ -202,12 +202,19 @@ export function SoundStatus({
       >
         {audible ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
       </button>
-      <span className="min-w-0 flex-1 truncate text-xs text-zinc-400">{soundSummary(value)}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-xs text-zinc-300">{soundSummary(value)}</span>
+        {/* The picker lives in Settings, so say what is there: most players never
+            find a choice they were not told about */}
+        <span className="block text-[11px] leading-snug text-zinc-500">
+          Pick your make and miss sounds in Settings: airhorn, crowd roar, sad trombone and more.
+        </span>
+      </span>
       <Link
-        href="/settings"
-        className="flex flex-shrink-0 items-center gap-0.5 text-xs text-cyan-400 underline"
+        href="/settings#sounds"
+        className="flex flex-shrink-0 items-center gap-0.5 text-xs font-semibold text-cyan-400 underline"
       >
-        Change <ChevronRight className="h-3 w-3" />
+        Sounds <ChevronRight className="h-3 w-3" />
       </Link>
     </div>
   );

@@ -211,6 +211,9 @@ export function RemindersCard({ isPro = false }: { isPro?: boolean }) {
                 className="rounded-lg bg-zinc-800 px-2 py-1 text-white"
               />
             </label>
+            <p className="text-xs text-zinc-500">
+              If your streak would end tonight, you also get one warning at this time, even on a day you did not pick.
+            </p>
             <div className="flex flex-wrap gap-2">
               {deviceOn ? (
                 <>
