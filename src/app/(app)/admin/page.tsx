@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, MessageSquareWarning } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, MessageSquareWarning, PlayCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -59,6 +59,15 @@ export default async function AdminPage() {
       badge: 'count' in crashes && crashes.count > 0 ? `${crashes.count} open` : null,
       tile: 'bg-red-600/20',
       iconColor: 'text-red-400',
+    },
+    {
+      href: '/admin/demo-videos',
+      icon: PlayCircle,
+      title: 'Demo videos',
+      desc: 'Pick the YouTube video that plays on each drill, exercise and IQ lesson',
+      badge: null,
+      tile: 'bg-sky-600/20',
+      iconColor: 'text-sky-400',
     },
     {
       href: '/admin/detector-bench',

@@ -32,3 +32,30 @@ export function youtubeEmbedUrl(id: string): string {
 export function youtubeSearchUrl(query: string): string {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 }
+
+/**
+ * The video id from anything the owner might paste in Owner tools: a watch
+ * link, a youtu.be share link, a Shorts or embed link, or the bare id. Null if
+ * it is not a YouTube video, so nothing else can ever be stored or embedded.
+ */
+export function youtubeIdFromLink(input: string): string | null {
+  const text = input.trim();
+  if (YOUTUBE_ID.test(text)) return text;
+  let url: URL;
+  try {
+    url = new URL(/^https?:\/\//.test(text) ? text : `https://${text}`);
+  } catch {
+    return null;
+  }
+  const host = url.hostname.replace(/^(www\.|m\.|music\.)/, '');
+  let id: string | null = null;
+  if (host === 'youtu.be') id = url.pathname.slice(1).split('/')[0];
+  else if (host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    if (url.pathname === '/watch') id = url.searchParams.get('v');
+    else {
+      const [, kind, value] = url.pathname.split('/');
+      if (kind === 'shorts' || kind === 'embed' || kind === 'live' || kind === 'v') id = value ?? null;
+    }
+  }
+  return id && YOUTUBE_ID.test(id) ? id : null;
+}

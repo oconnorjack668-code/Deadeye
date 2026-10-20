@@ -93,6 +93,10 @@ that data again.
       editor. It teaches the database streak freezes, so the leaderboard,
       friends list and team pages show the same streak as the dashboard (they
       also ignored rest days until now). Safe to run more than once.
+- [ ] Run `supabase/migrations/00042_drill_favourites_and_demo_videos.sql` in
+      the Supabase SQL editor. It turns on favourite drills and lets you pick a
+      demo video for each drill and exercise in Owner tools → Demo videos
+      (lessons work there already). Safe to run more than once.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

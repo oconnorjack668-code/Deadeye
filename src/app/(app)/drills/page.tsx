@@ -4,13 +4,23 @@ import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { DRILL_LEVELS, DRILL_PLAYERS, DRILL_SKILLS, skillLabel, type Drill } from '@/lib/drills';
-import { ListChecks, Clock, User, Users } from 'lucide-react';
+import { ListChecks, Clock, Search, Star, User, Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'Drill Library - Deadeye' };
 
-type Filters = { skill?: string; level?: string; players?: string };
+type Filters = { skill?: string; level?: string; players?: string; q?: string; fav?: string };
+
+/**
+ * A search as typed, cut down to letters, digits, spaces, hyphens and
+ * apostrophes. It goes inside a PostgREST filter, where commas, brackets and
+ * wildcards would mean something.
+ */
+function cleanSearch(raw: string | undefined): string | undefined {
+  const q = (raw || '').replace(/[^\p{L}\p{N} '-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+  return q || undefined;
+}
 
 function hrefWith(current: Filters, change: Filters): string {
   const next = { ...current, ...change };
@@ -34,12 +44,14 @@ function Chip({ href, active, children }: { href: string; active: boolean; child
 }
 
 export default async function DrillsPage({ searchParams }: { searchParams: Promise<Filters> }) {
-  await requireUser();
+  const user = await requireUser();
   const raw = await searchParams;
   const filters: Filters = {
     skill: DRILL_SKILLS.some((s) => s.id === raw.skill) ? raw.skill : undefined,
     level: (DRILL_LEVELS as readonly string[]).includes(raw.level || '') ? raw.level : undefined,
     players: (DRILL_PLAYERS as readonly string[]).includes(raw.players || '') ? raw.players : undefined,
+    q: cleanSearch(raw.q),
+    fav: raw.fav === '1' ? '1' : undefined,
   };
 
   const supabase = await createClient();
@@ -51,8 +63,16 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
   if (filters.skill) query = query.eq('skill', filters.skill);
   if (filters.level) query = query.eq('level', filters.level);
   if (filters.players) query = query.eq('players', filters.players);
-  const { data } = (await query) as { data: Drill[] | null };
-  const drills = data || [];
+  // Name or sub-skill, so "euro" finds the Euro step and "free throw" the
+  // free throw drills. Sub-skills are stored with underscores.
+  if (filters.q) query = query.or(`name.ilike."*${filters.q}*",sub_skill.ilike."*${filters.q.replace(/ /g, '_')}*"`);
+  // Before 00042 runs the table is missing, which reads as no favourites
+  const [{ data }, { data: favRows }] = await Promise.all([
+    query as unknown as Promise<{ data: Drill[] | null }>,
+    supabase.from('drill_favorites').select('drill_id').eq('user_id', user.id),
+  ]);
+  const favorites = new Set((favRows || []).map((f) => f.drill_id));
+  const drills = (data || []).filter((d) => !filters.fav || favorites.has(d.id));
 
   return (
     <div className="flex-1 overflow-auto">
@@ -67,8 +87,33 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
           </div>
         </div>
 
+        {/* A plain GET form: works before any JavaScript has loaded, and keeps
+            the chips below by sending them along */}
+        <form action="/drills" className="mb-3 flex gap-2">
+          {filters.skill && <input type="hidden" name="skill" value={filters.skill} />}
+          {filters.level && <input type="hidden" name="level" value={filters.level} />}
+          {filters.players && <input type="hidden" name="players" value={filters.players} />}
+          {filters.fav && <input type="hidden" name="fav" value="1" />}
+          <label className="relative flex-1">
+            <span className="sr-only">Search drills</span>
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
+            <input
+              type="search"
+              name="q"
+              defaultValue={filters.q}
+              placeholder="Search drills"
+              className="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 pl-9 pr-3 text-sm text-white placeholder:text-zinc-500"
+            />
+          </label>
+        </form>
+
         <div className="space-y-2 mb-5">
           <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
+            <Chip href={hrefWith(filters, { fav: filters.fav ? undefined : '1' })} active={!!filters.fav}>
+              <span className="inline-flex items-center gap-1">
+                <Star className={`h-3 w-3 ${filters.fav ? 'fill-current' : ''}`} /> Favourites
+              </span>
+            </Chip>
             <Chip href={hrefWith(filters, { skill: undefined })} active={!filters.skill}>All skills</Chip>
             {DRILL_SKILLS.map((s) =>
               // There are no IQ drills, so the chip opened an empty list. IQ is
@@ -106,7 +151,10 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
             <Link key={d.id} href={`/drills/${d.slug}`} className="block rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="font-semibold text-white">{d.name}</div>
+                  <div className="flex items-center gap-1.5 font-semibold text-white">
+                    {favorites.has(d.id) && <Star className="h-3.5 w-3.5 flex-shrink-0 fill-amber-400 text-amber-400" aria-label="Favourite" />}
+                    {d.name}
+                  </div>
                   <div className="text-xs text-zinc-500 mt-0.5">
                     {skillLabel(d.skill)} · {d.sub_skill.replace(/_/g, ' ')} · <span className="capitalize">{d.level}</span>
                   </div>
@@ -123,7 +171,13 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
               </div>
             </Link>
           ))}
-          {drills.length === 0 && <p className="text-sm text-zinc-500">No drills match these filters.</p>}
+          {drills.length === 0 && (
+            <p className="text-sm text-zinc-500">
+              {filters.fav && !filters.q
+                ? 'No favourites yet. Tap the star on any drill to keep it here.'
+                : 'No drills match these filters.'}
+            </p>
+          )}
         </div>
       </div>
     </div>

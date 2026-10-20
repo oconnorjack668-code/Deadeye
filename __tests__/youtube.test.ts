@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isRealYoutubeId, youtubeEmbedUrl, youtubeSearchUrl } from '@/lib/video/youtube';
+import { isRealYoutubeId, youtubeEmbedUrl, youtubeIdFromLink, youtubeSearchUrl } from '@/lib/video/youtube';
 
 describe('isRealYoutubeId', () => {
   it('accepts a genuine 11-character id', () => {
@@ -50,5 +50,28 @@ describe('youtubeEmbedUrl', () => {
 describe('youtubeSearchUrl', () => {
   it('escapes the query', () => {
     expect(youtubeSearchUrl('pick & roll reads')).toContain('pick%20%26%20roll%20reads');
+  });
+});
+
+describe('youtubeIdFromLink', () => {
+  const id = 'dQw4w9WgXcQ';
+
+  it('reads every kind of link the owner might paste', () => {
+    expect(youtubeIdFromLink(`https://www.youtube.com/watch?v=${id}&t=42s`)).toBe(id);
+    expect(youtubeIdFromLink(`https://youtu.be/${id}?si=abc123`)).toBe(id);
+    expect(youtubeIdFromLink(`https://m.youtube.com/watch?v=${id}`)).toBe(id);
+    expect(youtubeIdFromLink(`https://www.youtube.com/shorts/${id}`)).toBe(id);
+    expect(youtubeIdFromLink(`https://www.youtube-nocookie.com/embed/${id}`)).toBe(id);
+    expect(youtubeIdFromLink(`youtube.com/watch?v=${id}`)).toBe(id);
+    expect(youtubeIdFromLink(`  ${id}  `)).toBe(id);
+  });
+
+  it('refuses anything that is not a YouTube video', () => {
+    expect(youtubeIdFromLink('https://vimeo.com/123456789')).toBeNull();
+    expect(youtubeIdFromLink(`https://evil.example/watch?v=${id}`)).toBeNull();
+    expect(youtubeIdFromLink('https://www.youtube.com/@somechannel')).toBeNull();
+    expect(youtubeIdFromLink('https://www.youtube.com/watch?v=short')).toBeNull();
+    expect(youtubeIdFromLink('javascript:alert(1)')).toBeNull();
+    expect(youtubeIdFromLink('')).toBeNull();
   });
 });

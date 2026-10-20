@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { MUSCLE_GROUPS, type LibraryExercise } from '@/lib/exercises';
 import { exerciseLevel } from '@/lib/generator';
 import { ArrowLeft, Flame } from 'lucide-react';
+import { DemoVideo } from '@/components/DemoVideo';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +24,9 @@ export default async function ExerciseLibraryPage({
 
   let query = supabase
     .from('exercise_library')
-    .select('id, name, primary_muscle, equipment, description, cues, is_basketball_specific, is_system')
+    // Every column, so demo_video_id comes back once 00042 has added it and
+    // the page still loads before then
+    .select('*')
     .order('name');
   if (selected) query = query.eq('primary_muscle', selected);
   const { data } = (await query) as { data: LibraryExercise[] | null };
@@ -93,6 +96,7 @@ export default async function ExerciseLibraryPage({
                     hurts.
                   </p>
                 )}
+                {e.demo_video_id && <DemoVideo id={e.demo_video_id} title={e.name} />}
                 {e.description && <p className="text-zinc-300">{e.description}</p>}
                 {e.cues?.length > 0 && (
                   <ul className="list-disc pl-5 text-zinc-400 space-y-0.5">
@@ -107,7 +111,7 @@ export default async function ExerciseLibraryPage({
                   rel="noopener noreferrer"
                   className="inline-block text-xs text-emerald-400 underline"
                 >
-                  Watch how to do it on YouTube
+                  {e.demo_video_id ? 'More videos on YouTube' : 'Watch how to do it on YouTube'}
                 </a>
                 <Link href={`/workouts/exercise?name=${encodeURIComponent(e.name)}`} className="ml-4 inline-block text-xs text-zinc-300 underline">
                   Your history

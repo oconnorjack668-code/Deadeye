@@ -31,6 +31,8 @@ export interface Drill {
   coaching_cues: string[];
   common_mistakes: string[];
   tracks_makes: boolean;
+  /** A YouTube video id the owner chose (00042); missing before that migration. */
+  demo_video_id?: string | null;
 }
 
 export function skillLabel(id: string): string {

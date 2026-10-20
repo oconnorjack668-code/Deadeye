@@ -7,6 +7,8 @@ import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/Button';
 import { skillLabel, type Drill } from '@/lib/drills';
 import { ArrowLeft, Clock, Play, PlayCircle, CheckCircle2, AlertTriangle, Wrench } from 'lucide-react';
+import { DemoVideo } from '@/components/DemoVideo';
+import { FavoriteDrillButton } from './FavoriteDrillButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,10 +16,17 @@ export const metadata = { title: 'Drill - Deadeye' };
 
 export default async function DrillPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  await requireUser();
+  const user = await requireUser();
   const supabase = await createClient();
   const { data: drill } = (await supabase.from('drills').select('*').eq('slug', slug).maybeSingle()) as { data: Drill | null };
   if (!drill) notFound();
+  // Before 00042 runs the table is missing, which reads as not a favourite
+  const { data: favorite } = await supabase
+    .from('drill_favorites')
+    .select('drill_id')
+    .eq('user_id', user.id)
+    .eq('drill_id', drill.id)
+    .maybeSingle();
 
   return (
     <div className="flex-1 overflow-auto">
@@ -25,10 +34,15 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
         <Link href={`/drills?skill=${drill.skill}`} className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 mb-4">
           <ArrowLeft className="h-4 w-4" /> {skillLabel(drill.skill)} drills
         </Link>
-        <h1 className="text-3xl font-black tracking-tight text-white">{drill.name}</h1>
-        <p className="text-sm text-zinc-400 mt-1 capitalize">
-          {skillLabel(drill.skill)} · {drill.sub_skill.replace(/_/g, ' ')} · {drill.level} · {drill.players}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-black tracking-tight text-white">{drill.name}</h1>
+            <p className="text-sm text-zinc-400 mt-1 capitalize">
+              {skillLabel(drill.skill)} · {drill.sub_skill.replace(/_/g, ' ')} · {drill.level} · {drill.players}
+            </p>
+          </div>
+          <FavoriteDrillButton drillId={drill.id} userId={user.id} initial={!!favorite} />
+        </div>
 
         <div className="grid grid-cols-2 gap-3 my-5">
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
@@ -42,6 +56,12 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
             <div className="text-white font-semibold text-sm">{drill.reps}</div>
           </div>
         </div>
+
+        {drill.demo_video_id && (
+          <div className="mb-5">
+            <DemoVideo id={drill.demo_video_id} title={drill.name} />
+          </div>
+        )}
 
         <section className="space-y-4 text-sm">
           <div>
@@ -98,7 +118,7 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 rounded-xl border border-zinc-800 py-3 text-sm font-semibold text-zinc-300 hover:bg-zinc-900"
           >
-            <PlayCircle className="h-4 w-4 text-red-500" /> Watch demos on YouTube
+            <PlayCircle className="h-4 w-4 text-red-500" /> {drill.demo_video_id ? 'More demos on YouTube' : 'Watch demos on YouTube'}
           </a>
         </div>
       </div>

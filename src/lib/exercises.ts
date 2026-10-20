@@ -41,6 +41,8 @@ export interface LibraryExercise {
   cues: string[];
   is_basketball_specific: boolean;
   is_system: boolean;
+  /** A YouTube video id the owner chose (00042); missing before that migration. */
+  demo_video_id?: string | null;
 }
 
 /**

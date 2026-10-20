@@ -511,6 +511,8 @@ export interface Database {
           cues: string[];
           is_basketball_specific: boolean;
           created_at: string;
+          // Added by 00042_drill_favourites_and_demo_videos.sql
+          demo_video_id: string | null;
         };
         Insert: {
           id?: string;
@@ -535,6 +537,7 @@ export interface Database {
           primary_muscle?: string | null;
           cues?: string[];
           is_basketball_specific?: boolean;
+          demo_video_id?: string | null;
         };
         Relationships: [];
       };
@@ -1654,6 +1657,13 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      // 00042_drill_favourites_and_demo_videos.sql
+      drill_favorites: {
+        Row: { user_id: string; drill_id: string; created_at: string };
+        Insert: { user_id: string; drill_id: string; created_at?: string };
+        Update: never;
+        Relationships: [];
+      };
       drills: {
         Row: {
           id: string;
@@ -1672,6 +1682,8 @@ export interface Database {
           common_mistakes: string[];
           tracks_makes: boolean;
           created_at: string;
+          // Added by 00042_drill_favourites_and_demo_videos.sql
+          demo_video_id: string | null;
         };
         Insert: {
           id?: string;
@@ -1691,7 +1703,8 @@ export interface Database {
           tracks_makes?: boolean;
           created_at?: string;
         };
-        Update: never;
+        // Only the demo video is ever changed, by the owner
+        Update: { demo_video_id?: string | null };
         Relationships: [];
       };
       video_analyses: {
