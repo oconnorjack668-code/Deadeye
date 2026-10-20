@@ -81,23 +81,23 @@ that data again.
 - [ ] Run `supabase/migrations/00038_player_reports.sql` in the Supabase SQL
       editor. Until then "Report a problem" says the report could not be sent,
       and the errors tab says the migration is missing.
-- [ ] Run `supabase/migrations/00039_more_programs.sql` in the Supabase SQL
+- [x] Run `supabase/migrations/00039_more_programs.sql` in the Supabase SQL
       editor. It adds eight programmes, five of them Athleticism, and makes
       Basketball Strength Foundations the fourth free one. The pricing and
       landing pages already say four free and 18 with Pro.
-- [ ] Run `supabase/migrations/00040_fix_library_tags.sql` in the Supabase SQL
+- [x] Run `supabase/migrations/00040_fix_library_tags.sql` in the Supabase SQL
       editor. It moves the rear delt exercises to pull, makes the Mikan drill a
       finishing drill and marks the full-court layup drill as needing a hoop.
       Safe to run more than once.
-- [ ] Run `supabase/migrations/00041_streak_freezes.sql` in the Supabase SQL
+- [x] Run `supabase/migrations/00041_streak_freezes.sql` in the Supabase SQL
       editor. It teaches the database streak freezes, so the leaderboard,
       friends list and team pages show the same streak as the dashboard (they
       also ignored rest days until now). Safe to run more than once.
-- [ ] Run `supabase/migrations/00042_drill_favourites_and_demo_videos.sql` in
+- [x] Run `supabase/migrations/00042_drill_favourites_and_demo_videos.sql` in
       the Supabase SQL editor. It turns on favourite drills and lets you pick a
       demo video for each drill and exercise in Owner tools → Demo videos
       (lessons work there already). Safe to run more than once.
-- [ ] Run `supabase/migrations/00043_avatars_photos_levels.sql` in the Supabase
+- [x] Run `supabase/migrations/00043_avatars_photos_levels.sql` in the Supabase
       SQL editor. It adds emoji avatars, optional profile photos (with a
       choice of who sees them, and a parent approving any under-16 photo), and
       stores levels so friends can see them on player cards. It also creates
