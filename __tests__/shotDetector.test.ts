@@ -397,7 +397,8 @@ describe('ShotDetector after the rim', () => {
       ...approach(),
       ...after(165, [{ x: 0.51, y: 0.29 }, { x: 0.5, y: 0.26 }, { x: 0.5, y: 0.24 }, { x: 0.5, y: 0.26 }, { x: 0.5, y: 0.29 }], 0.1),
       ...after(330, [{ x: 0.5, y: 0.31 }, { x: 0.5, y: 0.33 }, { x: 0.5, y: 0.35 }], 0.25),
-      ...quiet(429, 20, 0.25),
+      // Judged after the late window, since it came off the ring first
+      ...quiet(429, 45, 0.25),
     ]);
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(true);
@@ -409,7 +410,8 @@ describe('ShotDetector after the rim', () => {
     const shots = run([...approach(), ...quiet(165, 45, 0.3)]);
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(true);
-    expect(shots[0].confident).toBe(false);
+    // Still swinging hard well after the ball went in, which a rim hit never does
+    expect(shots[0].confident).toBe(true);
   });
 
   it('calls a miss for a ball that hit the ring and vanished, shaking the net as a rim hit does', () => {
@@ -500,5 +502,57 @@ describe('ShotDetector, cases from a real session', () => {
     for (const o of quiet(1764, 20, 0.2)) d.push(o);
     expect(d.shots).toHaveLength(1);
     expect(d.shots[0].made).toBe(true);
+  });
+});
+
+// From the second phone run on the 2:39 session.
+describe('ShotDetector, second phone run', () => {
+  function approach(): BallObservation[] {
+    return Array.from({ length: 6 }, (_, i) => ({ t: i * 33, ball: { x: 0.62 - 0.02 * i, y: 0.12 + 0.03 * i }, id: 1 }));
+  }
+  const quiet = (from: number, frames: number, net = 0): BallObservation[] =>
+    Array.from({ length: frames }, (_, i) => ({ t: from + (i + 1) * 33, ball: null, net }));
+
+  it('judges a ball that shows up under the ring late as a new arrival, on what the net does then', () => {
+    // Hit the ring and vanished upwards, shaking the net...
+    const shots = (() => {
+      const d = new ShotDetector(RIM);
+      for (const o of [...approach(), ...quiet(165, 20, 0.1)]) d.push(o);
+      // ...then fell past the front of the net 0.7s later, which did not move
+      for (const [i, y] of [0.32, 0.34, 0.36, 0.38].entries()) d.push({ t: 1000 + i * 33, ball: { x: 0.5, y }, net: 0, id: 1 });
+      for (const o of quiet(1100, 40, 0)) d.push(o);
+      return d.shots;
+    })();
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(false);
+  });
+
+  it('ignores something else followed near the rim moments after the ball was last seen', () => {
+    const d = new ShotDetector(RIM);
+    for (const o of approach()) d.push(o);
+    // The ball drops into the ring; a glare beside the backboard lights up and rises
+    d.push({ t: 198, ball: null, net: 0.1 });
+    d.push({ t: 231, ball: null, net: 0.2 });
+    d.push({ t: 264, ball: { x: 0.44, y: 0.29 }, net: 0.2, id: 7 });
+    d.push({ t: 297, ball: { x: 0.44, y: 0.24 }, net: 0.2, id: 7 });
+    for (const o of quiet(297, 40, 0.25)) d.push(o);
+    expect(d.shots).toHaveLength(1);
+    expect(d.shots[0].made).toBe(true);
+  });
+
+  it('calls the shot still being judged when the clip ends', () => {
+    const d = new ShotDetector(RIM);
+    for (const o of [...approach(), ...quiet(165, 8, 0.2)]) d.push(o);
+    expect(d.shots).toHaveLength(0);
+    const last = d.finish();
+    expect(last).not.toBeNull();
+    expect(last!.confident).toBe(false);
+    expect(d.shots).toHaveLength(1);
+  });
+
+  it('has nothing to call at the end when no shot reached the ring', () => {
+    const d = new ShotDetector(RIM);
+    d.push({ t: 0, ball: { x: 0.1, y: 0.7 } });
+    expect(d.finish()).toBeNull();
   });
 });

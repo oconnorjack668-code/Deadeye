@@ -154,8 +154,9 @@ the second clip matched it closely: the same 32 calls, 8 of them unclear, and
 the ball seen on the same share of frames. Results also depend on where the
 rim was tapped, and a player's taps are not the bench's. So the second clip is
 scored with the rim tapped eleven ways: up to 14px up, down, in and out on a
-rim 50px wide. Across all eleven it calls 307 of 341 right (90%), with 7 calls
-where there was no shot. With the taps on the ring's edges it gets 30 of 31.
+rim 50px wide. Across all eleven it calls 313 of 341 right (92%), with 7 calls
+where there was no shot, and flags 1 call in 10 as unsure for the player to
+check. With the taps on the ring's edges it gets 31 of 31.
 The first clip stays at 10 of 10. `DEADEYE_BENCH_START` and `_END`, in
 seconds, run one stretch of a clip, for trying variations on a single shot.
 

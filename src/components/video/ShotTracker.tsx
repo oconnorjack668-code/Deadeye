@@ -105,6 +105,8 @@ export function ShotTracker({
   const ballSeenRef = useRef(0);
   /** Removes the clip-ended listener; see startTracking. */
   const endedCleanupRef = useRef<(() => void) | null>(null);
+  /** The run's shot detector, so finish() can call a shot still being judged. */
+  const detectorRef = useRef<ShotDetector | null>(null);
   const [quality, setQuality] = useState<{ fps: number; ballSeenPct: number; frames: number } | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -462,7 +464,10 @@ export function ShotTracker({
         older = null;
         held = null;
       }
-      shotDetector ??= new ShotDetector(calibratedRim, { aspect: video.videoHeight / video.videoWidth });
+      if (!shotDetector) {
+        shotDetector = new ShotDetector(calibratedRim, { aspect: video.videoHeight / video.videoWidth });
+        detectorRef.current = shotDetector;
+      }
 
       const pixels = ctx.getImageData(0, 0, px, px).data;
       // A frame shown twice has no motion in it to find, and comparing
@@ -499,7 +504,13 @@ export function ShotTracker({
           : null;
       // Nothing has been scored until three frames have arrived
       const shot = ready
-        ? shotDetector.push({ t, ball: centre, net: ballTracker.netMotion() ?? undefined, under: ballTracker.underNet() })
+        ? shotDetector.push({
+            t,
+            ball: centre,
+            net: ballTracker.netMotion() ?? undefined,
+            under: ballTracker.underNet(),
+            id: ballTracker.ballId(),
+          })
         : null;
       if (shot) {
         setShots((cur) => [...cur, { ...shot, id: nextId++ }]);
@@ -566,6 +577,11 @@ export function ShotTracker({
     stopRef.current = true;
     endedCleanupRef.current?.();
     endedCleanupRef.current = null;
+    // A shot can still be being judged when the clip ends - the call waits on
+    // what the net does next - and without this the last shot was dropped
+    const last = detectorRef.current?.finish();
+    detectorRef.current = null;
+    if (last) setShots((cur) => [...cur, { ...last, id: (cur.at(-1)?.id ?? 0) + 1 }]);
     // Snapshot how the run went before anything is torn down. Seconds come from
     // the clip for a file and from the clock for the camera, which is the same
     // distinction the tracking loop makes.
@@ -923,15 +939,17 @@ export function ShotTracker({
             <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
               <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="font-semibold uppercase tracking-wider text-zinc-400">Tracking quality</span>
-                <span className="tabular-nums text-zinc-400">
-                  {quality.fps.toFixed(0)} fps analysed · ball seen in {quality.ballSeenPct.toFixed(0)}% of frames
-                </span>
+                <span className="tabular-nums text-zinc-400">{quality.fps.toFixed(0)} fps analysed</span>
               </div>
+              {/* Judged on how many shots the tracker was unsure of, not on how
+                  often the ball was in view. The tracker reports only a ball in
+                  flight, which on a normal session is under a tenth of the
+                  frames, so a warning at 15% fired on every run. */}
               <p className="mt-1.5 text-xs text-zinc-500">
                 {quality.fps < 12
                   ? 'That is a low frame rate, so shots may have been missed between frames. Closing other apps, or filming a clip and analysing it afterwards, gives the tracker more to work with.'
-                  : quality.ballSeenPct < 15
-                    ? 'The ball was hard to pick out - usually dim light, or the hoop being far away. The counts below are worth checking carefully.'
+                  : shots.length > 0 && unresolved / shots.length > 0.2
+                    ? 'The tracker was unsure of a lot of these. That is usually the hoop being small in the picture, dim light, or bright windows behind it - the tips on the first screen help most.'
                     : 'Good conditions. The counts below should be close, but check them anyway.'}
               </p>
             </div>

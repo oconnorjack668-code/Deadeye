@@ -207,6 +207,13 @@ export interface BallTracker {
    * came out of the bottom of the net.
    */
   underNet(): boolean;
+  /**
+   * Which followed thing the last ball reported was, as a number that stays the
+   * same for as long as it is followed, or null when no ball was reported. Lets
+   * the shot detector tell the ball it has been watching from something else
+   * that turns up near the rim.
+   */
+  ballId(): number | null;
 }
 
 interface Sighting {
@@ -217,6 +224,7 @@ interface Sighting {
 }
 
 interface Track {
+  id: number;
   seen: Sighting[];
   /** Frames on which it was moving like a ball in flight. */
   flights: number;
@@ -244,6 +252,8 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
   let learned: Rgb | null = null;
   let lastNet: number | null = null;
   let lastUnder = false;
+  let lastId: number | null = null;
+  let nextTrackId = 1;
 
   const current = (): Rgb | null => learned ?? options.initialColour ?? null;
 
@@ -399,7 +409,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         if (claimed.has(c) || tracks.length >= MAX_TRACKS) continue;
         if (heatAt(c) >= HOT_SPOT) continue;
         const first = { t: now, x: c.x, y: c.y, diameter: c.diameter };
-        tracks.push({ seen: [first], flights: 0, box: [c.x, c.y, c.x, c.y], above: isAbove(c), current: c });
+        tracks.push({ id: nextTrackId++, seen: [first], flights: 0, box: [c.x, c.y, c.x, c.y], above: isAbove(c), current: c });
         claimed.add(c);
       }
 
@@ -421,6 +431,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
       // Without a rim to measure from, as the tracker was before, anything
       // followed counts.
       let found: BallCandidate | null = null;
+      lastId = null;
       let best = -1;
       for (const tr of tracks) {
         if (!tr.current) continue;
@@ -440,6 +451,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         if (rank > best) {
           best = rank;
           found = tr.current;
+          lastId = tr.id;
         }
       }
 
@@ -488,5 +500,6 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
     samples: () => samples.length,
     netMotion: () => lastNet,
     underNet: () => lastUnder,
+    ballId: () => lastId,
   };
 }

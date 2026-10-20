@@ -168,9 +168,10 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       trackerMs += performance.now() - began;
       const net = watchNet ? (tracker.netMotion() ?? undefined) : undefined;
       const under = watchNet ? tracker.underNet() : undefined;
+      const id = tracker.ballId();
       if (netTrace) netTrace.push(`${Math.round(videoMs)},${(tracker.netMotion() ?? 0).toFixed(3)}`);
       if (!found) {
-        shotDetector.push({ t: videoMs, ball: null, net, under });
+        shotDetector.push({ t: videoMs, ball: null, net, under, id });
         return;
       }
       framesWithBall++;
@@ -189,7 +190,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       };
       const centre = ballCentreInFrame(box, crop, width, height, CANVAS);
       trace.push(`${Math.round(videoMs)},${centre.x.toFixed(4)},${centre.y.toFixed(4)},${found.score.toFixed(3)},${(found.diameter / rimOnCanvas).toFixed(2)}`);
-      shotDetector.push({ t: videoMs, ball: centre, net, under });
+      shotDetector.push({ t: videoMs, ball: centre, net, under, id });
     };
 
     // Three-frame differencing reports where the ball is rather than where it
@@ -228,6 +229,8 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       fps
     );
 
+    // As the app does when the clip ends: call a shot still being judged
+    shotDetector.finish();
     const shots = shotDetector.shots;
 
     // Per-shot scoring against hand-labelled makes. Counts alone hide the thing
