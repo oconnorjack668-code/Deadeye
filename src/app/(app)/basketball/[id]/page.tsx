@@ -10,6 +10,7 @@ import { ZONE_LABELS } from '@/lib/court';
 import type { ShotZone } from '@/lib/supabase/types';
 import { ArrowLeft, Target, Sparkles, Video } from 'lucide-react';
 import { ShareCardButton } from '@/components/ShareCardButton';
+import { DeleteSessionButton } from './DeleteSessionButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -158,6 +159,8 @@ export default async function BasketballSessionPage({ params }: { params: Promis
             <Sparkles className="h-4 w-4" /> Get AI feedback on this session
           </Button>
         </Link>
+
+        <DeleteSessionButton id={id} />
       </div>
     </div>
   );

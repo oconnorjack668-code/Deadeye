@@ -10,6 +10,7 @@ import {
   isAmountRecord,
   setAmount,
   setModeOf,
+  recordFlags,
 } from '@/lib/exercises';
 
 describe('PR detection', () => {
@@ -84,5 +85,22 @@ describe('timed and distance sets', () => {
     expect(isAmountRecord(40, 20, carries)).toBe(false);
     // The first time is not a record
     expect(isAmountRecord(null, 60, [])).toBe(false);
+  });
+});
+
+describe('records after an edit', () => {
+  it('drops a PR once its typo is fixed, and keeps a real one', () => {
+    const earlier = [{ weight_kg: 100, reps: 5 }];
+    // 1000 kg was a typo for 100: fixed, it is no longer a record
+    expect(recordFlags([{ weight_kg: 100, reps: 5 }], earlier)).toEqual([false]);
+    expect(recordFlags([{ weight_kg: 105, reps: 5 }], earlier)).toEqual([true]);
+  });
+
+  it('compares a timed set only with timed sets', () => {
+    const earlier = [
+      { weight_kg: null, reps: 20 },
+      { weight_kg: null, reps: null, duration_seconds: 40 },
+    ];
+    expect(recordFlags([{ weight_kg: null, reps: null, duration_seconds: 50 }], earlier)).toEqual([true]);
   });
 });

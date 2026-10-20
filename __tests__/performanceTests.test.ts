@@ -1,6 +1,6 @@
 // __tests__/performanceTests.test.ts
 import { describe, it, expect } from 'vitest';
-import { convertResult, isPersonalBest, lengthUnit } from '@/lib/performanceTests';
+import { convertResult, isPersonalBest, lengthUnit, testRecordFlags } from '@/lib/performanceTests';
 
 describe('performance test units', () => {
   it('logs jumps in the player unit', () => {
@@ -24,5 +24,19 @@ describe('performance test units', () => {
     expect(isPersonalBest({ value: 3.4, unit: 'seconds' }, [{ value: 3.6, unit: 'seconds' }], true)).toBe(true);
     expect(isPersonalBest({ value: 3.8, unit: 'seconds' }, [{ value: 3.6, unit: 'seconds' }], true)).toBe(false);
     expect(isPersonalBest({ value: 50, unit: 'cm' }, [], false)).toBe(true);
+  });
+});
+
+describe('test records after an edit', () => {
+  it('recomputes which results were records, in order', () => {
+    const results = [
+      { value: 28, unit: 'inches' },
+      { value: 30, unit: 'inches' },
+      { value: 74, unit: 'cm' },
+      { value: 80, unit: 'cm' },
+    ];
+    // 74 cm is about 29.1 inches: not better than 30
+    expect(testRecordFlags(results, false)).toEqual([true, true, false, true]);
+    expect(testRecordFlags([{ value: 3.2, unit: 'seconds' }, { value: 3.1, unit: 'seconds' }], true)).toEqual([true, true]);
   });
 });

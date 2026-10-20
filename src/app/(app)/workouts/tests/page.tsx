@@ -6,6 +6,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import Link from 'next/link';
+import { TestActions } from './TestActions';
 import { Plus, TrendingUp, Award, Zap } from 'lucide-react';
 import { asMeasurementSystem } from '@/lib/units';
 import { LENGTH_TESTS, TIMED_TESTS, convertResult, lengthUnit } from '@/lib/performanceTests';
@@ -37,6 +38,7 @@ export default async function PerformanceTestsPage() {
       .order('test_date', { ascending: false })
       .returns<Array<{
         id: string;
+        user_id: string;
         test_type: string;
         test_date: string;
         value: number;
@@ -63,6 +65,7 @@ export default async function PerformanceTestsPage() {
     },
     {} as Record<string, Array<{
       id: string;
+      user_id: string;
       test_type: string;
       test_date: string;
       value: number;
@@ -205,7 +208,7 @@ export default async function PerformanceTestsPage() {
                   return (
                     <div
                       key={test.id}
-                      className="flex items-center justify-between p-3 rounded-lg bg-zinc-950/50 border border-zinc-800/60 hover:border-orange-500/30 transition-colors"
+                      className="flex flex-wrap items-center gap-x-3 p-3 rounded-lg bg-zinc-950/50 border border-zinc-800/60 hover:border-orange-500/30 transition-colors"
                     >
                       <div className="space-y-1">
                         <div className="flex items-center gap-2">
@@ -227,7 +230,7 @@ export default async function PerformanceTestsPage() {
                           })}
                         </p>
                       </div>
-                      <div className="text-right">
+                      <div className="ml-auto text-right">
                         <span className="text-lg font-bold text-orange-400">
                           {shown.value} {shown.unit}
                         </span>
@@ -235,6 +238,7 @@ export default async function PerformanceTestsPage() {
                           <p className="text-xs text-zinc-500 mt-0.5">{test.notes}</p>
                         )}
                       </div>
+                      <TestActions test={test} />
                     </div>
                   );
                 })}

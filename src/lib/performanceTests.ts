@@ -44,3 +44,13 @@ export function isPersonalBest(result: TestResult, earlier: TestResult[], lowerI
     return lowerIsBetter ? value < before : value > before;
   });
 }
+
+/**
+ * The personal record flag for each of one test's results, in the order they
+ * happened: each one that beats every earlier result. The first counts, as it
+ * did when it was logged. Used after a result is edited or deleted, when the
+ * flags saved at the time may no longer be true.
+ */
+export function testRecordFlags(results: TestResult[], lowerIsBetter: boolean): boolean[] {
+  return results.map((r, i) => isPersonalBest(r, results.slice(0, i), lowerIsBetter));
+}

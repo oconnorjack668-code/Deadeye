@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { ArrowLeft, Dumbbell, Award, TrendingUp } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { ShareCardButton } from '@/components/ShareCardButton';
+import { EditWorkout } from './EditWorkout';
 
 export const metadata = {
   title: 'Workout Details - Deadeye',
@@ -64,6 +65,7 @@ export default async function WorkoutDetailPage({
       rpe: number | null;
       is_personal_record: boolean;
       notes: string | null;
+      created_at: string;
     }>>();
 
   const workoutTypeLabel = {
@@ -193,6 +195,10 @@ export default async function WorkoutDetailPage({
             )}
           </CardContent>
         </Card>
+
+        <div className="mb-8">
+          <EditWorkout userId={user.id} workout={workout} sets={sets || []} units={units} />
+        </div>
 
         {/* Workout Notes */}
         {workout.notes && (

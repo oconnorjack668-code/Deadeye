@@ -13,6 +13,7 @@ import { ExercisePicker } from '@/components/workouts/ExercisePicker';
 import { localDateString } from '@/lib/dates';
 import {
   SET_MODE_UNIT,
+  WORKOUT_TYPES,
   categoryForMuscle,
   defaultSetMode,
   formatAmount,
@@ -81,15 +82,6 @@ const DRAFT_KEY = 'hoopiq-workout-draft-v1';
 const REST_KEY = 'hoopiq-rest-seconds';
 const LIBRARY_CACHE_KEY = 'hoopiq-exercise-cache-v1';
 
-const WORKOUT_TYPES = [
-  { value: 'strength', label: 'Strength' },
-  { value: 'power_plyos', label: 'Power & Plyos' },
-  { value: 'conditioning', label: 'Conditioning' },
-  { value: 'mobility', label: 'Mobility' },
-  { value: 'recovery', label: 'Recovery' },
-  { value: 'testing', label: 'Testing' },
-  { value: 'mixed', label: 'Mixed' },
-];
 
 function formatClock(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds));

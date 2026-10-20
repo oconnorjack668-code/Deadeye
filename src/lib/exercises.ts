@@ -147,3 +147,32 @@ export function isAmountRecord(weightKg: number | null, amount: number, history:
     return amount >= h.amount && weight >= before && (amount > h.amount || weight > before);
   });
 }
+
+/** The kinds of workout, as the workouts.workout_type column allows. */
+export const WORKOUT_TYPES = [
+  { value: 'strength', label: 'Strength' },
+  { value: 'power_plyos', label: 'Power & Plyos' },
+  { value: 'conditioning', label: 'Conditioning' },
+  { value: 'mobility', label: 'Mobility' },
+  { value: 'recovery', label: 'Recovery' },
+  { value: 'testing', label: 'Testing' },
+  { value: 'mixed', label: 'Mixed' },
+];
+
+/**
+ * Whether each set is a PR against sets from earlier workouts, the way the
+ * logger decided when the set was ticked. For a workout that was edited: a
+ * typo of 1000 kg should not stay a record once it is fixed.
+ */
+export function recordFlags(sets: MeasuredSet[], earlier: MeasuredSet[]): boolean[] {
+  return sets.map((s) => {
+    const mode = setModeOf(s);
+    const same = earlier.filter((h) => setModeOf(h) === mode);
+    if (mode === 'reps') return isPersonalRecord(s.weight_kg, s.reps, same);
+    return isAmountRecord(
+      s.weight_kg,
+      setAmount(s, mode) ?? 0,
+      same.map((h) => ({ weight_kg: h.weight_kg, amount: setAmount(h, mode) ?? 0 }))
+    );
+  });
+}

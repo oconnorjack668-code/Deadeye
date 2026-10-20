@@ -7,7 +7,7 @@
 //   signUpSchema          (auth)/signup
 //   updatePasswordSchema  (auth)/update-password
 //   sessionSchema         (app)/basketball/new
-//   workoutSchema         (app)/workouts/new
+//   workoutSchema         (app)/workouts/new and EditWorkout on (app)/workouts/[id]
 //   performanceTestSchema (app)/workouts/tests/new
 //
 // The rest are never imported. Their rules are enforced inline instead, and in
