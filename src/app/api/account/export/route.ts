@@ -45,6 +45,10 @@ const USER_TABLES = [
   'drill_favorites',
   // The parent consent record, which is about this account
   'age_checks',
+  // The optional profile photo record and the cached player level (00043).
+  // The image itself stays private in Storage, like uploaded video files.
+  'profile_photos',
+  'player_levels',
   // Crash reports sent from this account
   'app_errors',
 ] as const;
@@ -54,6 +58,7 @@ const USER_TABLES = [
 const STRIP_COLUMNS: Record<string, string[]> = {
   push_subscriptions: ['p256dh', 'auth'],
   age_checks: ['request_token', 'confirm_token'],
+  profile_photos: ['approval_token'],
 };
 
 export async function GET() {
@@ -95,7 +100,7 @@ export async function GET() {
     account: { id: user.id, email: user.email, created_at: authUser.data?.user?.created_at ?? null },
     profile: profile.data || null,
     data,
-    note: 'Uploaded video files are not included in this file. They stay in your account until you delete them.',
+    note: 'Uploaded video and profile-photo files are not included in this file. They stay in your account until you delete them.',
   };
 
   const filename = `deadeye-data-${new Date().toISOString().slice(0, 10)}.json`;

@@ -7,3 +7,34 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Codex and Claude Code collaboration
+
+This repository may be worked on by both Codex and Claude Code. Treat the
+working tree as shared: do not overwrite or revert another agent's
+uncommitted changes.
+
+Either agent may commit and push the other's work (the user decided this on
+2026-10-20), but only once it is complete and has been checked: read the diff,
+confirm it does what it set out to do, and run the relevant checks (at least
+`npx tsc --noEmit`, lint on the changed files, and the tests that cover them).
+Work that is unfinished, failing, or not understood stays uncommitted; say so
+instead.
+
+- By default, use a dedicated branch or Git worktree for each independent
+  task. When the user explicitly chooses a shared checkout, Codex and Claude
+  Code may work from the same folder, but each agent must own different files
+  or a clearly separate change area.
+- Before editing, inspect `git status` and the relevant files. If a file has
+  uncommitted changes from another agent, do not edit it while that work is in
+  progress; commit it once it is complete and checked (above), or leave it.
+- Keep durable project decisions in repository documentation, not only in an
+  agent conversation. `CLAUDE.md` imports this file, so these rules apply to
+  both agents.
+- Never read, print, commit, or modify `.env.local`. Use `.env.example` for
+  configuration requirements.
+- Before handing work over, run the smallest relevant verification, report the
+  branch and files changed, and leave the worktree in a reviewable state.
+- Database migrations, generated types, and shared app routes need especially
+  careful ownership: only one agent should change a given migration sequence
+  or route area at a time.
