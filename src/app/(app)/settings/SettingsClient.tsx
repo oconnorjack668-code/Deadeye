@@ -10,7 +10,8 @@ import { IRISH_COUNTIES, cleanRegion, countryOptions, regionLabel } from '@/lib/
 import type { MeasurementSystem } from '@/lib/units';
 import { SoundPicker } from '@/components/video/SoundPicker';
 import { ReportProblem } from '@/components/ReportProblem';
-import { Check, ChevronRight, Crown, Globe, Lock, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
+import { signOutOfThisPhone } from '@/lib/signOut';
+import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -34,9 +35,9 @@ interface Initial {
 
 type Patch = Partial<Omit<Initial, 'measurement_system'>> & { measurement_system?: MeasurementSystem };
 
-function Section({ icon: Icon, title, children }: { icon: React.ElementType; title: string; children: React.ReactNode }) {
+function Section({ icon: Icon, title, id, children }: { icon: React.ElementType; title: string; id?: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70">
+    <section id={id} className="scroll-mt-20 rounded-2xl border border-zinc-800 bg-zinc-900/70">
       <h2 className="flex items-center gap-2 px-4 pt-4 pb-2 text-sm font-bold uppercase tracking-wide text-zinc-400">
         <Icon className="h-4 w-4" /> {title}
       </h2>
@@ -73,6 +74,7 @@ export function SettingsClient({
   email,
   plan,
   initial,
+  avatar,
   notifications,
   dataControls,
   supportEmail,
@@ -81,6 +83,8 @@ export function SettingsClient({
   email: string | null;
   plan: string;
   initial: Initial;
+  /** The avatar and photo picker, built on the server with the player's own photo. */
+  avatar: React.ReactNode;
   notifications: React.ReactNode;
   dataControls: React.ReactNode;
   supportEmail: string | null;
@@ -92,6 +96,9 @@ export function SettingsClient({
   const [regionText, setRegionText] = useState(initial.region || '');
   const [status, setStatus] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
   const [resetSent, setResetSent] = useState(false);
+  const [newEmail, setNewEmail] = useState<string | null>(null);
+  const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
+  const [signingOut, setSigningOut] = useState(false);
   // Country names and time zones come from the phone's own lists, so they're filled in after
   // the page loads (the server's lists and time zone differ from the phone's)
   const onPhone = useSyncExternalStore(noSubscribe, () => true, () => false);
@@ -155,6 +162,37 @@ export function SettingsClient({
     else setResetSent(true);
   }
 
+  async function changeEmail() {
+    const next = (newEmail || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(next)) {
+      setStatus({ tone: 'error', text: 'Enter a full email address.' });
+      return;
+    }
+    if (next === email?.toLowerCase()) {
+      setNewEmail(null);
+      return;
+    }
+    // Nothing changes until the link in the email is opened, so a typo cannot
+    // lock anyone out of their account
+    const { error } = await createClient().auth.updateUser(
+      { email: next },
+      { emailRedirectTo: `${window.location.origin}/auth/callback?next=/settings` }
+    );
+    if (error) {
+      setStatus({ tone: 'error', text: error.message });
+      return;
+    }
+    setEmailSentTo(next);
+    setNewEmail(null);
+  }
+
+  async function signOut() {
+    setSigningOut(true);
+    await signOutOfThisPhone();
+    router.push('/login');
+    router.refresh();
+  }
+
   const zoneValue = s.timezone || '';
 
   return (
@@ -182,6 +220,11 @@ export function SettingsClient({
               maxLength={40}
               onChange={(e) => setName(e.target.value)}
               onBlur={() => void saveName()}
+              // Enter saves too, by leaving the box
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') e.currentTarget.blur();
+              }}
+              enterKeyHint="done"
               className="flex-1 min-w-0 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white"
             />
           </div>
@@ -207,12 +250,55 @@ export function SettingsClient({
             </Link>
           )}
         </Row>
+        <Row>{avatar}</Row>
         <Link href="/onboarding?edit=1" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           <span className="flex items-center gap-2">
             <Pencil className="h-4 w-4 text-zinc-500" /> Player info (height, position, hand, level, goals)
           </span>
           <ChevronRight className="h-4 w-4 text-zinc-600" />
         </Link>
+        <Row>
+          <div className="flex items-center justify-between gap-3">
+            <span className="min-w-0">
+              <span className="block text-sm text-zinc-100">Email</span>
+              <span className="block truncate text-xs text-zinc-500">{email}</span>
+            </span>
+            {newEmail === null && (
+              <Button size="sm" variant="secondary" onClick={() => setNewEmail('')}>
+                Change
+              </Button>
+            )}
+          </div>
+          {newEmail !== null && (
+            <div className="mt-2 flex gap-2">
+              <input
+                type="email"
+                value={newEmail}
+                autoFocus
+                autoComplete="email"
+                placeholder="New email address"
+                aria-label="New email address"
+                onChange={(e) => setNewEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') void changeEmail();
+                }}
+                className="min-w-0 flex-1 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white"
+              />
+              <Button size="sm" variant="primary" onClick={() => void changeEmail()}>
+                Send link
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => setNewEmail(null)}>
+                Cancel
+              </Button>
+            </div>
+          )}
+          {emailSentTo && (
+            <p className="mt-2 text-xs text-emerald-300">
+              Check {emailSentTo} for a link to confirm it. Your email changes once you open it, and until then you sign in with
+              the old one.
+            </p>
+          )}
+        </Row>
         <Row>
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm text-zinc-100">Password</span>
@@ -269,7 +355,7 @@ export function SettingsClient({
           A sound is judged through whichever speaker is in the gym, so it
           belongs to the device - and it is set here rather than in the tracker
           because it is chosen once and then wanted on every session. */}
-      <Section icon={Volume2} title="Shot sounds">
+      <Section icon={Volume2} title="Shot sounds" id="sounds">
         {/* One child, so the section draws no divider between the note and the picker */}
         <div>
           <p className="px-4 pt-1 text-xs text-zinc-400">
@@ -441,6 +527,10 @@ export function SettingsClient({
           <p className="text-xs text-zinc-500">Deadeye Basketball Training · version {version}</p>
         </Row>
       </Section>
+
+      <Button variant="outline" className="w-full gap-2" onClick={() => void signOut()} isLoading={signingOut}>
+        <LogOut className="h-4 w-4" /> Sign out
+      </Button>
     </div>
   );
 }

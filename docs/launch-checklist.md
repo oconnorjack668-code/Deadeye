@@ -97,6 +97,11 @@ that data again.
       the Supabase SQL editor. It turns on favourite drills and lets you pick a
       demo video for each drill and exercise in Owner tools → Demo videos
       (lessons work there already). Safe to run more than once.
+- [ ] Run `supabase/migrations/00043_avatars_photos_levels.sql` in the Supabase
+      SQL editor. It adds emoji avatars, optional profile photos (with a
+      choice of who sees them, and a parent approving any under-16 photo), and
+      stores levels so friends can see them on player cards. It also creates
+      the private `avatars` storage bucket. Safe to run more than once.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

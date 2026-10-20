@@ -1,13 +1,19 @@
 // src/app/(app)/players/[id]/page.tsx
-// A player's card: display name, season points, badges, streak (friends/teammates) and only
-// the details they chose to show in Settings. Age is never shown. (player_card, migration 00024)
+// A player's card: display name, level, season points, badges, streak (friends/teammates) and only
+// the details they chose to show in Settings. Age is never shown. (player_card, migrations 00024
+// and 00043, which added the level, the avatar and the photo when the viewer may see it)
 import React from 'react';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { countryName } from '@/lib/regions';
-import { ArrowLeft, Award, Flame, Lock, MapPin, Trophy } from 'lucide-react';
+import { Award, Flame, Lock, MapPin, Trophy } from 'lucide-react';
+import { Avatar } from '@/components/Avatar';
+import { BackButton } from '@/components/BackButton';
+import { signedPhotoUrl } from '@/lib/photos-server';
+import { tierFor } from '@/lib/achievements';
+import { TIER_THEME } from '@/lib/tierTheme';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Player - Deadeye' };
@@ -25,6 +31,11 @@ interface Card {
   badge_titles: string[];
   season_points: number | null;
   streak: number | null;
+  // From 00043; missing until it runs
+  level?: number | null;
+  avatar_emoji?: string | null;
+  avatar_color?: string | null;
+  photo_path?: string | null;
 }
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
@@ -34,13 +45,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   const { data } = await supabase.rpc('player_card', { p_user: id });
   const card = data as Card | null;
   const units = asMeasurementSystem(me?.measurement_system);
+  // player_card only returns the path when this viewer may see the photo
+  const photoUrl = await signedPhotoUrl(card?.photo_path);
+  const tier = card?.level ? tierFor(card.level) : null;
+  const theme = tier ? TIER_THEME[tier.name] : null;
 
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-xl mx-auto space-y-5">
-        <Link href="/leaderboard" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200">
-          <ArrowLeft className="h-4 w-4" /> Leaderboard
-        </Link>
+        <BackButton fallback="/leaderboard" />
 
         {!card ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-8 text-center">
@@ -51,10 +64,20 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
         ) : (
           <>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 text-center">
-              <div className="mx-auto mb-3 h-16 w-16 rounded-full bg-zinc-800 flex items-center justify-center text-2xl font-black text-orange-400">
-                {card.display_name.charAt(0).toUpperCase()}
-              </div>
+              <Avatar
+                name={card.display_name}
+                emoji={card.avatar_emoji}
+                color={card.avatar_color}
+                photoUrl={photoUrl}
+                size={80}
+                className="mx-auto mb-3"
+              />
               <h1 className="text-2xl font-black text-white">{card.display_name}</h1>
+              {tier && theme && (
+                <div className={`mt-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${theme.chip}`}>
+                  Level {card.level} · {tier.name}
+                </div>
+              )}
               <p className="text-sm text-zinc-400">
                 {[card.position, card.height_cm ? formatHeight(card.height_cm, units) : null].filter(Boolean).join(' · ')}
               </p>

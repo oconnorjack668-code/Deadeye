@@ -168,6 +168,18 @@ export async function loadAchievements(userId: string) {
   // the player sees
   const streak = streakRewards(allDays, current);
   const xpParts = xpBreakdown(stats, { challengePoints, badgeXp: badgeXp(earnedBadgeIds), streakXp: streak.xp });
+  const level = levelFor(xpParts.total);
+
+  // Kept for the player card, which shows friends a level without working it
+  // out from their whole history (00043). Written with the service role, so a
+  // player cannot set their own; a missing key or table just skips it.
+  try {
+    await createAdminClient()
+      .from('player_levels')
+      .upsert({ user_id: userId, level: level.level, xp: xpParts.total, updated_at: new Date().toISOString() });
+  } catch {
+    // Shown again next time the player opens the app
+  }
 
   return {
     stats,
@@ -186,7 +198,7 @@ export async function loadAchievements(userId: string) {
     newlyEarned: newBadges.map((b) => b.title),
     xp: xpParts.total,
     xpParts,
-    level: levelFor(xpParts.total),
+    level,
     streak,
     // Worked out from the dates; the database walks the same rule (00041)
     freeze: {

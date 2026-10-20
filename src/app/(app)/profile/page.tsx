@@ -1,11 +1,22 @@
+// src/app/(app)/profile/page.tsx
+// The player's own profile: who they are as a player at a glance - level,
+// streak, badges, shooting and best jump - then their player info, and a look
+// at the card other players see.
 import React from 'react';
+import Link from 'next/link';
 import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
 import { planLabel } from '@/lib/entitlements';
+import { createClient } from '@/lib/supabase/server';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { User, Pencil, Settings } from 'lucide-react';
-import Link from 'next/link';
+import { Avatar } from '@/components/Avatar';
+import { Award, ChevronRight, Eye, Flame, Pencil, Settings, Target, TrendingUp } from 'lucide-react';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
+import { loadAchievements } from '@/lib/achievements-server';
+import { getShotTotals } from '@/lib/player-activity';
+import { convertResult, lengthUnit } from '@/lib/performanceTests';
+import { signedPhotoUrl } from '@/lib/photos-server';
+import { TIER_THEME } from '@/lib/tierTheme';
 
 export const dynamic = 'force-dynamic';
 
@@ -34,30 +45,111 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
   );
 }
 
+function Stat({ icon: Icon, tone, value, label, href }: { icon: React.ElementType; tone: string; value: React.ReactNode; label: string; href: string }) {
+  return (
+    <Link href={href} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 hover:border-zinc-700">
+      <Icon className={`h-4 w-4 ${tone}`} />
+      <div className="mt-1 text-xl font-black text-white tabular-nums">{value}</div>
+      <div className="text-[11px] text-zinc-400">{label}</div>
+    </Link>
+  );
+}
+
 export default async function ProfilePage() {
   const user = await requireUser();
-  const [profile, subscription] = await Promise.all([getCurrentProfile(), getCurrentSubscription()]);
+  const supabase = await createClient();
+  const [profile, subscription, achievements, zones, { data: jumps }, { data: photoRow }] = await Promise.all([
+    getCurrentProfile(),
+    getCurrentSubscription(),
+    loadAchievements(user.id),
+    getShotTotals(user.id),
+    supabase.from('performance_tests').select('value, unit').eq('user_id', user.id).in('test_type', ['standing_vertical', 'approach_vertical']),
+    // Missing before 00043, which reads as no photo
+    supabase.from('profile_photos').select('path').eq('user_id', user.id).maybeSingle(),
+  ]);
   const units = asMeasurementSystem(profile?.measurement_system);
+  const photoUrl = await signedPhotoUrl(photoRow?.path);
+  const name = profile?.display_name || 'Player';
+  const level = achievements.level;
+  const theme = TIER_THEME[level.tier];
+
+  const makes = zones.reduce((n, z) => n + z.makes, 0);
+  const attempts = zones.reduce((n, z) => n + z.attempts, 0);
+  const shooting = attempts > 0 ? `${Math.round((makes / attempts) * 100)}%` : '–';
+  // Best vertical in the player's own unit, whichever unit each jump was logged in
+  const jumpUnit = lengthUnit(units);
+  const bestJump = (jumps || []).reduce<number | null>((best, j) => {
+    const v = convertResult(j, jumpUnit);
+    return v !== null && (best === null || v > best) ? v : best;
+  }, null);
+  const earned = achievements.badges.filter((b) => b.earned).length;
 
   return (
-    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl mx-auto">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-slate-600 to-gray-500 flex items-center justify-center shadow-lg">
-          <User className="h-6 w-6 text-white" />
+    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl mx-auto space-y-5">
+      {/* Who they are as a player */}
+      <section className={`rounded-2xl border p-5 ${theme.card}`}>
+        <div className="flex items-center gap-4">
+          <Avatar name={name} emoji={profile?.avatar_emoji} color={profile?.avatar_color} photoUrl={photoUrl} size={72} />
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-2xl font-black text-white">{name}</h1>
+            <div className={`text-sm font-bold ${theme.text}`}>
+              Level {level.level} · {level.tier}
+            </div>
+            <div className="text-xs text-zinc-400">{achievements.xp.toLocaleString()} XP</div>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-black tracking-tight text-white">Player Profile</h1>
-          <p className="text-sm text-zinc-400 mt-1">{user.email}</p>
+        {level.toNext > 0 && (
+          <>
+            <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-zinc-800">
+              <div className={`h-full rounded-full ${theme.bar}`} style={{ width: `${Math.round(level.progress * 100)}%` }} />
+            </div>
+            <div className="mt-1 text-xs text-zinc-400">
+              {level.toNext.toLocaleString()} XP to Level {level.level + 1}
+            </div>
+          </>
+        )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href={`/players/${user.id}`}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950/50 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-950"
+          >
+            <Eye className="h-3.5 w-3.5" /> See what others see
+          </Link>
+          <Link
+            href="/settings"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-950/50 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-950"
+          >
+            <Pencil className="h-3.5 w-3.5" /> Avatar and photo
+          </Link>
         </div>
+      </section>
+
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <Stat
+          icon={Flame}
+          tone="text-orange-400"
+          value={achievements.stats.currentStreak}
+          label={`day streak · best ${achievements.stats.longestStreak}`}
+          href="/streak"
+        />
+        <Stat icon={Award} tone="text-amber-300" value={`${earned}/${achievements.badges.length}`} label="badges" href="/achievements" />
+        <Stat icon={Target} tone="text-red-400" value={shooting} label={`${makes.toLocaleString()} makes`} href="/basketball" />
+        <Stat
+          icon={TrendingUp}
+          tone="text-emerald-400"
+          value={bestJump === null ? '–' : `${bestJump}${jumpUnit === 'cm' ? ' cm' : '"'}`}
+          label="best vertical"
+          href="/workouts/tests"
+        />
       </div>
 
       <Card className="border-zinc-800 bg-zinc-900/70">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
-            <CardTitle>Player Info</CardTitle>
+            <CardTitle>Player info</CardTitle>
             <Link href="/onboarding?edit=1">
               <Button variant="outline" size="sm" className="gap-1.5">
-                <Pencil className="h-3.5 w-3.5" /> Edit player info
+                <Pencil className="h-3.5 w-3.5" /> Edit
               </Button>
             </Link>
           </div>
@@ -65,43 +157,39 @@ export default async function ProfilePage() {
         <CardContent className="space-y-4">
           {!profile?.onboarding_completed && (
             <p className="text-sm text-amber-400">
-              Your player info isn&apos;t set up yet. Tap &ldquo;Edit player info&rdquo; to add it.
+              Your player info isn&apos;t set up yet. Tap &ldquo;Edit&rdquo; to add it.
             </p>
           )}
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Name" value={profile?.display_name} />
             <Field label="Position" value={profile?.position} />
             <Field label="Height" value={formatHeight(profile?.height_cm, units)} />
             <Field label="Level" value={profile?.playing_level ? LEVEL_LABELS[profile.playing_level] : null} />
             <Field label="Age" value={profile?.age_bracket} />
             <Field label="Dominant hand" value={profile?.dominant_hand ? HAND_LABELS[profile.dominant_hand] : null} />
+            <Field label="Training" value={`${achievements.stats.totalSessions} sessions · ${achievements.stats.totalWorkouts} workouts`} />
             <Field label="Plan" value={<Link href="/pro" className="underline">{planLabel(subscription)}</Link>} />
             <Field label="Units" value={units === 'metric' ? 'Metric (cm, kg)' : 'Imperial (ft, lbs)'} />
           </div>
-          {profile?.goals && profile.goals.length > 0 && (
-            <Field label="Goals" value={profile.goals.join(', ')} />
-          )}
-          {profile?.focus_areas && profile.focus_areas.length > 0 && (
-            <Field label="Focus areas" value={profile.focus_areas.join(', ')} />
-          )}
+          {profile?.goals && profile.goals.length > 0 && <Field label="Goals" value={profile.goals.join(', ')} />}
+          {profile?.focus_areas && profile.focus_areas.length > 0 && <Field label="Focus areas" value={profile.focus_areas.join(', ')} />}
         </CardContent>
       </Card>
 
       <Link
         href="/settings"
-        className="mt-6 flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900"
+        className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900"
       >
         <span className="flex items-center gap-3">
           <Settings className="h-5 w-5 text-zinc-400" />
           <span>
             <span className="block font-semibold text-white">Settings</span>
-            <span className="block text-xs text-zinc-500">Privacy, region and time zone, notifications, units, your data</span>
+            <span className="block text-xs text-zinc-500">Avatar, privacy, email, notifications, sounds, units, your data</span>
           </span>
         </span>
-        <span className="text-zinc-600">›</span>
+        <ChevronRight className="h-4 w-4 text-zinc-600" />
       </Link>
 
-      <p className="mt-8 text-center text-xs text-zinc-500">
+      <p className="text-center text-xs text-zinc-500">
         <Link href="/privacy" className="underline hover:text-zinc-300">Privacy policy</Link>
         {' · '}
         <Link href="/terms" className="underline hover:text-zinc-300">Terms of use</Link>

@@ -66,6 +66,11 @@ export async function deleteAccount(admin: Admin, userId: string): Promise<{ ok:
     }
   }
 
+  // And the profile photo (avatars/<user_id>/, 00043). One file at most, and
+  // the bucket is missing before 00043, so this never holds the deletion up
+  const { data: photos } = await admin.storage.from('avatars').list(userId, { limit: 100 });
+  if (photos?.length) await admin.storage.from('avatars').remove(photos.map((f) => `${userId}/${f.name}`));
+
   const { error: deleteError } = await admin.auth.admin.deleteUser(userId);
   if (deleteError) {
     console.error('Account deletion failed', deleteError);

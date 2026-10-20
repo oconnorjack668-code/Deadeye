@@ -1,6 +1,9 @@
 // src/app/(app)/settings/page.tsx
 import React from 'react';
-import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getCurrentSubscription, getCurrentAgeCheck } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
+import { signedPhotoUrl } from '@/lib/photos-server';
+import { AvatarEditor, type OwnPhoto } from '@/components/profile/AvatarEditor';
 import { asMeasurementSystem } from '@/lib/units';
 import { hasPro, planLabel } from '@/lib/entitlements';
 import { SettingsClient } from './SettingsClient';
@@ -14,7 +17,17 @@ export const metadata = { title: 'Settings - Deadeye' };
 
 export default async function SettingsPage() {
   const user = await requireUser();
-  const [profile, subscription] = await Promise.all([getCurrentProfile(), getCurrentSubscription()]);
+  const supabase = await createClient();
+  const [profile, subscription, ageCheck, { data: photoRow }] = await Promise.all([
+    getCurrentProfile(),
+    getCurrentSubscription(),
+    getCurrentAgeCheck(),
+    // The player's own row; missing before 00043, which reads as no photo
+    supabase.from('profile_photos').select('path, status, visibility').eq('user_id', user.id).maybeSingle(),
+  ]);
+  const photo: OwnPhoto | null = photoRow
+    ? { url: await signedPhotoUrl(photoRow.path), status: photoRow.status, visibility: photoRow.visibility }
+    : null;
   const plan = planLabel(subscription);
   const isPro = hasPro(subscription);
 
@@ -52,6 +65,15 @@ export default async function SettingsPage() {
               timezone: profile.timezone ?? null,
               measurement_system: asMeasurementSystem(profile.measurement_system),
             }}
+            avatar={
+              <AvatarEditor
+                name={profile.display_name}
+                emoji={profile.avatar_emoji ?? null}
+                color={profile.avatar_color ?? null}
+                photo={photo}
+                is16Plus={ageCheck?.is_16_plus ?? false}
+              />
+            }
             notifications={<RemindersCard isPro={isPro} />}
             dataControls={<ProfileSettings initialIsPublic={profile.is_public} showLeaderboard={false} />}
             supportEmail={process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL || null}

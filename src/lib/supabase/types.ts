@@ -215,6 +215,9 @@ export interface Database {
           allow_friend_requests: boolean;
           share_with_coaches: boolean;
           ai_coaching_enabled: boolean;
+          // Added by 00043_avatars_photos_levels.sql
+          avatar_emoji: string | null;
+          avatar_color: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -243,6 +246,8 @@ export interface Database {
           allow_friend_requests?: boolean;
           share_with_coaches?: boolean;
           ai_coaching_enabled?: boolean;
+          avatar_emoji?: string | null;
+          avatar_color?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -271,8 +276,48 @@ export interface Database {
           allow_friend_requests?: boolean;
           share_with_coaches?: boolean;
           ai_coaching_enabled?: boolean;
+          avatar_emoji?: string | null;
+          avatar_color?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
+      };
+      // 00043_avatars_photos_levels.sql. Written only by the server.
+      profile_photos: {
+        Row: {
+          user_id: string;
+          path: string;
+          visibility: 'everyone' | 'friends' | 'me';
+          status: 'pending' | 'approved';
+          consent_by: 'player' | 'parent';
+          approval_token: string | null;
+          created_at: string;
+          approved_at: string | null;
+        };
+        Insert: {
+          user_id: string;
+          path: string;
+          visibility?: 'everyone' | 'friends' | 'me';
+          status: 'pending' | 'approved';
+          consent_by: 'player' | 'parent';
+          approval_token?: string | null;
+          created_at?: string;
+          approved_at?: string | null;
+        };
+        Update: {
+          path?: string;
+          visibility?: 'everyone' | 'friends' | 'me';
+          status?: 'pending' | 'approved';
+          consent_by?: 'player' | 'parent';
+          approval_token?: string | null;
+          approved_at?: string | null;
+        };
+        Relationships: [];
+      };
+      player_levels: {
+        Row: { user_id: string; level: number; xp: number; updated_at: string };
+        Insert: { user_id: string; level: number; xp: number; updated_at?: string };
+        Update: { level?: number; xp?: number; updated_at?: string };
         Relationships: [];
       };
       user_roles: {

@@ -4,9 +4,10 @@
 import React from 'react';
 import { Logo } from '@/components/Logo';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { LogOut, ShieldAlert, Settings } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { ShieldAlert, Settings } from 'lucide-react';
 import type { Profile } from '@/lib/auth';
+import { Avatar } from '@/components/Avatar';
 import { DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
 
 interface NavbarProps {
@@ -15,41 +16,9 @@ interface NavbarProps {
 }
 
 export function Navbar({ profile, isOwner = false }: NavbarProps) {
-  const router = useRouter();
+  // Signing out lives in Settings, as a labelled button. An unlabelled icon here,
+  // right beside Settings, was easy to tap by mistake.
   const pathname = usePathname();
-
-  // Stop this phone's training reminders: they belong to the player who is signing out.
-  // Runs before sign-out (the server needs the login to forget the device) and never blocks it.
-  async function stopReminders() {
-    try {
-      const reg = await navigator.serviceWorker?.getRegistration();
-      const sub = await reg?.pushManager?.getSubscription();
-      if (!sub) return;
-      await Promise.race([
-        fetch('/api/push/subscribe', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ endpoint: sub.endpoint }),
-        }).catch(() => undefined),
-        new Promise((resolve) => setTimeout(resolve, 3000)),
-      ]);
-      await sub.unsubscribe().catch(() => false);
-    } catch {
-      // no service worker / push support: nothing to stop
-    }
-  }
-
-  async function handleSignOut() {
-    await stopReminders();
-    // Loaded on tap: the Supabase library is large and most pages don't otherwise need it
-    const { createClient } = await import('@/lib/supabase/client');
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    // Pages kept for offline logging belong to this player
-    if (typeof caches !== 'undefined') await caches.delete('hoopiq-pages-v1').catch(() => false);
-    router.push('/login');
-    router.refresh();
-  }
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
@@ -87,7 +56,7 @@ export function Navbar({ profile, isOwner = false }: NavbarProps) {
           })}
         </nav>
 
-        {/* Right side: Owner badge, Profile link, Sign Out */}
+        {/* Right side: Owner badge, Profile link, Settings */}
         <div className="flex items-center gap-3">
           {isOwner && (
             <Link
@@ -108,9 +77,7 @@ export function Navbar({ profile, isOwner = false }: NavbarProps) {
                 : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 text-zinc-300'
             }`}
           >
-            <div className="h-6 w-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-bold text-red-400">
-              {profile?.display_name?.charAt(0).toUpperCase() || 'P'}
-            </div>
+            <Avatar name={profile?.display_name || 'Player'} emoji={profile?.avatar_emoji} color={profile?.avatar_color} size={24} />
             <span className="text-xs font-medium hidden sm:inline">
               {profile?.display_name || 'Player'}
             </span>
@@ -128,15 +95,6 @@ export function Navbar({ profile, isOwner = false }: NavbarProps) {
           >
             <Settings className="h-4 w-4" />
           </Link>
-
-          <button
-            type="button"
-            onClick={handleSignOut}
-            title="Sign out"
-            className="h-9 w-9 flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:text-red-400 hover:border-red-900/40 hover:bg-red-950/20 transition-colors"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
         </div>
       </div>
     </header>

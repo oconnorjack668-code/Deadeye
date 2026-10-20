@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 18, 2026';
+const LAST_UPDATED = 'October 20, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -74,6 +74,12 @@ export default function PrivacyPage() {
               withdrew approval.
             </li>
             <li>Player profile: age bracket, height, position, dominant hand, playing level, goals and focus areas.</li>
+            <li>
+              Your avatar: the emoji and colour you pick and, only if you choose to add one, a profile photo with who you
+              chose to show it to. The photo is shrunk on your phone before it is sent, which removes its location and
+              other hidden data. If you are under 16, we also keep when your parent or guardian approved it.
+            </li>
+            <li>Your level and XP, worked out from your training, so friends can see your level.</li>
             <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests.</li>
             <li>Study activity: quiz scores and lesson progress.</li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
@@ -136,7 +142,7 @@ export default function PrivacyPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">Who processes it</h2>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Supabase stores your account, training data and videos.</li>
+            <li>Supabase stores your account, training data, videos and profile photo.</li>
             <li>Vercel hosts the app.</li>
             <li>
               {ai} receives the details of a session (type, duration, intensity, shooting numbers, drills and your
@@ -155,8 +161,8 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-white">Who can see it</h2>
           <p>
             Your data is private to your account, and your profile is private by default. If you turn on &ldquo;Show me
-            on the public leaderboard&rdquo; in Settings, other players can see your display name, season points,
-            training days, streak and badges. Your position, height and county/country are only shown if you switch
+            on the public leaderboard&rdquo; in Settings, other players can see your display name, avatar, level,
+            season points, training days, streak and badges. Your position, height and county/country are only shown if you switch
             them on in Settings → Privacy. Your age is never shown to anyone; it only puts you in the right age group
             on the leaderboard.
           </p>
@@ -173,6 +179,14 @@ export default function PrivacyPage() {
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any
             time from its page.
+          </p>
+          <p>
+            A profile photo is optional, and you choose who sees it: only you, your friends and teammates, or anyone who
+            can open your player card. Everyone else sees your emoji. If you are under 16, nobody else sees your photo
+            until a parent or guardian approves it and who can see it, and showing it to more people later needs their
+            approval again. They can remove it at any time from the link they were sent. Photos are never shown on the
+            website, in search engines or to anyone not signed in, and are only sent through links that expire within
+            an hour.
           </p>
           <p>
             AI Coach chat messages are stored in your account so the conversation continues; you can clear them at any
