@@ -78,7 +78,7 @@ that data again.
       pausing after a quiet week, and daily backups.
 - [x] Run `supabase/migrations/00037_free_and_pro.sql` in the Supabase SQL editor
       **before** the code that needs it goes live (see "Free and Pro" below).
-- [ ] Run `supabase/migrations/00038_player_reports.sql` in the Supabase SQL
+- [x] Run `supabase/migrations/00038_player_reports.sql` in the Supabase SQL
       editor. Until then "Report a problem" says the report could not be sent,
       and the errors tab says the migration is missing.
 - [x] Run `supabase/migrations/00039_more_programs.sql` in the Supabase SQL

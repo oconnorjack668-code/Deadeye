@@ -20,7 +20,7 @@ Entering totals in a hoops session is two taps per spot (court, then makes), and
 - Usage numbers from 2026-10-19 (21 players, 17 set up, 3 ever logged, 12 did nothing): Claude memory `usage-snapshot`
 
 ## Open
-- Confirm 00038 has been run in Supabase; `docs/launch-checklist.md` still has it unticked although 39 to 43 are ticked. Waits on the user.
+- ~~Confirm 00038 has been run~~: done, `to_regclass` found the table (2026-10-20).
 - Add a "Tracker got this wrong?" report link on the tracker results, once tracker work in `ShotTracker.tsx` settles.
 - Message 3 or 4 of the players who set up and did nothing, to learn why they left. Waits on the user.
 
