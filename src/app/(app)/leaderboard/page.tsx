@@ -7,10 +7,12 @@ import React from 'react';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { Avatar } from '@/components/Avatar';
 import { countryName } from '@/lib/regions';
-import { Trophy, Flame, Star, Target, Users, MapPin } from 'lucide-react';
+import { chaseFor } from '@/lib/leaderboard';
+import { leaderboardLooks, type RowLook } from '@/lib/leaderboard-server';
+import { Podium, StandingRow, type Standing } from './Standings';
+import { Trophy, Flame, Star, Target, Users, MapPin, CalendarCheck, ChevronRight, Check, Dumbbell, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Leaderboard - Deadeye' };
@@ -22,18 +24,7 @@ const AGE_GROUPS = [
   { id: '14-17', label: '14–17' },
   { id: '18+', label: '18+' },
 ] as const;
-
-interface Standing {
-  user_id: string;
-  player_name: string;
-  points: number;
-  rank: number;
-  sessions_completed: number;
-  training_days: number;
-  current_streak: number;
-  is_me: boolean;
-  total: number;
-}
+const LIST_LIMIT = 100;
 
 function href(scope: Scope, age: string, team?: string | null) {
   const q = new URLSearchParams({ scope });
@@ -41,6 +32,9 @@ function href(scope: Scope, age: string, team?: string | null) {
   if (scope === 'team' && team) q.set('team', team);
   return `/leaderboard?${q.toString()}`;
 }
+
+const TRAIN_BUTTON =
+  'inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/50 hover:bg-red-500';
 
 export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   await requireUser();
@@ -67,7 +61,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
 
   // The main list plus "your rank" in each view, all in parallel
   const [main, meEveryone, meCountry, meRegion, meFriends] = await Promise.all([
-    rpc(scope, 100, teamId),
+    rpc(scope, LIST_LIMIT, teamId),
     rpc('everyone', 0),
     profile?.country ? rpc('country', 0) : Promise.resolve({ data: [] }),
     profile?.region ? rpc('region', 0) : Promise.resolve({ data: [] }),
@@ -76,37 +70,49 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
   const notReady = !!main.error;
   const standings = ((main.data || []) as Standing[]);
   const me = (res: { data?: unknown }) => ((res.data || []) as Standing[]).find((r) => r.is_me);
-  const myRanks = [
-    { scope: 'everyone' as Scope, label: 'Everyone', row: me(meEveryone) },
-    ...(profile?.country ? [{ scope: 'country' as Scope, label: countryName(profile.country), row: me(meCountry) }] : []),
-    ...(profile?.region ? [{ scope: 'region' as Scope, label: profile.region, row: me(meRegion) }] : []),
-    { scope: 'friends' as Scope, label: 'Friends', row: me(meFriends) },
-  ];
+  const meRow = standings.find((s) => s.is_me);
+  const rankIn: Partial<Record<Scope, Standing | undefined>> = {
+    everyone: me(meEveryone),
+    country: me(meCountry),
+    region: me(meRegion),
+    friends: me(meFriends),
+  };
 
-  const tabs: Array<{ scope: Scope; label: string; team?: string }> = [
-    { scope: 'everyone', label: 'Everyone' },
-    { scope: 'country', label: profile?.country ? countryName(profile.country) : 'Country' },
-    { scope: 'region', label: profile?.region || 'County' },
-    { scope: 'friends', label: 'Friends' },
-    ...teams.map((t) => ({ scope: 'team' as Scope, label: t.name, team: t.id })),
+  const tabs: Array<{ scope: Scope; label: string; team?: string; row?: Standing }> = [
+    { scope: 'everyone', label: 'Everyone', row: rankIn.everyone },
+    { scope: 'country', label: profile?.country ? countryName(profile.country) : 'Country', row: rankIn.country },
+    { scope: 'region', label: profile?.region || 'County', row: rankIn.region },
+    { scope: 'friends', label: 'Friends', row: rankIn.friends },
+    ...teams.map((t) => ({ scope: 'team' as Scope, label: t.name, team: t.id, row: t.id === teamId ? meRow : undefined })),
   ];
+  const isActive = (t: { scope: Scope; team?: string }) => t.scope === scope && (t.scope !== 'team' || t.team === teamId);
+  const activeLabel = tabs.find(isActive)?.label ?? 'Everyone';
   const needsLocation = (scope === 'country' && !profile?.country) || (scope === 'region' && !profile?.region);
   const done = new Set(((myChallenges || []) as Array<{ challenge_id: string }>).map((c) => c.challenge_id));
-  const others = standings.filter((s) => !s.is_me || s.rank <= 100);
-  const meRow = standings.find((s) => s.is_me);
+
+  // Everyone in the top 100 is listed; a player further down is pinned under the list instead
+  const listed = standings.filter((s) => !s.is_me || s.rank <= LIST_LIMIT);
+  const pinnedMe = meRow && meRow.rank > LIST_LIMIT ? meRow : null;
+  const podium = listed.filter((s) => s.points > 0).slice(0, 3);
+  const podiumIds = new Set(podium.map((p) => p.user_id));
+  const rest = listed.filter((s) => !podiumIds.has(s.user_id));
+  const leaderPoints = listed[0]?.points ?? 0;
+  const looks = needsLocation ? new Map<string, RowLook>() : await leaderboardLooks(standings.map((s) => s.user_id));
+  const chase = chaseFor(standings, LIST_LIMIT);
+  const ranked = !!meRow && meRow.points > 0;
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-amber-600 to-orange-500 flex items-center justify-center shadow-lg">
+      <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-5">
+        <header className="flex items-center gap-3">
+          <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-red-700 to-red-500 flex items-center justify-center shadow-lg shadow-red-950/60">
             <Trophy className="h-6 w-6 text-white" />
           </div>
-          <div>
+          <div className="min-w-0">
             <h1 className="text-3xl font-black tracking-tight text-white">Leaderboard</h1>
-            <p className="text-sm text-zinc-400">{season?.name || 'Season'} · updates every few minutes</p>
+            <p className="text-sm text-zinc-400 truncate">{season?.name || 'This season'} · updates every few minutes</p>
           </div>
-        </div>
+        </header>
 
         {notReady ? (
           <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-4 text-sm text-amber-200">
@@ -114,62 +120,114 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           </p>
         ) : (
           <>
-            {/* Your rank in every view */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {myRanks.map((r) => (
-                <Link
-                  key={r.scope}
-                  href={href(r.scope, age)}
-                  className={`rounded-2xl border p-3 text-center ${scope === r.scope ? 'border-orange-500 bg-orange-500/10' : 'border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900'}`}
-                >
-                  <div className="text-2xl font-black text-white">{r.row && r.row.points > 0 ? `#${r.row.rank}` : '–'}</div>
-                  <div className="text-[11px] text-zinc-400 truncate">
-                    {r.label}
-                    {r.row && r.row.total > 0 ? ` · of ${r.row.total}` : ''}
+            {/* Where you stand, and what it takes to move up */}
+            {meRow && !needsLocation && (
+              <section className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-950/70 via-zinc-900 to-zinc-950 p-5">
+                <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-red-600/20 blur-3xl" />
+                <div className="relative flex items-center gap-4">
+                  <Avatar name={profile?.display_name || meRow.player_name} emoji={profile?.avatar_emoji} color={profile?.avatar_color} size={60} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[11px] font-bold uppercase tracking-widest text-red-300/80">You · {activeLabel}</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-5xl font-black leading-tight tabular-nums text-white">{ranked ? `#${meRow.rank}` : '–'}</span>
+                      {ranked && meRow.total > 1 && <span className="text-sm text-zinc-400">of {meRow.total}</span>}
+                    </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-            {meRow && (
-              <p className="text-sm text-zinc-400">
-                You: <span className="font-bold text-amber-400">{meRow.points} pts</span> · {meRow.training_days} training days
-                {meRow.current_streak > 0 && (
-                  <>
-                    {' '}
-                    · <Flame className="inline h-3.5 w-3.5 text-orange-400" /> {meRow.current_streak}
-                  </>
-                )}
+                  <div className="flex-shrink-0 text-right">
+                    <div className="text-3xl font-black leading-none tabular-nums text-white">{meRow.points}</div>
+                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">pts</div>
+                  </div>
+                </div>
+
+                <div className="relative mt-4 flex flex-wrap gap-2 text-xs">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950/60 px-2.5 py-1 text-zinc-300">
+                    <CalendarCheck className="h-3.5 w-3.5 text-emerald-400" /> {meRow.training_days} training days
+                  </span>
+                  {meRow.current_streak > 0 && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-950/60 px-2.5 py-1 text-zinc-300">
+                      <Flame className="h-3.5 w-3.5 text-orange-400" /> {meRow.current_streak} day streak
+                    </span>
+                  )}
+                </div>
+
+                <div className="relative mt-4 flex items-center justify-between gap-3 rounded-2xl border border-white/5 bg-zinc-950/50 p-3">
+                  <p className="text-sm text-zinc-300">
+                    {chase?.kind === 'chasing' ? (
+                      <>
+                        <span className="font-black text-white">{chase.gap} pts</span> to catch{' '}
+                        <span className="font-bold text-white">{chase.outsideList ? `the top ${LIST_LIMIT}` : chase.target}</span>
+                        <span className="block text-xs text-zinc-500">
+                          About {chase.days} training {chase.days === 1 ? 'day' : 'days'}
+                        </span>
+                      </>
+                    ) : chase?.kind === 'leading' ? (
+                      chase.over ? (
+                        chase.lead > 0 ? (
+                          <>
+                            You&apos;re top, <span className="font-black text-white">{chase.lead} pts</span> clear of {chase.over}. Keep training to stay there.
+                          </>
+                        ) : (
+                          <>Level at the top with {chase.over}. One training day puts you clear.</>
+                        )
+                      ) : (
+                        <>You&apos;re top of this board. Bring some friends to chase you.</>
+                      )
+                    ) : (
+                      <>Every training day is +10. Log one to get on the board.</>
+                    )}
+                  </p>
+                  <Link href="/train" className={TRAIN_BUTTON}>
+                    Train
+                    <ChevronRight className="h-4 w-4" />
+                  </Link>
+                </div>
+
                 {!profile?.is_public && (
-                  <>
-                    {' '}
-                    · <Link href="/settings" className="underline text-cyan-400">you&apos;re hidden from the public board</Link>
-                  </>
+                  <p className="relative mt-3 text-xs text-zinc-400">
+                    Only friends and teammates can see you.{' '}
+                    <Link href="/settings" className="underline text-cyan-400">
+                      Show me on the public board
+                    </Link>
+                  </p>
                 )}
-              </p>
+              </section>
             )}
 
-            {/* View + age filters */}
-            <div className="space-y-2">
-              <div className="flex gap-1.5 overflow-x-auto pb-1">
+            {/* Which board, with your rank on each */}
+            <div className="space-y-3">
+              <nav className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] md:mx-0 md:px-0">
                 {tabs.map((t) => {
-                  const active = t.scope === scope && (t.scope !== 'team' || t.team === teamId);
+                  const active = isActive(t);
+                  const rank = t.row && t.row.points > 0 ? `#${t.row.rank}` : t.scope === 'team' && !active ? null : '–';
                   return (
                     <Link
                       key={`${t.scope}-${t.team || ''}`}
                       href={href(t.scope, age, t.team)}
-                      className={`whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-semibold ${active ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-zinc-300'}`}
+                      aria-current={active ? 'page' : undefined}
+                      className={`min-w-[5.5rem] flex-shrink-0 rounded-2xl border px-3.5 py-2 transition-colors ${
+                        active ? 'border-red-500/70 bg-red-500/15 text-white' : 'border-zinc-800 bg-zinc-900/70 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
+                      }`}
                     >
-                      {t.label}
+                      <div className="max-w-[9rem] truncate text-xs font-semibold">
+                        {t.scope === 'team' && <Users className="mr-1 inline h-3 w-3" />}
+                        {t.label}
+                      </div>
+                      <div className={`text-lg font-black leading-tight tabular-nums ${active ? 'text-white' : 'text-zinc-300'}`}>
+                        {rank ?? <span className="text-xs font-semibold text-zinc-500">Team</span>}
+                      </div>
                     </Link>
                   );
                 })}
-              </div>
-              <div className="flex gap-1.5">
+              </nav>
+              <div className="inline-flex rounded-full border border-zinc-800 bg-zinc-900/70 p-1">
                 {AGE_GROUPS.map((g) => (
                   <Link
                     key={g.id}
                     href={href(scope, g.id, teamId)}
-                    className={`rounded-full px-3 py-1 text-[11px] font-semibold ${age === g.id ? 'bg-zinc-200 text-zinc-900' : 'bg-zinc-900 text-zinc-400 border border-zinc-800'}`}
+                    aria-current={age === g.id ? 'page' : undefined}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                      age === g.id ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-zinc-200'
+                    }`}
                   >
                     {g.label}
                   </Link>
@@ -178,93 +236,97 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             </div>
 
             {needsLocation ? (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6 text-center text-sm text-zinc-300">
-                <MapPin className="h-6 w-6 text-zinc-500 mx-auto mb-2" />
+              <div className="rounded-3xl border border-zinc-800 bg-zinc-900/50 p-8 text-center text-sm text-zinc-300">
+                <MapPin className="mx-auto mb-3 h-8 w-8 text-zinc-500" />
                 Add your {scope === 'country' ? 'country' : 'county'} in{' '}
                 <Link href="/settings" className="underline text-cyan-400">
                   Settings → Region
                 </Link>{' '}
                 to see this leaderboard.
               </div>
+            ) : listed.length === 0 ? (
+              <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-center">
+                <Trophy className="mx-auto mb-3 h-10 w-10 text-zinc-600" />
+                {scope === 'friends' ? (
+                  <>
+                    <p className="font-bold text-white">No friends on this board yet</p>
+                    <p className="mt-1 text-sm text-zinc-400">Add your teammates and see who trains the most.</p>
+                    <Link href="/friends" className={`${TRAIN_BUTTON} mt-4`}>
+                      Add friends
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <p className="font-bold text-white">Nobody&apos;s on the board yet</p>
+                    <p className="mt-1 text-sm text-zinc-400">Log a session and the top spot is yours.</p>
+                    <Link href="/train" className={`${TRAIN_BUTTON} mt-4`}>
+                      Start training
+                    </Link>
+                  </>
+                )}
+              </div>
             ) : (
-              <Card className="border-zinc-800 bg-zinc-900/70">
-                <CardContent className="p-0">
-                  <div className="divide-y divide-zinc-800">
-                    {others.length > 0 ? (
-                      others.map((player) => {
-                        const medal = player.points > 0 && player.rank <= 3 ? ['🥇', '🥈', '🥉'][player.rank - 1] : null;
-                        return (
-                          <div
-                            key={player.user_id}
-                            className={`p-4 flex items-center justify-between gap-3 ${player.is_me ? 'bg-orange-500/10 border-l-2 border-orange-500' : ''}`}
-                          >
-                            <div className="flex items-center gap-4 min-w-0">
-                              <div className="w-8 text-center flex-shrink-0">
-                                {medal ? <span className="text-xl">{medal}</span> : <span className="text-sm font-bold text-zinc-500">#{player.rank}</span>}
-                              </div>
-                              <div className="min-w-0">
-                                <Link href={`/players/${player.user_id}`} className="font-semibold text-white hover:underline truncate block">
-                                  {player.player_name}
-                                  {player.is_me && (
-                                    <Badge variant="orange" className="ml-2 text-xs">
-                                      You
-                                    </Badge>
-                                  )}
-                                </Link>
-                                <div className="text-xs text-zinc-500 flex items-center gap-2 mt-0.5">
-                                  <span>{player.training_days} training days</span>
-                                  {player.current_streak > 0 && (
-                                    <span className="flex items-center gap-1">
-                                      · <Flame className="h-3 w-3 text-orange-400" /> {player.current_streak}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                            <div className="text-right flex-shrink-0">
-                              <div className="text-2xl font-black text-amber-400">{player.points}</div>
-                              <div className="text-xs text-zinc-500">pts</div>
-                            </div>
-                          </div>
-                        );
-                      })
-                    ) : (
-                      <div className="p-8 text-center text-sm text-zinc-400">
-                        {scope === 'friends' ? (
-                          <>
-                            No friends here yet. <Link href="/friends" className="underline text-cyan-400">Add friends</Link>
-                          </>
-                        ) : (
-                          'Nobody here yet this season. Log a session to get on the board!'
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="space-y-3">
+                {podium.length > 0 && <Podium top={podium} looks={looks} />}
+                {rest.length > 0 && (
+                  <ol className="divide-y divide-zinc-800/80 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/60">
+                    {rest.map((player) => (
+                      <li key={player.user_id}>
+                        <StandingRow player={player} look={looks.get(player.user_id)} leaderPoints={leaderPoints} />
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {pinnedMe && (
+                  <>
+                    <div className="text-center text-lg leading-none tracking-[0.4em] text-zinc-700" aria-hidden>
+                      ···
+                    </div>
+                    <div className="overflow-hidden rounded-2xl border border-red-500/30 bg-zinc-900/60">
+                      <StandingRow player={pinnedMe} look={looks.get(pinnedMe.user_id)} leaderPoints={leaderPoints} />
+                    </div>
+                  </>
+                )}
+              </div>
             )}
 
-            <div className="flex flex-wrap gap-2">
-              <Link href="/friends" className="inline-flex items-center gap-2 rounded-xl border border-cyan-700/40 bg-cyan-950/30 px-3 py-2 text-sm font-semibold text-cyan-300 hover:bg-cyan-950/50">
-                <Users className="h-4 w-4" /> Weekly friends leaderboard
-              </Link>
-            </div>
+            <Link
+              href="/friends"
+              className="flex items-center gap-3 rounded-2xl border border-cyan-700/40 bg-cyan-950/30 p-4 transition-colors hover:bg-cyan-950/50"
+            >
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-500/15">
+                <Users className="h-5 w-5 text-cyan-300" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-bold text-cyan-200">Weekly friends leaderboard</div>
+                <div className="text-xs text-zinc-400">Who trained most in the last 7 days</div>
+              </div>
+              <ChevronRight className="h-5 w-5 text-cyan-400/70" />
+            </Link>
 
-            <details className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm">
-              <summary className="cursor-pointer font-semibold text-zinc-200">How points work</summary>
-              <ul className="mt-2 space-y-1 text-zinc-300">
-                <li>
-                  <span className="font-bold text-emerald-400">Training:</span> +10 for each day you log a hoops session or workout (max 1 per day, on
-                  your own calendar)
-                </li>
-                <li>
-                  <span className="font-bold text-amber-400">Quiz:</span> +10 for each IQ Study topic quiz passed at 80%+
-                </li>
-                <li>
-                  <span className="font-bold text-red-400">Challenges:</span> bonus points for weekly challenges
-                </li>
-              </ul>
-              <p className="mt-2 text-xs text-zinc-500">
+            <details className="group rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm">
+              <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-zinc-200">
+                How points work
+                <ChevronRight className="h-4 w-4 text-zinc-500 transition-transform group-open:rotate-90" />
+              </summary>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                <div className="rounded-xl bg-zinc-950/60 p-3">
+                  <Dumbbell className="h-4 w-4 text-emerald-400" />
+                  <div className="mt-1.5 font-bold text-white">+10 training</div>
+                  <p className="mt-0.5 text-xs text-zinc-400">Each day you log a hoops session or workout (once a day, on your own calendar)</p>
+                </div>
+                <div className="rounded-xl bg-zinc-950/60 p-3">
+                  <BookOpen className="h-4 w-4 text-amber-400" />
+                  <div className="mt-1.5 font-bold text-white">+10 quiz</div>
+                  <p className="mt-0.5 text-xs text-zinc-400">Each IQ Study topic quiz passed at 80%+</p>
+                </div>
+                <div className="rounded-xl bg-zinc-950/60 p-3">
+                  <Target className="h-4 w-4 text-red-400" />
+                  <div className="mt-1.5 font-bold text-white">Bonus</div>
+                  <p className="mt-0.5 text-xs text-zinc-400">Extra points for weekly challenges</p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-zinc-500">
                 Everyone, country and county boards show players who turned on &ldquo;Show me on the public leaderboard&rdquo;. Friends and
                 team boards show your friends and teammates. Age groups use your age bracket, which is never shown to anyone.
               </p>
@@ -273,34 +335,41 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
         )}
 
         {challenges && challenges.length > 0 && (
-          <div>
-            <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-3">
+          <section>
+            <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-white">
               <Target className="h-5 w-5 text-red-400" /> Active challenges
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {(challenges as Array<{ id: string; title: string; description: string; points: number }>).map((c) => (
-                <div key={c.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="font-bold text-white">{c.title}</h3>
-                      <p className="text-xs text-zinc-400 mt-1">{c.description}</p>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+              {(challenges as Array<{ id: string; title: string; description: string; points: number }>).map((c) => {
+                const complete = done.has(c.id);
+                return (
+                  <div
+                    key={c.id}
+                    className={`flex gap-3 rounded-2xl border p-4 ${complete ? 'border-emerald-600/30 bg-emerald-950/20' : 'border-zinc-800 bg-zinc-900/70'}`}
+                  >
+                    <div
+                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${complete ? 'bg-emerald-500/15' : 'bg-red-500/15'}`}
+                    >
+                      {complete ? <Check className="h-5 w-5 text-emerald-400" /> : <Target className="h-5 w-5 text-red-400" />}
                     </div>
-                    {done.has(c.id) && (
-                      <Badge variant="success" className="text-xs flex-shrink-0">
-                        ✓ Done
-                      </Badge>
-                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-bold text-white">{c.title}</h3>
+                        <span className="inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-400/10 px-2 py-0.5 text-xs font-black text-amber-300">
+                          <Star className="h-3 w-3" /> +{c.points}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-zinc-400">{c.description}</p>
+                      {complete && <p className="mt-2 text-xs font-semibold text-emerald-400">Done</p>}
+                    </div>
                   </div>
-                  <div className="mt-3 flex items-center gap-1 text-sm font-black text-amber-400">
-                    <Star className="h-4 w-4" /> {c.points}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <Link href="/achievements" className="mt-2 inline-block text-xs text-cyan-400 underline">
               See your challenge progress
             </Link>
-          </div>
+          </section>
         )}
       </div>
     </div>
