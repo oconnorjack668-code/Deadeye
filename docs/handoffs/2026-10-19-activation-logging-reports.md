@@ -21,7 +21,7 @@ Entering totals in a hoops session is two taps per spot (court, then makes), and
 
 ## Open
 - ~~Confirm 00038 has been run~~: done, `to_regclass` found the table (2026-10-20).
-- Add a "Tracker got this wrong?" report link on the tracker results, once tracker work in `ShotTracker.tsx` settles.
+- ~~Tracker report link~~: done 2026-10-20, "Tracker got this wrong? Tell us" on the tracker results sends the run's counts, unclear shots, fps and zone with the report.
 - Message 3 or 4 of the players who set up and did nothing, to learn why they left. Waits on the user.
 
 ## Gotchas

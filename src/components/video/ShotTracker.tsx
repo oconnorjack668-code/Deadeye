@@ -26,6 +26,7 @@ import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
 import type { ShootingSummary } from '@/components/video/VideoAIFeedback';
 import { HighlightReel } from '@/components/video/HighlightReel';
+import { ReportProblem } from '@/components/ReportProblem';
 import { RimAdjuster } from '@/components/video/RimAdjuster';
 import { leftFirst, type Point } from '@/lib/video/rimAdjust';
 import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity } from 'lucide-react';
@@ -954,6 +955,18 @@ export function ShotTracker({
               </p>
             </div>
           )}
+
+          {/* The player is the only one who saw what really happened, and this
+              is the moment they know it. The run's numbers go with the report
+              so it can be matched to what the tracker did. */}
+          <ReportProblem
+            label="Tracker got this wrong? Tell us"
+            context={`Shot tracker, ${source === 'camera' ? 'live camera' : 'video'}: ${makes}/${shots.length} on screen, ${unresolved} unclear${
+              quality ? `, ${quality.fps.toFixed(0)} fps` : ''
+            }, ${ZONE_LABELS[zone]}`}
+            className="text-xs text-zinc-500 underline"
+            panelClassName="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3"
+          />
 
           <div className="space-y-1.5 max-h-80 overflow-y-auto">
             {shots.map((s, i) => (
