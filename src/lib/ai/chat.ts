@@ -13,7 +13,8 @@ export const COACH_SYSTEM_PROMPT = coachPrompt(`Your task: answer the player's q
 
 How to answer:
 - Use the player's training data below. Quote their real numbers (percentages, zones, sessions) when relevant.
-- Be specific and practical: drills with reps/sets, cues, and what to track next. Prefer short paragraphs and bullet points; aim for under 180 words unless they ask for a full plan.
+- Be specific and practical: drills with reps/sets, cues, and what to track next. Aim for under 180 words unless they ask for a full plan.
+- Format for a phone chat: short paragraphs and "-" bullets, with sub-points indented by two spaces under their bullet, and **bold** for drill names. Use a short "### " heading only to split a longer plan into parts. No tables.
 - If the data doesn't cover the question, say so briefly and give general best practice.
 - Suggest Deadeye features when useful: Shot tracker (Hoops), Form check, Jump test and highlight reels (Video), Game stats, Programs, Drills, IQ Study, Style Match, Goals, Teams.
 - Stay on basketball, training, strength and conditioning, recovery, nutrition basics, mindset and the game's rules/IQ. Politely decline unrelated requests.`);

@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { CHAT_STARTERS, FREE_CHAT_PER_DAY, MAX_CHAT_MESSAGE } from '@/lib/ai/chat';
+import { parseCoachText, parseInline } from '@/lib/ai/coachText';
 import { Send, Sparkles, Trash2 } from 'lucide-react';
 
 export interface ChatEntry {
@@ -14,27 +15,55 @@ export interface ChatEntry {
   created_at: string;
 }
 
-/** Light formatting for coach replies: paragraphs, bullet lines and **bold**. */
-function Formatted({ text }: { text: string }) {
-  const blocks = text.split(/\n{2,}/);
+function Inline({ text }: { text: string }) {
   return (
     <>
-      {blocks.map((block, i) => {
-        const lines = block.split('\n');
-        const isList = lines.every((l) => /^\s*([-•*]|\d+[.)])\s+/.test(l));
-        const render = (s: string) =>
-          s.split(/(\*\*[^*]+\*\*)/g).map((part, j) =>
-            part.startsWith('**') && part.endsWith('**') ? <strong key={j}>{part.slice(2, -2)}</strong> : <React.Fragment key={j}>{part}</React.Fragment>
-          );
-        return isList ? (
-          <ul key={i} className="my-1 space-y-0.5 pl-4 list-disc">
-            {lines.map((l, j) => (
-              <li key={j}>{render(l.replace(/^\s*([-•*]|\d+[.)])\s+/, ''))}</li>
-            ))}
-          </ul>
+      {parseInline(text).map((p, i) =>
+        p.bold ? (
+          <strong key={i} className="font-semibold text-white">
+            {p.text}
+          </strong>
+        ) : p.italic ? (
+          <em key={i}>{p.text}</em>
         ) : (
+          <React.Fragment key={i}>{p.text}</React.Fragment>
+        )
+      )}
+    </>
+  );
+}
+
+/** Coach replies: headings, numbered and bulleted lists (one level of nesting), paragraphs, bold and italics. */
+function Formatted({ text }: { text: string }) {
+  return (
+    <>
+      {parseCoachText(text).map((block, i) => {
+        if (block.type === 'heading') {
+          return (
+            <p key={i} className="mt-3 mb-1 first:mt-0.5 font-semibold text-white">
+              <Inline text={block.text} />
+            </p>
+          );
+        }
+        if (block.type === 'list') {
+          return (
+            <ul key={i} className="my-1.5 space-y-1">
+              {block.items.map((item, j) => (
+                <li key={j} className={`flex gap-2 ${item.depth ? 'ml-6 text-zinc-300' : ''}`}>
+                  <span aria-hidden className={`shrink-0 tabular-nums ${item.marker ? 'min-w-[1.1rem] text-zinc-400' : 'text-zinc-500'}`}>
+                    {item.marker ?? (item.depth ? '–' : '•')}
+                  </span>
+                  <span>
+                    <Inline text={item.text} />
+                  </span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        return (
           <p key={i} className="my-1 whitespace-pre-wrap">
-            {render(block)}
+            <Inline text={block.text} />
           </p>
         );
       })}
