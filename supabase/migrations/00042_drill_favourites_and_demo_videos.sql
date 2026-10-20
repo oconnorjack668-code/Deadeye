@@ -24,8 +24,13 @@ CREATE TABLE IF NOT EXISTS public.drill_favorites (
 ALTER TABLE public.drill_favorites ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Users manage own favorite drills" ON public.drill_favorites;
+-- (select auth.uid()) is worked out once per query rather than once per row
 CREATE POLICY "Users manage own favorite drills" ON public.drill_favorites
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+  FOR ALL TO authenticated USING ((select auth.uid()) = user_id) WITH CHECK ((select auth.uid()) = user_id);
+
+-- The primary key leads with user_id, so deleting a drill would otherwise scan
+-- every favourite to find its rows
+CREATE INDEX IF NOT EXISTS drill_favorites_drill_id_idx ON public.drill_favorites (drill_id);
 
 -- This project does not auto-grant new tables to the API roles (see 00008)
 GRANT SELECT, INSERT, DELETE ON public.drill_favorites TO authenticated;

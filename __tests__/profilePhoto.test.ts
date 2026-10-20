@@ -5,7 +5,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@/lib/auth', () => ({ getCurrentUser: async () => ({ id: 'user-1', email: 'player@example.com' }) }));
-vi.mock('@/lib/email', () => ({ emailConfigured: () => false, sendEmail: vi.fn() }));
+const email = { configured: true, sent: [] as Array<{ to: string; text: string }>, fail: false };
+vi.mock('@/lib/email', () => ({
+  emailConfigured: () => email.configured,
+  sendEmail: async (message: { to: string; text: string }) => {
+    if (email.fail) throw new Error('mail down');
+    email.sent.push(message);
+  },
+}));
 
 interface Db {
   ageCheck: { is_16_plus: boolean; consent_status: string; parent_email: string | null } | null;
@@ -71,6 +78,9 @@ function patch(visibility: string) {
 }
 
 beforeEach(() => {
+  email.configured = true;
+  email.fail = false;
+  email.sent = [];
   db.ageCheck = null;
   db.photo = null;
   db.upserts = [];
@@ -99,13 +109,34 @@ describe('profile photo upload', () => {
     expect(db.upserts[0]).toMatchObject({ status: 'approved', consent_by: 'player', visibility: 'everyone', approval_token: null });
   });
 
-  it('holds an under-16 photo for a parent, with a link to send them', async () => {
+  it('holds an under-16 photo and emails the parent the link, never the player', async () => {
     db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: 'parent@example.com' };
     const res = await upload({ consent: 'yes' });
-    const body = (await res.json()) as { status: string; link: string };
-    expect(body.status).toBe('pending');
+    const body = await res.json();
+    // With the link, a player could approve their own photo
+    expect(body).toEqual({ status: 'pending', emailed: true });
     expect(db.upserts[0]).toMatchObject({ status: 'pending', consent_by: 'parent' });
-    expect(body.link).toBe(`http://localhost/parents/photo/${db.upserts[0].approval_token}`);
+    expect(email.sent[0].to).toBe('parent@example.com');
+    expect(email.sent[0].text).toContain(`http://localhost/parents/photo/${db.upserts[0].approval_token}`);
+  });
+
+  it('takes no under-16 photo while there is no way to email a parent', async () => {
+    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: 'parent@example.com' };
+    email.configured = false;
+    expect((await upload({ consent: 'yes' })).status).toBe(403);
+    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: null };
+    email.configured = true;
+    expect((await upload({ consent: 'yes' })).status).toBe(403);
+    expect(db.uploads).toHaveLength(0);
+  });
+
+  it('keeps the photo hidden and the link private when the email fails', async () => {
+    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: 'parent@example.com' };
+    email.fail = true;
+    const res = await upload({ consent: 'yes' });
+    expect(res.status).toBe(502);
+    expect(JSON.stringify(await res.json())).not.toContain('/parents/photo/');
+    expect(db.upserts[0]).toMatchObject({ status: 'pending' });
   });
 
   it('takes no photo from an under-16 whose account a parent has not approved', async () => {
@@ -117,10 +148,10 @@ describe('profile photo upload', () => {
 
 describe('changing who sees a photo', () => {
   it('asks a parent again before an under-16 photo is shown to more people', async () => {
-    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: null };
+    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: 'parent@example.com' };
     db.photo = { path: 'user-1/a.jpg', created_at: '2026-10-01T00:00:00Z', status: 'approved', visibility: 'friends', approval_token: 'old' };
-    const body = (await (await patch('everyone')).json()) as { status: string; link: string };
-    expect(body.status).toBe('pending');
+    expect(await (await patch('everyone')).json()).toEqual({ status: 'pending', emailed: true });
+    expect(email.sent).toHaveLength(1);
     expect(db.updates[0]).toMatchObject({ visibility: 'everyone', status: 'pending', approved_at: null });
     expect(db.updates[0].approval_token).not.toBe('old');
   });
@@ -130,5 +161,13 @@ describe('changing who sees a photo', () => {
     db.photo = { path: 'user-1/a.jpg', created_at: '2026-10-01T00:00:00Z', status: 'approved', visibility: 'everyone', approval_token: 'old' };
     expect(await (await patch('me')).json()).toEqual({ status: 'approved' });
     expect(db.updates[0]).toEqual({ visibility: 'me' });
+  });
+
+  it('leaves the photo as it was when a parent cannot be emailed', async () => {
+    db.ageCheck = { is_16_plus: false, consent_status: 'approved', parent_email: 'parent@example.com' };
+    email.configured = false;
+    db.photo = { path: 'user-1/a.jpg', created_at: '2026-10-01T00:00:00Z', status: 'approved', visibility: 'friends', approval_token: 'old' };
+    expect((await patch('everyone')).status).toBe(403);
+    expect(db.updates).toHaveLength(0);
   });
 });

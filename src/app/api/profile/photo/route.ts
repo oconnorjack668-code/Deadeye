@@ -25,43 +25,38 @@ async function whoIs(admin: Admin, userId: string) {
 }
 
 /**
- * Asks a parent to approve the photo. By email when it is set up and we have
- * their address, so the approval really comes from the parent; otherwise the
- * player gets a link to send them, as with the account approval.
+ * Whether a parent can be asked at all: only by email, to the address they
+ * gave when they approved the account. The approval link is never handed to
+ * the player - with it, a player under 16 could open it and approve their own
+ * photo - so with no email set up, under-16 photos stay off.
  */
-async function askParent(
-  admin: Admin,
-  origin: string,
-  userId: string,
-  token: string,
-  visibility: PhotoVisibility,
-  parentEmail: string | null
-): Promise<{ status: 'pending'; emailed: boolean; link: string | null }> {
-  const link = `${origin}/parents/photo/${token}`;
-  if (emailConfigured() && parentEmail) {
-    const { data: profile } = await admin.from('profiles').select('display_name').eq('id', userId).maybeSingle();
-    const child = firstName(profile?.display_name);
-    try {
-      await sendEmail({
-        to: parentEmail,
-        subject: `${child} would like a profile photo on Deadeye`,
-        text: [
-          `${child} has chosen a profile photo on Deadeye, the basketball training app you approved.`,
-          '',
-          `They would like it to be seen by ${VISIBILITY_WORDS[visibility]}. Nobody else sees it until you approve it here:`,
-          '',
-          link,
-          '',
-          'If you do not approve, the photo is deleted and they keep their emoji avatar. You can remove an approved photo from the same link at any time.',
-        ].join('\n'),
-      });
-      return { status: 'pending', emailed: true, link: null };
-    } catch (err) {
-      console.error('Photo approval email failed', err);
-    }
-  }
-  return { status: 'pending', emailed: false, link };
+function canAskParent(parentEmail: string | null | undefined): parentEmail is string {
+  return emailConfigured() && !!parentEmail;
 }
+
+const NO_PARENT_EMAIL = 'Photos for players under 16 need a parent to approve them by email, which is not switched on yet. Your emoji avatar works in the meantime.';
+
+/** Emails the parent the approval link. Throws if the email could not be sent. */
+async function askParent(admin: Admin, origin: string, userId: string, token: string, visibility: PhotoVisibility, parentEmail: string) {
+  const link = `${origin}/parents/photo/${token}`;
+  const { data: profile } = await admin.from('profiles').select('display_name').eq('id', userId).maybeSingle();
+  const child = firstName(profile?.display_name);
+  await sendEmail({
+    to: parentEmail,
+    subject: `${child} would like a profile photo on Deadeye`,
+    text: [
+      `${child} has chosen a profile photo on Deadeye, the basketball training app you approved.`,
+      '',
+      `They would like it to be seen by ${VISIBILITY_WORDS[visibility]}. Nobody else sees it until you approve it here:`,
+      '',
+      link,
+      '',
+      'If you do not approve, the photo is deleted and they keep their emoji avatar. You can remove an approved photo from the same link at any time.',
+    ].join('\n'),
+  });
+}
+
+const EMAIL_FAILED = 'We could not email your parent just now, so nobody else will see the photo yet. Please try again later.';
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -85,6 +80,7 @@ export async function POST(request: Request) {
   if (!check.is_16_plus && check.consent_status !== 'approved') {
     return Response.json({ error: 'A parent needs to approve your account first.' }, { status: 403 });
   }
+  if (!check.is_16_plus && !canAskParent(check.parent_email)) return Response.json({ error: NO_PARENT_EMAIL }, { status: 403 });
 
   const { data: existing } = await admin.from('profile_photos').select('path, created_at, status').eq('user_id', user.id).maybeSingle();
   // A new photo emails a parent, so not more than one a minute
@@ -119,7 +115,14 @@ export async function POST(request: Request) {
   if (existing?.path) await admin.storage.from('avatars').remove([existing.path]);
 
   if (adult) return Response.json({ status: 'approved' });
-  return Response.json(await askParent(admin, new URL(request.url).origin, user.id, token!, visibility, check.parent_email));
+  try {
+    await askParent(admin, new URL(request.url).origin, user.id, token!, visibility, check.parent_email!);
+  } catch (err) {
+    // The photo stays pending, so nobody else sees it; choosing it again retries
+    console.error('Photo approval email failed', err);
+    return Response.json({ error: EMAIL_FAILED }, { status: 502 });
+  }
+  return Response.json({ status: 'pending', emailed: true });
 }
 
 /** Changes who can see the photo. Under 16, showing it to more people waits for a parent again. */
@@ -142,9 +145,17 @@ export async function PATCH(request: Request) {
     await admin.from('profile_photos').update({ visibility }).eq('user_id', user.id);
     return Response.json({ status: row.status });
   }
+  // Checked before anything changes, so a photo is never left hidden for nothing
+  if (!canAskParent(check?.parent_email)) return Response.json({ error: NO_PARENT_EMAIL }, { status: 403 });
   const token = crypto.randomUUID();
   await admin.from('profile_photos').update({ visibility, status: 'pending', approval_token: token, approved_at: null }).eq('user_id', user.id);
-  return Response.json(await askParent(admin, new URL(request.url).origin, user.id, token, visibility, check?.parent_email ?? null));
+  try {
+    await askParent(admin, new URL(request.url).origin, user.id, token, visibility, check!.parent_email!);
+  } catch (err) {
+    console.error('Photo approval email failed', err);
+    return Response.json({ error: EMAIL_FAILED }, { status: 502 });
+  }
+  return Response.json({ status: 'pending', emailed: true });
 }
 
 export async function DELETE() {

@@ -3,7 +3,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Copy, Share2, Trash2 } from 'lucide-react';
+import { Camera, Trash2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Avatar } from '@/components/Avatar';
 import { Button } from '@/components/ui/Button';
@@ -73,7 +73,6 @@ export function AvatarEditor({
   const [visibility, setVisibility] = useState<PhotoVisibility>(initialPhoto?.visibility ?? 'friends');
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
-  const [parentLink, setParentLink] = useState<string | null>(null);
 
   async function saveLook(next: { avatar_emoji?: string; avatar_color?: string }) {
     const before = { emoji, color };
@@ -106,17 +105,18 @@ export function AvatarEditor({
     }
   }
 
-  /** What the server said after a change: approved, or waiting for a parent. */
-  function afterSave(data: { status?: string; emailed?: boolean; link?: string | null }, url: string | null) {
+  /**
+   * What the server said after a change: approved, or waiting for a parent,
+   * who was emailed. The approval link only ever goes to the parent: a player
+   * holding it could approve their own photo.
+   */
+  function afterSave(data: { status?: string }, url: string | null) {
     const status = data.status === 'approved' ? 'approved' : 'pending';
     setPhoto((p) => ({ url: url ?? p?.url ?? null, status, visibility }));
-    setParentLink(data.link ?? null);
     setMessage(
       status === 'approved'
         ? { tone: 'ok', text: 'Photo saved.' }
-        : data.emailed
-          ? { tone: 'ok', text: 'We emailed your parent to approve it. Until then, everyone else sees your emoji.' }
-          : { tone: 'ok', text: 'Send the link below to a parent to approve it. Until then, everyone else sees your emoji.' }
+        : { tone: 'ok', text: 'We emailed your parent to approve it. Until then, everyone else sees your emoji.' }
     );
     router.refresh();
   }
@@ -130,7 +130,7 @@ export function AvatarEditor({
     form.append('visibility', visibility);
     form.append('consent', consent ? 'yes' : 'no');
     const res = await fetch('/api/profile/photo', { method: 'POST', body: form }).catch(() => null);
-    const data = (await res?.json().catch(() => ({}))) as { error?: string; status?: string; emailed?: boolean; link?: string | null };
+    const data = (await res?.json().catch(() => ({}))) as { error?: string; status?: string };
     setBusy(false);
     if (!res?.ok) {
       setMessage({ tone: 'error', text: data?.error || 'Could not save your photo. Please try again.' });
@@ -150,7 +150,7 @@ export function AvatarEditor({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ visibility: next }),
     }).catch(() => null);
-    const data = (await res?.json().catch(() => ({}))) as { error?: string; status?: string; emailed?: boolean; link?: string | null };
+    const data = (await res?.json().catch(() => ({}))) as { error?: string; status?: string };
     setBusy(false);
     if (!res?.ok) {
       setVisibility(photo?.visibility ?? 'friends');
@@ -170,20 +170,8 @@ export function AvatarEditor({
       return;
     }
     setPhoto(null);
-    setParentLink(null);
     setMessage({ tone: 'ok', text: 'Photo removed.' });
     router.refresh();
-  }
-
-  async function shareLink() {
-    if (!parentLink) return;
-    try {
-      if (navigator.share) await navigator.share({ title: 'Approve my Deadeye photo', url: parentLink });
-      else await navigator.clipboard.writeText(parentLink);
-      if (!navigator.share) setMessage({ tone: 'ok', text: 'Link copied. Send it to a parent.' });
-    } catch {
-      // Share sheet closed
-    }
   }
 
   const choiceClass = (on: boolean) =>
@@ -257,7 +245,8 @@ export function AvatarEditor({
 
         {!is16Plus && (
           <p className="text-xs text-zinc-400">
-            You are under 16, so a parent or guardian approves your photo, and who can see it, before anyone else sees it.
+            You are under 16, so we email the parent or guardian who approved your account to approve your photo, and who
+            can see it, before anyone else sees it.
           </p>
         )}
 
@@ -303,16 +292,6 @@ export function AvatarEditor({
               </Button>
             </div>
           </>
-        )}
-
-        {parentLink && (
-          <div className="rounded-lg bg-zinc-950/60 p-2 text-xs text-zinc-300">
-            <p className="mb-2 break-all">{parentLink}</p>
-            <Button size="sm" variant="secondary" className="gap-1.5" onClick={() => void shareLink()}>
-              {typeof navigator !== 'undefined' && 'share' in navigator ? <Share2 className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}{' '}
-              Send to a parent
-            </Button>
-          </div>
         )}
       </div>
 

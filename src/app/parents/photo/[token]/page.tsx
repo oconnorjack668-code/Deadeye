@@ -35,8 +35,8 @@ export default async function ParentPhotoPage({ params }: { params: Promise<{ to
 
         {!row ? (
           <p className="text-sm text-zinc-300">
-            This link is not valid, or the photo has been changed or removed. If your child chose a new photo, they can
-            send you a new link from Settings in the app.
+            This link is not valid, or the photo has been changed or removed. If your child chose a new photo, we will have
+            emailed you a new link.
           </p>
         ) : (
           <>

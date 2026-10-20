@@ -61,7 +61,7 @@ ALTER TABLE public.profile_photos ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Players see their own photo row" ON public.profile_photos;
 CREATE POLICY "Players see their own photo row" ON public.profile_photos
-  FOR SELECT USING (auth.uid() = user_id);
+  FOR SELECT TO authenticated USING ((select auth.uid()) = user_id);
 
 -- This project does not auto-grant new tables to the API roles (see 00008).
 -- Players may only read their own row, and not its approval token: with the
@@ -93,7 +93,7 @@ ALTER TABLE public.player_levels ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Players see their own level row" ON public.player_levels;
 CREATE POLICY "Players see their own level row" ON public.player_levels
-  FOR SELECT USING (auth.uid() = user_id);
+  FOR SELECT TO authenticated USING ((select auth.uid()) = user_id);
 
 GRANT SELECT ON public.player_levels TO authenticated;
 GRANT ALL ON public.player_levels TO service_role;
