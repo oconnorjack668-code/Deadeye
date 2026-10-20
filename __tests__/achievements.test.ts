@@ -1,6 +1,21 @@
 // __tests__/achievements.test.ts
 import { describe, it, expect } from 'vitest';
-import { BADGES, challengeProgress, rankFor, streaks, xpFor, type PlayerStats } from '@/lib/achievements';
+import {
+  BADGES,
+  BADGE_XP,
+  badgeXp,
+  challengeProgress,
+  levelFor,
+  streakDayBonus,
+  streakRewards,
+  streaks,
+  tierFor,
+  xpBreakdown,
+  xpForLevel,
+  MAX_LEVEL,
+  STREAK_XP_CAP,
+  type PlayerStats,
+} from '@/lib/achievements';
 
 const base: PlayerStats = {
   totalSessions: 0,
@@ -10,6 +25,7 @@ const base: PlayerStats = {
   sectionsWithLesson: 0,
   totalPRs: 0,
   programsCompleted: 0,
+  programDays: 0,
   videoTracked: 0,
   longestStreak: 0,
   currentStreak: 0,
@@ -38,14 +54,75 @@ describe('achievements', () => {
     expect(new Set(BADGES.map((b) => b.id)).size).toBe(BADGES.length);
   });
 
-  it('adds XP and finds the rank with progress to the next one', () => {
-    const xp = xpFor({ ...base, totalSessions: 20, totalMakes: 1500 }, 100, 2);
-    expect(xp).toBe(20 * 20 + 150 + 100 + 100);
-    expect(rankFor(0)).toMatchObject({ name: 'Rookie', next: { name: 'Prospect' } });
-    const r = rankFor(750);
-    expect(r.name).toBe('Prospect');
-    expect(r.progress).toBeCloseTo(0.9, 5);
-    expect(rankFor(20000)).toMatchObject({ name: 'GOAT', next: null, progress: 1 });
+  it('adds up XP from everything a player does', () => {
+    const xp = xpBreakdown(
+      { ...base, totalSessions: 20, totalWorkouts: 3, totalMakes: 1500, programDays: 4, programsCompleted: 1, videoTracked: 2 },
+      { challengePoints: 100, badgeXp: 150, streakXp: 40 }
+    );
+    expect(xp.training).toBe(23 * 20);
+    expect(xp.makes).toBe(150);
+    expect(xp.programs).toBe(4 * 15 + 300);
+    expect(xp.video).toBe(50);
+    expect(xp.total).toBe(460 + 150 + 360 + 50 + 100 + 150 + 40);
+  });
+
+  it('makes the first level-up come quickly and each one after a little harder', () => {
+    expect(xpForLevel(1)).toBe(0);
+    // About two sessions
+    expect(xpForLevel(2)).toBe(60);
+    const gaps = Array.from({ length: MAX_LEVEL - 1 }, (_, i) => xpForLevel(i + 2) - xpForLevel(i + 1));
+    for (let i = 1; i < gaps.length; i++) expect(gaps[i]).toBeGreaterThan(gaps[i - 1]);
+  });
+
+  it('finds the level, its tier, and the way to the next', () => {
+    expect(levelFor(0)).toMatchObject({ level: 1, tier: 'Rookie', nextTier: { name: 'Prospect', level: 5 } });
+    const mid = levelFor(xpForLevel(12) + 10);
+    expect(mid).toMatchObject({ level: 12, tier: 'Rotation Player', into: 10 });
+    expect(mid.toNext).toBe(xpForLevel(13) - xpForLevel(12) - 10);
+    expect(mid.progress).toBeGreaterThan(0);
+    expect(levelFor(10_000_000)).toMatchObject({ level: MAX_LEVEL, tier: 'GOAT', toNext: 0, progress: 1, nextTier: null });
+    expect(tierFor(20).name).toBe('All-Star');
+  });
+
+  it('keeps every badge players may already have', () => {
+    // Stored in reward_events: removing or renaming one takes it off a player
+    const legacy = ['first-session', 'sessions-10', 'sessions-50', 'sessions-100', 'makes-1000', 'makes-5000', 'makes-10000', 'streak-7', 'streak-30', 'first-pr', 'prs-10', 'gym-20', 'student', 'scholar', 'program-finisher', 'video-tracker'];
+    const ids = new Set(BADGES.map((b) => b.id));
+    for (const id of legacy) expect(ids.has(id)).toBe(true);
+  });
+
+  it('shows progress towards a badge, and values it by tier', () => {
+    const fiveK = BADGES.find((b) => b.id === 'makes-5000')!;
+    expect(fiveK.metric({ ...base, totalMakes: 3210 })).toBe(3210);
+    expect(fiveK.target).toBe(5000);
+    expect(badgeXp(['makes-5000', 'first-session', 'no-longer-exists'])).toBe(BADGE_XP.gold + BADGE_XP.bronze);
+  });
+
+  it('pays more for each day a streak goes on, up to a cap', () => {
+    expect(streakDayBonus(1)).toBeLessThan(streakDayBonus(5));
+    expect(streakDayBonus(1000)).toBe(STREAK_XP_CAP);
+  });
+
+  it('pays streak milestones every time a streak reaches them', () => {
+    // Two separate 3-day streaks, then a 7-day one
+    const days = [
+      '2026-09-01', '2026-09-02', '2026-09-03',
+      '2026-09-10', '2026-09-11', '2026-09-12',
+      '2026-09-20', '2026-09-21', '2026-09-22', '2026-09-23', '2026-09-24', '2026-09-25', '2026-09-26',
+    ];
+    const r = streakRewards(days, 7);
+    expect(r.milestones).toEqual({ 3: 3, 7: 1 });
+    const run = (n: number) => Array.from({ length: n }, (_, i) => streakDayBonus(i + 1)).reduce((x, y) => x + y, 0);
+    const dayBonus = run(3) + run(3) + run(7);
+    expect(r.xp).toBe(dayBonus + 3 * 75 + 200);
+    // On a 7-day streak, the next to aim for is 14
+    expect(r.next).toEqual({ days: 14, xp: 400, remaining: 7 });
+    expect(r.nextDayBonus).toBe(streakDayBonus(8));
+  });
+
+  it('counts a streak through a rest day for its rewards, as for the streak itself', () => {
+    const everyOtherDay = ['2026-09-20', '2026-09-22', '2026-09-24'];
+    expect(streakRewards(everyOtherDay, 3).milestones).toEqual({ 3: 1 });
   });
 
   it('computes longest and current streaks', () => {

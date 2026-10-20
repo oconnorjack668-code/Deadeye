@@ -22,6 +22,8 @@ import { ShotHeatMap } from '@/components/basketball/ShotHeatMap';
 import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
 import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
+import { LevelUpCelebration } from '@/components/LevelUpCelebration';
+import { TIER_THEME } from '@/lib/tierTheme';
 
 export const dynamic = 'force-dynamic';
 
@@ -236,48 +238,56 @@ export default async function DashboardPage() {
           <span>{metrics.load.message}</span>
         </div>
 
-        {/* Rank. rankFor() already returns the next rank and the fraction of the
-            way there, so the bar shows real progress to a real next tier rather
-            than a bare XP total with nothing to aim at. */}
+        {/* Level. Shows the next level and how far there is to go, so the bar
+            is real progress towards something rather than a bare XP total, and
+            what the streak is worth today, which is the reason to come back. */}
+        <LevelUpCelebration level={achievements.level.level} tier={achievements.level.tier} />
         <Link
           href="/achievements"
-          className="mb-8 block rounded-2xl border border-red-500/30 bg-red-500/10 p-4 hover:bg-red-500/15"
+          className={`mb-8 block rounded-2xl border p-4 transition-colors hover:brightness-110 ${TIER_THEME[achievements.level.tier].card}`}
         >
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-red-500/20">
-                <Star className="h-5 w-5 text-red-300" />
+              <span className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${TIER_THEME[achievements.level.tier].chip}`}>
+                <Star className="h-5 w-5" />
               </span>
               <div className="min-w-0">
-                <div className="font-black text-red-300">{achievements.rank.name}</div>
-                {achievements.rank.next && (
+                <div className="font-black text-white">
+                  Level {achievements.level.level}{' '}
+                  <span className={`text-sm font-bold ${TIER_THEME[achievements.level.tier].text}`}>{achievements.level.tier}</span>
+                </div>
+                {achievements.level.toNext > 0 && (
                   <div className="text-xs text-zinc-400">
-                    {(achievements.rank.next.min - achievements.xp).toLocaleString()} XP to{' '}
-                    {achievements.rank.next.name}
+                    {achievements.level.toNext.toLocaleString()} XP to Level {achievements.level.level + 1}
                   </div>
                 )}
               </div>
             </div>
             <div className="text-right flex-shrink-0">
               <span className="text-xl font-black text-white">{achievements.xp.toLocaleString()}</span>
-              <span className="text-xs text-zinc-500">
-                {achievements.rank.next ? ` / ${achievements.rank.next.min.toLocaleString()}` : ''} XP
-              </span>
+              <span className="text-xs text-zinc-500"> XP</span>
             </div>
           </div>
           <div className="mt-3 h-2 rounded-full bg-zinc-800 overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-red-500 to-red-400 transition-all"
-              style={{ width: `${Math.round(Math.min(1, Math.max(0, achievements.rank.progress)) * 100)}%` }}
+              className={`h-full rounded-full transition-all ${TIER_THEME[achievements.level.tier].bar}`}
+              style={{ width: `${Math.round(Math.min(1, Math.max(0, achievements.level.progress)) * 100)}%` }}
             />
           </div>
-          <div className="mt-2.5 flex items-center justify-between text-xs">
-            <span className="font-semibold text-red-300">
-              Weekly challenges · {achievements.challenges.filter((c) => c.done).length} of{' '}
-              {achievements.challenges.length} done
+          <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
+            <span className="font-semibold text-orange-300">
+              {achievements.stats.currentStreak > 0
+                ? `Next training day +${achievements.streak.nextDayBonus} streak XP`
+                : 'Train today to start a streak'}
+              {achievements.streak.next &&
+                ` · ${achievements.streak.next.remaining} to the ${achievements.streak.next.days}-day bonus (+${achievements.streak.next.xp.toLocaleString()})`}
             </span>
-            {achievements.newlyEarned.length > 0 && (
+            {achievements.newlyEarned.length > 0 ? (
               <span className="font-semibold text-emerald-400">New badge: {achievements.newlyEarned[0]}!</span>
+            ) : (
+              <span className="text-zinc-400">
+                Weekly challenges {achievements.challenges.filter((c) => c.done).length}/{achievements.challenges.length}
+              </span>
             )}
           </div>
         </Link>

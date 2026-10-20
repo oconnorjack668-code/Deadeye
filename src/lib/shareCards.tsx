@@ -149,7 +149,10 @@ export function WorkoutCard({ date, type, minutes, sets, volume, unit, prs, best
 }
 
 export interface RankCardData {
+  /** The tier name. */
   rank: string;
+  /** Shown large above the tier when given. */
+  level?: number;
   xp: number;
   streak: number;
   sessions: number;
@@ -157,11 +160,18 @@ export interface RankCardData {
   makes: number;
 }
 
-export function RankCard({ rank, xp, streak, sessions, badges, makes }: RankCardData) {
+export function RankCard({ rank, level, xp, streak, sessions, badges, makes }: RankCardData) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ display: 'flex', fontSize: 34, color: '#a1a1aa', letterSpacing: 4 }}>MY RANK</div>
-      <div style={{ display: 'flex', fontSize: 150, fontWeight: 900, color: ORANGE, lineHeight: 1.1 }}>{rank}</div>
+      <div style={{ display: 'flex', fontSize: 34, color: '#a1a1aa', letterSpacing: 4 }}>{level ? 'MY LEVEL' : 'MY RANK'}</div>
+      {level ? (
+        <>
+          <div style={{ display: 'flex', fontSize: 170, fontWeight: 900, color: ORANGE, lineHeight: 1.05 }}>{`Level ${level}`}</div>
+          <div style={{ display: 'flex', fontSize: 64, fontWeight: 800, color: '#e4e4e7' }}>{rank}</div>
+        </>
+      ) : (
+        <div style={{ display: 'flex', fontSize: 150, fontWeight: 900, color: ORANGE, lineHeight: 1.1 }}>{rank}</div>
+      )}
       <div style={{ display: 'flex', fontSize: 44, fontWeight: 800 }}>{`${xp.toLocaleString('en-IE')} XP`}</div>
       <div style={{ display: 'flex', width: '100%', marginTop: 64 }}>
         <Stat value={`${streak}`} label="day streak" color={ORANGE} />

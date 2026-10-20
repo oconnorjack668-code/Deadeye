@@ -93,5 +93,6 @@ describe('share cards', () => {
 
   it('rank card', async () => {
     expect(isPng(await render('rank', <RankCard rank="All-Star" xp={5230} streak={6} sessions={48} badges={9} makes={3120} />))).toBe(true);
+    expect(isPng(await render('level', <RankCard rank="Hall of Famer" level={42} xp={19830} streak={23} sessions={310} badges={21} makes={18200} />))).toBe(true);
   }, 30_000);
 });

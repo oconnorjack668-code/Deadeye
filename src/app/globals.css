@@ -50,6 +50,33 @@ body {
   animation: deadeye-flash 1.4s ease-out forwards;
 }
 
+/* Pops in and stays, for a level-up: deadeye-flash fades back out, which suits
+   a shot call and not a reward the player should be able to read */
+@keyframes deadeye-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.deadeye-pop {
+  animation: deadeye-pop 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deadeye-pop {
+    animation: none;
+  }
+}
+
 /* Someone filming their own shooting does not need it bouncing at them */
 @media (prefers-reduced-motion: reduce) {
   .deadeye-flash {

@@ -136,7 +136,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
     const a = await loadAchievements(user.id);
     body = (
       <RankCard
-        rank={a.rank.name}
+        rank={a.level.tier}
+        level={a.level.level}
         xp={a.xp}
         streak={a.stats.currentStreak}
         sessions={a.stats.totalSessions + a.stats.totalWorkouts}

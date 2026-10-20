@@ -6,10 +6,12 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   BADGES,
+  badgeXp,
   challengeProgress,
-  rankFor,
+  levelFor,
+  streakRewards,
   streaks,
-  xpFor,
+  xpBreakdown,
   type ChallengeRules,
   type PlayerStats,
 } from '@/lib/achievements';
@@ -41,6 +43,7 @@ export async function loadAchievements(userId: string) {
     totalPRs,
     { data: programDays },
     { count: programsDone },
+    { count: programDaysDone },
     { count: videoTracked },
     { data: challenges },
     { data: completions },
@@ -57,6 +60,7 @@ export async function loadAchievements(userId: string) {
     getPersonalRecordCount(userId),
     supabase.from('program_day_completions').select('completed_at').eq('user_id', userId).gte('completed_at', weekStartIso),
     supabase.from('program_enrollments').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('status', 'completed'),
+    supabase.from('program_day_completions').select('id', { count: 'exact', head: true }).eq('user_id', userId),
     supabase.from('video_analyses').select('id', { count: 'exact', head: true }).eq('user_id', userId).eq('kind', 'shot_tracking'),
     supabase.from('challenges').select('id, slug, title, description, points, challenge_type, rules').eq('recurring', true).eq('is_active', true).order('points', { ascending: false }),
     supabase.from('challenge_completions').select('challenge_id, period_start, points_earned').eq('user_id', userId),
@@ -82,6 +86,7 @@ export async function loadAchievements(userId: string) {
     sectionsWithLesson: new Set(lessonRows.map((l) => l.study_items?.topic_id).filter(Boolean)).size,
     totalPRs,
     programsCompleted: programsDone || 0,
+    programDays: programDaysDone || 0,
     videoTracked: videoTracked || 0,
     longestStreak: longest,
     currentStreak: current,
@@ -155,14 +160,29 @@ export async function loadAchievements(userId: string) {
   }
 
   const challengePoints = completionRows.reduce((n, c) => n + c.points_earned, 0) + awardedPoints;
-  const xp = xpFor(stats, challengePoints, earnedBadgeIds.size);
+  // From the same training days, with the same rest-day rule, as the streak
+  // the player sees
+  const streak = streakRewards(allDays, current);
+  const xpParts = xpBreakdown(stats, { challengePoints, badgeXp: badgeXp(earnedBadgeIds), streakXp: streak.xp });
 
   return {
     stats,
     challenges: challengeViews,
-    badges: BADGES.map((b) => ({ id: b.id, title: b.title, description: b.description, tier: b.tier, icon: b.icon, earned: earnedBadgeIds.has(b.id) })),
+    badges: BADGES.map((b) => ({
+      id: b.id,
+      title: b.title,
+      description: b.description,
+      tier: b.tier,
+      group: b.group,
+      icon: b.icon,
+      earned: earnedBadgeIds.has(b.id),
+      current: Math.min(b.metric(stats), b.target),
+      target: b.target,
+    })),
     newlyEarned: newBadges.map((b) => b.title),
-    xp,
-    rank: rankFor(xp),
+    xp: xpParts.total,
+    xpParts,
+    level: levelFor(xpParts.total),
+    streak,
   };
 }
