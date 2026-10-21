@@ -1,8 +1,8 @@
 // src/app/(app)/workouts/tests/new/page.tsx
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { performanceTestSchema } from '@/lib/validation';
 import { localDateString } from '@/lib/dates';
@@ -22,19 +22,19 @@ const TESTS: Array<{ value: PerformanceTestType; label: string }> = [
   { value: 'custom', label: 'Custom Test' },
 ];
 
-export default function NewPerformanceTestPage() {
+function NewPerformanceTestForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // The phone's own date (toISOString() is UTC, which is still yesterday just after midnight in Ireland)
   const [testDate, setTestDate] = useState(() => localDateString());
-  // ?type=<test_type> preselects the test (e.g. from a program day). Read straight
-  // from the URL in the initializer instead of an effect, so there's no extra
-  // render and no setState-in-effect.
+  // ?type=<test_type> preselects the test (e.g. from a program day). Read through
+  // useSearchParams, not window.location: the server can't see window, so it
+  // rendered "inches" while the browser rendered "seconds" (React error #418).
   const [testType, setTestType] = useState<PerformanceTestType>(() => {
-    if (typeof window === 'undefined') return 'standing_vertical';
-    const type = new URLSearchParams(window.location.search).get('type');
+    const type = searchParams.get('type');
     const match = TESTS.find((t) => t.value === type);
     return match ? match.value : 'standing_vertical';
   });
@@ -254,5 +254,13 @@ export default function NewPerformanceTestPage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function NewPerformanceTestPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewPerformanceTestForm />
+    </Suspense>
   );
 }

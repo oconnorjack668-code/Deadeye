@@ -66,7 +66,14 @@ export default function SignUpPage() {
       });
 
       if (signUpError) {
-        setServerError(signUpError.message);
+        // Supabase's built-in mailer sends only a few emails an hour for the whole
+        // app, so a busy hour blocks the confirmation email. Its own wording
+        // ("email rate limit exceeded") reads like the player did something wrong.
+        setServerError(
+          signUpError.code === 'over_email_send_rate_limit'
+            ? "Lots of players are signing up right now and we couldn't send your confirmation email. Please try again in an hour."
+            : signUpError.message
+        );
         setIsLoading(false);
         return;
       }
