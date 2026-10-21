@@ -27,7 +27,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this one · Status: shipped
 
 ## Open
 - Re-run the activation counts in a week or two to see whether new players log a first session more often (user, SQL editor; see memory `usage-snapshot`).
-- A dedicated non-owner test account would let Claude check signed-in pages end to end. Waits on the user creating one (not the owner login).
+- ~~A dedicated non-owner test account~~: done, deadeyetester@gmail.com (memory `tester-account`).
 
 ## Gotchas
 - React Compiler lint: a caller of `startTracking` declared above it made the compiler treat `startTracking` and `startFromSavedRim` as render code ("Cannot call impure function"). Fixed by declaring the sample functions below `startTracking`. Passing them to `<Button>` doesn't help.

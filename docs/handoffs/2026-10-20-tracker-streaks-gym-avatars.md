@@ -34,7 +34,7 @@ Agent: Claude Code (Opus 5.5, with sub-agents for the programmes, the gym and dr
 ## Open
 - Try the new screens on a phone, because nobody has clicked through them yet: the rim adjuster, streaks, gym units, edit and delete, drills, avatars and settings. Waits on the user.
 - Parent emails: buy `deadeye.ie` (free on 19 Oct; about €6 the first year at Blacknight, then about €37 a year, possibly before VAT), then set up Resend and the two Vercel settings. Until then, under-16s can't add a photo and parents approve by link only. No current player is under 16.
-- Reminders run once a day at 18:00 UTC, so a player who picks a later time never gets one. Either limit the time picker or run the job hourly, which needs Vercel's paid plan. The user decides.
+- ~~Reminder time~~: decided 21 Oct, once a day at 16:00 UTC with no picker ([funnel-demo-progress-coach-plan](2026-10-21-funnel-demo-progress-coach-plan.md)).
 - Tracker: film 2–3 normal sessions with the recommended setup, so the bench can measure typical accuracy. Waits on the user's clips.
 - Not yet built from the review: warm-ups and cool-downs, easier versions of exercises, team and off-ball drills, drills without a hoop, advice on growth pains, sprint tests in metres, and a drill timer. Demo videos still need choosing in Owner tools.
 - Optional: `gws` needs a Google OAuth `client_secret.json` in `~/.config/gws/`, though Claude's Google connectors may be enough. Codex's `approval_policy` can go to `"never"`. Turning on "Dynamic workflows" in `/config` would let a full Claude Security scan run.

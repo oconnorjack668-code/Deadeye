@@ -30,7 +30,7 @@ Follows [first-run-tutorial](2026-10-21-first-run-tutorial.md).
 - Tests: `__tests__/nameFilter.test.ts`, `reset-name.test.ts`, plus additions to `dashboard-metrics` and `recommend`
 
 ## Open
-- Run 00044 in the Supabase SQL editor (user). Until then, the app's own check blocks new rude names, but the existing one stays.
+- ~~Run 00044 in the Supabase SQL editor~~: done by the user, 21 Oct.
 - ~~Re-check signed-in pages on the live site~~: done after the merge. MAKE/MISS visible after a tap, Settings refuses a rude name and keeps the old one, no page errors, layouts fixed. Previews can't sign in ("Failed to fetch"; likely no database env vars on previews).
 - Sample clip: the miss was intermittent (failed 4 of 16 live phone-sized runs, all in one stretch; 0 of 12 locally). After the merge: 4 of 4 live phone-sized runs right. The old code had also passed its last 4, so this shows it works, not that the preload was the fix.
 
