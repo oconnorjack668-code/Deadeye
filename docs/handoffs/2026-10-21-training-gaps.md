@@ -1,6 +1,6 @@
 # Phase 5 training gaps (2026-10-21)
 
-Agent: Claude Code (Opus 5.5) · Branch: `training-gaps`, commit 7cc9bee (not pushed) · Status: in progress (built and checked; waits on migration 00048)
+Agent: Claude Code (Opus 5.5) · Commits: 7cc9bee, and a follow-up hiding the old warm-up notes · Status: shipped (00048 run by the user 21 Oct; checked live with the tester)
 
 Follows [coach-side-c1-c2](2026-10-21-coach-side-c1-c2.md). The gaps came from the October review ([tracker-streaks-gym-avatars](2026-10-20-tracker-streaks-gym-avatars.md)); status is in the plan doc, Phase 5 ([Deadeye next steps plan](https://claude.ai/artifact/RqfLp144xsDgauotzCHkhj)).
 
@@ -22,8 +22,9 @@ Follows [coach-side-c1-c2](2026-10-21-coach-side-c1-c2.md). The gaps came from t
 - Test names in one list: `TEST_TYPES` in `src/lib/performanceTests.ts`.
 
 ## Open
-- Run 00048 in Supabase, then say push (user). Before it runs, choosing a metre sprint would fail to save, and the new skill chips are empty.
-- After the push: check a drill timer, the No hoop filter and a programme day live with the tester (Claude).
+- Checked live at phone size: No hoop filter (71 drills, none needing a hoop), new skill chips, the Mikan Drill timer (read 3 x 30 s, counted, paused, resumed, switched to rest, reset), a Strength Foundations day (warm-up card, easier versions, cool-down), the 10 m and 20 m sprints in the test form, the growth guide, and 117 of 167 exercise cards with an easier version (the 22 seed ones included).
+- The check found 23 programme days with their own "Warm up 10 minutes first" note under the new warm-up card; those notes are now hidden when the card shows.
+- The timer's beeps and vibration were not heard or felt in the check (no sound from the browser tool); try it on a phone.
 - Tracker accuracy: 2 or 3 filmed sessions (user). Demo videos in Owner tools (user).
 
 ## Gotchas

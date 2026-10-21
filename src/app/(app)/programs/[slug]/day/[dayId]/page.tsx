@@ -76,6 +76,9 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
   const easierFor = new Map(((easier || []) as Array<{ name: string; easier_version: string | null }>).map((e) => [e.name, e.easier_version]));
   const warmUp = drillBySlug.get(WARM_UP_SLUG) as { name: string; duration_minutes: number } | undefined;
   const coolDown = drillBySlug.get(COOL_DOWN_SLUG) as { name: string; duration_minutes: number } | undefined;
+  // 23 days carry their own "Warm up 10 minutes first: ..." note from before the
+  // Court Warm-Up existed; with the card above them it read as two warm-ups
+  const shown = warmUp ? items.filter((i) => !(i.type === 'note' && /^Warm up [0-9]+ minutes first/.test(i.text))) : items;
   const topicBySlug = new Map((topics || []).map((t: { slug: string }) => [t.slug, t]));
 
   const isActive = active?.program.id === day.training_programs.id;
@@ -107,7 +110,7 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
               </div>
             </Link>
           )}
-          {items.map((item, i) => {
+          {shown.map((item, i) => {
             if (item.type === 'drill') {
               const d = drillBySlug.get(item.slug) as { name: string; duration_minutes: number; reps: string } | undefined;
               return (
