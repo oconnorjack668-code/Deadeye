@@ -17,6 +17,7 @@ import {
   type PlayerStats,
 } from '@/lib/achievements';
 import { userCalendarNow } from '@/lib/userTime';
+import { STARTER_BONUS_ID, STARTER_BONUS_XP } from '@/lib/starter';
 import { getPersonalRecordCount, getShotTotals, getShotsSince, getStreaksFromDb, getTrainingCounts, getTrainingDates } from '@/lib/player-activity';
 
 export interface ChallengeView {
@@ -167,7 +168,10 @@ export async function loadAchievements(userId: string) {
   // From the same training days, with the same rest-day rule, as the streak
   // the player sees
   const streak = streakRewards(allDays, current);
-  const xpParts = xpBreakdown(stats, { challengePoints, badgeXp: badgeXp(earnedBadgeIds), streakXp: streak.xp });
+  // The starting-steps bonus is stored in reward_events beside the badges but
+  // is not one: badgeXp ignores ids it does not know, so it is added here.
+  const bonusXp = earnedBadgeIds.has(STARTER_BONUS_ID) ? STARTER_BONUS_XP : 0;
+  const xpParts = xpBreakdown(stats, { challengePoints, badgeXp: badgeXp(earnedBadgeIds), streakXp: streak.xp, bonusXp });
   const level = levelFor(xpParts.total);
 
   // Kept for the player card, which shows friends a level without working it

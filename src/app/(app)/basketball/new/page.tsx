@@ -22,6 +22,8 @@ import {
   type BasketballSavePayload,
 } from '@/lib/offline';
 import { SavedOfflineCard } from '@/components/SavedOfflineCard';
+import { FirstLogGuide, logGuideStep } from '@/components/basketball/FirstLogGuide';
+import { LOG_GUIDE_HIDDEN_KEY, readFlag, writeFlag } from '@/lib/starter';
 import { ArrowLeft, Plus, Timer, Undo2, X, Flame } from 'lucide-react';
 
 interface TrackedShot {
@@ -257,6 +259,37 @@ export default function NewBasketballSessionPage() {
   useEffect(() => {
     preloadRecordings(loadSound());
   }, []);
+
+  // First-time tips, only for a player with no session saved yet. Asked of the
+  // database rather than remembered on the phone, so a player who logged on
+  // another device is not walked through it again. Offline, no tips.
+  const [guideOn, setGuideOn] = useState(false);
+  useEffect(() => {
+    if (readFlag(LOG_GUIDE_HIDDEN_KEY)) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const userId = await getUserIdForSave(supabase);
+        if (!userId || isOffline()) return;
+        const { count, error } = await supabase
+          .from('training_sessions')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', userId);
+        if (!cancelled && !error && count === 0) setGuideOn(true);
+      } catch {
+        // Tips are a nicety: without an answer, the page works as it always did
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  function hideGuide() {
+    writeFlag(LOG_GUIDE_HIDDEN_KEY);
+    setGuideOn(false);
+  }
 
   const active = draft.drills.find((d) => d.key === draft.activeKey) || draft.drills[0];
   const spot = draft.spot ?? null;
@@ -547,7 +580,8 @@ export default function NewBasketballSessionPage() {
       setSavedOffline(true);
       return;
     }
-    router.push('/basketball');
+    // ?saved=1 lets the Hoops page celebrate a first session (FirstSessionCelebration)
+    router.push('/basketball?saved=1');
     router.refresh();
   }
 
@@ -575,6 +609,7 @@ export default function NewBasketballSessionPage() {
     zoneTotals.set(s.zone, z);
   }
 
+  const guideStep = logGuideStep(!!spot, allShots.length);
   const challengeRemaining = challengeEndsAt ? (challengeEndsAt - now) / 1000 : 0;
   const shootingDrills = draft.drills.filter(tracksShots);
 
@@ -592,7 +627,12 @@ export default function NewBasketballSessionPage() {
               {totalMakes}/{allShots.length} · {pct(totalMakes, allShots.length)}
             </p>
           </div>
-          <Button variant="primary" size="sm" onClick={openFinish}>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={openFinish}
+            className={guideOn && guideStep === 3 ? 'ring-2 ring-orange-300 ring-offset-2 ring-offset-zinc-950 animate-pulse' : undefined}
+          >
             Finish
           </Button>
         </div>
@@ -650,6 +690,8 @@ export default function NewBasketballSessionPage() {
           ))}
         </div>
 
+        {guideOn && <FirstLogGuide step={guideStep} mode={mode} onHide={hideGuide} />}
+
         <CourtMap shots={active.shots} selected={spot} onTap={handleTap} />
 
         {spot ? (
@@ -673,6 +715,9 @@ export default function NewBasketballSessionPage() {
               {active.name}: {activeMakes}/{active.shots.length} ({pct(activeMakes, active.shots.length)})
             </span>
           </div>
+        ) : guideOn ? (
+          // The first-time tip above the court already says this
+          <div className="mb-3" />
         ) : (
           // Sits directly above the logging buttons because those are disabled
           // until a spot is picked - the page-level error Alert is off-screen here.

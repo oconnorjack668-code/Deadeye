@@ -273,7 +273,9 @@ export default function OnboardingPage() {
         }
       }
 
-      router.push(isEditing ? '/profile' : '/dashboard');
+      // A new player lands on the welcome screen's "are you at a court?" rather
+      // than the dashboard: see src/app/(app)/welcome/page.tsx
+      router.push(isEditing ? '/profile' : '/welcome');
       router.refresh();
     } catch {
       fail('Failed to save profile. Please try again.');

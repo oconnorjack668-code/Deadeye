@@ -22,6 +22,7 @@ import { ShotHeatMap } from '@/components/basketball/ShotHeatMap';
 import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
 import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
+import { StarterSteps } from '@/components/StarterSteps';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
 
@@ -95,7 +96,7 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient();
-  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad] = await Promise.all([
+  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad, iqAnswers] = await Promise.all([
     getCurrentSubscription(),
     calculateDashboardMetrics(user.id),
     getShootingByZone(user.id),
@@ -106,7 +107,11 @@ export default async function DashboardPage() {
     // platform churn at about half the rate of solo ones, and for an
     // individual-skill sport a name you know beats a national rank.
     supabase.rpc('friends_overview'),
+    // One of the starting steps: has the daily IQ question ever been answered
+    supabase.from('daily_iq_answers').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
   ]);
+  // Shown until the bonus for finishing them is paid; it is in the XP once paid
+  const showStarterSteps = achievements.xpParts.bonus === 0;
   const squadLine = squadActivityLine((squad.data || []) as unknown as FriendRow[]);
   const isPro = hasPro(subscription);
   const [offer, isOwner] = await Promise.all([getFoundingOffer(), checkIsOwner()]);
@@ -152,7 +157,8 @@ export default async function DashboardPage() {
           </Link>
         )}
 
-        <InstallNudge />
+        {/* The starting steps include the home screen, so one nudge at a time */}
+        {!showStarterSteps && <InstallNudge />}
 
         {/* Today. Deliberately the first thing under the greeting: you open the
             app to decide what to train, not to look at a reward meter. */}
@@ -226,6 +232,10 @@ export default async function DashboardPage() {
             </>
           )}
         </div>
+
+        {/* Straight under Today: three of the four can be done away from a
+            court, which is where most new players are (src/lib/starter.ts) */}
+        {showStarterSteps && <StarterSteps iqDone={(iqAnswers.count || 0) > 0} shotsDone={metrics.totalSessions > 0} />}
 
         {/* The founding member offer while it can still be claimed, or the
             heads-up in the last week of a founding member's free months. Under

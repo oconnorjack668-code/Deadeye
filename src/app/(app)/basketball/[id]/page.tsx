@@ -11,6 +11,8 @@ import type { ShotZone } from '@/lib/supabase/types';
 import { ArrowLeft, Target, Sparkles, Video } from 'lucide-react';
 import { ShareCardButton } from '@/components/ShareCardButton';
 import { DeleteSessionButton } from './DeleteSessionButton';
+import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { XP_VALUES } from '@/lib/achievements';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,10 +22,22 @@ function pct(makes: number, attempts: number): string {
   return attempts > 0 ? `${Math.round((makes / attempts) * 100)}%` : '–';
 }
 
-export default async function BasketballSessionPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export default async function BasketballSessionPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ saved?: string }>;
+}) {
+  const [{ id }, { saved }] = await Promise.all([params, searchParams]);
   const user = await requireUser();
   const supabase = await createClient();
+
+  // The camera tracker lands here after saving (?saved=1). Counted only then,
+  // so opening an old session costs no extra query.
+  const firstSession =
+    saved === '1' &&
+    (await supabase.from('training_sessions').select('id', { count: 'exact', head: true }).eq('user_id', user.id)).count === 1;
 
   const [{ data: session }, { data: drills }] = (await Promise.all([
     supabase.from('training_sessions').select('*').eq('id', id).eq('user_id', user.id).maybeSingle(),
@@ -67,6 +81,9 @@ export default async function BasketballSessionPage({ params }: { params: Promis
         <Link href="/basketball" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 mb-4">
           <ArrowLeft className="h-4 w-4" /> Hoops
         </Link>
+        {firstSession && (
+          <FirstSessionCelebration xp={XP_VALUES.session + (session.verified_by_video ? XP_VALUES.videoTracked : 0)} />
+        )}
         <h1 className="text-3xl font-black tracking-tight text-white capitalize flex items-center gap-2">
           <Target className="h-7 w-7 text-orange-400" /> {session.session_type.replace(/-/g, ' ')}
         </h1>

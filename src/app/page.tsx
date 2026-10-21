@@ -170,10 +170,14 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Shot tracker spotlight */}
+        {/* Shot tracker spotlight, with the promo. On a phone the video sits
+            between the heading and the points; wider screens give it its own
+            column. preload="none" so visitors who never press play don't
+            download it; the 720p copy in public/promo is cut from
+            docs/brand/deadeye-promo-voice.mp4. */}
         <section className="px-4 py-14">
           <div className="mx-auto grid max-w-5xl gap-8 sm:grid-cols-2 sm:items-center">
-            <div>
+            <div className="sm:self-end">
               <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-orange-400">
                 <Video className="h-4 w-4" /> Automatic shot tracking
               </p>
@@ -183,7 +187,19 @@ export default async function Home() {
                 doesn&apos;t.
               </p>
             </div>
-            <ul className="space-y-3">
+            <figure className="mx-auto w-full max-w-[300px] sm:col-start-2 sm:row-span-2 sm:row-start-1">
+              <video
+                className="aspect-[9/16] w-full rounded-3xl border border-zinc-800 bg-zinc-900 object-cover"
+                src="/promo/deadeye-promo.mp4"
+                poster="/promo/deadeye-promo-poster.jpg"
+                controls
+                playsInline
+                preload="none"
+                aria-label="Deadeye promo: the shot tracker counting makes and misses"
+              />
+              <figcaption className="mt-2 text-center text-xs text-zinc-500">25 seconds · sound on</figcaption>
+            </figure>
+            <ul className="space-y-3 sm:self-start">
               {TRACKER_POINTS.map((p) => (
                 <li key={p} className="flex gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 text-sm text-zinc-300">
                   <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />

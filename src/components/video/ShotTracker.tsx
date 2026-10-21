@@ -29,7 +29,7 @@ import { HighlightReel } from '@/components/video/HighlightReel';
 import { ReportProblem } from '@/components/ReportProblem';
 import { RimAdjuster } from '@/components/video/RimAdjuster';
 import { leftFirst, type Point } from '@/lib/video/rimAdjust';
-import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity } from 'lucide-react';
+import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
 type Source = 'camera' | 'file';
@@ -37,6 +37,21 @@ type Source = 'camera' | 'file';
 
 export interface TrackedShot extends DetectedShot {
   id: number;
+}
+
+/**
+ * A built-in clip with its rim already measured, for a new player to watch the
+ * tracker work from anywhere - most sign up nowhere near a court
+ * (/welcome/sample). The real tracker runs on it; nothing from it is saved.
+ */
+export interface TrackerSample {
+  src: string;
+  poster?: string;
+  rim: Rim;
+  /** What really happened in the clip, labelled by hand, to set the call against. */
+  truth: { makes: number; attempts: number };
+  /** Once the run reaches review, with what the tracker called. */
+  onFinished?: (called: { makes: number; attempts: number }) => void;
 }
 
 function clock(ms: number): string {
@@ -47,9 +62,11 @@ function clock(ms: number): string {
 export function ShotTracker({
   onCheckForm,
   onSummary,
+  sample,
 }: {
   onCheckForm?: (file: File, shotTimeMs: number) => void;
   onSummary?: (summary: ShootingSummary | null) => void;
+  sample?: TrackerSample;
 }) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -605,6 +622,56 @@ export function ShotTracker({
     setStep('review');
   }
 
+  /**
+   * Plays the built-in sample with its rim already set. The video element only
+   * exists once the step has moved on from 'source' (and is a fresh one after
+   * review), so the clip is attached on the next frame, as openFile does, and
+   * sampleReady starts tracking when it has loaded.
+   */
+  function startSample() {
+    if (!sample) return;
+    setError(null);
+    setSound(loadSound());
+    setShots([]);
+    setRim(sample.rim);
+    setFirstEdge(null);
+    setEdges(null);
+    setCalibrating(true);
+    setStep('calibrate');
+    sampleNotifiedRef.current = false;
+    samplePendingRef.current = true;
+    requestAnimationFrame(() => {
+      const video = videoRef.current;
+      if (!video) return;
+      video.srcObject = null;
+      video.src = sample.src;
+    });
+  }
+
+  /**
+   * The video's onLoadedData: tracking starts once the sample can play.
+   *
+   * These sample functions sit below startTracking on purpose. Declared above
+   * it, the React Compiler analysed startTracking and startFromSavedRim as
+   * render code and rejected their performance.now() and Date.now() as impure
+   * calls during render - the same bailout startFromSavedRim's note describes.
+   */
+  function sampleReady() {
+    if (!sample || !samplePendingRef.current) return;
+    samplePendingRef.current = false;
+    startTracking(sample.rim).finally(() => setCalibrating(false));
+  }
+
+  // Tell the page the sample was watched, once per run
+  const sampleNotifiedRef = useRef(false);
+  /** Set by startSample, cleared by sampleReady: only a sample start begins tracking on load. */
+  const samplePendingRef = useRef(false);
+  useEffect(() => {
+    if (!sample || step !== 'review' || sampleNotifiedRef.current) return;
+    sampleNotifiedRef.current = true;
+    sample.onFinished?.({ makes: shots.filter((s) => s.made).length, attempts: shots.length });
+  }, [sample, step, shots]);
+
   function toggleShot(id: number) {
     setShots((cur) => cur.map((s) => (s.id === id ? { ...s, made: !s.made, confident: true } : s)));
   }
@@ -675,7 +742,8 @@ export function ShotTracker({
       session_id: session.id,
       summary: { source, zone, makes, attempts: shots.length, shots: shots.map((s) => ({ t: Math.round(s.t), made: s.made })) },
     });
-    router.push(`/basketball/${session.id}`);
+    // ?saved=1 lets the session page celebrate a first session
+    router.push(`/basketball/${session.id}?saved=1`);
   }
 
   const makes = shots.filter((s) => s.made).length;
@@ -686,7 +754,32 @@ export function ShotTracker({
       {error && <Alert variant="error" title="Check this">{error}</Alert>}
       {status && <p className="text-sm text-zinc-400">{status}</p>}
 
-      {step === 'source' && (
+      {step === 'source' && sample && (
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={startSample}
+            className="group relative block w-full overflow-hidden rounded-2xl border border-zinc-800 bg-black"
+            aria-label="Play the sample session"
+          >
+            {sample.poster && (
+              // eslint-disable-next-line @next/next/no-img-element -- a fixed local poster, no resizing wanted
+              <img src={sample.poster} alt="" className="w-full opacity-70 transition-opacity group-hover:opacity-90" />
+            )}
+            <span className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-600 shadow-lg">
+                <Play className="ml-1 h-7 w-7 fill-white text-white" />
+              </span>
+              <span className="rounded-full bg-black/70 px-3 py-1 text-sm font-semibold text-white">Play the sample</span>
+            </span>
+          </button>
+          <p className="text-xs text-zinc-500">
+            The rim is already set for this clip. At a court you tap its two sides once, then just shoot.
+          </p>
+        </div>
+      )}
+
+      {step === 'source' && !sample && (
         <div className="space-y-3">
           {/* Where the phone is matters more than anything the tracker does
               afterwards. Each of these was a measured cause of wrong calls on
@@ -726,7 +819,7 @@ export function ShotTracker({
 
       {step !== 'source' && step !== 'review' && (
         <div className="relative w-full overflow-hidden rounded-2xl bg-black">
-          <video ref={videoRef} playsInline muted className="w-full h-auto" />
+          <video ref={videoRef} playsInline muted onLoadedData={sampleReady} className="w-full h-auto" />
           <canvas ref={canvasRef} onClick={tapRim} className="absolute inset-0 h-full w-full touch-manipulation" />
           {step === 'calibrate' &&
             (edges ?? (firstEdge ? [firstEdge] : [])).map((edge, i) => (
@@ -931,6 +1024,25 @@ export function ShotTracker({
             )}
           </div>
 
+          {/* The sample's answer is known, so say how close the call was rather
+              than asking the player to check shots they never saw taken. */}
+          {sample && (
+            <div className="rounded-2xl border border-emerald-600/40 bg-emerald-600/10 p-4 text-sm">
+              <p className="font-semibold text-white">
+                {makes === sample.truth.makes && shots.length === sample.truth.attempts
+                  ? `Spot on. In this clip ${sample.truth.makes} of ${sample.truth.attempts} really went in.`
+                  : `In this clip ${sample.truth.makes} of ${sample.truth.attempts} really went in.`}
+              </p>
+              <p className="mt-1 text-zinc-300">
+                {makes !== sample.truth.makes || shots.length !== sample.truth.attempts
+                  ? 'A slow or busy phone can miss a moment. On your own sessions you can fix any call before saving.'
+                  : unresolved > 0
+                    ? `It was unsure of ${unresolved === 1 ? 'one shot' : `${unresolved} shots`} and guessed right. On your own sessions you settle a shot like that with one tap.`
+                    : 'That was the real tracker, running on your phone. At a court it does the same with your own shots.'}
+              </p>
+            </div>
+          )}
+
           {/* How well the tracking itself went. Counts from a run that managed
               8 frames a second deserve less trust than one that managed 30, and
               only the app knows which happened - so say it, rather than letting
@@ -959,14 +1071,14 @@ export function ShotTracker({
           {/* The player is the only one who saw what really happened, and this
               is the moment they know it. The run's numbers go with the report
               so it can be matched to what the tracker did. */}
-          <ReportProblem
+          {!sample && <ReportProblem
             label="Tracker got this wrong? Tell us"
             context={`Shot tracker, ${source === 'camera' ? 'live camera' : 'video'}: ${makes}/${shots.length} on screen, ${unresolved} unclear${
               quality ? `, ${quality.fps.toFixed(0)} fps` : ''
             }, ${ZONE_LABELS[zone]}`}
             className="text-xs text-zinc-500 underline"
             panelClassName="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3"
-          />
+          />}
 
           <div className="space-y-1.5 max-h-80 overflow-y-auto">
             {shots.map((s, i) => (
@@ -1019,6 +1131,20 @@ export function ShotTracker({
             )}
           </div>
 
+          {sample ? (
+            // A plain button, not <Button>: handed to a component, the React
+            // Compiler cannot tell startSample is an event handler, and analyses
+            // it - and startTracking under it - as render code (see
+            // startFromSavedRim)
+            <button
+              type="button"
+              onClick={startSample}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-zinc-800 font-semibold text-zinc-100 hover:bg-zinc-700"
+            >
+              <RotateCcw className="h-4 w-4" /> Watch it again
+            </button>
+          ) : (
+          <>
           <div className="flex gap-2">
             <button type="button" onClick={() => addShot(true)} className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-zinc-800 py-2 text-xs font-semibold text-zinc-200">
               <Plus className="h-3.5 w-3.5" /> Add a make it missed
@@ -1095,6 +1221,8 @@ export function ShotTracker({
           <button type="button" onClick={() => { setShots([]); setRim(null); setStep('source'); }} className="w-full text-center text-xs text-zinc-500">
             Start over
           </button>
+          </>
+          )}
         </div>
       )}
     </div>

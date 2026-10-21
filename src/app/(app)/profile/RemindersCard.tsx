@@ -17,7 +17,8 @@ function vapidKeyToBytes(base64: string): Uint8Array {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
-export function RemindersCard({ isPro = false }: { isPro?: boolean }) {
+/** showWeekly: false on the welcome screen, where a Pro report is not what a brand-new player came for. */
+export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: boolean; showWeekly?: boolean }) {
   const [loaded, setLoaded] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [days, setDays] = useState<number[]>([1, 3, 5]);
@@ -232,7 +233,7 @@ export function RemindersCard({ isPro = false }: { isPro?: boolean }) {
             </div>
           </>
         )}
-        {weekly !== null && isPro && (
+        {showWeekly && weekly !== null && isPro && (
           <label className="flex items-center justify-between gap-4 border-t border-zinc-800 pt-4 text-sm text-zinc-200">
             <span>
               Weekly AI report
@@ -249,7 +250,7 @@ export function RemindersCard({ isPro = false }: { isPro?: boolean }) {
         )}
         {/* Shown, not hidden: on Free the switch is replaced by what the report is
             and that it comes with Pro, so a player knows it exists */}
-        {!isPro && (
+        {showWeekly && !isPro && (
           <div className="flex items-start justify-between gap-4 border-t border-zinc-800 pt-4 text-sm text-zinc-200">
             <span>
               Weekly AI report

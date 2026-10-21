@@ -18,6 +18,6 @@ export const config = {
      * - api/webhooks (Stripe webhook endpoint handles own signature auth)
      * - api/cron (scheduled jobs; protected by CRON_SECRET)
      */
-    '/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|\\.well-known/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|mp3)$|api/webhooks|api/cron).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|\\.well-known/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|mp3|mp4)$|api/webhooks|api/cron).*)',
   ],
 };

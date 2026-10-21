@@ -24,6 +24,7 @@ import { requireUser } from '@/lib/auth';
 import { loadAchievements } from '@/lib/achievements-server';
 import { BADGE_XP, FREEZE_EVERY, STREAK_MILESTONES, STREAK_XP_CAP, STREAK_XP_PER_DAY, TIERS, XP_VALUES, type BadgeGroup } from '@/lib/achievements';
 import { TIER_THEME } from '@/lib/tierTheme';
+import { STARTER_BONUS_XP } from '@/lib/starter';
 import { ShareCardButton } from '@/components/ShareCardButton';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 
@@ -59,6 +60,7 @@ const EARN = [
   { what: 'Streak milestones', xp: `+${STREAK_MILESTONES[0].xp} to +${STREAK_MILESTONES[STREAK_MILESTONES.length - 1].xp.toLocaleString()}` },
   { what: 'Badges', xp: `+${BADGE_XP.bronze} to +${BADGE_XP.legend.toLocaleString()}` },
   { what: 'Weekly challenges', xp: 'their points' },
+  { what: 'Finish the starting steps (once)', xp: `+${STARTER_BONUS_XP}` },
 ];
 
 export default async function AchievementsPage() {
@@ -330,6 +332,7 @@ export default async function AchievementsPage() {
                   ['Lessons', a.xpParts.lessons],
                   ['Personal records', a.xpParts.prs],
                   ['Video', a.xpParts.video],
+                  ['Starting steps', a.xpParts.bonus],
                 ] as const
               ).map(([label, xp]) => (
                 <li key={label} className="flex justify-between gap-3">

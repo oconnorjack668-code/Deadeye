@@ -9,12 +9,15 @@ import Link from 'next/link';
 import { Plus, Target, ListChecks, ClipboardList, Video, Lightbulb, ChevronRight } from 'lucide-react';
 import { formatShootingPercentage } from '@/lib/stats';
 import { getShotTotals } from '@/lib/player-activity';
+import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { XP_VALUES } from '@/lib/achievements';
 
 export const metadata = {
   title: 'Hoops - Deadeye',
 };
 
-export default async function BasketballPage() {
+export default async function BasketballPage({ searchParams }: { searchParams: Promise<{ saved?: string }> }) {
+  const { saved } = await searchParams;
   const user = await requireUser();
   const supabase = await createClient();
 
@@ -54,6 +57,9 @@ export default async function BasketballPage() {
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-3xl mx-auto">
         <PageHeader tone="hoops" icon={Target} title="Hoops" subtitle="Drills, shooting and game minutes" />
+
+        {/* The shot logger lands here after saving (?saved=1) */}
+        {saved === '1' && totalSessions === 1 && <FirstSessionCelebration xp={XP_VALUES.session} />}
 
         {/* One unmistakable primary action, full width. It used to sit inline
             beside the heading, which on a phone squeezed it to a chip. */}

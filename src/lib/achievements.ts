@@ -223,12 +223,14 @@ export interface XpBreakdown {
   challenges: number;
   badges: number;
   streaks: number;
+  /** One-off rewards, such as finishing the starting steps (src/lib/starter.ts). */
+  bonus: number;
   total: number;
 }
 
 export function xpBreakdown(
   s: PlayerStats,
-  extra: { challengePoints: number; badgeXp: number; streakXp: number }
+  extra: { challengePoints: number; badgeXp: number; streakXp: number; bonusXp?: number }
 ): XpBreakdown {
   const parts = {
     training: s.totalSessions * XP_VALUES.session + s.totalWorkouts * XP_VALUES.workout,
@@ -240,6 +242,7 @@ export function xpBreakdown(
     challenges: extra.challengePoints,
     badges: extra.badgeXp,
     streaks: extra.streakXp,
+    bonus: extra.bonusXp ?? 0,
   };
   return { ...parts, total: Object.values(parts).reduce((n, v) => n + v, 0) };
 }
