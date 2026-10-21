@@ -1,6 +1,6 @@
 # Coach side C1 + C2: setup, coach home, mode switch, safeguarding (2026-10-21)
 
-Agent: Claude Code (Opus 5.5) · Branch: `coach-side-c1-c2` (not pushed) · Status: in progress (built and checked; waits on migration 00047 and a push)
+Agent: Claude Code (Opus 5.5) · Commits: d4a2c94, 4768623 · Status: shipped (00047 run by the user 21 Oct; live and checked with the tester)
 
 Follows [funnel-demo-progress-coach-plan](2026-10-21-funnel-demo-progress-coach-plan.md). Spec and status: the plan doc, "Coach product", "Safeguarding" and "Coach roadmap" ([Deadeye next steps plan](https://claude.ai/artifact/RqfLp144xsDgauotzCHkhj)).
 
@@ -24,8 +24,8 @@ Follows [funnel-demo-progress-coach-plan](2026-10-21-funnel-demo-progress-coach-
 - New dependency: `qrcode` 1.5.4 (+ `@types/qrcode`).
 
 ## Open
-- Run 00047 in the Supabase SQL editor, then say push (user). Pushing first would show coaches a setup that cannot save.
-- After the push: sign the tester in so Claude can check setup, coach home, the switch and the share screen on a phone-size window (user, then Claude). The signed-in pages were not seen rendered this session.
+- Checked live with the tester (desktop and 375px frames): Settings → Player & coach → setup (vetting refused until ticked) → team → share screen (QR decodes to the join link) → coach home → posting an assignment → team page → Playing / Coaching switch. Two fixes came out of it (4768623). The test team was deleted and the tester set back to player, but its coach_profiles row stays (no way to remove one in the app), so the tester now counts as a coach for the friend rule.
+- Not checked live: the under-18 path, a second account joining by link, the parent view of coach posts, and the Report button (players only).
 - Parents of 16 and 17 year olds have no parent link, so they can't see coach posts; needs parent emails (deadeye.ie, Resend) (user, then Claude).
 - C3 (assignments that count themselves, weekly squad summary, season history) waits for 5 coaches using it for 3 weeks.
 - Existing friendships between coaches and under-18s were left alone; decide whether to end them (user).
