@@ -46,13 +46,18 @@ export interface TrackedShot extends DetectedShot {
  * (/welcome/sample). The real tracker runs on it; nothing from it is saved.
  */
 export interface TrackerSample {
-  src: string;
+  /** The clip, or a function that fetches it when play is pressed (the landing page, where most visitors never press it). */
+  src: string | (() => Promise<string>);
   poster?: string;
   rim: Rim;
   /** What really happened in the clip, labelled by hand, to set the call against. */
   truth: { makes: number; attempts: number };
+  /** When play is pressed */
+  onStarted?: () => void;
   /** Once the run reaches review, with what the tracker called. */
   onFinished?: (called: { makes: number; attempts: number }) => void;
+  /** Shown in review straight under the verdict, above the shot list (the landing page's sign-up) */
+  cta?: React.ReactNode;
 }
 
 function clock(ms: number): string {
@@ -643,10 +648,16 @@ export function ShotTracker({
    * review), so the clip is attached on the next frame, as openFile does, and
    * sampleReady starts tracking when it has loaded.
    */
-  function startSample() {
+  async function startSample() {
     if (!sample) return;
-    track('sample_played');
+    sample.onStarted?.();
     setError(null);
+    let src = sample.src;
+    if (typeof src !== 'string') {
+      setSampleLoading(true);
+      src = await src();
+      setSampleLoading(false);
+    }
     const soundSettings = loadSound();
     setSound(soundSettings);
     // Fetched now, not at the first make: loading the swish mid-run cost a
@@ -664,7 +675,7 @@ export function ShotTracker({
       const video = videoRef.current;
       if (!video) return;
       video.srcObject = null;
-      video.src = sample.src;
+      video.src = src;
     });
   }
 
@@ -684,6 +695,8 @@ export function ShotTracker({
 
   // Tell the page the sample was watched, once per run
   const sampleNotifiedRef = useRef(false);
+  /** While a sample given as a loader is downloading, after play was pressed */
+  const [sampleLoading, setSampleLoading] = useState(false);
   /** Set by startSample, cleared by sampleReady: only a sample start begins tracking on load. */
   const samplePendingRef = useRef(false);
   useEffect(() => {
@@ -780,6 +793,7 @@ export function ShotTracker({
           <button
             type="button"
             onClick={startSample}
+            disabled={sampleLoading}
             className="group relative block w-full overflow-hidden rounded-2xl border border-zinc-800 bg-black"
             aria-label="Play the sample session"
           >
@@ -789,9 +803,15 @@ export function ShotTracker({
             )}
             <span className="absolute inset-0 flex flex-col items-center justify-center gap-2">
               <span className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-600 shadow-lg">
-                <Play className="ml-1 h-7 w-7 fill-white text-white" />
+                {sampleLoading ? (
+                  <span className="h-7 w-7 animate-spin rounded-full border-[3px] border-white border-t-transparent" />
+                ) : (
+                  <Play className="ml-1 h-7 w-7 fill-white text-white" />
+                )}
               </span>
-              <span className="rounded-full bg-black/70 px-3 py-1 text-sm font-semibold text-white">Play the sample</span>
+              <span className="rounded-full bg-black/70 px-3 py-1 text-sm font-semibold text-white">
+                {sampleLoading ? 'Loading the clip…' : 'Play the sample'}
+              </span>
             </span>
           </button>
           <p className="text-xs text-zinc-500">
@@ -1066,6 +1086,7 @@ export function ShotTracker({
               </p>
             </div>
           )}
+          {sample?.cta}
 
           {/* How well the tracking itself went. Counts from a run that managed
               8 frames a second deserve less trust than one that managed 30, and

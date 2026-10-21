@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { track } from '@/lib/events';
+import { track, trackIfFromDemo } from '@/lib/events';
 import Link from 'next/link';
 import { ArrowLeft, Brain, Camera, Check, MapPin, PenLine, PlayCircle, Sofa } from 'lucide-react';
 import { Logo } from '@/components/Logo';
@@ -20,7 +20,10 @@ const COURT_TIPS = [
 export function WelcomeClient({ firstName }: { firstName: string | null }) {
   const [answer, setAnswer] = useState<Answer>('ask');
 
-  useEffect(() => track('welcome_seen'), []);
+  useEffect(() => {
+    track('welcome_seen');
+    trackIfFromDemo();
+  }, []);
 
   if (answer === 'court') {
     return (

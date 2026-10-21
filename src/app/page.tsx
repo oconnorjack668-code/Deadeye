@@ -27,6 +27,7 @@ import { Logo } from '@/components/Logo';
 import { InstallGuide } from '@/components/InstallGuide';
 import { InAppBrowserNotice } from '@/components/InAppBrowserNotice';
 import { LandingHeader } from '@/components/LandingHeader';
+import { LandingDemo } from '@/components/LandingDemo';
 import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
 import { FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
@@ -136,6 +137,9 @@ export default async function Home() {
               </a>
             </div>
             <p className="mt-4 text-xs text-zinc-500">Free to start · For players aged 13 and over · No ads</p>
+            <a href="#try-it" className="mt-3 inline-block text-sm font-semibold text-orange-400 hover:text-orange-300">
+              Watch it track real shots, right here ↓
+            </a>
             {offer.open && (
               <a
                 href="#pricing"
@@ -207,6 +211,17 @@ export default async function Home() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* The tracker itself, on a real clip. The promo shows it; this lets a
+              visitor watch it count, in their own browser, before signing up. */}
+          <div id="try-it" className="mx-auto mt-14 max-w-xl scroll-mt-28">
+            <h3 className="text-2xl font-black tracking-tight text-white">Watch it call real shots</h3>
+            <p className="mt-2 mb-5 text-sm text-zinc-400">
+              This is the real tracker, running right here in your browser on a clip from a real session. Press play and
+              watch it count every make and miss.
+            </p>
+            <LandingDemo signedIn={signedIn} />
           </div>
         </section>
 

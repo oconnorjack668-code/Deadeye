@@ -40,6 +40,7 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
   {
     title: 'Welcome',
     steps: [
+      { name: 'signup_from_demo', label: 'Signed up from the landing page demo' },
       { name: 'welcome_seen', label: 'Saw the welcome screen' },
       { name: 'sample_played', label: 'Played the sample clip' },
       { name: 'sample_finished', label: 'Watched the sample to the end' },
