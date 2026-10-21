@@ -10,7 +10,7 @@ import type { Profile } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
 import { COACH_NAV_ITEMS, DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
 import { ModeSwitch } from './ModeSwitch';
-import { MODE_HOME } from '@/lib/coachSide';
+import { MODE_HOME, shownMode } from '@/lib/coachSide';
 import type { AppMode } from '@/lib/supabase/types';
 
 interface NavbarProps {
@@ -21,10 +21,11 @@ interface NavbarProps {
   canSwitch?: boolean;
 }
 
-export function Navbar({ profile, isOwner = false, mode = 'playing', canSwitch = false }: NavbarProps) {
+export function Navbar({ profile, isOwner = false, mode: savedMode = 'playing', canSwitch = false }: NavbarProps) {
   // Signing out lives in Settings, as a labelled button. An unlabelled icon here,
   // right beside Settings, was easy to tap by mistake.
   const pathname = usePathname();
+  const mode = shownMode(savedMode, pathname);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">

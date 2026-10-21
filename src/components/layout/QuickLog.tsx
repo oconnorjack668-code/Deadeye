@@ -16,8 +16,9 @@ const ACTIONS = [
 // Screens where a floating "log something" button would be redundant or in the
 // way: the logging forms themselves, the camera tracker, the coach chat (it sat
 // on top of the send button), and the welcome screens a new player is guided
-// through.
+// through. Also the coach pages, where it covered the quick actions.
 const HIDDEN_ON = [
+  '/coach',
   '/basketball/new',
   '/workouts/new',
   '/workouts/tests/new',

@@ -369,7 +369,7 @@ export function TeamClient({
                       </span>
                     )}
                     <span>
-                      {done.length}/{players.length || roster.length} done
+                      {done.length}/{players.length} done
                     </span>
                     {isSafeAppPath(a.link) && (
                       <Link href={a.link} className="text-cyan-400 underline">

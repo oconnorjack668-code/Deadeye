@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, CalendarCheck, Shield, ClipboardList, ListChecks, Settings } from 'lucide-react';
 import type { AppMode } from '@/lib/supabase/types';
+import { shownMode } from '@/lib/coachSide';
 
 // Pages that live under the Train hub light up the Train tab
 const TRAIN_PATHS = ['/train', '/programs', '/drills', '/guides', '/style-match', '/video', '/ai-coach', '/leaderboard', '/achievements', '/goals'];
@@ -43,8 +44,9 @@ export function isNavActive(pathname: string, match: string[], exact = false): b
   return match.some((m) => pathname === m || (!exact && pathname.startsWith(`${m}/`)));
 }
 
-export function BottomNav({ mode = 'playing' }: { mode?: AppMode }) {
+export function BottomNav({ mode: savedMode = 'playing' }: { mode?: AppMode }) {
   const pathname = usePathname();
+  const mode = shownMode(savedMode, pathname);
   const items: Array<(typeof NAV_ITEMS)[number] & { exact?: boolean }> = mode === 'coaching' ? COACH_NAV_ITEMS : NAV_ITEMS;
 
   return (

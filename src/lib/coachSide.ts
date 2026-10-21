@@ -21,6 +21,15 @@ export function appModeFor(profile: { account_role?: string | null; app_mode?: s
   return 'playing';
 }
 
+/**
+ * The mode the menus show. The coach pages always show coaching, whatever was
+ * saved: Coach home opened from the Train hub kept the player menu, with the
+ * floating log button over its quick actions.
+ */
+export function shownMode(saved: AppMode, pathname: string): AppMode {
+  return pathname === '/coach' || pathname.startsWith('/coach/') ? 'coaching' : saved;
+}
+
 /** Where each mode starts. */
 export const MODE_HOME: Record<AppMode, string> = { playing: '/dashboard', coaching: '/coach' };
 

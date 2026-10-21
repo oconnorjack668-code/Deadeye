@@ -6,6 +6,7 @@ import {
   AGE_GROUPS,
   TEAM_LEVELS,
   appModeFor,
+  shownMode,
   assignmentProgress,
   isStaff,
   parentMessage,
@@ -25,6 +26,14 @@ describe('coach side', () => {
     expect(appModeFor({ account_role: 'both', app_mode: 'coaching' })).toBe('coaching');
     expect(appModeFor({ account_role: 'both', app_mode: null })).toBe('playing');
     expect(appModeFor(null)).toBe('playing');
+  });
+
+  it('shows the coaching menu on every coach page, and the saved mode elsewhere', () => {
+    expect(shownMode('playing', '/coach')).toBe('coaching');
+    expect(shownMode('playing', '/coach/assignments')).toBe('coaching');
+    expect(shownMode('playing', '/coaches')).toBe('playing');
+    expect(shownMode('coaching', '/drills')).toBe('coaching');
+    expect(shownMode('playing', '/drills')).toBe('playing');
   });
 
   it('offers exactly the age groups and levels the database accepts', () => {
