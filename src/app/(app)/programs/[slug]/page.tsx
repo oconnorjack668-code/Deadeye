@@ -35,7 +35,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
     getHasPro(),
     startedProgramIds(supabase, user.id),
   ]);
-  // The outline stays visible either way: what a programme covers week by week
+  // The outline stays visible either way: what a program covers week by week
   // is how a player decides whether it is worth it
   const unlocked = canUseProgram(program, isPro, started);
   const days = sortDays((dayRows || []) as ProgramDay[]);
@@ -72,10 +72,10 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
             nextHref={isActive && active!.next ? `/programs/${program.slug}/day/${active!.next.id}` : undefined}
           />
           ) : (
-            <ProLock title="This programme is part of Deadeye Pro">
+            <ProLock title="This program is part of Deadeye Pro">
               <p>
-                Pro includes every programme: structured plans that build week by week toward a goal or a position.
-                Three programmes are free to follow from start to finish, and you can see the full outline of this one
+                Pro includes every program: structured plans that build week by week toward a goal or a position.
+                Four programs are free to follow from start to finish, and you can see the full outline of this one
                 below.
               </p>
             </ProLock>

@@ -88,7 +88,7 @@ export default function PrivacyPage() {
               itself runs on your phone, so videos you analyse without uploading never leave your device.
             </li>
             <li>AI coaching reports generated from your session data.</li>
-            <li>Programmes, goals, challenges, badges and NBA style match results.</li>
+            <li>Programs, goals, challenges, badges and NBA style match results.</li>
             <li>Game stats you log (box scores, opponent name, score) and teams you create or join.</li>
             <li>Settings you choose: country, county/region, time zone, whether you use Deadeye as a player or coach, and your privacy choices.</li>
             <li>Reminder settings (time, days, time zone) and, if you turn reminders on, your browser&apos;s push address.</li>

@@ -13,6 +13,16 @@ describe('dashboard metrics', () => {
     expect(computeDashboardMetrics({ ...base, sessionDates: [], workoutDates: [] }).consistency).toBe(0);
   });
 
+  it('shows a day count, not a %, in a player\'s first week', () => {
+    const first = computeDashboardMetrics({ ...base, sessionDates: ['2026-09-24'], workoutDates: [] });
+    expect(first.consistencyReady).toBe(false);
+    expect(first.consistencyDays).toBe(1);
+    // Training that started a week or more ago has a % worth showing
+    const week = computeDashboardMetrics({ ...base, sessionDates: ['2026-09-24', '2026-09-17'], workoutDates: [] });
+    expect(week.consistencyReady).toBe(true);
+    expect(computeDashboardMetrics({ ...base, sessionDates: [], workoutDates: [] }).consistencyReady).toBe(false);
+  });
+
   it('streak and weekly goal include gym workouts, like the leaderboard and Goals page', () => {
     const m = computeDashboardMetrics({
       ...base,

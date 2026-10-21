@@ -111,18 +111,18 @@ export default async function PerformanceTestsPage() {
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-3 mb-8">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="h-12 w-12 rounded-xl bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center shadow-lg">
               <Award className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-white">Performance Tests</h1>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Performance Tests</h1>
               <p className="text-sm text-zinc-400 mt-1">Vertical, sprint, agility, and custom tests</p>
             </div>
           </div>
-          <Link href="/workouts/tests/new">
-            <Button variant="primary" size="lg" className="gap-2">
+          <Link href="/workouts/tests/new" className="flex-shrink-0">
+            <Button variant="primary" className="gap-1.5 whitespace-nowrap">
               <Plus className="h-4 w-4" /> Log Test
             </Button>
           </Link>

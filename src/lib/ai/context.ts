@@ -218,7 +218,7 @@ Recent games (last ${gameRows.length}): ${avg((g) => g.points)} ppg, ${avg((g) =
   const goalRows = goals.data || [];
   if (goalRows.length) lines.push(`\nActive goals: ${goalRows.map((g) => `${g.title} (${g.current_value}/${g.target_value} ${g.period})`).join('; ')}`);
   const programName = (enrollment.data as unknown as EnrollmentRow | null)?.training_programs?.name;
-  if (programName) lines.push(`Current programme: ${programName}.`);
+  if (programName) lines.push(`Current program: ${programName}.`);
   if (formCheck.data?.summary) {
     lines.push(`Latest shooting form check (${String(formCheck.data.created_at).slice(0, 10)}): ${JSON.stringify(formCheck.data.summary).slice(0, 500)}`);
   }

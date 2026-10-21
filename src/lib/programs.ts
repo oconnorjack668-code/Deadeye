@@ -151,7 +151,7 @@ export async function getActiveProgram(supabase: SupabaseClient<Database>, userI
 
 /**
  * Whether a player can start or follow a programme: it is one of the Free
- * three, they have Pro, or they had already started it (00037 lets anyone
+ * four, they have Pro, or they had already started it (00037 lets anyone
  * finish, or restart, a programme they began before it became Pro). The same
  * rule enforce_programme_access() applies in the database.
  */

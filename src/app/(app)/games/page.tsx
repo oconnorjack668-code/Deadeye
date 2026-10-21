@@ -49,12 +49,13 @@ export default async function GamesPage() {
               <Trophy className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-white">Games</h1>
+              <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Games</h1>
               <p className="text-sm text-zinc-400">Your stats from real games</p>
             </div>
           </div>
-          <Link href="/games/new">
-            <Button variant="primary" className="gap-1.5">
+          {/* Never wraps: on a phone "Log game" broke onto two lines */}
+          <Link href="/games/new" className="flex-shrink-0">
+            <Button variant="primary" className="gap-1.5 whitespace-nowrap">
               <Plus className="h-4 w-4" /> Log game
             </Button>
           </Link>

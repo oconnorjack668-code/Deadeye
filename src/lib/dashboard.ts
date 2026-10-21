@@ -20,6 +20,14 @@ export interface DashboardMetrics {
   weeklyGoalTarget: number;
   /** % of the last 30 days (including today) with any training logged */
   consistency: number;
+  /** Days with training in those 30 days, the number behind the % */
+  consistencyDays: number;
+  /**
+   * False in a player's first week. A % of 30 days is 3% after a first
+   * session, which read as a failing grade on day one; the tile shows the
+   * count of days instead until there is a week to measure.
+   */
+  consistencyReady: boolean;
   /** This week's workload against last week's, in plain language */
   load: TrainingLoad;
 }
@@ -82,6 +90,10 @@ export function computeDashboardMetrics(input: MetricsInput): DashboardMetrics {
     weeklyGoalProgress: weekTrainingDays,
     weeklyGoalTarget: input.weeklyGoalTarget || 4,
     consistency: Math.round((activeDays / CONSISTENCY_DAYS) * 100),
+    consistencyDays: activeDays,
+    // The earliest training day in the window is a week or more back. With
+    // nothing logged at all there is nothing to grade either.
+    consistencyReady: trainingDays.length > 0 && trainingDays.reduce((a, b) => (a < b ? a : b)) <= addDays(today, -7),
     load: trainingLoad(trainingDays, today),
   };
 }

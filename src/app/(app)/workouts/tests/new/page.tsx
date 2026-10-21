@@ -149,13 +149,14 @@ export default function NewPerformanceTestPage() {
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-black tracking-tight text-white">Log Performance Test</h1>
-          <Link href="/workouts/tests">
+        {/* Back on the left, as on every other page */}
+        <div className="flex items-center gap-3 mb-8">
+          <Link href="/workouts/tests" aria-label="Back to tests">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Log a test</h1>
         </div>
 
         {error && (
@@ -200,7 +201,9 @@ export default function NewPerformanceTestPage() {
               />
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* The unit is only a choice for a custom test; otherwise it is in
+                the label, where a second box saying "inches" again used to sit */}
+            <div className={testType === 'custom' ? 'grid grid-cols-2 gap-4' : ''}>
               <Input
                 label={`Value (${getUnit()})`}
                 type="number"
@@ -223,16 +226,7 @@ export default function NewPerformanceTestPage() {
                     { value: 'reps', label: 'Reps' },
                   ]}
                 />
-              ) : (
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-300 mb-1.5">
-                    Unit
-                  </label>
-                  <div className="h-11 px-3.5 py-2 rounded-xl border border-zinc-700/80 bg-zinc-900/90 flex items-center text-sm text-zinc-400">
-                    {getUnit()}
-                  </div>
-                </div>
-              )}
+              ) : null}
             </div>
 
             <div>

@@ -22,10 +22,13 @@ const GOAL_MAP: Record<string, string> = {
 
 /** Onboarding focus area -> program goal key. */
 const FOCUS_MAP: Record<string, string> = {
-  'Shooting Arc & Kinetic Dip': 'shooting',
+  'Shooting Arc & Dip': 'shooting',
   'Floater Range & Touch': 'finishing',
   'First Step Acceleration': 'athleticism',
   'Defensive Lateral Slide Speed': 'athleticism',
+  'Strong Ankles & Knees': 'athleticism',
+  // The names these had before 21 Oct 2026, still on older profiles
+  'Shooting Arc & Kinetic Dip': 'shooting',
   'Ankle & Knee Deceleration Durability': 'athleticism',
   'Free Throw Routine': 'shooting',
   'Off-Ball Spacing & Cuts': 'complete',

@@ -56,8 +56,8 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
           </Link>
           <ProLock title={`${day.training_programs.name} is part of Deadeye Pro`}>
             <p>
-              The full programme library is part of Pro: structured plans that build week by week toward a goal. Three
-              programmes are free to follow from start to finish.
+              The full program library is part of Pro: structured plans that build week by week toward a goal. Four
+              programs are free to follow from start to finish.
             </p>
           </ProLock>
         </div>

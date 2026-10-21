@@ -217,7 +217,9 @@ export default function NewGamePage() {
 
         {error && <Alert variant="error" title="Check this">{error}</Alert>}
 
-        <div className="grid grid-cols-3 gap-2">
+        {/* Two rows: three across, a phone cut off both the date and the
+            opponent placeholder */}
+        <div className="grid grid-cols-2 gap-2">
           <input
             type="date"
             value={draft.date}
@@ -243,7 +245,7 @@ export default function NewGamePage() {
             placeholder="Opponent name"
             aria-label="Opponent name"
             maxLength={80}
-            className="rounded-xl bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-white"
+            className="col-span-2 rounded-xl bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-white"
           />
         </div>
 

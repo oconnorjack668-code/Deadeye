@@ -162,6 +162,7 @@ export default function NewBasketballSessionPage() {
   const shotsRef = useRef(0);
   const shotListRef = useRef<TrackedShot[]>([]);
   const errorRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
 
   // Restore an unfinished session, then add a drill started from the drill library
   useEffect(() => {
@@ -330,6 +331,8 @@ export default function NewBasketballSessionPage() {
 
   function handleTap(x: number, y: number) {
     setSpot({ x, y, zone: classifyZone(x, y) });
+    // After the render that enables the buttons; does nothing if already in view
+    requestAnimationFrame(() => controlsRef.current?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' }));
   }
 
   // The list is there for when a tap lands in the wrong zone: the corner 3 is a
@@ -726,6 +729,10 @@ export default function NewBasketballSessionPage() {
           </p>
         )}
 
+        {/* Scrolled into view when a spot is tapped: on a phone the court fills
+            the screen and MAKE and MISS start below the bottom nav, so a first
+            tap on the court looked like it did nothing. scroll-mb clears the nav. */}
+        <div ref={controlsRef} className="scroll-mb-24">
         {mode === 'track' ? (
           <>
             <div className="grid grid-cols-[1fr_1fr_auto] gap-2">
@@ -870,6 +877,7 @@ export default function NewBasketballSessionPage() {
             )}
           </div>
         )}
+        </div>
 
         {/* Zone breakdown */}
         {zoneTotals.size > 0 && (

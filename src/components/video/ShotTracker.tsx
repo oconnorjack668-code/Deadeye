@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { ShotDetector, rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
 import { expectedBallDiameter } from '@/lib/video/motionBall';
-import { announceShot, loadSound, DEFAULT_SOUND, type SoundSettings } from '@/lib/video/trackerSound';
+import { announceShot, loadSound, preloadRecordings, DEFAULT_SOUND, type SoundSettings } from '@/lib/video/trackerSound';
 import { SoundStatus } from './SoundPicker';
 import { createBallTracker, type BallTracker } from '@/lib/video/ballTracker';
 import {
@@ -236,7 +236,11 @@ export function ShotTracker({
     // Read here rather than on mount: localStorage does not exist while this
     // renders on the server, and seeding state from it would hydrate to a
     // different value than the server sent.
-    setSound(loadSound());
+    const soundSettings = loadSound();
+    setSound(soundSettings);
+    // Fetched now, not at the first make: loading the swish mid-run cost a
+    // ~100ms stall on the very frames that call that shot
+    preloadRecordings(soundSettings);
     setSavedRims(loadSavedRims());
     setRimSaved(false);
     setRimName('');
@@ -631,7 +635,11 @@ export function ShotTracker({
   function startSample() {
     if (!sample) return;
     setError(null);
-    setSound(loadSound());
+    const soundSettings = loadSound();
+    setSound(soundSettings);
+    // Fetched now, not at the first make: loading the swish mid-run cost a
+    // ~100ms stall on the very frames that call that shot
+    preloadRecordings(soundSettings);
     setShots([]);
     setRim(sample.rim);
     setFirstEdge(null);
@@ -781,22 +789,6 @@ export function ShotTracker({
 
       {step === 'source' && !sample && (
         <div className="space-y-3">
-          {/* Where the phone is matters more than anything the tracker does
-              afterwards. Each of these was a measured cause of wrong calls on
-              the test sessions: a hoop too small in the picture, a camera
-              side-on and low, bright windows behind the ring, and a copy of the
-              video at half the resolution of the original. */}
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-            <p className="mb-2 text-sm font-semibold text-white">For the most accurate count</p>
-            <ul className="space-y-1.5 text-sm text-zinc-300">
-              <li>• Phone on a tripod or propped up, not in your hand</li>
-              <li>• 3 to 6 metres from the hoop, at an angle rather than side-on, at head height or higher</li>
-              <li>• The whole ring and net in shot, big in the picture, with room above for the ball</li>
-              <li>• Not facing bright windows or the sun</li>
-              <li>• Upload the original video, not a screen recording or one sent through a messaging app</li>
-            </ul>
-            <p className="mt-2 text-xs text-zinc-500">Your video stays on your phone.</p>
-          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <button type="button" onClick={openCamera} className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-left hover:bg-zinc-900">
               <Camera className="h-6 w-6 text-orange-400" />
@@ -813,6 +805,25 @@ export function ShotTracker({
               </div>
               <input type="file" accept="video/*" className="hidden" onChange={(e) => e.target.files?.[0] && openFile(e.target.files[0])} />
             </label>
+          </div>
+          {/* Below the two buttons rather than above them: on a phone this card
+              pushed the buttons off the first screen, so the first thing a new
+              player saw was text instead of the way in. Where the phone is still
+              matters more than anything the tracker does afterwards. Each of
+              these was a measured cause of wrong calls on the test sessions: a
+              hoop too small in the picture, a camera
+              side-on and low, bright windows behind the ring, and a copy of the
+              video at half the resolution of the original. */}
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+            <p className="mb-2 text-sm font-semibold text-white">For the most accurate count</p>
+            <ul className="space-y-1.5 text-sm text-zinc-300">
+              <li>• Phone on a tripod or propped up, not in your hand</li>
+              <li>• 3 to 6 metres from the hoop, at an angle rather than side-on, at head height or higher</li>
+              <li>• The whole ring and net in shot, big in the picture, with room above for the ball</li>
+              <li>• Not facing bright windows or the sun</li>
+              <li>• Upload the original video, not a screen recording or one sent through a messaging app</li>
+            </ul>
+            <p className="mt-2 text-xs text-zinc-500">Your video stays on your phone.</p>
           </div>
         </div>
       )}

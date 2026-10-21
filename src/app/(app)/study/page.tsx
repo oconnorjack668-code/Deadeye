@@ -223,7 +223,7 @@ export default async function StudyPage() {
         {!isPro && (
           <ProNote className="mb-3">
             The question of the day and the sections without a Pro tag are free, and so is any section that is part of
-            the programme you are following. All {sections.length} sections, with every lesson and quiz, are part of
+            the program you are following. All {sections.length} sections, with every lesson and quiz, are part of
             Pro.
           </ProNote>
         )}

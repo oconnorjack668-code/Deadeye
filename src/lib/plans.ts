@@ -8,7 +8,7 @@
 // it here in the same commit. Where each limit lives:
 //   AI reports a month  FREE_MONTHLY_AI_REPORTS  src/lib/entitlements.ts
 //   coach questions     FREE_CHAT_PER_DAY        src/lib/ai/chat.ts
-//   free programmes     training_programs.is_free (00037)
+//   free programs     training_programs.is_free (00037)
 //   free IQ sections    study_topics.is_free (00037)
 //   30-day shot chart   dashboard page
 //
@@ -34,7 +34,7 @@ export const FREE_PLAN: Plan = {
     'Automatic shot tracking from your camera or a video, with no limit',
     'Log every session, workout and test, and keep your full history',
     'All 150 drills, and form check whenever you want',
-    '4 complete training programmes, including Basketball Strength Foundations',
+    '4 complete training programs, including Basketball Strength Foundations',
     'Basketball IQ: the question of the day and the first 3 sections',
     'Your shot chart for the last 30 days',
     `${FREE_MONTHLY_AI_REPORTS} AI coaching reports a month and ${FREE_CHAT_PER_DAY} questions to the coach a day`,
@@ -48,7 +48,7 @@ export const PRO_PLAN: Plan = {
   features: [
     'Unlimited AI coaching on every session and video',
     'Unlimited questions to your AI coach, plus a weekly AI report',
-    'Every training programme, built around a goal or your position',
+    'Every training program, built around a goal or your position',
     'Every Basketball IQ section, with all lessons and quizzes',
     'Your all-time shot chart, and how your form changes over time',
     'An AI development plan from your NBA style match',

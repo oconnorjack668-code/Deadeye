@@ -38,7 +38,7 @@ export default function AccountDeletionPage() {
         <section className="space-y-2">
           <h2 className="text-lg font-bold text-white">What gets deleted</h2>
           <p>
-            Everything: your profile, training sessions, shots, workouts, tests, study progress, programmes, goals,
+            Everything: your profile, training sessions, shots, workouts, tests, study progress, programs, goals,
             badges, AI reports, video analysis results, uploaded videos and reminder settings. Nothing is kept, except
             that anonymous crash reports (with your account link removed) may remain for up to 90 days, and payment
             records that Stripe must keep by law if you bought Pro.

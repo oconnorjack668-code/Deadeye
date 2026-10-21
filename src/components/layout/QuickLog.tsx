@@ -14,8 +14,19 @@ const ACTIONS = [
 ];
 
 // Screens where a floating "log something" button would be redundant or in the
-// way: the logging forms themselves, and the camera tracker.
-const HIDDEN_ON = ['/basketball/new', '/workouts/new', '/games/new', '/video', '/onboarding'];
+// way: the logging forms themselves, the camera tracker, the coach chat (it sat
+// on top of the send button), and the welcome screens a new player is guided
+// through.
+const HIDDEN_ON = [
+  '/basketball/new',
+  '/workouts/new',
+  '/workouts/tests/new',
+  '/games/new',
+  '/video',
+  '/onboarding',
+  '/ai-coach/chat',
+  '/welcome',
+];
 
 /**
  * Phone-only quick log action. Logging is the thing players do most, but it was

@@ -38,7 +38,7 @@ export default function TermsPage() {
           <p>
             Basketball and strength training carry a risk of injury. Deadeye gives general training information, not
             medical advice. Warm up, use good technique, choose weights you can control and stop if you feel pain,
-            dizziness or unusual discomfort. Talk to a doctor or physiotherapist before starting a new programme if you
+            dizziness or unusual discomfort. Talk to a doctor or physiotherapist before starting a new program if you
             have an injury or a health condition. You train at your own risk.
           </p>
         </section>

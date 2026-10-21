@@ -39,7 +39,7 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Deadeye - the basketball app that watches your shot',
   description:
-    'Point your phone at the hoop and Deadeye counts every make and miss. Form check, training programmes, an AI coach and basketball IQ, free to start.',
+    'Point your phone at the hoop and Deadeye counts every make and miss. Form check, training programs, an AI coach and basketball IQ, free to start.',
 };
 
 const TRACKER_POINTS = [
@@ -67,7 +67,7 @@ const FEATURES = [
   },
   {
     icon: ClipboardList,
-    title: 'Training programmes',
+    title: 'Training programs',
     desc: 'Plans that build week by week for shooting, handles, finishing and athleticism: 4 free, 18 with Pro. Plus 150 drills.',
   },
   {
@@ -78,7 +78,7 @@ const FEATURES = [
   {
     icon: Brain,
     title: 'Basketball IQ',
-    desc: 'Study sections on offence, defence, reads and rules, with quizzes and a free question every day.',
+    desc: 'Study sections on offense, defense, reads and rules, with quizzes and a free question every day.',
   },
   {
     icon: Trophy,
@@ -241,7 +241,7 @@ export default async function Home() {
               {[
                 ['Create a free account', 'Email and a password. Under 16? A parent approves your account from a link.'],
                 ['Add it to your home screen', 'Deadeye is a web app: no app store, no download, and it opens full screen. The steps are near the top of this page.'],
-                ['Train', 'Track your shots, follow a programme, log the gym, and watch your numbers move.'],
+                ['Train', 'Track your shots, follow a program, log the gym, and watch your numbers move.'],
               ].map(([title, desc], i) => (
                 <li key={title} className="rounded-2xl border border-zinc-800 bg-zinc-950/60 p-5">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-orange-600 text-sm font-black text-white">

@@ -63,6 +63,9 @@ describe('recommendedProgramGoal', () => {
       'Ankle & Knee Deceleration Durability',
       'Free Throw Routine',
       'Off-Ball Spacing & Cuts',
+      // The plainer names from 21 Oct 2026; the old two above stay on older profiles
+      'Shooting Arc & Dip',
+      'Strong Ankles & Knees',
     ];
     // Guards against a typo in the maps producing a goal key that filters to
     // an empty programs list.

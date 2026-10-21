@@ -22,6 +22,7 @@ import {
 import type { AgeBracket, BasketballPosition, DominantHand, PlayingLevel } from '@/lib/supabase/types';
 import { asMeasurementSystem, cmToFeetInches, feetInchesToCm, type MeasurementSystem } from '@/lib/units';
 import { allowedAgeBrackets } from '@/lib/parentApproval';
+import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 
 const AGE_BRACKET_LABELS: Record<AgeBracket, string> = {
   '13': '13',
@@ -43,14 +44,22 @@ const GOAL_OPTIONS = [
 ];
 
 const FOCUS_AREA_OPTIONS = [
-  'Shooting Arc & Kinetic Dip',
+  'Shooting Arc & Dip',
   'Floater Range & Touch',
   'First Step Acceleration',
   'Defensive Lateral Slide Speed',
-  'Ankle & Knee Deceleration Durability',
+  'Strong Ankles & Knees',
   'Free Throw Routine',
   'Off-Ball Spacing & Cuts',
 ];
+
+// Focus areas renamed on 21 Oct 2026 for plainer words. Older profiles still
+// hold the old names; mapped on load so they show as selected (recommend.ts
+// still reads both).
+const RENAMED_FOCUS_AREAS: Record<string, string> = {
+  'Shooting Arc & Kinetic Dip': 'Shooting Arc & Dip',
+  'Ankle & Knee Deceleration Durability': 'Strong Ankles & Knees',
+};
 
 const STRENGTH_OPTIONS = [
   'Catch & Shoot Accuracy',
@@ -71,20 +80,23 @@ export default function OnboardingPage() {
 
   // Form State
   const [displayName, setDisplayName] = useState('');
-  const [ageBracket, setAgeBracket] = useState<AgeBracket>('18-22');
+  // Empty until the player picks: a default of 18-22 (or 185 cm below) was
+  // saved for anyone who did not change it, and Play Style Match then worked
+  // from a height the player never gave
+  const [ageBracket, setAgeBracket] = useState<AgeBracket | ''>('');
   // The under/over-16 answer from sign-up limits which brackets make sense
   const [is16Plus, setIs16Plus] = useState<boolean | null>(null);
   // Height is kept in cm (what's stored); imperial players type feet + inches
-  const [heightCm, setHeightCm] = useState<number | ''>(185);
+  const [heightCm, setHeightCm] = useState<number | ''>('');
   const [units, setUnits] = useState<MeasurementSystem>('imperial');
-  const [feet, setFeet] = useState<number | ''>(6);
-  const [inches, setInches] = useState<number | ''>(1);
+  const [feet, setFeet] = useState<number | ''>('');
+  const [inches, setInches] = useState<number | ''>('');
   const [position, setPosition] = useState<BasketballPosition>('G');
   const [dominantHand, setDominantHand] = useState<DominantHand>('right');
   const [playingLevel, setPlayingLevel] = useState<PlayingLevel>('intermediate');
   const [goals, setGoals] = useState<string[]>(['Consistent Training Habit', '3-Point Shooting Consistency']);
   const [strengths, setStrengths] = useState<string[]>(['Catch & Shoot Accuracy']);
-  const [focusAreas, setFocusAreas] = useState<string[]>(['Shooting Arc & Kinetic Dip']);
+  const [focusAreas, setFocusAreas] = useState<string[]>(['Shooting Arc & Dip']);
   // /onboarding?edit=1 (from Profile) edits an existing player record
   const [isEditing, setIsEditing] = useState(false);
 
@@ -109,8 +121,6 @@ export default function OnboardingPage() {
 
       const allowed = allowedAgeBrackets(ageCheck?.is_16_plus ?? null);
       if (ageCheck) setIs16Plus(ageCheck.is_16_plus);
-      // The 18-22 default is wrong for an under-16
-      if (!allowed.includes('18-22')) setAgeBracket(allowed[allowed.length - 1]);
 
       if (profile) {
         if (profile.onboarding_completed && !editing) {
@@ -131,7 +141,9 @@ export default function OnboardingPage() {
         if (profile.playing_level) setPlayingLevel(profile.playing_level as PlayingLevel);
         if (profile.goals && profile.goals.length > 0) setGoals(profile.goals);
         if (profile.strengths && profile.strengths.length > 0) setStrengths(profile.strengths);
-        if (profile.focus_areas && profile.focus_areas.length > 0) setFocusAreas(profile.focus_areas);
+        if (profile.focus_areas && profile.focus_areas.length > 0) {
+          setFocusAreas(profile.focus_areas.map((a: string) => RENAMED_FOCUS_AREAS[a] ?? a));
+        }
       }
 
       setIsFetchingProfile(false);
@@ -178,8 +190,34 @@ export default function OnboardingPage() {
     errorRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  /** Step 1 needs a name and an age bracket; height stays optional. */
+  function nextFromProfile() {
+    setError(null);
+    if (nameBlocked(displayName)) {
+      fail(NAME_BLOCKED_MESSAGE);
+      return;
+    }
+    if (!ageBracket) {
+      fail('Choose your age bracket.');
+      return;
+    }
+    setStep(2);
+  }
+
   async function handleFinish() {
     setError(null);
+
+    if (!ageBracket) {
+      setStep(1);
+      fail('Choose your age bracket.');
+      return;
+    }
+
+    // Shown on the leaderboard to players as young as 13 (src/lib/nameFilter.ts)
+    if (nameBlocked(displayName)) {
+      fail(NAME_BLOCKED_MESSAGE);
+      return;
+    }
 
     // Matches the profiles.height_cm CHECK (between 100 and 250 cm)
     if (heightCm !== '' && (Number(heightCm) <= 100 || Number(heightCm) >= 250)) {
@@ -199,11 +237,11 @@ export default function OnboardingPage() {
     // goals at all - which is what recommend.ts maps to a program and what the
     // AI coach reads as context, so an empty answer degrades both quietly.
     if (goals.length === 0) {
-      fail('Pick at least one primary goal so your programme and coaching match what you are working on.');
+      fail('Pick at least one primary goal so your program and coaching match what you are working on.');
       return;
     }
     if (focusAreas.length === 0) {
-      fail('Pick at least one focus area so your programme and coaching match what you are working on.');
+      fail('Pick at least one focus area so your program and coaching match what you are working on.');
       return;
     }
 
@@ -339,7 +377,7 @@ export default function OnboardingPage() {
               </div>
               <CardTitle className="text-xl">Tell us about your game</CardTitle>
               <CardDescription>
-                Basic measurements and positioning to anchor your training recommendations.
+                So your plans, drills and coaching fit you.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -435,12 +473,15 @@ export default function OnboardingPage() {
                   label="Age Bracket"
                   value={ageBracket}
                   onChange={(e) => setAgeBracket(e.target.value as AgeBracket)}
-                  options={allowedAgeBrackets(is16Plus).map((value) => ({ value, label: AGE_BRACKET_LABELS[value] }))}
+                  options={[
+                    { value: '', label: 'Choose…' },
+                    ...allowedAgeBrackets(is16Plus).map((value) => ({ value, label: AGE_BRACKET_LABELS[value] })),
+                  ]}
                 />
               </div>
             </CardContent>
             <CardFooter className="flex justify-end pt-4">
-              <Button onClick={() => setStep(2)}>
+              <Button onClick={nextFromProfile}>
                 Next: Experience & Level <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </CardFooter>
@@ -454,9 +495,9 @@ export default function OnboardingPage() {
               <div className="flex items-center gap-2 text-orange-400 text-xs font-bold uppercase tracking-wider">
                 <Activity className="h-4 w-4" /> Playing Level
               </div>
-              <CardTitle className="text-xl">What is your current competitive tier?</CardTitle>
+              <CardTitle className="text-xl">What level do you play at?</CardTitle>
               <CardDescription>
-                We calibrate intensity expectations and testing baselines to your tier.
+                So your plans start at the right level.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -607,7 +648,7 @@ export default function OnboardingPage() {
                 isLoading={isLoading}
                 className="gap-2"
               >
-                <Sparkles className="h-4 w-4" /> {isEditing ? 'Save changes' : 'Enter Deadeye OS'}
+                <Sparkles className="h-4 w-4" /> {isEditing ? 'Save changes' : 'Finish setup'}
               </Button>
             </CardFooter>
           </Card>

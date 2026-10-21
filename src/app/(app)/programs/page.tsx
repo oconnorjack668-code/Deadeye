@@ -83,7 +83,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
 
         {!isPro && (
           <ProNote className="mb-3">
-            Programmes without a Pro tag are free to follow from start to finish. The rest, the longer plans built
+            Programs without a Pro tag are free to follow from start to finish. The rest, the longer plans built
             around a goal or a position, are part of Pro.
           </ProNote>
         )}

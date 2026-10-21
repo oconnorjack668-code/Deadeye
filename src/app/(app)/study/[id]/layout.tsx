@@ -27,8 +27,8 @@ export default async function StudySectionLayout({
   ]);
 
   // An unknown id falls through, so the page's own notFound() handles it.
-  // A section the player's programme sends them to opens too: a free
-  // programme must never stop halfway at a lock.
+  // A section the player's program sends them to opens too: a free
+  // program must never stop halfway at a lock.
   if (!topic || topic.is_free || isPro || (active && studySlugsIn(active.days).has(topic.slug))) return <>{children}</>;
 
   return (
@@ -40,7 +40,7 @@ export default async function StudySectionLayout({
         <ProLock title={`${topic.title} is part of Deadeye Pro`}>
           <p>
             Pro includes every Basketball IQ section, with all of its lessons and quizzes. The question of the day and
-            the first sections stay free, and any section that is part of the programme you are following opens with it.
+            the first sections stay free, and any section that is part of the program you are following opens with it.
           </p>
         </ProLock>
       </div>

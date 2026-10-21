@@ -28,6 +28,7 @@
 //                               per goal type, custom title >= 3 chars
 //   notificationPreferencesSchema  no form parses this one
 import * as z from 'zod/mini';
+import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -42,7 +43,11 @@ const newPassword = () =>
 export const signUpSchema = z.object({
   email: z.email('Please enter a valid email address'),
   password: newPassword(),
-  displayName: z.string().check(z.minLength(2, 'Display name must be at least 2 characters'), z.maxLength(50)),
+  displayName: z.string().check(
+    z.minLength(2, 'Display name must be at least 2 characters'),
+    z.maxLength(50),
+    z.refine((n) => !nameBlocked(n), NAME_BLOCKED_MESSAGE)
+  ),
   // Deadeye is for players aged 13 and over; under 16 needs a parent (00036)
   age: z.enum(['16-plus', '13-15'], 'Please tell us how old you are'),
   termsAccepted: z.boolean().check(z.refine((v) => v, 'Please agree to the privacy policy and terms')),
@@ -70,7 +75,7 @@ export const updatePasswordSchema = z
   );
 
 export const onboardingSchema = z.object({
-  displayName: z.string().check(z.minLength(2, 'Display name is required')),
+  displayName: z.string().check(z.minLength(2, 'Display name is required'), z.refine((n) => !nameBlocked(n), NAME_BLOCKED_MESSAGE)),
   ageBracket: z.enum(['13', '14-17', '18-22', '23-30', '30+'], {
     message: 'Please select an age bracket',
   }),

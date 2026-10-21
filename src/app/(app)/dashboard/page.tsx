@@ -367,11 +367,11 @@ export default async function DashboardPage() {
               credits now sit in the slim row below instead. */}
           <StatCard
             label="Consistency"
-            value={`${metrics.consistency}%`}
-            badge="30 days"
+            value={metrics.consistencyReady ? `${metrics.consistency}%` : metrics.consistencyDays}
+            badge={metrics.consistencyReady ? '30 days' : 'days'}
             badgeVariant="cyan"
             valueClass="text-cyan-400"
-            hint="Days with any training logged"
+            hint={metrics.consistencyReady ? 'Days with any training logged' : 'Your % shows after your first week'}
           />
         </div>
 

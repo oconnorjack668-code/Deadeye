@@ -12,6 +12,7 @@ import { SoundPicker } from '@/components/video/SoundPicker';
 import { ReportProblem } from '@/components/ReportProblem';
 import { signOutOfThisPhone } from '@/lib/signOut';
 import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
+import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -145,6 +146,10 @@ export function SettingsClient({
     const clean = name.replace(/\s+/g, ' ').trim().slice(0, 40);
     if (clean.length < 2) {
       setStatus({ tone: 'error', text: 'Your name needs at least 2 characters.' });
+      return;
+    }
+    if (nameBlocked(clean)) {
+      setStatus({ tone: 'error', text: NAME_BLOCKED_MESSAGE });
       return;
     }
     if (clean !== s.display_name) await save({ display_name: clean }, 'Name saved');

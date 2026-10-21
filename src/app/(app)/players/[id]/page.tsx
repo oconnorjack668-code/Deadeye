@@ -4,7 +4,8 @@
 // and 00043, which added the level, the avatar and the photo when the viewer may see it)
 import React from 'react';
 import Link from 'next/link';
-import { requireUser, getCurrentProfile } from '@/lib/auth';
+import { requireUser, getCurrentProfile, checkIsOwner } from '@/lib/auth';
+import { ResetNameButton } from './ResetNameButton';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { countryName } from '@/lib/regions';
@@ -41,7 +42,7 @@ interface Card {
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   await requireUser();
-  const [supabase, me] = await Promise.all([createClient(), getCurrentProfile()]);
+  const [supabase, me, isOwner] = await Promise.all([createClient(), getCurrentProfile(), checkIsOwner()]);
   const { data } = await supabase.rpc('player_card', { p_user: id });
   const card = data as Card | null;
   const units = asMeasurementSystem(me?.measurement_system);
@@ -54,6 +55,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-xl mx-auto space-y-5">
         <BackButton fallback="/leaderboard" />
+
+        {/* Owner only, and shown even on a private card: a rude name is on the
+            leaderboard whether or not the card is private */}
+        {isOwner && !card?.is_me && <ResetNameButton userId={id} name={card?.display_name ?? 'this player'} />}
 
         {!card ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-8 text-center">

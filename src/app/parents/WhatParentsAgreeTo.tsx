@@ -12,7 +12,7 @@ export function WhatParentsAgreeTo({ child }: { child: string }) {
     <section className="space-y-3 text-sm leading-6 text-zinc-300">
       <h2 className="text-base font-bold text-white">What Deadeye is</h2>
       <p>
-        Deadeye is a basketball training app. {child} logs training, shooting and gym work, follows training programmes,
+        Deadeye is a basketball training app. {child} logs training, shooting and gym work, follows training programs,
         and can film their shot to check their form. Deadeye has no ads, does not sell data, and has no chat or messaging
         between players.
       </p>

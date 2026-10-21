@@ -7,7 +7,8 @@ export function calculateShootingPercentage(makes: number, attempts: number): nu
 }
 
 export function formatShootingPercentage(makes: number, attempts: number): string {
-  if (attempts <= 0) return '0.0%';
+  // Before any shot there is no percentage, and "0.0%" read as a bad one
+  if (attempts <= 0) return '–';
   return `${calculateShootingPercentage(makes, attempts)}%`;
 }
 

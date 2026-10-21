@@ -136,7 +136,9 @@ export async function GET(request: Request) {
         for (const s of subs || []) {
           const result = await sendPush(s, {
             title: 'Your week in review 🏀',
-            body: out.headline || `${context.week.trainingDays} training days this week. See what to focus on next.`,
+            body:
+              out.headline ||
+              `${context.week.trainingDays} training day${context.week.trainingDays === 1 ? '' : 's'} this week. See what to focus on next.`,
             url: '/ai-coach',
           });
           if (result === 'sent') pushed += 1;

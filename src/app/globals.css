@@ -84,3 +84,15 @@ body {
     transform: none;
   }
 }
+
+/* Room at the end of every page on a phone, so the last thing on it can scroll
+   clear of the floating quick-log button (QuickLog), which sits above the
+   bottom nav. Pages scroll inside their own flex-1 overflow-auto container,
+   so padding on main cannot do it. */
+@media (max-width: 767px) {
+  main > .overflow-auto::after {
+    content: '';
+    display: block;
+    height: 4.5rem;
+  }
+}

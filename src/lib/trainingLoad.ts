@@ -24,6 +24,11 @@ export interface TrainingLoad {
 /** At or above this many days in seven, rest is the useful advice, not more work. */
 const HEAVY_DAYS = 6;
 
+/** "1 day", "3 days" - the messages said "1 days this week". */
+function dayCount(n: number): string {
+  return `${n} day${n === 1 ? '' : 's'}`;
+}
+
 function countBetween(days: Set<string>, from: string, to: string): number {
   let n = 0;
   for (const d of days) if (d >= from && d <= to) n += 1;
@@ -51,16 +56,20 @@ export function trainingLoad(trainingDays: string[], today: string): TrainingLoa
   } else if (last7 >= HEAVY_DAYS) {
     // More is not better here, and saying so is more useful than cheering
     status = 'heavy';
-    message = `${last7} days in the last week. Take a rest day before you pick up a niggle.`;
+    message = `${dayCount(last7)} in the last week. Take a rest day before you pick up a niggle.`;
   } else if (last7 > prev7) {
     status = 'building';
-    message = `${last7} days this week, up from ${prev7}. You are building nicely.`;
+    // "up from 0" read oddly in a first week
+    message =
+      prev7 === 0
+        ? `${dayCount(last7)} this week. That is the start: get one more in.`
+        : `${dayCount(last7)} this week, up from ${prev7}. You are building nicely.`;
   } else if (last7 < prev7) {
     status = 'easing';
-    message = `${last7} days this week, down from ${prev7}. Worth getting one more in.`;
+    message = `${dayCount(last7)} this week, down from ${prev7}. Worth getting one more in.`;
   } else {
     status = 'steady';
-    message = `${last7} days a week, two weeks running. That consistency is the whole game.`;
+    message = `${dayCount(last7)} a week, two weeks running. That consistency is the whole game.`;
   }
 
   return { last7, prev7, status, message };
