@@ -19,7 +19,7 @@ export default function AccountDeletionPage() {
           <h2 className="text-lg font-bold text-white">In the app</h2>
           <ol className="list-decimal pl-5 space-y-1">
             <li>Log in to Deadeye (the app or <Link href="/login" className="text-orange-400 underline">the website</Link>).</li>
-            <li>Open <strong>Profile</strong>.</li>
+            <li>Open <strong>Settings</strong> (the gear at the top, or Profile → Settings).</li>
             <li>Scroll to <strong>Delete account</strong>, type DELETE and tap <strong>Delete my account</strong>.</li>
           </ol>
           <p>Deletion is immediate. Tip: use <strong>Download my data</strong> on the same page first if you want a copy.</p>

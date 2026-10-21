@@ -11,6 +11,7 @@ import {
   Activity,
   Brain,
   Check,
+  ChevronDown,
   ClipboardList,
   Crown,
   Dumbbell,
@@ -93,6 +94,57 @@ const FEATURES = [
   },
 ];
 
+/**
+ * The questions that stop people signing up, answered. Every answer has to be
+ * true of the app as it stands (checked against the code, the terms and the
+ * privacy policy on 21 Oct 2026) - change it when what it describes changes.
+ * The same text feeds the FAQ markup Google reads, so the two cannot differ.
+ */
+function faqItems(proPrice: string): Array<{ q: string; a: string }> {
+  return [
+    {
+      q: 'Does Deadeye work on my phone?',
+      a: "Yes, on iPhone and Android. Deadeye runs in Safari or Chrome, so there's nothing to download from an app store. Add it to your home screen once and it opens full screen, like any other app.",
+    },
+    {
+      q: 'Do I have to hold my phone while I shoot?',
+      a: 'No. Prop it on a tripod, a bag or a bench, 3 to 6 metres from the hoop and off to one side, with the whole ring in shot. Tap the two sides of the rim once, then just shoot: Deadeye counts every make and miss.',
+    },
+    {
+      q: 'How accurate is the shot tracker?',
+      a: 'It calls every shot as a make or a miss, and you can fix any call before you save, so your numbers stay honest. Good light and the whole ring and net in shot help most. You can watch it count a real session further up this page.',
+    },
+    {
+      q: 'Do my videos get uploaded?',
+      a: 'Not unless you choose to. Shot tracking and form check run on your phone itself, so a video you analyse never leaves it. You can upload a clip on purpose, for example to ask your coach about it.',
+    },
+    {
+      q: 'Is Deadeye safe for under-16s?',
+      a: 'Players under 16 need a parent or guardian to approve their account, and the parent can withdraw that at any time. Profiles are private by default, there are no ads and no messaging between players, and we never sell data.',
+    },
+    {
+      q: "What's free, and what does Pro add?",
+      a: `Shot tracking, logging and your history, all 150 drills, form check, 4 training programs and the social features are free, with no time limit. Pro (${proPrice}) adds every program and IQ section, unlimited AI coaching with a weekly report, your all-time shot chart and form trends, and teams.`,
+    },
+    {
+      q: 'Can I cancel Pro?',
+      a: 'Yes, any time, in Profile → Deadeye Pro → Manage subscription. You keep Pro until the end of the period you paid for. You can also withdraw within 14 days of buying and get a full refund.',
+    },
+    {
+      q: "What if there's no signal at the court?",
+      a: "Sessions you log with no signal are kept on your phone and upload by themselves when you're back online.",
+    },
+    {
+      q: 'Can coaches use Deadeye?',
+      a: 'Yes. A coach creates a team, players join with a code, and the coach can post assignments and see the training each player chooses to share. Players always join for free.',
+    },
+    {
+      q: 'How do I delete my account?',
+      a: 'Any time, in Settings → Delete account. Your data is deleted straight away, apart from crash reports, which go within 90 days, and the payment records the law requires. You can download a copy of your data on the same page first.',
+    },
+  ];
+}
+
 export default async function Home() {
   const signedIn = !!(await getCurrentUser());
 
@@ -101,6 +153,7 @@ export default async function Home() {
   const buyingOpen = stripeConfigured();
   const foundingLine = `The first ${FOUNDING_PLACES} players get ${FOUNDING_MONTHS} months of Pro free`;
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
+  const faq = faqItems(proPrice);
 
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
@@ -370,6 +423,48 @@ export default async function Home() {
               .
             </p>
           </div>
+        </section>
+
+        {/* FAQ. Native details/summary: opens and closes with no JavaScript,
+            works with a keyboard and a screen reader, and every answer is in
+            the page for search engines whether it is open or not. */}
+        <section id="faq" className="scroll-mt-28 border-y border-zinc-900 bg-zinc-900/40 px-4 py-16">
+          <div className="mx-auto max-w-2xl">
+            <h2 className="text-center text-3xl font-black tracking-tight text-white">Questions</h2>
+            <p className="mt-2 text-center text-zinc-400">What players and parents ask before signing up.</p>
+            <div className="mt-8 space-y-2">
+              {faq.map(({ q, a }) => (
+                <details key={q} className="group rounded-xl border border-zinc-800 bg-zinc-950/60">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 p-4 font-semibold text-white">
+                    {q}
+                    <ChevronDown className="h-4 w-4 flex-shrink-0 text-zinc-500 transition-transform group-open:rotate-180" />
+                  </summary>
+                  <p className="px-4 pb-4 text-sm leading-6 text-zinc-300">{a}</p>
+                </details>
+              ))}
+            </div>
+            {contactEmail && (
+              <p className="mt-6 text-center text-sm text-zinc-400">
+                Something else?{' '}
+                <a href={`mailto:${contactEmail}`} className="text-orange-400 underline">
+                  Email us
+                </a>
+                .
+              </p>
+            )}
+          </div>
+          {/* The same questions, for search results (FAQPage structured data).
+              '<' is escaped so no answer can ever close the script tag. */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: faq.map(({ q, a }) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })),
+              }).replace(/</g, '\\u003c'),
+            }}
+          />
         </section>
 
         {/* Final call to action */}

@@ -16,6 +16,7 @@ export const LANDING_SECTIONS = [
   { id: 'features', label: 'Features' },
   { id: 'pricing', label: 'Pricing' },
   { id: 'parents', label: 'For parents' },
+  { id: 'faq', label: 'FAQ' },
 ] as const;
 
 export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
