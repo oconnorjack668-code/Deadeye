@@ -23,6 +23,7 @@ import type { AgeBracket, BasketballPosition, DominantHand, PlayingLevel } from 
 import { asMeasurementSystem, cmToFeetInches, feetInchesToCm, type MeasurementSystem } from '@/lib/units';
 import { allowedAgeBrackets } from '@/lib/parentApproval';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
+import { focusAreaLabel } from '@/lib/focusAreas';
 
 const AGE_BRACKET_LABELS: Record<AgeBracket, string> = {
   '13': '13',
@@ -52,14 +53,6 @@ const FOCUS_AREA_OPTIONS = [
   'Free Throw Routine',
   'Off-Ball Spacing & Cuts',
 ];
-
-// Focus areas renamed on 21 Oct 2026 for plainer words. Older profiles still
-// hold the old names; mapped on load so they show as selected (recommend.ts
-// still reads both).
-const RENAMED_FOCUS_AREAS: Record<string, string> = {
-  'Shooting Arc & Kinetic Dip': 'Shooting Arc & Dip',
-  'Ankle & Knee Deceleration Durability': 'Strong Ankles & Knees',
-};
 
 const STRENGTH_OPTIONS = [
   'Catch & Shoot Accuracy',
@@ -142,7 +135,7 @@ export default function OnboardingPage() {
         if (profile.goals && profile.goals.length > 0) setGoals(profile.goals);
         if (profile.strengths && profile.strengths.length > 0) setStrengths(profile.strengths);
         if (profile.focus_areas && profile.focus_areas.length > 0) {
-          setFocusAreas(profile.focus_areas.map((a: string) => RENAMED_FOCUS_AREAS[a] ?? a));
+          setFocusAreas(profile.focus_areas.map(focusAreaLabel));
         }
       }
 

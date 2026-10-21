@@ -1,6 +1,6 @@
 // src/app/api/cron/reminders/route.ts
-// Scheduled job: sends training reminders to players whose reminder is due in
-// their timezone and who haven't trained yet today. Protected by CRON_SECRET
+// Scheduled job, once a day at 16:00 UTC (vercel.json): sends training
+// reminders to players whose reminder is due today and who haven't trained yet. Protected by CRON_SECRET
 // (Vercel Cron sends it as "Authorization: Bearer <CRON_SECRET>").
 import { createAdminClient } from '@/lib/supabase/admin';
 import { pushConfigured, sendPush } from '@/lib/push';
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
 
   const { data: prefs, error } = await admin
     .from('notification_preferences')
-    .select('user_id, reminder_enabled, push_enabled, reminder_days, reminder_time, timezone, last_reminded_on')
+    .select('user_id, reminder_enabled, push_enabled, reminder_days, timezone, last_reminded_on')
     .eq('reminder_enabled', true)
     .eq('push_enabled', true);
   if (error) return Response.json({ error: error.message }, { status: 500 });
@@ -84,8 +84,8 @@ export async function GET(request: Request) {
   let skipped = 0;
   for (const p of (prefs || []) as Array<ReminderPrefs & { user_id: string }>) {
     if (lockedIds.has(p.user_id)) continue;
-    // Any day once the hour has come: a streak about to end is warned about
-    // even on a day the player did not pick. Other reminders keep to their days.
+    // Any day: a streak about to end is warned about even on a day the player
+    // did not pick. Other reminders keep to their days.
     if (!reminderWindowOpen(p, now)) continue;
     const { due: chosenDay, localDate } = reminderDue(p, now);
 

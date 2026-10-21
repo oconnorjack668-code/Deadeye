@@ -6,7 +6,6 @@ const prefs: ReminderPrefs = {
   reminder_enabled: true,
   push_enabled: true,
   reminder_days: [1, 3, 5], // Mon, Wed, Fri
-  reminder_time: '18:00',
   timezone: 'Europe/Dublin',
   last_reminded_on: null,
 };
@@ -20,12 +19,13 @@ describe('reminders', () => {
     expect(localParts(new Date('2026-09-25T17:30:00Z'), 'Not/AZone').hour).toBe(17);
   });
 
-  it('is due on a chosen day at or after the chosen time, once', () => {
-    const fridayEvening = new Date('2026-09-25T17:30:00Z');
-    expect(reminderDue(prefs, fridayEvening)).toEqual({ due: true, localDate: '2026-09-25' });
-    expect(reminderDue({ ...prefs, last_reminded_on: '2026-09-25' }, fridayEvening).due).toBe(false);
-    expect(reminderDue(prefs, new Date('2026-09-25T15:00:00Z')).due).toBe(false); // 16:00 local, too early
-    expect(reminderDue(prefs, new Date('2026-09-24T17:30:00Z')).due).toBe(false); // Thursday
+  it('is due on a chosen day whenever the daily job runs, once', () => {
+    // The job runs at 16:00 UTC: 17:00 in Dublin in summer, 16:00 in winter
+    const fridayAfterSchool = new Date('2026-09-25T16:00:00Z');
+    expect(reminderDue(prefs, fridayAfterSchool)).toEqual({ due: true, localDate: '2026-09-25' });
+    expect(reminderDue(prefs, new Date('2026-11-27T16:00:00Z'))).toEqual({ due: true, localDate: '2026-11-27' });
+    expect(reminderDue({ ...prefs, last_reminded_on: '2026-09-25' }, fridayAfterSchool).due).toBe(false);
+    expect(reminderDue(prefs, new Date('2026-09-24T16:00:00Z')).due).toBe(false); // Thursday
   });
 
   it('respects the switches', () => {
@@ -55,11 +55,11 @@ describe('reminderPush', () => {
 });
 
 describe('reminderWindowOpen', () => {
-  it('opens at the chosen hour on any day, once a day', () => {
-    // Tuesday 18:30 in Dublin: not a chosen day, but the window is open
-    const tuesdayEvening = new Date('2026-10-20T17:30:00Z');
-    expect(reminderWindowOpen(prefs, tuesdayEvening)).toBe(true);
-    expect(reminderWindowOpen({ ...prefs, last_reminded_on: '2026-10-20' }, tuesdayEvening)).toBe(false);
-    expect(reminderWindowOpen({ ...prefs, reminder_time: '20:00' }, tuesdayEvening)).toBe(false);
+  it('opens on any day, once a day', () => {
+    // Tuesday in Dublin: not a chosen day, but the window is open
+    const tuesdayAfterSchool = new Date('2026-10-20T16:00:00Z');
+    expect(reminderWindowOpen(prefs, tuesdayAfterSchool)).toBe(true);
+    expect(reminderWindowOpen({ ...prefs, last_reminded_on: '2026-10-20' }, tuesdayAfterSchool)).toBe(false);
+    expect(reminderWindowOpen({ ...prefs, reminder_enabled: false }, tuesdayAfterSchool)).toBe(false);
   });
 });

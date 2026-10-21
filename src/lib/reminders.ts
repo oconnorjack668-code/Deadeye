@@ -5,7 +5,6 @@ export interface ReminderPrefs {
   reminder_enabled: boolean;
   push_enabled: boolean;
   reminder_days: number[]; // 0 = Sunday ... 6 = Saturday
-  reminder_time: string; // 'HH:MM' or 'HH:MM:SS'
   timezone: string;
   last_reminded_on: string | null; // YYYY-MM-DD (local)
 }
@@ -36,30 +35,33 @@ export function localParts(now: Date, timeZone: string): { date: string; weekday
 }
 
 /**
- * A reminder is due on a chosen day, at or after the chosen hour, at most once a day.
- * "At or after" means a once-a-day scheduler still delivers it (just later).
+ * When reminders go out, as players are told it. The time itself is the cron
+ * schedule in vercel.json (16:00 UTC): Vercel's free plan runs a job at most
+ * once a day, so there is no per-player time. 16:00 UTC is 4pm in Ireland in
+ * winter and 5pm in summer, after school either way. The old reminder_time
+ * column stays in the database but is no longer read.
  */
+export const REMINDER_TIME_LABEL = 'around 4pm';
+
+/** A reminder is due on a chosen day, at most once a day. */
 export function reminderDue(prefs: ReminderPrefs, now: Date): { due: boolean; localDate: string } {
-  const { date, weekday, hour } = localParts(now, prefs.timezone);
-  const reminderHour = Number(prefs.reminder_time.split(':')[0]);
+  const { date, weekday } = localParts(now, prefs.timezone);
   const due =
     prefs.reminder_enabled &&
     prefs.push_enabled &&
     prefs.reminder_days.includes(weekday) &&
-    hour >= reminderHour &&
     prefs.last_reminded_on !== date;
   return { due, localDate: date };
 }
 
 /**
- * Whether tonight's reminder window is open at all: the chosen hour has come
- * and nothing was sent today. Unlike reminderDue, any day of the week, because
- * a streak about to end is worth one message even on a day off.
+ * Whether today's reminder can go out at all: nothing was sent today. Unlike
+ * reminderDue, any day of the week, because a streak about to end is worth one
+ * message even on a day off.
  */
 export function reminderWindowOpen(prefs: ReminderPrefs, now: Date): boolean {
-  const { date, hour } = localParts(now, prefs.timezone);
-  const reminderHour = Number(prefs.reminder_time.split(':')[0]);
-  return prefs.reminder_enabled && prefs.push_enabled && hour >= reminderHour && prefs.last_reminded_on !== date;
+  const { date } = localParts(now, prefs.timezone);
+  return prefs.reminder_enabled && prefs.push_enabled && prefs.last_reminded_on !== date;
 }
 
 export interface ReminderPush {

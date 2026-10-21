@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { ProBadge } from '@/components/ProGate';
+import { REMINDER_TIME_LABEL } from '@/lib/reminders';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -22,7 +23,6 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
   const [loaded, setLoaded] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [days, setDays] = useState<number[]>([1, 3, 5]);
-  const [time, setTime] = useState('18:00');
   const [deviceOn, setDeviceOn] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -42,13 +42,12 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
       if (!user) return;
       const { data } = await supabase
         .from('notification_preferences')
-        .select('reminder_enabled, reminder_days, reminder_time')
+        .select('reminder_enabled, reminder_days')
         .eq('user_id', user.id)
         .maybeSingle();
       if (data) {
         setEnabled(data.reminder_enabled);
         setDays(data.reminder_days || [1, 3, 5]);
-        setTime(String(data.reminder_time || '18:00').slice(0, 5));
       }
       // Separate query: the column only exists after migration 00021
       const { data: weeklyRow, error: weeklyError } = await supabase
@@ -65,7 +64,7 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
     })();
   }, [supported]);
 
-  async function savePrefs(next: { enabled?: boolean; days?: number[]; time?: string }) {
+  async function savePrefs(next: { enabled?: boolean; days?: number[] }) {
     const supabase = createClient();
     const {
       data: { user },
@@ -76,7 +75,6 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
       .update({
         reminder_enabled: next.enabled ?? enabled,
         reminder_days: next.days ?? days,
-        reminder_time: next.time ?? time,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         updated_at: new Date().toISOString(),
       })
@@ -163,7 +161,9 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5 text-orange-400" /> Training reminders
         </CardTitle>
-        <CardDescription>A nudge on your training days, only if you haven&apos;t trained yet.</CardDescription>
+        <CardDescription>
+          A nudge on your training days, {REMINDER_TIME_LABEL}, only if you haven&apos;t trained yet.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {!supported ? (
@@ -200,20 +200,9 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
                 </button>
               ))}
             </div>
-            <label className="flex items-center gap-3 text-sm text-zinc-300">
-              At
-              <input
-                type="time"
-                value={time}
-                onChange={(e) => {
-                  setTime(e.target.value);
-                  savePrefs({ time: e.target.value });
-                }}
-                className="rounded-lg bg-zinc-800 px-2 py-1 text-white"
-              />
-            </label>
             <p className="text-xs text-zinc-500">
-              If your streak would end tonight, you also get one warning at this time, even on a day you did not pick.
+              Reminders come once a day, {REMINDER_TIME_LABEL}. If your streak would end tonight, you also get one warning
+              then, even on a day you did not pick.
             </p>
             <div className="flex flex-wrap gap-2">
               {deviceOn ? (

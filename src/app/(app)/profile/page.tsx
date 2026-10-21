@@ -10,7 +10,9 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/Avatar';
-import { Award, ChevronRight, Eye, Flame, Pencil, Settings, Target, TrendingUp } from 'lucide-react';
+import { Award, ChevronRight, Crosshair, Eye, Flag, Flame, Pencil, Settings, Target, TrendingUp } from 'lucide-react';
+import { Badge } from '@/components/ui/Badge';
+import { focusAreaLabel } from '@/lib/focusAreas';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { loadAchievements } from '@/lib/achievements-server';
 import { getShotTotals } from '@/lib/player-activity';
@@ -41,6 +43,24 @@ function Field({ label, value }: { label: string; value: React.ReactNode }) {
     <div>
       <div className="text-xs text-zinc-400 font-semibold uppercase mb-1">{label}</div>
       <div className="font-semibold text-white">{value || '-'}</div>
+    </div>
+  );
+}
+
+/** Goals and focus areas as tags: as one comma-joined line they ran on as a bold wall of text. */
+function TagGroup({ icon: Icon, tone, label, items, variant }: { icon: React.ElementType; tone: string; label: string; items: string[]; variant: 'orange' | 'default' }) {
+  return (
+    <div>
+      <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase text-zinc-400">
+        <Icon className={`h-3.5 w-3.5 ${tone}`} /> {label}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {items.map((item) => (
+          <Badge key={item} variant={variant} className="px-3 py-1 text-[13px] font-medium tracking-normal">
+            {item}
+          </Badge>
+        ))}
+      </div>
     </div>
   );
 }
@@ -83,6 +103,9 @@ export default async function ProfilePage() {
     return v !== null && (best === null || v > best) ? v : best;
   }, null);
   const earned = achievements.badges.filter((b) => b.earned).length;
+  const goals: string[] = profile?.goals || [];
+  // Deduped: an old name and its new one would otherwise show as the same tag twice
+  const focusAreas = [...new Set<string>((profile?.focus_areas || []).map(focusAreaLabel))];
 
   return (
     <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl mx-auto space-y-5">
@@ -170,8 +193,14 @@ export default async function ProfilePage() {
             <Field label="Plan" value={<Link href="/pro" className="underline">{planLabel(subscription)}</Link>} />
             <Field label="Units" value={units === 'metric' ? 'Metric (cm, kg)' : 'Imperial (ft, lbs)'} />
           </div>
-          {profile?.goals && profile.goals.length > 0 && <Field label="Goals" value={profile.goals.join(', ')} />}
-          {profile?.focus_areas && profile.focus_areas.length > 0 && <Field label="Focus areas" value={profile.focus_areas.join(', ')} />}
+          {(goals.length > 0 || focusAreas.length > 0) && (
+            <div className="space-y-4 border-t border-zinc-800 pt-4">
+              {goals.length > 0 && <TagGroup icon={Flag} tone="text-orange-400" label="Goals" items={goals} variant="orange" />}
+              {focusAreas.length > 0 && (
+                <TagGroup icon={Crosshair} tone="text-zinc-300" label="Focus areas" items={focusAreas} variant="default" />
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 
