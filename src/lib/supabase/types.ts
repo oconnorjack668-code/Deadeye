@@ -1616,6 +1616,24 @@ export interface Database {
         Update: { resolved?: boolean };
         Relationships: [];
       };
+      app_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          day: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          day?: string;
+          created_at?: string;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       friendships: {
         Row: {
           id: string;

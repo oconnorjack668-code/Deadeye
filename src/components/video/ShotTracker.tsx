@@ -29,6 +29,7 @@ import { HighlightReel } from '@/components/video/HighlightReel';
 import { ReportProblem } from '@/components/ReportProblem';
 import { RimAdjuster } from '@/components/video/RimAdjuster';
 import { leftFirst, type Point } from '@/lib/video/rimAdjust';
+import { track } from '@/lib/events';
 import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
@@ -139,6 +140,13 @@ export function ShotTracker({
     []
   );
 
+  // Funnel steps (src/lib/events.ts). The sample has its own, so a player
+  // watching it is not counted as having used the tracker.
+  const isSample = !!sample;
+  useEffect(() => {
+    if (!isSample) track('tracker_opened');
+  }, [isSample]);
+
   // Share the reviewed shots with the AI feedback panel
   useEffect(() => {
     if (step !== 'review' || shots.length === 0) {
@@ -233,6 +241,7 @@ export function ShotTracker({
   const [rimSaved, setRimSaved] = useState(false);
 
   function startCalibrating() {
+    if (!sample) track('tracker_setup');
     // Read here rather than on mount: localStorage does not exist while this
     // renders on the server, and seeding state from it would hydrate to a
     // different value than the server sent.
@@ -384,6 +393,7 @@ export function ShotTracker({
     setError(null);
     // No model to fetch any more: the tracker is pixel maths, so tracking can
     // start the instant the rim is set, offline, with nothing downloaded.
+    if (!sample) track('tracker_started');
     setStatus(null);
     setShots([]);
     setStep('tracking');
@@ -623,6 +633,7 @@ export function ShotTracker({
     videoRef.current?.pause();
     streamRef.current?.getTracks().forEach((t) => t.stop());
     lockRef.current?.release().catch(() => undefined);
+    if (!sample) track('tracker_finished');
     setStep('review');
   }
 
@@ -634,6 +645,7 @@ export function ShotTracker({
    */
   function startSample() {
     if (!sample) return;
+    track('sample_played');
     setError(null);
     const soundSettings = loadSound();
     setSound(soundSettings);
@@ -750,6 +762,7 @@ export function ShotTracker({
       session_id: session.id,
       summary: { source, zone, makes, attempts: shots.length, shots: shots.map((s) => ({ t: Math.round(s.t), made: s.made })) },
     });
+    track('tracker_saved');
     // ?saved=1 lets the session page celebrate a first session
     router.push(`/basketball/${session.id}?saved=1`);
   }

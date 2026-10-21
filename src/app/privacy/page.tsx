@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 20, 2026';
+const LAST_UPDATED = 'October 21, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -106,6 +106,12 @@ export default function PrivacyPage() {
               type and your account id, kept for 90 days and used only to fix problems. Deleting your account deletes
               them straight away.
             </li>
+            <li>
+              A few steps you reach in the app, at most once a day each: seeing the welcome screen, playing the sample
+              clip, and opening, starting and finishing the shot tracker. Kept for 90 days, with your account id, only to
+              see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
+              anyone. Deleting your account deletes them straight away.
+            </li>
           </ul>
         </section>
 
@@ -128,8 +134,8 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, and keeping the service secure rely on our legitimate interest in
-              Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, and keeping the service secure rely on our
+              legitimate interest in Deadeye working properly.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>

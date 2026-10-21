@@ -42,9 +42,9 @@ export async function GET(request: Request) {
   }
   const admin = createAdminClient();
 
-  // Housekeeping: crash reports and player reports are kept for 90 days
+  // Housekeeping: crash reports, player reports and funnel steps are kept for 90 days
   const ninetyDaysAgo = new Date(Date.now() - 90 * 86_400_000).toISOString();
-  for (const table of ['app_errors', 'player_reports'] as const) {
+  for (const table of ['app_errors', 'player_reports', 'app_events'] as const) {
     await admin
       .from(table)
       .delete()

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ShotTracker, type TrackerSample } from '@/components/video/ShotTracker';
 import { rimFromEdges } from '@/lib/video/shotDetector';
 import { SAMPLE_TRIED_KEY, writeFlag } from '@/lib/starter';
+import { track } from '@/lib/events';
 
 const SAMPLE_URL = '/samples/tracker-sample.mp4';
 const POSTER = '/samples/tracker-sample-poster.jpg';
@@ -52,6 +53,7 @@ export function SampleClient() {
 
   function finished() {
     writeFlag(SAMPLE_TRIED_KEY);
+    track('sample_finished');
     setWatched(true);
   }
 
