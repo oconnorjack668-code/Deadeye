@@ -80,6 +80,7 @@ export function SettingsClient({
   dataControls,
   supportEmail,
   version,
+  coachSetUp = false,
 }: {
   email: string | null;
   plan: string;
@@ -90,6 +91,8 @@ export function SettingsClient({
   dataControls: React.ReactNode;
   supportEmail: string | null;
   version: string;
+  /** Has a coach profile (00047): coach setup is done */
+  coachSetUp?: boolean;
 }) {
   const router = useRouter();
   const [s, setS] = useState<Initial>(initial);
@@ -242,7 +245,11 @@ export function SettingsClient({
                 key={r}
                 type="button"
                 aria-pressed={s.account_role === r}
-                onClick={() => void save({ account_role: r })}
+                onClick={() => {
+                  // Coaching starts with coach setup (age, vetting, first team)
+                  if (r !== 'player' && !coachSetUp) router.push(`/coach/setup?role=${r}`);
+                  else void save({ account_role: r });
+                }}
                 className={`rounded-lg py-2 text-sm font-semibold capitalize ${s.account_role === r ? 'bg-red-600 text-white' : 'bg-zinc-800 text-zinc-300'}`}
               >
                 {r === 'both' ? 'Player & coach' : r}
@@ -250,9 +257,16 @@ export function SettingsClient({
             ))}
           </div>
           {s.account_role !== 'player' && (
-            <Link href="/coach" className="mt-2 inline-flex items-center gap-1 text-xs text-cyan-400 underline">
-              Open the Coach dashboard <ChevronRight className="h-3 w-3" />
-            </Link>
+            <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+              <Link href="/coach" className="inline-flex items-center gap-1 text-xs text-cyan-400 underline">
+                Coach home <ChevronRight className="h-3 w-3" />
+              </Link>
+              {coachSetUp && (
+                <Link href="/coach/setup?edit=1" className="inline-flex items-center gap-1 text-xs text-cyan-400 underline">
+                  Coach details (club, age, vetting) <ChevronRight className="h-3 w-3" />
+                </Link>
+              )}
+            </span>
           )}
         </Row>
         <Row>{avatar}</Row>

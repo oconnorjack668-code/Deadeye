@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { Card, CardContent } from '@/components/ui/Card';
+import { ReportProblem } from '@/components/ReportProblem';
 import { Trash2, Clock, CheckCircle2 } from 'lucide-react';
 import {
   questionProblem,
@@ -229,7 +230,7 @@ export function AskClient({
 
           <p className="text-xs text-zinc-500">
             {teamId
-              ? 'Your coach can watch this one moment of this one clip. They cannot browse your other videos, and deleting the question takes their access with it.'
+              ? 'The head coaches of this team can watch this one moment of this one clip, and all of them see the same question, so it is never a private chat. Assistant coaches cannot. Nobody can browse your other videos, and deleting the question takes their access with it.'
               : 'Nobody else sees this. Worth knowing: people are often confident and wrong in equal measure about their own decisions, so an outside answer is worth more than your own.'}
           </p>
 
@@ -289,6 +290,16 @@ export function AskClient({
                     <CheckCircle2 className="h-4 w-4" /> {verdictLabel(q.verdict)}
                   </p>
                   {q.coach_note && <p className="mt-1 text-sm text-zinc-300">{q.coach_note}</p>}
+                  {/* Safeguarding: anything a coach writes can be reported to us (Owner tools) */}
+                  {q.coach_note && (
+                    <ReportProblem
+                      label={<span className="mt-2 inline-block text-[11px] text-zinc-500 underline hover:text-zinc-300">Report this answer</span>}
+                      question="What is wrong with this answer?"
+                      placeholder="Tell us what worries you. Only the Deadeye team reads this, not your coach."
+                      context={`Coach post: film answer ${q.id}: ${q.coach_note}`.slice(0, 300)}
+                      panelClassName="mt-3"
+                    />
+                  )}
                 </div>
               ) : (
                 <p className="mt-2 text-xs text-amber-400">

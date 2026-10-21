@@ -39,6 +39,8 @@ const USER_TABLES = [
   'games',
   'team_members',
   'team_assignment_completions',
+  // Coach setup answers: club, 18 or over, when vetting was declared (00047)
+  'coach_profiles',
   'player_reports',
   'fuel_logs',
   'daily_iq_answers',

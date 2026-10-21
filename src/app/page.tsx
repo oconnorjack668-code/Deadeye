@@ -124,7 +124,7 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
     },
     {
       q: "What's free, and what does Pro add?",
-      a: `Shot tracking, logging and your history, all 150 drills, form check, 4 training programs and the social features are free, with no time limit. Pro (${proPrice}) adds every program and IQ section, unlimited AI coaching with a weekly report, your all-time shot chart and form trends, and teams.`,
+      a: `Shot tracking, logging and your history, all 150 drills, form check, 4 training programs and the social features are free, with no time limit. Pro (${proPrice}) adds every program and IQ section, unlimited AI coaching with a weekly report, your all-time shot chart and form trends, and coaching more than one team.`,
     },
     {
       q: 'Can I cancel Pro?',
@@ -136,7 +136,7 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
     },
     {
       q: 'Can coaches use Deadeye?',
-      a: 'Yes. A coach creates a team, players join with a code, and the coach can post assignments and see the training each player chooses to share. Players always join for free.',
+      a: "Yes, and coaching one team is free. A coach sets up the team and shares a code or link, players join for free, and the coach posts assignments to the whole team. Coaches see each player's weekly training totals, and more only if the player shares it. There are no private messages between coaches and players, and head coaches must be 18 or over.",
     },
     {
       q: 'How do I delete my account?',

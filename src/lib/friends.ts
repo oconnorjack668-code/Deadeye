@@ -64,7 +64,7 @@ export function clearInvite(): void {
 }
 
 /** use_code only comes from send_friend_request_to (00046): adding from a player's card. */
-export type RequestResult = 'sent' | 'accepted' | 'already' | 'self' | 'not_found' | 'limit' | 'closed' | 'use_code';
+export type RequestResult = 'sent' | 'accepted' | 'already' | 'self' | 'not_found' | 'limit' | 'closed' | 'use_code' | 'coach_minor';
 
 export const REQUEST_MESSAGES: Record<RequestResult, string> = {
   sent: 'Friend request sent.',
@@ -75,6 +75,8 @@ export const REQUEST_MESSAGES: Record<RequestResult, string> = {
   limit: "You've reached the friend request limit. Wait for some to be accepted first.",
   closed: "This player isn't accepting friend requests right now.",
   use_code: 'If you know this player, ask them for their friend code and add them in Friends.',
+  // 00047: Basketball Ireland asks coaches not to befriend players under 18
+  coach_minor: "Coaches and players under 18 can't be friends on Deadeye. Coaches post to the whole team instead.",
 };
 
 /**

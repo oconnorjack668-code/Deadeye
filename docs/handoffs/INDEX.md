@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-10-21 · coach-side-c1-c2 · Coach setup, coach home, mode switch, safeguarding; waits on 00047 · open: 5 → [handoff](2026-10-21-coach-side-c1-c2.md)
 - 2026-10-21 · funnel-demo-progress-coach-plan · Player funnel, landing demo, progress cards, add friend, FAQ; coach plan · open: 8 → [handoff](2026-10-21-funnel-demo-progress-coach-plan.md)
 - 2026-10-21 · app-review-fixes · Tester walkthrough of 40 pages; name filter, layout and copy fixes, shipped · open: 1 → [handoff](2026-10-21-app-review-fixes.md)
 - 2026-10-21 · first-run-tutorial · Welcome screen, sample tracker clip, starting steps +150 XP, promo on site · open: 1 → [handoff](2026-10-21-first-run-tutorial.md)

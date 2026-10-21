@@ -8,15 +8,18 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { IRISH_COUNTIES, POPULAR_COUNTRIES, countryName } from '@/lib/regions';
 import { Alert } from '@/components/ui/Alert';
-import { Check, Flame, Share2, Trash2, UserCog, X } from 'lucide-react';
+import { Check, Flag, Flame, Share2, Trash2, X } from 'lucide-react';
 import { isSafeAppPath } from '@/lib/safePath';
 import { localDateString } from '@/lib/dates';
+import { AGE_GROUPS, ASSIGNMENT_LINKS, ROLE_LABELS, TEAM_LEVELS, type TeamRole } from '@/lib/coachSide';
+import { TeamShare } from '@/components/coach/TeamShare';
+import { ReportProblem } from '@/components/ReportProblem';
 
 export interface RosterRow {
   user_id: string;
   display_name: string;
   player_position: string | null;
-  role: 'coach' | 'player';
+  role: TeamRole;
   sessions_7d: number;
   workouts_7d: number;
   minutes_7d: number;
@@ -42,11 +45,9 @@ export interface TeamDetails {
   season: string | null;
 }
 
-const AGE_GROUPS = ['U10', 'U12', 'U14', 'U16', 'U18', 'U20', 'Senior', 'Masters', 'Mixed'];
-const LEVELS = ['recreational', 'school', 'club', 'regional', 'national', 'elite'];
-
 export interface Assignment {
   id: string;
+  created_by: string | null;
   title: string;
   details: string | null;
   link: string | null;
@@ -54,18 +55,7 @@ export interface Assignment {
   created_at: string;
 }
 
-// In-app places a coach can point an assignment at
-const LINK_OPTIONS = [
-  { value: '', label: 'No link' },
-  { value: '/basketball/new', label: 'Log a hoops session' },
-  { value: '/workouts/new', label: 'Log a workout' },
-  { value: '/games/new', label: 'Log a game' },
-  { value: '/video', label: 'Video: shot tracker / form check' },
-  { value: '/programs', label: 'Programs' },
-  { value: '/drills', label: 'Drill library' },
-  { value: '/study', label: 'IQ Study' },
-  { value: '/workouts/tests', label: 'Athletic tests' },
-];
+const LINK_OPTIONS = ASSIGNMENT_LINKS;
 
 function lastSeen(date: string | null): string {
   if (!date) return 'never';
@@ -79,6 +69,9 @@ export function TeamClient({
   joinCode,
   myId,
   isCoach,
+  isStaff,
+  myName,
+  openShare = false,
   roster,
   assignments,
   completions,
@@ -88,7 +81,13 @@ export function TeamClient({
   teamName: string;
   joinCode: string;
   myId: string;
+  /** Head coach: details, roles, removing members */
   isCoach: boolean;
+  /** Head or assistant coach: posting assignments and inviting players */
+  isStaff: boolean;
+  myName: string;
+  /** Opened from the coach home's "Share team code" */
+  openShare?: boolean;
   roster: RosterRow[];
   assignments: Assignment[];
   completions: Array<{ assignment_id: string; user_id: string }>;
@@ -146,20 +145,7 @@ export function TeamClient({
   }
 
   const db = () => createClient();
-
-  async function share() {
-    const url = `${window.location.origin}/teams`;
-    const text = `Join ${teamName} on Deadeye! Open ${url} and enter team code ${joinCode}`;
-    try {
-      if (navigator.share) await navigator.share({ title: teamName, text });
-      else {
-        await navigator.clipboard.writeText(text);
-        setMessage({ tone: 'success', text: 'Invite copied. Paste it in your team chat.' });
-      }
-    } catch {
-      // share sheet closed
-    }
-  }
+  const nameOf = (uid: string | null) => roster.find((r) => r.user_id === uid)?.display_name || 'a coach';
 
   async function addAssignment(e: React.FormEvent) {
     e.preventDefault();
@@ -258,9 +244,9 @@ export function TeamClient({
             </select>
             <select value={info.level || ''} onChange={(e) => setInfo({ ...info, level: e.target.value || null })} aria-label="Level" className="rounded-lg bg-zinc-800 px-2 py-2 text-sm text-white">
               <option value="">Level</option>
-              {LEVELS.map((l) => (
-                <option key={l} value={l}>
-                  {l[0].toUpperCase() + l.slice(1)}
+              {TEAM_LEVELS.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label}
                 </option>
               ))}
             </select>
@@ -306,20 +292,32 @@ export function TeamClient({
         </details>
       )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-        <div>
+      {isStaff ? (
+        <details open={openShare} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+          <summary className="flex cursor-pointer items-center justify-between gap-3">
+            <span>
+              <span className="block text-xs font-semibold uppercase text-zinc-500">Team code</span>
+              <span className="block text-2xl font-black tracking-[0.2em] text-white">{joinCode}</span>
+            </span>
+            <span className="flex items-center gap-1.5 rounded-xl bg-zinc-800 px-3 py-2 text-sm font-semibold text-zinc-100">
+              <Share2 className="h-4 w-4" /> Invite players
+            </span>
+          </summary>
+          <div className="mt-4">
+            <TeamShare teamName={teamName} code={joinCode} coachName={myName} />
+          </div>
+        </details>
+      ) : (
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
           <div className="text-xs font-semibold uppercase text-zinc-500">Team code</div>
           <div className="text-2xl font-black tracking-[0.2em] text-white">{joinCode}</div>
         </div>
-        <Button variant="secondary" className="gap-1.5" onClick={() => void share()}>
-          <Share2 className="h-4 w-4" /> Invite players
-        </Button>
-      </div>
+      )}
 
       {/* Assignments */}
       <section className="space-y-2">
         <h2 className="font-bold text-white">Assignments</h2>
-        {isCoach && (
+        {isStaff && (
           <form onSubmit={addAssignment} className="rounded-2xl border border-cyan-800/40 bg-cyan-950/20 p-3 space-y-2">
             <input
               value={title}
@@ -353,7 +351,7 @@ export function TeamClient({
             </Button>
           </form>
         )}
-        {assignments.length === 0 && <p className="text-sm text-zinc-500">{isCoach ? 'Post the first assignment above.' : 'No assignments yet.'}</p>}
+        {assignments.length === 0 && <p className="text-sm text-zinc-500">{isStaff ? 'Post the first assignment above.' : 'No assignments yet.'}</p>}
         {assignments.map((a) => {
           const done = doneBy(a.id);
           const mine = done.includes(myId);
@@ -395,7 +393,7 @@ export function TeamClient({
                   >
                     {mine ? 'Undo' : <><Check className="h-4 w-4 mr-1" /> Done</>}
                   </Button>
-                  {isCoach && (
+                  {isStaff && (
                     <button
                       type="button"
                       aria-label={`Delete ${a.title}`}
@@ -407,10 +405,24 @@ export function TeamClient({
                   )}
                 </div>
               </div>
-              {isCoach && done.length > 0 && (
+              {isStaff && done.length > 0 && (
                 <p className="mt-2 text-[11px] text-emerald-400/80">
                   ✓ {done.map((uid) => roster.find((r) => r.user_id === uid)?.display_name || 'Former member').join(', ')}
                 </p>
+              )}
+              {/* Safeguarding: anything a coach posts can be reported to us (Owner tools → Errors and reports) */}
+              {!isStaff && (
+                <ReportProblem
+                  label={
+                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-300">
+                      <Flag className="h-3 w-3" /> Report this post
+                    </span>
+                  }
+                  question="What is wrong with this post?"
+                  placeholder="Tell us what worries you. Only the Deadeye team reads this, not your coach."
+                  context={`Coach post: assignment ${a.id} on ${teamName}, by ${nameOf(a.created_by)}: ${a.title}${a.details ? ` - ${a.details}` : ''}`.slice(0, 300)}
+                  panelClassName="mt-3 rounded-xl border border-zinc-800 bg-zinc-950/60 p-3"
+                />
               )}
             </div>
           );
@@ -454,7 +466,7 @@ export function TeamClient({
                       ) : (
                         r.display_name
                       )}
-                      {r.role === 'coach' && <span className="ml-1.5 text-[10px] font-bold text-cyan-400">COACH</span>}
+                      {r.role !== 'player' && <span className="ml-1.5 text-[10px] font-bold uppercase text-cyan-400">{ROLE_LABELS[r.role]}</span>}
                       {isCoach && r.role === 'player' && !r.share_details && (
                         <span title="Not sharing training details" className="ml-1.5 text-[10px] text-zinc-500">
                           🔒
@@ -482,19 +494,26 @@ export function TeamClient({
                     <td className="px-2 py-2 text-right whitespace-nowrap">
                       {r.user_id !== myId && (
                         <>
-                          <button
-                            type="button"
-                            title={r.role === 'coach' ? 'Make player' : 'Make coach'}
-                            aria-label={r.role === 'coach' ? `Make ${r.display_name} a player` : `Make ${r.display_name} a coach`}
-                            className="text-zinc-500 hover:text-cyan-400 mr-2"
-                            onClick={() =>
-                              void run(`r-${r.user_id}`, () =>
-                                db().rpc('set_team_role', { p_team: teamId, p_user: r.user_id, p_role: r.role === 'coach' ? 'player' : 'coach' })
+                          {/* A head coach must be an adult who finished coach setup; set_team_role (00047) says so if not */}
+                          <select
+                            value={r.role}
+                            aria-label={`Role of ${r.display_name}`}
+                            disabled={busy === `r-${r.user_id}`}
+                            onChange={(e) =>
+                              void run(
+                                `r-${r.user_id}`,
+                                () => db().rpc('set_team_role', { p_team: teamId, p_user: r.user_id, p_role: e.target.value }),
+                                `${r.display_name} is now ${ROLE_LABELS[e.target.value as TeamRole].toLowerCase()}.`
                               )
                             }
+                            className="mr-2 rounded-md bg-zinc-800 px-1.5 py-1 text-xs text-zinc-200"
                           >
-                            <UserCog className="h-4 w-4" />
-                          </button>
+                            {(Object.keys(ROLE_LABELS) as TeamRole[]).map((role) => (
+                              <option key={role} value={role}>
+                                {ROLE_LABELS[role]}
+                              </option>
+                            ))}
+                          </select>
                           <button
                             type="button"
                             aria-label={`Remove ${r.display_name}`}
@@ -526,7 +545,7 @@ export function TeamClient({
           className="text-zinc-500 underline"
           onClick={async () => {
             if (isCoach && roster.filter((r) => r.role === 'coach').length === 1) {
-              setMessage({ tone: 'error', text: "You're the only coach. Make another member a coach first, or delete the team." });
+              setMessage({ tone: 'error', text: "You're the only head coach. Make another adult coach head coach first, or delete the team." });
               return;
             }
             if (!window.confirm(`Leave ${teamName}?`)) return;

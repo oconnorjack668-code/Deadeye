@@ -1,11 +1,11 @@
 // src/app/(app)/teams/page.tsx
 import React from 'react';
 import Link from 'next/link';
-import { requireUser, getCurrentSubscription } from '@/lib/auth';
+import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { TeamsActions } from './TeamsActions';
 import { Shield, ChevronRight } from 'lucide-react';
-import { hasPro } from '@/lib/entitlements';
+import { isStaff, ROLE_LABELS, type TeamRole } from '@/lib/coachSide';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Teams - Deadeye' };
@@ -13,12 +13,8 @@ export const metadata = { title: 'Teams - Deadeye' };
 export default async function TeamsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [{ data, error }, subscription] = await Promise.all([
-    supabase.from('team_members').select('role, teams(id, name)').eq('user_id', user.id),
-    getCurrentSubscription(),
-  ]);
-  const teams = ((data || []) as unknown as Array<{ role: string; teams: { id: string; name: string } | null }>).filter((m) => m.teams);
-  const canCreate = hasPro(subscription);
+  const { data, error } = await supabase.from('team_members').select('role, teams(id, name)').eq('user_id', user.id);
+  const teams = ((data || []) as unknown as Array<{ role: TeamRole; teams: { id: string; name: string } | null }>).filter((m) => m.teams);
 
   return (
     <div className="flex-1 overflow-auto">
@@ -39,9 +35,9 @@ export default async function TeamsPage() {
           </p>
         ) : (
           <>
-            {teams.some((m) => m.role === 'coach') && (
+            {teams.some((m) => isStaff(m.role)) && (
               <Link href="/coach" className="flex items-center justify-between rounded-2xl border border-indigo-600/40 bg-indigo-600/10 px-4 py-3 text-sm font-semibold text-indigo-200 hover:bg-indigo-600/15">
-                Coach dashboard: all your teams this week <ChevronRight className="h-4 w-4" />
+                Coach home: all your teams this week <ChevronRight className="h-4 w-4" />
               </Link>
             )}
             {teams.length > 0 && (
@@ -54,17 +50,17 @@ export default async function TeamsPage() {
                   >
                     <div>
                       <div className="font-bold text-white">{m.teams!.name}</div>
-                      <div className="text-xs text-zinc-500">{m.role === 'coach' ? 'Coach' : 'Player'}</div>
+                      <div className="text-xs text-zinc-500">{ROLE_LABELS[m.role] ?? 'Player'}</div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-zinc-600" />
                   </Link>
                 ))}
               </section>
             )}
-            <TeamsActions canCreate={canCreate} />
+            <TeamsActions />
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 text-sm text-zinc-400 space-y-1">
               <p className="font-semibold text-zinc-200">How teams work</p>
-              <p>Coaches create a team and share its code. Players join with the code (free).</p>
+              <p>Coaches create a team and share its code or link. Players join for free.</p>
               <p>
                 Everyone on the team sees the roster&apos;s training totals and game averages. Coaches post assignments players tick off.
                 Notes, videos and AI reports always stay private.

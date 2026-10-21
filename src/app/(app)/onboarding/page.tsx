@@ -18,6 +18,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Sparkles,
+  ClipboardCheck,
+  Users,
 } from 'lucide-react';
 import type { AgeBracket, BasketballPosition, DominantHand, PlayingLevel } from '@/lib/supabase/types';
 import { asMeasurementSystem, cmToFeetInches, feetInchesToCm, type MeasurementSystem } from '@/lib/units';
@@ -92,6 +94,11 @@ export default function OnboardingPage() {
   const [focusAreas, setFocusAreas] = useState<string[]>(['Shooting Arc & Dip']);
   // /onboarding?edit=1 (from Profile) edits an existing player record
   const [isEditing, setIsEditing] = useState(false);
+  // New accounts first say whether they play, coach or both. Coaching has its
+  // own, shorter setup (/coach/setup); "both" does that first and comes back
+  // here for the player part, with the question already answered.
+  const [askRole, setAskRole] = useState(false);
+  const [accountRole, setAccountRole] = useState<string>('player');
 
   useEffect(() => {
     async function loadCurrent() {
@@ -114,6 +121,9 @@ export default function OnboardingPage() {
 
       const allowed = allowedAgeBrackets(ageCheck?.is_16_plus ?? null);
       if (ageCheck) setIs16Plus(ageCheck.is_16_plus);
+
+      if (!editing && profile?.account_role !== 'both') setAskRole(true);
+      if (profile?.account_role) setAccountRole(profile.account_role);
 
       if (profile) {
         if (profile.onboarding_completed && !editing) {
@@ -304,6 +314,12 @@ export default function OnboardingPage() {
         }
       }
 
+      // A player-coach finishing the player part carries on as a player. Its own
+      // call, so a missing app_mode column (before 00047) cannot stop setup.
+      if (accountRole === 'both' && !isEditing) {
+        await supabase.from('profiles').update({ app_mode: 'playing' }).eq('id', user.id);
+      }
+
       // A new player lands on the welcome screen's "are you at a court?" rather
       // than the dashboard: see src/app/(app)/welcome/page.tsx
       router.push(isEditing ? '/profile' : '/welcome');
@@ -320,6 +336,53 @@ export default function OnboardingPage() {
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-xs text-zinc-400 font-medium">Setting up your player record...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (askRole) {
+    const choices = [
+      { key: 'player', title: "I'm a player", text: 'Track your shots, train and get better.', icon: User },
+      { key: 'coach', title: 'I coach', text: 'Set up your team and see who is training.', icon: ClipboardCheck },
+      { key: 'both', title: 'I play and coach', text: 'Switch between your own training and your team.', icon: Users },
+    ] as const;
+    return (
+      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-4 py-12">
+        <div className="w-full max-w-lg space-y-6">
+          <div className="flex items-center gap-2">
+            <Logo size={36} />
+            <h2 className="text-sm font-black uppercase tracking-wider text-white">Deadeye Setup</h2>
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-white">How will you use Deadeye?</h1>
+            <p className="text-sm text-zinc-400">You can change this later in Settings.</p>
+          </div>
+          <div className="space-y-3">
+            {choices.map((c) => {
+              const Icon = c.icon;
+              return (
+                <button
+                  key={c.key}
+                  type="button"
+                  onClick={() => {
+                    if (c.key === 'player') setAskRole(false);
+                    else router.push(`/coach/setup?role=${c.key}`);
+                  }}
+                  className="flex w-full items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-4 text-left hover:border-zinc-600"
+                >
+                  <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-zinc-800">
+                    <Icon className="h-5 w-5 text-orange-400" />
+                  </span>
+                  <span>
+                    <span className="block font-bold text-white">{c.title}</span>
+                    <span className="block text-sm text-zinc-400">{c.text}</span>
+                  </span>
+                  <ArrowRight className="ml-auto h-5 w-5 text-zinc-600" />
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     );

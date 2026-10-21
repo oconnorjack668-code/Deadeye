@@ -12,6 +12,7 @@ export type Json =
 export type UserRole = 'player' | 'owner' | 'admin';
 export type PlanType = 'free' | 'pro' | 'owner';
 export type AgeBracket = '13' | '14-17' | '18-22' | '23-30' | '30+';
+export type AppMode = 'playing' | 'coaching';
 export type ConsentStatus = 'not_needed' | 'pending' | 'approved' | 'withdrawn';
 export type BasketballPosition = 'PG' | 'SG' | 'SF' | 'PF' | 'C' | 'G' | 'F' | 'multi';
 export type DominantHand = 'left' | 'right' | 'ambidextrous';
@@ -218,6 +219,8 @@ export interface Database {
           // Added by 00043_avatars_photos_levels.sql
           avatar_emoji: string | null;
           avatar_color: string | null;
+          // Added by 00047_coach_side.sql: the side of the app a player-coach last used
+          app_mode: AppMode | null;
           created_at: string;
           updated_at: string;
         };
@@ -248,6 +251,7 @@ export interface Database {
           ai_coaching_enabled?: boolean;
           avatar_emoji?: string | null;
           avatar_color?: string | null;
+          app_mode?: AppMode | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -278,6 +282,7 @@ export interface Database {
           ai_coaching_enabled?: boolean;
           avatar_emoji?: string | null;
           avatar_color?: string | null;
+          app_mode?: AppMode | null;
           updated_at?: string;
         };
         Relationships: [];
@@ -1528,6 +1533,20 @@ export interface Database {
         };
         Relationships: [];
       };
+      coach_profiles: {
+        Row: {
+          user_id: string;
+          club_name: string | null;
+          is_adult: boolean;
+          vetting_declared_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        // Written only through save_coach_profile (00047)
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       team_members: {
         Row: { team_id: string; user_id: string; role: string; joined_at: string; share_details: boolean };
         Insert: { team_id: string; user_id: string; role?: string; joined_at?: string; share_details?: boolean };
@@ -1916,6 +1935,9 @@ export interface Database {
         Returns: { user_id: string; display_name: string; kind: string; happened_on: string; created_at: string; title: string; detail: string | null }[];
       };
       create_team: { Args: { p_name: string }; Returns: string };
+      create_team_with_details: { Args: { p_name: string; p_club: string | null; p_age_group: string | null; p_level: string | null }; Returns: string };
+      save_coach_profile: { Args: { p_club: string | null; p_is_adult: boolean; p_vetted: boolean; p_role: 'coach' | 'both' }; Returns: void };
+      team_preview: { Args: { p_code: string }; Returns: { name: string; club_name: string | null; age_group: string | null; members: number }[] };
       join_team: { Args: { p_code: string }; Returns: string };
       delete_team: { Args: { p_team: string }; Returns: void };
       set_team_role: { Args: { p_team: string; p_user: string; p_role: string }; Returns: void };

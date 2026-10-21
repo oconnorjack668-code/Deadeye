@@ -11,6 +11,7 @@
 //   free programs     training_programs.is_free (00037)
 //   free IQ sections    study_topics.is_free (00037)
 //   30-day shot chart   dashboard page
+//   teams coached       create_team_with_details (00047): 1 free, 10 with Pro
 //
 // The thinking behind the split: Free keeps everything that brings players in
 // and everything that is their own data. Pro is coaching - structure,
@@ -39,6 +40,7 @@ export const FREE_PLAN: Plan = {
     'Your shot chart for the last 30 days',
     `${FREE_MONTHLY_AI_REPORTS} AI coaching reports a month and ${FREE_CHAT_PER_DAY} questions to the coach a day`,
     'Friends, leaderboard, challenges, badges and highlight reels',
+    'Coach one team: a team code, the roster, assignments and this week at a glance',
   ],
 };
 
@@ -52,7 +54,7 @@ export const PRO_PLAN: Plan = {
     'Every Basketball IQ section, with all lessons and quizzes',
     'Your all-time shot chart, and how your form changes over time',
     'An AI development plan from your NBA style match',
-    'Create teams and coach them from one dashboard',
+    'Coach up to 10 teams from one coach home',
     'Everything in Free',
   ],
 };

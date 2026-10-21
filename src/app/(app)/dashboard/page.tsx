@@ -25,6 +25,7 @@ import { InstallNudge } from '@/components/InstallNudge';
 import { StarterSteps } from '@/components/StarterSteps';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
+import { appModeFor } from '@/lib/coachSide';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,6 +89,10 @@ function StatCard({
 export default async function DashboardPage() {
   const user = await requireUser();
   const profile = await getCurrentProfile();
+
+  // The app opens here after logging in. Coach-only accounts have no player
+  // side, and a player-coach opens in the mode they used last.
+  if (appModeFor(profile) === 'coaching') redirect('/coach');
 
   // Players who never finished setup (e.g. the confirmation link didn't land them
   // on /onboarding) are sent there from their landing page

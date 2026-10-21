@@ -9,6 +9,7 @@ import { Logo } from '@/components/Logo';
 import { WhatParentsAgreeTo } from '../WhatParentsAgreeTo';
 import { ParentApprovalForm } from '../ParentApprovalForm';
 import { WithdrawApproval } from '../WithdrawApproval';
+import { CoachPosts } from '../CoachPosts';
 
 export const metadata = { title: 'Approve an account - Deadeye', robots: { index: false } };
 export const dynamic = 'force-dynamic';
@@ -40,6 +41,7 @@ export default async function ParentPage({ params }: { params: Promise<{ token: 
           <>
             <h1 className="text-2xl font-black text-white">You approved {child}&apos;s account</h1>
             <p className="text-sm text-zinc-300">Thanks. {child} can use Deadeye. You can withdraw your approval here at any time.</p>
+            <CoachPosts childId={check.user_id} child={child} />
             <WithdrawApproval token={token} child={child} />
           </>
         ) : (

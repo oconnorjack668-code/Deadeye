@@ -2,7 +2,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { requireUser } from '@/lib/auth';
+import { requireUser, getCurrentProfile } from '@/lib/auth';
+import { isStaff } from '@/lib/coachSide';
 import { createClient } from '@/lib/supabase/server';
 import { TeamClient, type Assignment, type RosterRow } from './TeamClient';
 import { ArrowLeft, Shield } from 'lucide-react';
@@ -10,8 +11,16 @@ import { ArrowLeft, Shield } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Team - Deadeye' };
 
-export default async function TeamPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TeamPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ share?: string }>;
+}) {
   const { id } = await params;
+  const { share } = await searchParams;
+  const profile = await getCurrentProfile();
   const user = await requireUser();
   const supabase = await createClient();
   const { data: team } = await supabase.from('teams').select('id, name, join_code, club_name, country, region, age_group, level, season').eq('id', id).maybeSingle();
@@ -21,7 +30,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
     supabase.rpc('team_roster', { p_team: id }),
     supabase
       .from('team_assignments')
-      .select('id, title, details, link, due_date, created_at')
+      .select('id, title, details, link, due_date, created_at, created_by')
       .eq('team_id', id)
       .order('created_at', { ascending: false })
       .limit(50),
@@ -43,7 +52,7 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           <div>
             <h1 className="text-3xl font-black tracking-tight text-white">{team.name}</h1>
             <p className="text-sm text-zinc-400">
-              {rows.length} {rows.length === 1 ? 'member' : 'members'} · you&apos;re {me?.role === 'coach' ? 'a coach' : 'a player'}
+              {rows.length} {rows.length === 1 ? 'member' : 'members'} · you&apos;re {me?.role === 'coach' ? 'a head coach' : me?.role === 'assistant' ? 'an assistant coach' : 'a player'}
             </p>
           </div>
         </div>
@@ -53,6 +62,9 @@ export default async function TeamPage({ params }: { params: Promise<{ id: strin
           joinCode={team.join_code}
           myId={user.id}
           isCoach={me?.role === 'coach'}
+          isStaff={isStaff(me?.role)}
+          myName={profile?.display_name || 'Coach'}
+          openShare={share === '1'}
           team={{
             club_name: team.club_name ?? null,
             country: team.country ?? null,

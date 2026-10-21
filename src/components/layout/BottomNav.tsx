@@ -4,7 +4,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, CalendarCheck } from 'lucide-react';
+import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, CalendarCheck, Shield, ClipboardList, ListChecks, Settings } from 'lucide-react';
+import type { AppMode } from '@/lib/supabase/types';
 
 // Pages that live under the Train hub light up the Train tab
 const TRAIN_PATHS = ['/train', '/programs', '/drills', '/guides', '/style-match', '/video', '/ai-coach', '/leaderboard', '/achievements', '/goals'];
@@ -27,19 +28,31 @@ export const DESKTOP_NAV_ITEMS = [
   { href: '/leaderboard', label: 'Ranks', icon: Trophy, match: ['/leaderboard'] },
 ];
 
-export function isNavActive(pathname: string, match: string[]): boolean {
-  return match.some((m) => pathname === m || pathname.startsWith(`${m}/`));
+// Coaching mode: the coach home, teams, assignments, the drill library to
+// plan a practice, and settings. Same five tabs on phones and desktop.
+export const COACH_NAV_ITEMS = [
+  // Exact, so the home tab is not lit on /coach/assignments
+  { href: '/coach', label: 'Home', icon: LayoutDashboard, match: ['/coach', '/coach/setup'], exact: true },
+  { href: '/teams', label: 'Teams', icon: Shield, match: ['/teams'] },
+  { href: '/coach/assignments', label: 'Assignments', icon: ClipboardList, match: ['/coach/assignments'] },
+  { href: '/drills', label: 'Drills', icon: ListChecks, match: ['/drills'] },
+  { href: '/settings', label: 'Settings', icon: Settings, match: ['/settings'] },
+];
+
+export function isNavActive(pathname: string, match: string[], exact = false): boolean {
+  return match.some((m) => pathname === m || (!exact && pathname.startsWith(`${m}/`)));
 }
 
-export function BottomNav() {
+export function BottomNav({ mode = 'playing' }: { mode?: AppMode }) {
   const pathname = usePathname();
+  const items: Array<(typeof NAV_ITEMS)[number] & { exact?: boolean }> = mode === 'coaching' ? COACH_NAV_ITEMS : NAV_ITEMS;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-zinc-800/90 bg-zinc-950/95 backdrop-blur-lg md:hidden">
       <div className="grid grid-cols-5 px-1 pt-1.5 safe-bottom">
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const Icon = item.icon;
-          const isActive = isNavActive(pathname, item.match);
+          const isActive = isNavActive(pathname, item.match, item.exact);
 
           return (
             <Link

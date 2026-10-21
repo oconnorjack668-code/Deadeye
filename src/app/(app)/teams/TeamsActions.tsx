@@ -16,11 +16,10 @@ const JOIN_MESSAGES: Record<string, string> = {
   full: 'That team is full (60 members).',
 };
 
-export function TeamsActions({ canCreate }: { canCreate: boolean }) {
+export function TeamsActions() {
   const router = useRouter();
   const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [busy, setBusy] = useState<'join' | 'create' | null>(null);
+  const [busy, setBusy] = useState<'join' | null>(null);
   const [message, setMessage] = useState<{ tone: 'success' | 'error'; text: string } | null>(null);
 
   async function join(e: React.FormEvent) {
@@ -40,20 +39,6 @@ export function TeamsActions({ canCreate }: { canCreate: boolean }) {
       setCode('');
       router.refresh();
     }
-  }
-
-  async function create(e: React.FormEvent) {
-    e.preventDefault();
-    if (name.trim().length < 2) {
-      setMessage({ tone: 'error', text: 'Give your team a name (at least 2 characters).' });
-      return;
-    }
-    setBusy('create');
-    setMessage(null);
-    const { data, error } = await createClient().rpc('create_team', { p_name: name.trim().slice(0, 60) });
-    setBusy(null);
-    if (error) return setMessage({ tone: 'error', text: error.message });
-    router.push(`/teams/${data}`);
   }
 
   return (
@@ -86,32 +71,13 @@ export function TeamsActions({ canCreate }: { canCreate: boolean }) {
         </div>
       </form>
 
-      <form onSubmit={create} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-2">
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-2">
         <h2 className="font-bold text-white">Coach a team</h2>
-        {canCreate ? (
-          <div className="flex gap-2">
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Team name, e.g. U16 Dublin Lions"
-              aria-label="Team name"
-              maxLength={60}
-              className="flex-1 min-w-0 rounded-xl border border-zinc-700/80 bg-zinc-900/90 px-3.5 py-2 text-sm text-zinc-100 focus:border-cyan-500 focus:outline-none"
-            />
-            <Button type="submit" variant="primary" isLoading={busy === 'create'}>
-              Create
-            </Button>
-          </div>
-        ) : (
-          <p className="text-sm text-zinc-400">
-            Creating a team is part of{' '}
-            <Link href="/pro" className="underline text-cyan-300">
-              Deadeye Pro
-            </Link>
-            . Players join for free.
-          </p>
-        )}
-      </form>
+        <p className="text-sm text-zinc-400">Coaching one team is free. Set it up and get a code, a QR code and a link to send your players.</p>
+        <Link href="/coach/setup?step=team" className="inline-block rounded-xl bg-indigo-600 px-4 py-2 text-sm font-bold text-white hover:bg-indigo-500">
+          Set up a team
+        </Link>
+      </div>
     </div>
   );
 }

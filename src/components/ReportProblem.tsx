@@ -14,11 +14,16 @@ import { Button } from '@/components/ui/Button';
  */
 export function ReportProblem({
   label = 'Report a problem',
+  question = 'What went wrong?',
+  placeholder = 'What happened, and what were you trying to do?',
   context,
   className,
   panelClassName,
 }: {
   label?: React.ReactNode;
+  /** The form's heading and hint, e.g. when reporting a coach's post */
+  question?: string;
+  placeholder?: string;
   /** Sent with the report, e.g. which crash it followed */
   context?: string;
   /** The closed button */
@@ -90,14 +95,14 @@ export function ReportProblem({
   return (
     <form onSubmit={send} className={`space-y-2 text-left ${panelClassName || ''}`}>
       <label className="block">
-        <span className="text-sm font-semibold text-zinc-100">What went wrong?</span>
+        <span className="text-sm font-semibold text-zinc-100">{question}</span>
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           maxLength={1000}
           rows={4}
           autoFocus
-          placeholder="What happened, and what were you trying to do?"
+          placeholder={placeholder}
           className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-500"
         />
       </label>

@@ -18,12 +18,14 @@ export const metadata = { title: 'Settings - Deadeye' };
 export default async function SettingsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [profile, subscription, ageCheck, { data: photoRow }] = await Promise.all([
+  const [profile, subscription, ageCheck, { data: photoRow }, { data: coachProfile }] = await Promise.all([
     getCurrentProfile(),
     getCurrentSubscription(),
     getCurrentAgeCheck(),
     // The player's own row; missing before 00043, which reads as no photo
     supabase.from('profile_photos').select('path, status, visibility').eq('user_id', user.id).maybeSingle(),
+    // Missing before 00047, which reads as not set up
+    supabase.from('coach_profiles').select('user_id').eq('user_id', user.id).maybeSingle(),
   ]);
   const photo: OwnPhoto | null = photoRow
     ? { url: await signedPhotoUrl(photoRow.path), status: photoRow.status, visibility: photoRow.visibility }
@@ -78,6 +80,7 @@ export default async function SettingsPage() {
             dataControls={<ProfileSettings initialIsPublic={profile.is_public} showLeaderboard={false} />}
             supportEmail={process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL || null}
             version={pkg.version}
+            coachSetUp={!!coachProfile}
           />
         ) : (
           <p className="text-sm text-amber-300">Could not load your settings. Please refresh the page.</p>

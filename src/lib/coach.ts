@@ -1,10 +1,10 @@
 // src/lib/coach.ts
-// Team summaries for the Coach dashboard, built from team_roster rows.
+// Team summaries for the coach home, built from team_roster rows.
 
 export interface RosterStats {
   user_id: string;
   display_name: string;
-  role: 'coach' | 'player';
+  role: 'coach' | 'assistant' | 'player';
   share_details: boolean;
   sessions_7d: number;
   workouts_7d: number;

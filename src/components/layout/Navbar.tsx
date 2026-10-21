@@ -8,14 +8,20 @@ import { usePathname } from 'next/navigation';
 import { ShieldAlert, Settings } from 'lucide-react';
 import type { Profile } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
-import { DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
+import { COACH_NAV_ITEMS, DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
+import { ModeSwitch } from './ModeSwitch';
+import { MODE_HOME } from '@/lib/coachSide';
+import type { AppMode } from '@/lib/supabase/types';
 
 interface NavbarProps {
   profile: Profile | null;
   isOwner?: boolean;
+  mode?: AppMode;
+  /** Plays and coaches: shows the Playing / Coaching switch */
+  canSwitch?: boolean;
 }
 
-export function Navbar({ profile, isOwner = false }: NavbarProps) {
+export function Navbar({ profile, isOwner = false, mode = 'playing', canSwitch = false }: NavbarProps) {
   // Signing out lives in Settings, as a labelled button. An unlabelled icon here,
   // right beside Settings, was easy to tap by mistake.
   const pathname = usePathname();
@@ -24,23 +30,24 @@ export function Navbar({ profile, isOwner = false }: NavbarProps) {
     <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
       <div className="flex h-16 items-center justify-between px-4 md:px-8 max-w-7xl mx-auto">
         {/* Brand Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2.5">
+        <Link href={MODE_HOME[mode]} className="flex items-center gap-2.5">
           <Logo size={36} />
-          <div className="flex flex-col">
+          {/* On phones the switch needs the room */}
+          <div className={`${canSwitch ? 'hidden sm:flex' : 'flex'} flex-col`}>
             <span className="text-base font-black tracking-tight text-white uppercase leading-none">
               Deadeye
             </span>
-            <span className="text-[10px] font-semibold text-red-400 tracking-wider uppercase leading-none mt-0.5">
-              Aim is earned
+            <span className={`text-[10px] font-semibold tracking-wider uppercase leading-none mt-0.5 ${mode === 'coaching' ? 'text-indigo-300' : 'text-red-400'}`}>
+              {mode === 'coaching' ? 'Coaching' : 'Aim is earned'}
             </span>
           </div>
         </Link>
 
         {/* Desktop section links (phones use BottomNav) */}
         <nav className="hidden md:flex items-center gap-1">
-          {DESKTOP_NAV_ITEMS.map((item) => {
+          {(mode === 'coaching' ? COACH_NAV_ITEMS : DESKTOP_NAV_ITEMS).map((item: (typeof COACH_NAV_ITEMS)[number]) => {
             const Icon = item.icon;
-            const isActive = isNavActive(pathname, item.match);
+            const isActive = isNavActive(pathname, item.match, item.exact);
             return (
               <Link
                 key={item.href}
@@ -57,7 +64,8 @@ export function Navbar({ profile, isOwner = false }: NavbarProps) {
         </nav>
 
         {/* Right side: Owner badge, Profile link, Settings */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {canSwitch && <ModeSwitch mode={mode} />}
           {isOwner && (
             <Link
               href="/admin"

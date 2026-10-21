@@ -6,6 +6,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { QuickLog } from '@/components/layout/QuickLog';
 import { OfflineSync } from '@/components/OfflineSync';
+import { appModeFor } from '@/lib/coachSide';
 
 export const metadata = {
   title: 'Deadeye Basketball Training',
@@ -26,16 +27,19 @@ export default async function AppLayout({
   if (gate === 'ask-age') redirect('/age-check');
   if (gate === 'needs-parent') redirect('/parent-approval');
 
+  // Coaching has its own menu; logging a session belongs to playing
+  const mode = appModeFor(profile);
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
-      <Navbar profile={profile} isOwner={isOwner} />
+      <Navbar profile={profile} isOwner={isOwner} mode={mode} canSwitch={profile?.account_role === 'both'} />
 
       <main className="flex-1 flex flex-col overflow-hidden pb-20 md:pb-0">
         {children}
       </main>
 
-      <QuickLog />
-      <BottomNav />
+      {mode === 'playing' && <QuickLog />}
+      <BottomNav mode={mode} />
       <OfflineSync />
     </div>
   );

@@ -4,9 +4,10 @@
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { track, trackIfFromDemo } from '@/lib/events';
 import { clearInvite, pendingInvite } from '@/lib/friends';
+import { pendingTeamInvite, teamJoinPath } from '@/lib/coachSide';
 import { REMINDER_TIME_LABEL } from '@/lib/reminders';
 import Link from 'next/link';
-import { ArrowLeft, Brain, Camera, Check, MapPin, PenLine, PlayCircle, Sofa, UserPlus } from 'lucide-react';
+import { ArrowLeft, Brain, Camera, Check, MapPin, PenLine, PlayCircle, Shield, Sofa, UserPlus } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { RemindersCard } from '@/app/(app)/profile/RemindersCard';
 
@@ -24,6 +25,8 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
   // Saved by the login page when they signed up from a friend's invite link.
   // Read after hydration (null on the server), as StarterSteps reads its flags.
   const invite = useSyncExternalStore(noSubscribe, pendingInvite, () => null);
+  // The same for a coach's team join link
+  const teamInvite = useSyncExternalStore(noSubscribe, pendingTeamInvite, () => null);
 
   useEffect(() => {
     track('welcome_seen');
@@ -169,6 +172,18 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
           <span>
             <span className="block font-semibold text-white">Add the friend who invited you</span>
             <span className="block text-sm text-zinc-400">Then you can see each other&apos;s training and compete.</span>
+          </span>
+        </Link>
+      )}
+      {teamInvite && (
+        <Link
+          href={teamJoinPath(teamInvite)}
+          className="flex items-center gap-3 rounded-2xl border border-blue-600/40 bg-blue-600/10 p-4 text-left hover:bg-blue-600/15"
+        >
+          <Shield className="h-6 w-6 flex-shrink-0 text-blue-400" />
+          <span>
+            <span className="block font-semibold text-white">Join your coach&apos;s team</span>
+            <span className="block text-sm text-zinc-400">Your coach sent you a team link.</span>
           </span>
         </Link>
       )}

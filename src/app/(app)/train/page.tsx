@@ -74,7 +74,7 @@ const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
       { href: '/ai-coach/chat', icon: MessageCircle, title: 'Ask coach', desc: 'Chat, knows your numbers', ...COACHING },
       { href: '/video', icon: Video, title: 'Video AI', desc: 'Shot tracking, form check, jump test', ...COACHING },
       { href: '/teams', icon: Shield, title: 'Teams', desc: 'Join a team, roster', ...COACHING },
-      { href: '/coach', icon: ClipboardCheck, title: 'Coach dashboard', desc: 'All your teams', ...COACHING, badge: 'PRO' },
+      { href: '/coach', icon: ClipboardCheck, title: 'Coach home', desc: 'Coach a team, free', ...COACHING },
       { href: '/pro', icon: Crown, title: 'Deadeye Pro', desc: 'Unlimited AI coaching', ...PREMIUM },
     ],
   },

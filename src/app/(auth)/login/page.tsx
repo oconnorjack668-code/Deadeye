@@ -12,6 +12,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Alert } from '@/components/ui/Alert';
 import { safeAppPath } from '@/lib/safePath';
 import { rememberInvite } from '@/lib/friends';
+import { rememberTeamInvite } from '@/lib/coachSide';
 
 function LoginContent() {
   const router = useRouter();
@@ -19,6 +20,7 @@ function LoginContent() {
   // Only follow links inside Deadeye (never "//other-site", "/\other-site" or "https://…")
   const redirectTo = safeAppPath(searchParams.get('redirectTo'));
   const invited = redirectTo.startsWith('/friends/add/');
+  const teamInvite = redirectTo.startsWith('/teams/join/');
   const queryError = searchParams.get('error');
 
   const [email, setEmail] = useState('');
@@ -142,11 +144,19 @@ function LoginContent() {
                   A friend invited you. Create an account and you can add them straight after.
                 </p>
               )}
+              {teamInvite && (
+                <p className="text-xs text-center text-cyan-300">
+                  Your coach invited you to a team. Create an account and you can join it straight after.
+                </p>
+              )}
               <p className="text-xs text-center text-zinc-400">
                 New to Deadeye?{' '}
                 <Link
                   href="/signup"
-                  onClick={() => rememberInvite(redirectTo)}
+                  onClick={() => {
+                    rememberInvite(redirectTo);
+                    rememberTeamInvite(redirectTo);
+                  }}
                   className="font-semibold text-red-400 hover:text-red-300 transition-colors"
                 >
                   Create an account
