@@ -1,16 +1,29 @@
 // src/lib/drills.ts
+// Warm-up first and cool-down last, the order a session uses them (00048)
 export const DRILL_SKILLS = [
+  { id: 'warm_up', label: 'Warm-Up' },
   { id: 'shooting', label: 'Shooting' },
   { id: 'ball_handling', label: 'Ball Handling' },
   { id: 'finishing', label: 'Finishing' },
   { id: 'footwork', label: 'Footwork' },
   { id: 'passing', label: 'Passing' },
+  { id: 'off_ball', label: 'Off-Ball' },
   { id: 'defense', label: 'Defense' },
   { id: 'rebounding', label: 'Rebounding' },
   { id: 'post_play', label: 'Post Play' },
   { id: 'conditioning', label: 'Conditioning' },
   { id: 'iq', label: 'IQ' },
+  { id: 'cool_down', label: 'Cool-Down' },
 ] as const;
+
+/** The routines a session starts and ends with (00048). Linked from program days and the session logger. */
+export const WARM_UP_SLUG = 'court-warm-up';
+export const COOL_DOWN_SLUG = 'cool-down-stretch';
+
+/** A drill needs a hoop when its equipment says so; the rest work in a hall, a yard or a bedroom. */
+export function needsHoop(equipment: string[]): boolean {
+  return equipment.includes('hoop');
+}
 
 export const DRILL_LEVELS = ['beginner', 'intermediate', 'advanced'] as const;
 export const DRILL_PLAYERS = ['solo', 'partner', 'team'] as const;

@@ -12,6 +12,7 @@
 //   free IQ sections    study_topics.is_free (00037)
 //   30-day shot chart   dashboard page
 //   teams coached       create_team_with_details (00047): 1 free, 10 with Pro
+//   drills              DRILL_COUNT below, checked against the migrations by a test
 //
 // The thinking behind the split: Free keeps everything that brings players in
 // and everything that is their own data. Pro is coaching - structure,
@@ -19,6 +20,9 @@
 // unlimited AI, the one thing that costs money every time it runs.
 import { FREE_MONTHLY_AI_REPORTS } from './entitlements';
 import { FREE_CHAT_PER_DAY } from './ai/chat';
+
+/** Drills in the library: 150 in 00013 and 18 in 00048. __tests__/plans.test.ts counts them. */
+export const DRILL_COUNT = 168;
 
 export interface Plan {
   name: string;
@@ -34,7 +38,7 @@ export const FREE_PLAN: Plan = {
   features: [
     'Automatic shot tracking from your camera or a video, with no limit',
     'Log every session, workout and test, and keep your full history',
-    'All 150 drills, and form check whenever you want',
+    `All ${DRILL_COUNT} drills, and form check whenever you want`,
     '4 complete training programs, including Basketball Strength Foundations',
     'Basketball IQ: the question of the day and the first 3 sections',
     'Your shot chart for the last 30 days',

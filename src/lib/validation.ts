@@ -163,6 +163,8 @@ export const performanceTestSchema = z.object({
   testType: z.enum([
     'standing_vertical',
     'approach_vertical',
+    'sprint_10m',
+    'sprint_20m',
     'sprint_three_quarter',
     'sprint_40yd',
     'lane_agility',

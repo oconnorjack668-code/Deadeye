@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'Drill Library - Deadeye' };
 
-type Filters = { skill?: string; level?: string; players?: string; q?: string; fav?: string };
+type Filters = { skill?: string; level?: string; players?: string; q?: string; fav?: string; hoop?: string };
 
 /**
  * A search as typed, cut down to letters, digits, spaces, hyphens and
@@ -52,6 +52,7 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
     players: (DRILL_PLAYERS as readonly string[]).includes(raw.players || '') ? raw.players : undefined,
     q: cleanSearch(raw.q),
     fav: raw.fav === '1' ? '1' : undefined,
+    hoop: raw.hoop === 'no' ? 'no' : undefined,
   };
 
   const supabase = await createClient();
@@ -63,6 +64,8 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
   if (filters.skill) query = query.eq('skill', filters.skill);
   if (filters.level) query = query.eq('level', filters.level);
   if (filters.players) query = query.eq('players', filters.players);
+  // For a hall, a driveway with no hoop, or a bedroom
+  if (filters.hoop) query = query.not('equipment', 'cs', '{hoop}');
   // Name or sub-skill, so "euro" finds the Euro step and "free throw" the
   // free throw drills. Sub-skills are stored with underscores.
   if (filters.q) query = query.or(`name.ilike."*${filters.q}*",sub_skill.ilike."*${filters.q.replace(/ /g, '_')}*"`);
@@ -94,6 +97,7 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
           {filters.level && <input type="hidden" name="level" value={filters.level} />}
           {filters.players && <input type="hidden" name="players" value={filters.players} />}
           {filters.fav && <input type="hidden" name="fav" value="1" />}
+          {filters.hoop && <input type="hidden" name="hoop" value="no" />}
           <label className="relative flex-1">
             <span className="sr-only">Search drills</span>
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" />
@@ -143,6 +147,10 @@ export default async function DrillsPage({ searchParams }: { searchParams: Promi
                 {p}
               </Chip>
             ))}
+            <span className="w-2" />
+            <Chip href={hrefWith(filters, { hoop: filters.hoop ? undefined : 'no' })} active={!!filters.hoop}>
+              No hoop needed
+            </Chip>
           </div>
         </div>
 

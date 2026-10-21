@@ -248,7 +248,8 @@ describe('programme content: the reader found the seeded data', () => {
     expect(drillSlugs.size).toBeGreaterThanOrEqual(150);
     expect(exerciseNames.size).toBeGreaterThanOrEqual(150);
     expect(topicSlugs.size).toBeGreaterThanOrEqual(12);
-    expect(testTypes.size).toBe(7);
+    // 7 from 00003, plus the 10 m and 20 m sprints from 00048
+    expect(testTypes.size).toBe(9);
     expect(programs.length).toBeGreaterThanOrEqual(10);
     expect(days.length).toBeGreaterThanOrEqual(100);
   });

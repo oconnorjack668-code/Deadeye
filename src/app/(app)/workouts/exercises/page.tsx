@@ -105,6 +105,11 @@ export default async function ExerciseLibraryPage({
                     ))}
                   </ul>
                 )}
+                {e.easier_version && (
+                  <p className="rounded-lg bg-zinc-950/60 px-3 py-2 text-xs text-zinc-300">
+                    <span className="font-semibold text-emerald-300">Easier version:</span> {e.easier_version}
+                  </p>
+                )}
                 <a
                   href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${e.name} exercise form`)}`}
                   target="_blank"

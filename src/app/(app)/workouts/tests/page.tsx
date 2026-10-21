@@ -9,21 +9,11 @@ import Link from 'next/link';
 import { TestActions } from './TestActions';
 import { Plus, TrendingUp, Award, Zap } from 'lucide-react';
 import { asMeasurementSystem } from '@/lib/units';
-import { LENGTH_TESTS, TIMED_TESTS, convertResult, lengthUnit } from '@/lib/performanceTests';
+import { LENGTH_TESTS, TEST_TYPES, TIMED_TESTS, convertResult, lengthUnit } from '@/lib/performanceTests';
 
 export const metadata = {
   title: 'Performance Tests - Deadeye',
 };
-
-const TEST_TYPES = [
-  { id: 'standing_vertical', label: 'Standing Vertical', icon: '📈' },
-  { id: 'approach_vertical', label: 'Approach Vertical', icon: '🚀' },
-  { id: 'sprint_three_quarter', label: '3/4 Court Sprint', icon: '⚡' },
-  { id: 'sprint_40yd', label: '40 Yard Dash', icon: '💨' },
-  { id: 'lane_agility', label: 'Lane Agility', icon: '🔄' },
-  { id: 'pro_agility_5_10_5', label: 'Pro Agility (5-10-5)', icon: '↔️' },
-  { id: 'standing_broad_jump', label: 'Standing Broad Jump', icon: '🦘' },
-];
 
 export default async function PerformanceTestsPage() {
   const user = await requireUser();

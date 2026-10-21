@@ -86,6 +86,8 @@ export type ExerciseCategory =
 export type PerformanceTestType =
   | 'standing_vertical'
   | 'approach_vertical'
+  | 'sprint_10m'
+  | 'sprint_20m'
   | 'sprint_three_quarter'
   | 'sprint_40yd'
   | 'lane_agility'
@@ -563,6 +565,8 @@ export interface Database {
           created_at: string;
           // Added by 00042_drill_favourites_and_demo_videos.sql
           demo_video_id: string | null;
+          // Added by 00048_training_gaps.sql: one line on an easier exercise
+          easier_version: string | null;
         };
         Insert: {
           id?: string;
@@ -588,6 +592,7 @@ export interface Database {
           cues?: string[];
           is_basketball_specific?: boolean;
           demo_video_id?: string | null;
+          easier_version?: string | null;
         };
         Relationships: [];
       };

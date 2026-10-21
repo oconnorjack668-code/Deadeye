@@ -7,8 +7,28 @@ import type { MeasurementSystem } from '@/lib/units';
 
 const CM_PER_INCH = 2.54;
 
+import type { PerformanceTestType } from '@/lib/supabase/types';
+
+/**
+ * Every test a player can log, in the order the app lists them. The same list
+ * as the performance_tests.test_type check (00048 added the metre sprints).
+ */
+export const TEST_TYPES: Array<{ id: Exclude<PerformanceTestType, 'custom'>; label: string; icon: string }> = [
+  { id: 'standing_vertical', label: 'Standing Vertical', icon: '📈' },
+  { id: 'approach_vertical', label: 'Approach Vertical', icon: '🚀' },
+  { id: 'sprint_10m', label: '10 m Sprint', icon: '⚡' },
+  { id: 'sprint_20m', label: '20 m Sprint', icon: '💨' },
+  { id: 'sprint_three_quarter', label: '3/4 Court Sprint', icon: '⚡' },
+  { id: 'sprint_40yd', label: '40 Yard Dash', icon: '💨' },
+  { id: 'lane_agility', label: 'Lane Agility', icon: '🔄' },
+  { id: 'pro_agility_5_10_5', label: 'Pro Agility (5-10-5)', icon: '↔️' },
+  { id: 'standing_broad_jump', label: 'Standing Broad Jump', icon: '🦘' },
+];
+
+export const TEST_LABELS: Record<string, string> = Object.fromEntries(TEST_TYPES.map((t) => [t.id, t.label]));
+
 export const LENGTH_TESTS = ['standing_vertical', 'approach_vertical', 'standing_broad_jump'];
-export const TIMED_TESTS = ['sprint_three_quarter', 'sprint_40yd', 'lane_agility', 'pro_agility_5_10_5'];
+export const TIMED_TESTS = ['sprint_10m', 'sprint_20m', 'sprint_three_quarter', 'sprint_40yd', 'lane_agility', 'pro_agility_5_10_5'];
 
 export interface TestResult {
   value: number;

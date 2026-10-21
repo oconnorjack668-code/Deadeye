@@ -43,6 +43,8 @@ export interface LibraryExercise {
   is_system: boolean;
   /** A YouTube video id the owner chose (00042); missing before that migration. */
   demo_video_id?: string | null;
+  /** One line on an easier exercise to start with (00048); missing before that migration. */
+  easier_version?: string | null;
 }
 
 /**

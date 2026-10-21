@@ -16,21 +16,13 @@ import {
 import { ProLock } from '@/components/ProGate';
 import { Button } from '@/components/ui/Button';
 import { CompleteDayButton } from './CompleteDayButton';
-import { ArrowLeft, Target, Dumbbell, BookOpen, Award, Info, Clock } from 'lucide-react';
+import { ArrowLeft, Target, Dumbbell, BookOpen, Award, Info, Clock, Flame, Wind } from 'lucide-react';
+import { COOL_DOWN_SLUG, WARM_UP_SLUG } from '@/lib/drills';
+import { TEST_LABELS } from '@/lib/performanceTests';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'Program Session - Deadeye' };
-
-const TEST_LABELS: Record<string, string> = {
-  standing_vertical: 'Standing vertical',
-  approach_vertical: 'Approach vertical',
-  sprint_three_quarter: '3/4 court sprint',
-  sprint_40yd: '40-yard dash',
-  lane_agility: 'Lane agility',
-  pro_agility_5_10_5: 'Pro agility (5-10-5)',
-  standing_broad_jump: 'Standing broad jump',
-};
 
 export default async function ProgramDayPage({ params }: { params: Promise<{ slug: string; dayId: string }> }) {
   const { slug, dayId } = await params;
@@ -68,15 +60,22 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
   const items = (day.items || []) as ProgramItem[];
   const drillSlugs = items.filter((i) => i.type === 'drill').map((i) => (i as { slug: string }).slug);
   const topicSlugs = items.filter((i) => i.type === 'study').map((i) => (i as { topic_slug: string }).topic_slug);
+  const exerciseNames = items.filter((i) => i.type === 'exercise').map((i) => (i as { name: string }).name);
 
-  const [{ data: drills }, { data: topics }, active] = await Promise.all([
-    drillSlugs.length
-      ? supabase.from('drills').select('slug, name, duration_minutes, reps').in('slug', drillSlugs)
-      : Promise.resolve({ data: [] }),
+  const [{ data: drills }, { data: topics }, active, { data: easier }] = await Promise.all([
+    // The warm-up and cool-down come with every session; they exist once 00048 is run
+    supabase.from('drills').select('slug, name, duration_minutes, reps').in('slug', [...drillSlugs, WARM_UP_SLUG, COOL_DOWN_SLUG]),
     topicSlugs.length ? supabase.from('study_topics').select('id, slug, title').in('slug', topicSlugs) : Promise.resolve({ data: [] }),
     getActiveProgram(supabase, user.id),
+    // Missing before 00048, which reads as no easier versions
+    exerciseNames.length
+      ? supabase.from('exercise_library').select('name, easier_version').eq('is_system', true).in('name', exerciseNames)
+      : Promise.resolve({ data: [] }),
   ]);
   const drillBySlug = new Map((drills || []).map((d: { slug: string }) => [d.slug, d]));
+  const easierFor = new Map(((easier || []) as Array<{ name: string; easier_version: string | null }>).map((e) => [e.name, e.easier_version]));
+  const warmUp = drillBySlug.get(WARM_UP_SLUG) as { name: string; duration_minutes: number } | undefined;
+  const coolDown = drillBySlug.get(COOL_DOWN_SLUG) as { name: string; duration_minutes: number } | undefined;
   const topicBySlug = new Map((topics || []).map((t: { slug: string }) => [t.slug, t]));
 
   const isActive = active?.program.id === day.training_programs.id;
@@ -99,6 +98,15 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
         </p>
 
         <div className="mt-6 space-y-2">
+          {warmUp && (
+            <Link href={`/drills/${WARM_UP_SLUG}`} className="flex items-start gap-3 rounded-xl border border-orange-500/30 bg-orange-500/10 p-3 hover:bg-orange-500/15">
+              <Flame className="h-5 w-5 text-orange-400 mt-0.5" />
+              <div>
+                <div className="font-semibold text-white text-sm">Warm up first: {warmUp.name}</div>
+                <div className="text-xs text-zinc-400">{warmUp.duration_minutes} min, with a timer. No ball needed.</div>
+              </div>
+            </Link>
+          )}
           {items.map((item, i) => {
             if (item.type === 'drill') {
               const d = drillBySlug.get(item.slug) as { name: string; duration_minutes: number; reps: string } | undefined;
@@ -124,6 +132,7 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
                     <div className="text-xs text-zinc-500">
                       {item.sets || 3} sets{item.reps ? ` × ${item.reps}` : ''}
                     </div>
+                    {easierFor.get(item.name) && <div className="mt-1 text-xs text-zinc-400">Easier: {easierFor.get(item.name)}</div>}
                   </div>
                 </div>
               );
@@ -158,6 +167,15 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
               </div>
             );
           })}
+          {coolDown && (
+            <Link href={`/drills/${COOL_DOWN_SLUG}`} className="flex items-start gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-3 hover:bg-cyan-500/15">
+              <Wind className="h-5 w-5 text-cyan-300 mt-0.5" />
+              <div>
+                <div className="font-semibold text-white text-sm">Finish with the {coolDown.name}</div>
+                <div className="text-xs text-zinc-400">{coolDown.duration_minutes} min of easy stretches</div>
+              </div>
+            </Link>
+          )}
         </div>
 
         <div className="mt-6 space-y-2">

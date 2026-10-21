@@ -5,7 +5,9 @@ import { notFound } from 'next/navigation';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { Button } from '@/components/ui/Button';
-import { skillLabel, type Drill } from '@/lib/drills';
+import { needsHoop, skillLabel, type Drill } from '@/lib/drills';
+import { planFor } from '@/lib/drillTimer';
+import { DrillTimer } from '@/components/DrillTimer';
 import { ArrowLeft, Clock, Play, PlayCircle, CheckCircle2, AlertTriangle, Wrench } from 'lucide-react';
 import { DemoVideo } from '@/components/DemoVideo';
 import { FavoriteDrillButton } from './FavoriteDrillButton';
@@ -40,6 +42,9 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
             <p className="text-sm text-zinc-400 mt-1 capitalize">
               {skillLabel(drill.skill)} · {drill.sub_skill.replace(/_/g, ' ')} · {drill.level} · {drill.players}
             </p>
+            {!needsHoop(drill.equipment) && (
+              <span className="mt-2 inline-block rounded-full bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-300">No hoop needed</span>
+            )}
           </div>
           <FavoriteDrillButton drillId={drill.id} userId={user.id} initial={!!favorite} />
         </div>
@@ -55,6 +60,10 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
             <div className="text-xs font-semibold uppercase text-zinc-500">Reps</div>
             <div className="text-white font-semibold text-sm">{drill.reps}</div>
           </div>
+        </div>
+
+        <div className="mb-5">
+          <DrillTimer initial={planFor(drill)} />
         </div>
 
         {drill.demo_video_id && (
@@ -106,12 +115,21 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
           </div>
         </section>
 
-        <div className="mt-6 space-y-2">
-          <Link href={`/basketball/new?drill=${drill.slug}`} className="block">
-            <Button variant="primary" size="lg" className="w-full gap-2">
-              <Play className="h-4 w-4" /> Start this drill
-            </Button>
+        {drill.skill === 'warm_up' && (
+          <Link href="/guides/warm-up-that-actually-works" className="mt-5 block rounded-xl border border-zinc-800 bg-zinc-900/50 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-900">
+            Why warm up this way: <span className="text-orange-400 underline">Warm-Up That Actually Works</span>
           </Link>
+        )}
+
+        <div className="mt-6 space-y-2">
+          {/* A warm-up or cool-down is not a session to log: the timer above is how to do it */}
+          {drill.skill !== 'warm_up' && drill.skill !== 'cool_down' && (
+            <Link href={`/basketball/new?drill=${drill.slug}`} className="block">
+              <Button variant="primary" size="lg" className="w-full gap-2">
+                <Play className="h-4 w-4" /> Start this drill
+              </Button>
+            </Link>
+          )}
           <a
             href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${drill.name} basketball drill`)}`}
             target="_blank"

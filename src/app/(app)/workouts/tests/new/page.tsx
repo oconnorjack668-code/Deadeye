@@ -15,16 +15,10 @@ import { ArrowLeft, Award } from 'lucide-react';
 import Link from 'next/link';
 import type { PerformanceTestType } from '@/lib/supabase/types';
 import { asMeasurementSystem, type MeasurementSystem } from '@/lib/units';
-import { LENGTH_TESTS, TIMED_TESTS, isPersonalBest, lengthUnit } from '@/lib/performanceTests';
+import { LENGTH_TESTS, TEST_TYPES, TIMED_TESTS, isPersonalBest, lengthUnit } from '@/lib/performanceTests';
 
 const TESTS: Array<{ value: PerformanceTestType; label: string }> = [
-  { value: 'standing_vertical', label: 'Standing Vertical' },
-  { value: 'approach_vertical', label: 'Approach Vertical' },
-  { value: 'sprint_three_quarter', label: '3/4 Court Sprint' },
-  { value: 'sprint_40yd', label: '40 Yard Dash' },
-  { value: 'lane_agility', label: 'Lane Agility' },
-  { value: 'pro_agility_5_10_5', label: 'Pro Agility 5-10-5' },
-  { value: 'standing_broad_jump', label: 'Standing Broad Jump' },
+  ...TEST_TYPES.map((t) => ({ value: t.id, label: t.label })),
   { value: 'custom', label: 'Custom Test' },
 ];
 

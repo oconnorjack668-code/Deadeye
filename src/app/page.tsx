@@ -31,7 +31,7 @@ import { LandingHeader } from '@/components/LandingHeader';
 import { LandingDemo } from '@/components/LandingDemo';
 import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
-import { FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
+import { DRILL_COUNT, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
 import { getFoundingOffer } from '@/lib/foundingServer';
@@ -70,7 +70,7 @@ const FEATURES = [
   {
     icon: ClipboardList,
     title: 'Training programs',
-    desc: 'Plans that build week by week for shooting, handles, finishing and athleticism: 4 free, 18 with Pro. Plus 150 drills.',
+    desc: `Plans that build week by week for shooting, handles, finishing and athleticism: 4 free, 18 with Pro. Plus ${DRILL_COUNT} drills.`,
   },
   {
     icon: Dumbbell,
@@ -124,7 +124,7 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
     },
     {
       q: "What's free, and what does Pro add?",
-      a: `Shot tracking, logging and your history, all 150 drills, form check, 4 training programs and the social features are free, with no time limit. Pro (${proPrice}) adds every program and IQ section, unlimited AI coaching with a weekly report, your all-time shot chart and form trends, and coaching more than one team.`,
+      a: `Shot tracking, logging and your history, all ${DRILL_COUNT} drills, form check, 4 training programs and the social features are free, with no time limit. Pro (${proPrice}) adds every program and IQ section, unlimited AI coaching with a weekly report, your all-time shot chart and form trends, and coaching more than one team.`,
     },
     {
       q: 'Can I cancel Pro?',

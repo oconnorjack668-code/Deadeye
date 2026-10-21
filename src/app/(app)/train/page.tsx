@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile } from '@/lib/auth';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck } from 'lucide-react';
+import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck, Flame } from 'lucide-react';
 
 export const metadata = { title: 'Train - Deadeye' };
 
@@ -45,6 +45,7 @@ const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
       { href: '/programs', icon: CalendarCheck, title: 'Programs', desc: 'Multi-week plans', ...PLAN },
       { href: '/train/generate', icon: Wand2, title: 'Workout builder', desc: 'Pick time and focus', ...PLAN },
       { href: '/goals', icon: Crosshair, title: 'Goals', desc: 'Set weekly targets', ...PLAN },
+      { href: '/drills?skill=warm_up', icon: Flame, title: 'Warm-ups', desc: 'Before you play, with a timer', ...PLAN },
     ],
   },
   {
