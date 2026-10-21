@@ -1,10 +1,12 @@
 // src/app/(app)/welcome/WelcomeClient.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useSyncExternalStore } from 'react';
 import { track, trackIfFromDemo } from '@/lib/events';
+import { clearInvite, pendingInvite } from '@/lib/friends';
+import { REMINDER_TIME_LABEL } from '@/lib/reminders';
 import Link from 'next/link';
-import { ArrowLeft, Brain, Camera, Check, MapPin, PenLine, PlayCircle, Sofa } from 'lucide-react';
+import { ArrowLeft, Brain, Camera, Check, MapPin, PenLine, PlayCircle, Sofa, UserPlus } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import { RemindersCard } from '@/app/(app)/profile/RemindersCard';
 
@@ -19,6 +21,9 @@ const COURT_TIPS = [
 
 export function WelcomeClient({ firstName }: { firstName: string | null }) {
   const [answer, setAnswer] = useState<Answer>('ask');
+  // Saved by the login page when they signed up from a friend's invite link.
+  // Read after hydration (null on the server), as StarterSteps reads its flags.
+  const invite = useSyncExternalStore(noSubscribe, pendingInvite, () => null);
 
   useEffect(() => {
     track('welcome_seen');
@@ -85,7 +90,7 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
         <div>
           <h1 className="text-3xl font-black tracking-tight text-white">No problem</h1>
           <p className="mt-2 text-zinc-400">
-            Pick the days and time you usually train, and Deadeye will remind you when it&apos;s time.
+            Pick the days you usually train, and Deadeye will remind you {REMINDER_TIME_LABEL} on those days.
           </p>
         </div>
 
@@ -154,12 +159,27 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
           </span>
         </button>
       </div>
+      {invite && (
+        <Link
+          href={`/friends/add/${invite}`}
+          onClick={clearInvite}
+          className="flex items-center gap-3 rounded-2xl border border-cyan-600/40 bg-cyan-600/10 p-4 text-left hover:bg-cyan-600/15"
+        >
+          <UserPlus className="h-6 w-6 flex-shrink-0 text-cyan-400" />
+          <span>
+            <span className="block font-semibold text-white">Add the friend who invited you</span>
+            <span className="block text-sm text-zinc-400">Then you can see each other&apos;s training and compete.</span>
+          </span>
+        </Link>
+      )}
       <Link href="/dashboard" className="inline-block text-sm text-zinc-500 hover:text-zinc-300">
         Skip to my dashboard
       </Link>
     </div>
   );
 }
+
+const noSubscribe = () => () => {};
 
 function BackButton({ onClick }: { onClick: () => void }) {
   return (

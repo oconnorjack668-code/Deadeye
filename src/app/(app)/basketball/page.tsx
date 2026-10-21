@@ -10,6 +10,7 @@ import { Plus, Target, ListChecks, ClipboardList, Video, Lightbulb, ChevronRight
 import { formatShootingPercentage } from '@/lib/stats';
 import { getShotTotals } from '@/lib/player-activity';
 import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { AfterSession } from '@/components/basketball/AfterSession';
 import { XP_VALUES } from '@/lib/achievements';
 
 export const metadata = {
@@ -60,6 +61,8 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
 
         {/* The shot logger lands here after saving (?saved=1) */}
         {saved === '1' && totalSessions === 1 && <FirstSessionCelebration xp={XP_VALUES.session} />}
+        {/* After a hand-logged save: how the newest session compares, and an invite */}
+        {saved === '1' && <AfterSession userId={user.id} sessionId={null} showInvite />}
 
         {/* One unmistakable primary action, full width. It used to sit inline
             beside the heading, which on a phone squeezed it to a chip. */}

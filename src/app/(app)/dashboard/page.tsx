@@ -11,7 +11,7 @@ import { calculateDashboardMetrics, getShootingByZone, rankZones } from '@/lib/d
 import { getRecentZoneTotals } from '@/lib/player-activity';
 import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
 import { ProNote } from '@/components/ProGate';
-import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity } from 'lucide-react';
+import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -112,6 +112,8 @@ export default async function DashboardPage() {
   ]);
   // Shown until the bonus for finishing them is paid; it is in the XP once paid
   const showStarterSteps = achievements.xpParts.bonus === 0;
+  // Nothing logged yet, hoops or gym, and no program on the go
+  const firstRun = metrics.totalSessions === 0 && achievements.stats.totalWorkouts === 0 && !activeProgram;
   const squadLine = squadActivityLine((squad.data || []) as unknown as FriendRow[]);
   const isPro = hasPro(subscription);
   const [offer, isOwner] = await Promise.all([getFoundingOffer(), checkIsOwner()]);
@@ -242,6 +244,10 @@ export default async function DashboardPage() {
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
 
+        {/* Until the first log, everything below is numbers that are all still
+            zero, under a Today card asking for one thing. Folded away so a new
+            player sees that one thing (Phase 3 of the plan). Still a tap away. */}
+        <FoldedUntilFirstLog folded={firstRun}>
         {/* Workload. Every other number here only moves when you train, so there
             is nothing to come back for on a rest day. This one still says
             something useful - including "take a rest day". */}
@@ -495,8 +501,25 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+        </FoldedUntilFirstLog>
 
       </div>
     </div>
+  );
+}
+
+function FoldedUntilFirstLog({ folded, children }: { folded: boolean; children: React.ReactNode }) {
+  if (!folded) return <>{children}</>;
+  return (
+    <details className="group mb-8 rounded-2xl border border-zinc-800 bg-zinc-900/40">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-sm font-semibold text-zinc-300 hover:text-white">
+        <span>
+          Everything else in Deadeye
+          <span className="block text-xs font-normal text-zinc-500">Your stats, level, shot chart and shortcuts fill in once you log</span>
+        </span>
+        <ChevronDown className="h-4 w-4 flex-shrink-0 transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="px-4 pb-1">{children}</div>
+    </details>
   );
 }

@@ -1884,6 +1884,7 @@ export interface Database {
     // rather than running `supabase gen types`.
     Functions: {
       send_friend_request: { Args: { p_code: string }; Returns: string };
+      send_friend_request_to: { Args: { p_user: string }; Returns: string };
       respond_friend_request: { Args: { p_friendship_id: string; p_accept: boolean }; Returns: void };
       remove_friendship: { Args: { p_friendship_id: string }; Returns: void };
       // training_streak(p_user) is deliberately absent: 00024 revokes EXECUTE

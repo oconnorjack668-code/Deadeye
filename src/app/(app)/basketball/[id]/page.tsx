@@ -12,6 +12,7 @@ import { ArrowLeft, Target, Sparkles, Video } from 'lucide-react';
 import { ShareCardButton } from '@/components/ShareCardButton';
 import { DeleteSessionButton } from './DeleteSessionButton';
 import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { AfterSession } from '@/components/basketball/AfterSession';
 import { XP_VALUES } from '@/lib/achievements';
 
 export const dynamic = 'force-dynamic';
@@ -109,6 +110,9 @@ export default async function BasketballSessionPage({
             text={attempts > 0 ? `${makes}/${attempts} shots today on Deadeye 🏀` : 'Put the work in today on Deadeye 🏀'}
           />
         </div>
+
+        {/* How it compares with earlier sessions; the invite only straight after saving */}
+        <AfterSession userId={user.id} sessionId={id} showInvite={saved === '1'} />
 
         {attempts > 0 && (
           <Card className="border-zinc-800 bg-zinc-900/70 mb-4">

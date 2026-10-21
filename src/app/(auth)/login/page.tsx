@@ -11,12 +11,14 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { safeAppPath } from '@/lib/safePath';
+import { rememberInvite } from '@/lib/friends';
 
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Only follow links inside Deadeye (never "//other-site", "/\other-site" or "https://…")
   const redirectTo = safeAppPath(searchParams.get('redirectTo'));
+  const invited = redirectTo.startsWith('/friends/add/');
   const queryError = searchParams.get('error');
 
   const [email, setEmail] = useState('');
@@ -135,10 +137,16 @@ function LoginContent() {
                 Sign In
               </Button>
 
+              {invited && (
+                <p className="text-xs text-center text-cyan-300">
+                  A friend invited you. Create an account and you can add them straight after.
+                </p>
+              )}
               <p className="text-xs text-center text-zinc-400">
                 New to Deadeye?{' '}
                 <Link
                   href="/signup"
+                  onClick={() => rememberInvite(redirectTo)}
                   className="font-semibold text-red-400 hover:text-red-300 transition-colors"
                 >
                   Create an account

@@ -28,7 +28,43 @@ export interface FeedItem {
   detail: string | null;
 }
 
-export type RequestResult = 'sent' | 'accepted' | 'already' | 'self' | 'not_found' | 'limit' | 'closed';
+/**
+ * An invite link opened by someone without an account sends them to log in
+ * (with redirectTo), and from there to sign up - which goes on to setup and
+ * the welcome screen, and the invite was lost. The code is kept on the device
+ * when they tap "Create an account", and the welcome screen offers it.
+ */
+const PENDING_INVITE_KEY = 'deadeye-pending-invite';
+
+/** On the login page: keeps the friend code if the player was sent there from an invite link. */
+export function rememberInvite(redirectTo: string): void {
+  const match = redirectTo.match(/^\/friends\/add\/([A-Za-z0-9]{4,12})$/);
+  if (!match) return;
+  try {
+    localStorage.setItem(PENDING_INVITE_KEY, match[1].toUpperCase());
+  } catch {
+    // Storage blocked: they can still add their friend by code
+  }
+}
+
+export function pendingInvite(): string | null {
+  try {
+    return localStorage.getItem(PENDING_INVITE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function clearInvite(): void {
+  try {
+    localStorage.removeItem(PENDING_INVITE_KEY);
+  } catch {
+    // Nothing to clear
+  }
+}
+
+/** use_code only comes from send_friend_request_to (00046): adding from a player's card. */
+export type RequestResult = 'sent' | 'accepted' | 'already' | 'self' | 'not_found' | 'limit' | 'closed' | 'use_code';
 
 export const REQUEST_MESSAGES: Record<RequestResult, string> = {
   sent: 'Friend request sent.',
@@ -38,6 +74,7 @@ export const REQUEST_MESSAGES: Record<RequestResult, string> = {
   not_found: 'No player has that code. Check the 6 letters and numbers.',
   limit: "You've reached the friend request limit. Wait for some to be accepted first.",
   closed: "This player isn't accepting friend requests right now.",
+  use_code: 'If you know this player, ask them for their friend code and add them in Friends.',
 };
 
 /**

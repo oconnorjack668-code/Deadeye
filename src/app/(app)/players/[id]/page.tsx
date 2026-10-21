@@ -6,6 +6,7 @@ import React from 'react';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile, checkIsOwner } from '@/lib/auth';
 import { ResetNameButton } from './ResetNameButton';
+import { FriendButton, type FriendState } from './FriendButton';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { countryName } from '@/lib/regions';
@@ -41,10 +42,23 @@ interface Card {
 
 export default async function PlayerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  await requireUser();
+  const user = await requireUser();
   const [supabase, me, isOwner] = await Promise.all([createClient(), getCurrentProfile(), checkIsOwner()]);
   const { data } = await supabase.rpc('player_card', { p_user: id });
   const card = data as Card | null;
+  // Where the two of you stand, for the Add friend button. Players can read
+  // their own friendships (00021). Only asked once the card exists, so id is a
+  // real player's uuid before it goes into the filter.
+  let friend: FriendState = { kind: 'none' };
+  if (card && !card.is_me) {
+    const { data: row } = await supabase
+      .from('friendships')
+      .select('id, requester_id, status')
+      .or(`and(requester_id.eq.${user.id},addressee_id.eq.${card.user_id}),and(requester_id.eq.${card.user_id},addressee_id.eq.${user.id})`)
+      .maybeSingle();
+    if (row?.status === 'accepted') friend = { kind: 'friends' };
+    else if (row) friend = row.requester_id === user.id ? { kind: 'outgoing', friendshipId: row.id } : { kind: 'incoming', friendshipId: row.id };
+  }
   const units = asMeasurementSystem(me?.measurement_system);
   // player_card only returns the path when this viewer may see the photo
   const photoUrl = await signedPhotoUrl(card?.photo_path);
@@ -91,10 +105,14 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                   <MapPin className="h-3 w-3" /> {[card.region, countryName(card.country)].filter(Boolean).join(', ')}
                 </p>
               )}
-              {card.is_me && (
+              {card.is_me ? (
                 <Link href="/settings" className="mt-3 inline-block text-xs text-cyan-400 underline">
                   Choose what others see in Settings → Privacy
                 </Link>
+              ) : (
+                // Keyed on the state the server read, so a refresh after a
+                // request starts it fresh with the new request's id
+                <FriendButton key={JSON.stringify(friend)} userId={card.user_id} initial={friend} />
               )}
             </div>
 
