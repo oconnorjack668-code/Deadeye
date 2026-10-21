@@ -16,7 +16,10 @@ captions in `index.html` sit exactly over them, each timed to the voice.
 From `../promo-video` (ffmpeg and ffprobe on PATH):
 
 1. `node scripts/build-classic.mjs` cuts and grades the pieces into `assets/classic/` and blurs the old captions.
-   The boxes and timings it blurs are listed at the top of the script.
+   The boxes and timings it blurs are listed at the top of the script. It then runs
+   `scripts/fix-rim-line.mjs`, which ends the first hoop's rim line on the far side of the ring
+   (the first promo ran it onto the bracket), using clean pixels from the raw clip 16606.
+   Run that only through build-classic: on its own it would move the end a second time.
 2. `node scripts/make-sfx.mjs classic`
 3. Here: `npx hyperframes render --video-frame-format png -o renders/picture.mp4`
 4. `node scripts/mux-voice.mjs classic` gives `renders/silent.mp4` and `renders/voice.mp4`.

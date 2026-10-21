@@ -71,6 +71,8 @@ cut('middle', 4.07, 16.3);           // makes and misses, rim set-up, form check
     '-map', '[v]', ...enc, mid], { stdio: 'inherit' });
   for (const f of ['middle-pass1.mp4', 'patch-see.png', 'patch-ask.png', 'hold-anygym.png']) fs.unlinkSync(path.join(OUT, f));
 }
+// the first hoop's rim line runs onto the bracket: end it on the ring (needs the fresh cuts above)
+execFileSync(process.execPath, [path.join(HERE, 'fix-rim-line.mjs')], { stdio: 'inherit' });
 cut('close', 18.3, 24.0, ',tpad=stop_mode=clone:stop_duration=1.4'); // no sensors (covered by new footage), end card, held
 // clean footage for the closing line, in place of the first promo's "No sensors" shot
 execFileSync(FF, ['-hide_banner', '-loglevel', 'error', '-y', '-ss', '24.2', '-t', '2.3', '-i', 'C:/Users/Vivobook S16/Downloads/Mobile Devices/16606.mp4',
