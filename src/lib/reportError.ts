@@ -1,12 +1,21 @@
 // src/lib/reportError.ts
 // Browser-side crash reporting to /api/errors (stored in app_errors, viewed at /admin/errors).
 
+/**
+ * A request that never finished: the connection dropped, not a bug. Each
+ * browser words it differently. "network error" is Chrome's when a response
+ * stops part-way through - a page streaming in as an Android phone loses
+ * signal. It reached the crash log twice from one player's dashboard on
+ * 21 Oct 2026 because only "NetworkError" (no space) was listed.
+ */
+const CONNECTION = /Failed to fetch|NetworkError|network error|Load failed|network request failed/i;
+
 const IGNORE = [
   /ResizeObserver loop/i,
   /^Script error\.?$/i, // cross-origin script with no details
   /chrome-extension:|moz-extension:|safari-extension:/i,
   /AbortError|The user aborted a request/i,
-  /Failed to fetch|NetworkError|Load failed|network request failed/i, // connection problems, not bugs
+  CONNECTION,
   // Scripts that in-app browsers and webviews inject into every page (not Deadeye code)
   /SCDynimacBridge|__gCrWeb|_AutofillCallbackHandler|webkit\.messageHandlers|WeixinJSBridge|zaloJSV2|instantSearchSDKJSBridge/,
 ];
@@ -14,6 +23,11 @@ const IGNORE = [
 /** True for errors that come from the browser or another app, not from Deadeye. */
 export function isIgnoredError(text: string): boolean {
   return IGNORE.some((re) => re.test(text));
+}
+
+/** True when the error is a dropped connection, so the error screen can say so. */
+export function isConnectionError(text: string): boolean {
+  return CONNECTION.test(text);
 }
 
 const sent = new Set<string>();

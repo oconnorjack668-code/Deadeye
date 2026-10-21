@@ -41,8 +41,15 @@ async function markReportRead(formData: FormData) {
   revalidatePath('/admin/errors');
 }
 
+/** In Irish time: this renders on the server, which runs in UTC, so 16:05 in Dublin showed as 15:05. */
 function when(iso: string): string {
-  return new Date(iso).toLocaleString('en-IE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  return new Date(iso).toLocaleString('en-IE', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: process.env.APP_TIME_ZONE || 'Europe/Dublin',
+  });
 }
 
 async function markResolved(formData: FormData) {

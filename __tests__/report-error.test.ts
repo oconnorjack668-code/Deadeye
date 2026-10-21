@@ -1,6 +1,6 @@
 // __tests__/report-error.test.ts
 import { describe, it, expect, vi } from 'vitest';
-import { isIgnoredError } from '@/lib/reportError';
+import { isConnectionError, isIgnoredError } from '@/lib/reportError';
 
 describe('crash report filter', () => {
   it('ignores errors injected by in-app browsers and connection drops', () => {
@@ -8,6 +8,15 @@ describe('crash report filter', () => {
     expect(isIgnoredError("ReferenceError: Can't find variable: __gCrWeb")).toBe(true);
     expect(isIgnoredError('TypeError: Failed to fetch')).toBe(true);
     expect(isIgnoredError('ResizeObserver loop completed with undelivered notifications.')).toBe(true);
+  });
+
+  it('treats every browser wording of a dropped connection as one', () => {
+    // Chrome on Android, when a page stops streaming in part-way (21 Oct 2026)
+    expect(isIgnoredError('TypeError: network error')).toBe(true);
+    expect(isConnectionError('TypeError: network error')).toBe(true);
+    expect(isConnectionError('TypeError: Load failed')).toBe(true); // Safari
+    expect(isConnectionError('NetworkError when attempting to fetch resource.')).toBe(true); // Firefox
+    expect(isConnectionError("TypeError: Cannot read properties of undefined (reading 'makes')")).toBe(false);
   });
 
   it('keeps real Deadeye errors', () => {

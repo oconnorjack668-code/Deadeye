@@ -3,21 +3,26 @@
 
 import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { reportError } from '@/lib/reportError';
+import { isConnectionError, reportError } from '@/lib/reportError';
 import { ReportProblem } from '@/components/ReportProblem';
 
 export default function Error({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     reportError('boundary', error, { digest: error.digest });
   }, [error]);
+  // A page that stopped loading part-way, usually lost signal. Not reported
+  // (reportError ignores it), so the screen must not claim it was.
+  const connection = isConnectionError(error.message);
 
   return (
     <div className="flex-1 flex items-center justify-center p-6">
       <div className="max-w-sm w-full rounded-2xl border border-zinc-800 bg-zinc-900/70 p-6 text-center">
         <div className="text-4xl mb-3">🏀</div>
-        <h1 className="text-xl font-black text-white">Something went wrong</h1>
+        <h1 className="text-xl font-black text-white">{connection ? 'Connection dropped' : 'Something went wrong'}</h1>
         <p className="mt-2 text-sm text-zinc-400">
-          That one rimmed out. The problem has been reported automatically. Try again, or head back to your dashboard.
+          {connection
+            ? 'The page stopped loading part-way, usually from a weak signal. Check your connection and try again.'
+            : 'That one rimmed out. The problem has been reported automatically. Try again, or head back to your dashboard.'}
         </p>
         {error.digest && <p className="mt-2 text-[11px] text-zinc-600">Error code: {error.digest}</p>}
         <div className="mt-5 flex flex-col gap-2">
