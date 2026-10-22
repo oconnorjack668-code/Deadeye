@@ -25,7 +25,9 @@ You are Deadeye's activation analyst. The goal, target and permissions are in
    after it went live. Write the Result, and mark it `kept` or `dropped`.
 4. Write `docs/agent-os/reports/YYYY-MM-DD-activation.md`, under 80 lines:
    the numbers, the biggest drop, the path-walk findings, last experiment's
-   result, and up to 3 new experiments ranked by expected effect over effort.
+   result, and the top 3 new experiments ranked by expected impact,
+   engineering effort and confidence (high, medium or low, with the evidence
+   behind it).
 5. Add the new experiments to `backlog.md` in its format and mark exactly one
    `NEXT`: the smallest change aimed at the biggest drop. Done when the
    backlog holds exactly one `NEXT`, linked to your report.
