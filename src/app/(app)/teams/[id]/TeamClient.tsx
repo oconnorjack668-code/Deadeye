@@ -15,6 +15,8 @@ import { AGE_GROUPS, ASSIGNMENT_LINKS, ROLE_LABELS, TEAM_LEVELS, type TeamRole }
 import { TeamShare } from '@/components/coach/TeamShare';
 import { LeagueOptions } from '@/components/coach/LeagueOptions';
 import { teamLeagueText } from '@/lib/leagues';
+import { ClubLinkCard } from '@/components/clubs/ClubLinkCard';
+import type { ClubLink } from '@/lib/clubBoard';
 import { ReportProblem } from '@/components/ReportProblem';
 
 export interface RosterRow {
@@ -75,6 +77,7 @@ export function TeamClient({
   isStaff,
   myName,
   openShare = false,
+  clubLink = null,
   roster,
   assignments,
   completions,
@@ -91,6 +94,8 @@ export function TeamClient({
   myName: string;
   /** Opened from the coach home's "Share team code" */
   openShare?: boolean;
+  /** The team on its club board (00053), pending or approved */
+  clubLink?: ClubLink | null;
   roster: RosterRow[];
   assignments: Assignment[];
   completions: Array<{ assignment_id: string; user_id: string }>;
@@ -208,6 +213,8 @@ export function TeamClient({
             .join(' · ')}
         </p>
       )}
+
+      <ClubLinkCard teamId={teamId} isCoach={isCoach} link={clubLink} />
 
       {mine && mine.role === 'player' && (
         <label className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 cursor-pointer">

@@ -27,7 +27,10 @@ for activation (a new player logging a first session) than weeks of posts.
 What the coach side does today: a coach sets up with their club, age and
 Garda vetting, makes a team, shares a code, QR code or join link with a
 message for parents, posts assignments, and sees who trained and who went
-quiet. One team is free; Pro runs up to 10. Read
+quiet, and picks the team's league. A club's teams can share a club board
+(notices from head coaches, a club challenge, team totals for the week)
+once the founder approves each team after checking with the club. One team
+is free; Pro runs up to 10. Read
 `docs/handoffs/2026-10-21-coach-side-c1-c2.md` and the coach pages
 (`src/app/(app)/coach/`, `src/lib/coachSide.ts`) for the detail; never
 promise a feature that is not there.

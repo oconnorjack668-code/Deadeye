@@ -5,12 +5,13 @@
 // for a player under 16 that card badge reaches friends and teammates only.
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Check, Search, Shield } from 'lucide-react';
+import React, { useState } from 'react';
+import { Shield } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { clubById, clubPlace, searchClubs } from '@/lib/clubs';
+import { clubById, clubPlace } from '@/lib/clubs';
+import { ClubSearch } from '@/components/clubs/ClubSearch';
 
 const input =
   'w-full px-3.5 py-2 rounded-xl border border-zinc-700/80 bg-zinc-900/90 text-sm text-zinc-100 focus:border-orange-500 focus:outline-none';
@@ -33,7 +34,6 @@ export function HomeClubCard({
   const [note, setNote] = useState<string | null>(null);
 
   const club = clubById(clubId);
-  const results = useMemo(() => searchClubs(query), [query]);
 
   async function save(nextId: string | null, nextShow: boolean) {
     setBusy(true);
@@ -122,44 +122,7 @@ export function HomeClubCard({
 
         {picking && !suggesting && (
           <div className="space-y-2">
-            <label htmlFor="club-search" className="sr-only">
-              Search for your club
-            </label>
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500" aria-hidden />
-              <input
-                id="club-search"
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search by club or town"
-                autoComplete="off"
-                className={`${input} pl-9`}
-              />
-            </div>
-            {query.trim().length >= 2 && (
-              <ul className="max-h-64 space-y-1 overflow-y-auto" aria-label="Clubs">
-                {results.map((c) => (
-                  <li key={c.id}>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => save(c.id, c.id === clubId ? showOnCard : false)}
-                      className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2 text-left hover:bg-zinc-800"
-                    >
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-white">{c.name}</span>
-                        <span className="block truncate text-xs text-zinc-500">
-                          {[clubPlace(c), c.aka.length ? `also ${c.aka.join(', ')}` : ''].filter(Boolean).join(' · ')}
-                        </span>
-                      </span>
-                      {c.id === clubId && <Check className="h-4 w-4 flex-shrink-0 text-emerald-400" aria-label="Your club" />}
-                    </button>
-                  </li>
-                ))}
-                {results.length === 0 && <li className="px-3 py-2 text-sm text-zinc-500">No club by that name yet.</li>}
-              </ul>
-            )}
+            <ClubSearch id="club-search" selectedId={clubId} disabled={busy} onQuery={setQuery} onPick={(c) => save(c.id, c.id === clubId ? showOnCard : false)} />
             <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
               <button
                 type="button"

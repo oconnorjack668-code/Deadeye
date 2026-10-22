@@ -34,6 +34,14 @@ export interface ClubCounts {
   teamsWithLeague: number;
   /** Teams whose coach said their league is not in the list */
   teamsLeagueNotListed: number;
+  /** Clubs with a live board (00053): at least one approved team */
+  clubBoards: number;
+  /** Teams on a club board */
+  teamsOnBoards: number;
+  /** Teams waiting for the founder to approve them onto a board */
+  boardRequests: number;
+  /** Club board notices posted in the last 7 days */
+  noticesThisWeek: number;
 }
 
 export interface ClubRows {
@@ -44,6 +52,8 @@ export interface ClubRows {
   playerClubs?: Array<{ user_id: string; club_id: string }>;
   suggestionsOpen?: number;
   teamLeagues?: Array<{ id: string; league_id: string | null }>;
+  boardLinks?: Array<{ team_id: string; club_id: string; status: string }>;
+  noticesThisWeek?: number;
 }
 
 export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
@@ -59,6 +69,17 @@ export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
     ...homeClubCounts(rows.playerClubs ?? [], excluded),
     suggestionsOpen: rows.suggestionsOpen ?? 0,
     ...leagueCounts((rows.teamLeagues ?? []).filter((t) => realTeams.has(t.id))),
+    ...boardCounts((rows.boardLinks ?? []).filter((l) => realTeams.has(l.team_id))),
+    noticesThisWeek: rows.noticesThisWeek ?? 0,
+  };
+}
+
+function boardCounts(links: Array<{ club_id: string; status: string }>) {
+  const live = links.filter((l) => l.status === 'approved');
+  return {
+    clubBoards: new Set(live.map((l) => l.club_id)).size,
+    teamsOnBoards: live.length,
+    boardRequests: links.filter((l) => l.status === 'pending').length,
   };
 }
 
@@ -118,6 +139,8 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
       `- "Club not listed" suggestions waiting: ${clubs.suggestionsOpen}`,
       `- Teams with a league picked: ${clubs.teamsWithLeague}`,
       `- Teams whose league is not in the list: ${clubs.teamsLeagueNotListed}`,
+      `- Club boards: ${clubs.clubBoards} (${clubs.teamsOnBoards} teams on them, ${clubs.boardRequests} waiting for approval)`,
+      `- Club board notices posted in the last 7 days: ${clubs.noticesThisWeek}`,
       ''
     );
   }

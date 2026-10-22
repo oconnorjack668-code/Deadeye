@@ -77,7 +77,7 @@ export async function loadClubCounts(): Promise<ClubCounts | { problem: string }
     if (listError) return { problem: listError.message };
     const excluded = await excludedIds(admin, list.users);
     const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
-    const [coachProfiles, teams, members, assignments, playerClubs, suggestions, teamLeagues] = await Promise.all([
+    const [coachProfiles, teams, members, assignments, playerClubs, suggestions, teamLeagues, boardLinks, notices] = await Promise.all([
       admin.from('coach_profiles').select('user_id'),
       admin.from('teams').select('id, created_by'),
       admin.from('team_members').select('team_id, user_id, role'),
@@ -87,6 +87,9 @@ export async function loadClubCounts(): Promise<ClubCounts | { problem: string }
       admin.from('club_suggestions').select('id', { count: 'exact', head: true }).eq('resolved', false),
       // Missing before 00052: no leagues yet
       admin.from('teams').select('id, league_id'),
+      // Missing before 00053: no club boards yet
+      admin.from('club_team_links').select('team_id, club_id, status'),
+      admin.from('club_notices').select('id', { count: 'exact', head: true }).gte('created_at', weekAgo),
     ]);
     const failed = [coachProfiles, teams, members, assignments].find((r) => r.error);
     if (failed?.error) return { problem: failed.error.message };
@@ -99,6 +102,8 @@ export async function loadClubCounts(): Promise<ClubCounts | { problem: string }
         playerClubs: playerClubs.error ? [] : playerClubs.data ?? [],
         suggestionsOpen: suggestions.error ? 0 : suggestions.count ?? 0,
         teamLeagues: teamLeagues.error ? [] : teamLeagues.data ?? [],
+        boardLinks: boardLinks.error ? [] : boardLinks.data ?? [],
+        noticesThisWeek: notices.error ? 0 : notices.count ?? 0,
       },
       excluded
     );
