@@ -14,6 +14,7 @@ import {
   ChevronDown,
   ClipboardList,
   Crown,
+  Download,
   Dumbbell,
   Gift,
   ScanEye,
@@ -31,7 +32,7 @@ import { LandingHeader } from '@/components/LandingHeader';
 import { LandingDemo } from '@/components/LandingDemo';
 import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
-import { DRILL_COUNT, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
+import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
 import { getFoundingOffer } from '@/lib/foundingServer';
@@ -391,6 +392,42 @@ export default async function Home() {
                   </li>
                 ))}
               </ul>
+            </div>
+
+            {/* For club committees: the prices and the sheet they can print or forward */}
+            <div id="clubs" className="mt-4 scroll-mt-28 rounded-2xl border border-orange-500/40 bg-gradient-to-br from-orange-600/15 via-zinc-900/70 to-zinc-900/70 p-6">
+              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-300">
+                <Users className="h-4 w-4" /> For clubs and teams
+              </p>
+              <h3 className="mt-1 text-xl font-black text-white">Every player on Pro, for less than €1 a month each</h3>
+              <ul className="mt-4 grid gap-3 sm:grid-cols-3">
+                {CLUB_PLANS.map((p) => (
+                  <li key={p.name} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
+                    <span className="block text-sm font-bold text-white">{p.name}</span>
+                    <span className="mt-1 block text-2xl font-black text-white">{p.price}</span>
+                    <span className="block text-xs text-zinc-400">{p.alt}</span>
+                    <span className="mt-2 block text-sm text-zinc-300">{p.detail}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-3 text-sm text-zinc-400">
+                Paid club plans open soon, and coaching a team is free today. Founding club offer: our first 3 clubs are free until
+                31 January 2027, then pay €59.99 per team per season for as long as they stay subscribed. Closes 31 December 2026.
+              </p>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <a
+                  href={CLUB_PLANS_PDF}
+                  download
+                  className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-bold text-zinc-950 hover:bg-orange-400"
+                >
+                  <Download className="h-4 w-4" /> Club pricing sheet (PDF)
+                </a>
+                {contactEmail && (
+                  <a href={`mailto:${contactEmail}?subject=Deadeye%20for%20our%20club`} className="text-sm font-semibold text-orange-300 underline">
+                    Email us about your club
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </section>

@@ -88,3 +88,16 @@ export const WHY_PRO_COSTS: Array<{ title: string; text: string }> = [
     text: 'Pro pays for the features still to come.',
   },
 ];
+
+/**
+ * Club and team prices, for the landing page. The pricing sheet clubs are sent
+ * (docs/sales/deadeye-club-plans.html, printed to public/deadeye-club-plans.pdf)
+ * carries the same numbers: change both together. Paid club plans are not on
+ * sale yet, so the page says they open soon.
+ */
+export const CLUB_PLANS: Array<{ name: string; price: string; alt: string; detail: string }> = [
+  { name: 'Coach Free', price: '€0', alt: 'always', detail: 'One team: codes, assignments, coach home and club board' },
+  { name: 'Team Pass', price: '€149.99', alt: 'per season, or €19.99 a month', detail: 'Every player on the team gets Pro, up to 15' },
+  { name: 'Club plan', price: '€99.99', alt: 'per team per season, or €11.99 a month', detail: 'Team Pass for every team, from 4 teams, one bill' },
+];
+export const CLUB_PLANS_PDF = '/deadeye-club-plans.pdf';

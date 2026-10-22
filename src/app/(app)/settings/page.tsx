@@ -88,16 +88,15 @@ export default async function SettingsPage() {
             supportEmail={process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL || null}
             version={pkg.version}
             coachSetUp={!!coachProfile}
+            homeClub={
+              <HomeClubCard
+                initial={homeClub ? { clubId: homeClub.club_id, showOnCard: homeClub.show_on_card } : null}
+                is16Plus={ageCheck?.is_16_plus ?? false}
+              />
+            }
           />
         ) : (
           <p className="text-sm text-amber-300">Could not load your settings. Please refresh the page.</p>
-        )}
-
-        {profile && (
-          <HomeClubCard
-            initial={homeClub ? { clubId: homeClub.club_id, showOnCard: homeClub.show_on_card } : null}
-            is16Plus={ageCheck?.is_16_plus ?? false}
-          />
         )}
 
         {canResetTester && user.email && <ResetTesterCard email={user.email} />}

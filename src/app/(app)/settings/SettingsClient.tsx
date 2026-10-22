@@ -81,6 +81,7 @@ export function SettingsClient({
   supportEmail,
   version,
   coachSetUp = false,
+  homeClub = null,
 }: {
   email: string | null;
   plan: string;
@@ -93,6 +94,8 @@ export function SettingsClient({
   version: string;
   /** Has a coach profile (00047): coach setup is done */
   coachSetUp?: boolean;
+  /** "Your club", built on the server; shown straight after Account */
+  homeClub?: React.ReactNode;
 }) {
   const router = useRouter();
   const [s, setS] = useState<Initial>(initial);
@@ -331,6 +334,12 @@ export function SettingsClient({
           </div>
         </Row>
       </Section>
+
+      {homeClub && (
+        <div id="club" className="scroll-mt-4">
+          {homeClub}
+        </div>
+      )}
 
       <Section icon={Lock} title="Privacy" id="privacy">
         <Toggle
