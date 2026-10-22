@@ -13,12 +13,13 @@ import type { FounderPost } from '@/lib/founderPosts';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { countryName } from '@/lib/regions';
-import { Award, Flame, Lock, MapPin, Trophy } from 'lucide-react';
+import { Award, Flame, Lock, MapPin, Shield, Trophy } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { BackButton } from '@/components/BackButton';
 import { signedPhotoUrl } from '@/lib/photos-server';
 import { ownersAmong } from '@/lib/owners-server';
 import { FounderBadge } from '@/components/FounderBadge';
+import { clubById } from '@/lib/clubs';
 import { tierFor } from '@/lib/achievements';
 import { TIER_THEME } from '@/lib/tierTheme';
 
@@ -68,6 +69,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   // player_card only returns the path when this viewer may see the photo
   const [photoUrl, owners] = await Promise.all([signedPhotoUrl(card?.photo_path), ownersAmong(card ? [card.user_id] : [])]);
   const isFounder = !!card && owners.has(card.user_id);
+  // Their club, only when they chose to show it and this viewer may see it
+  // (00051). The function always gives a player their own club, so on their
+  // own card it shows only when switched on, as others would see it.
+  const [{ data: badgeClub }, { data: ownClub }] = card
+    ? await Promise.all([
+        supabase.rpc('player_club_badge', { p_user: card.user_id }),
+        card.is_me ? supabase.from('player_clubs').select('show_on_card').eq('user_id', user.id).maybeSingle() : Promise.resolve({ data: null }),
+      ])
+    : [{ data: null }, { data: null }];
+  const club = clubById(badgeClub);
+  const clubOnCard = !!club && (!card?.is_me || ownClub?.show_on_card === true);
   // The founder card has Follow instead of Add friend, and their posts (00050).
   // Before 00050 runs these all fail, and the card shows neither.
   const [posts, follow, followers] = isFounder
@@ -110,9 +122,15 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 className="mx-auto mb-3"
               />
               <h1 className="text-2xl font-black text-white">{card.display_name}</h1>
-              {isFounder && (
-                <div className="mt-1 flex justify-center">
-                  <FounderBadge className="px-2.5 py-0.5 text-xs" />
+              {(isFounder || clubOnCard) && (
+                <div className="mt-1 flex flex-wrap justify-center gap-1.5">
+                  {isFounder && <FounderBadge className="px-2.5 py-0.5 text-xs" />}
+                  {clubOnCard && club && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-zinc-700 bg-zinc-800/80 px-2.5 py-0.5 text-xs font-semibold text-zinc-200">
+                      <Shield className="h-3 w-3 text-orange-300" aria-hidden />
+                      {club.name}
+                    </span>
+                  )}
                 </div>
               )}
               {tier && theme && (

@@ -3,6 +3,10 @@
 // api/cron/agent-counts every Monday so the founder no longer pastes it.
 // Counts only: no names, emails, ids or report text ever go in it.
 import type { Funnel } from '@/lib/funnel';
+import { clubById } from '@/lib/clubs';
+
+/** A club is named in counts only with this many players or more, so no child can be picked out */
+export const CLUB_COUNT_MIN = 5;
 
 export interface ReportCounts {
   /** Problem reports players sent in the last 7 days */
@@ -19,6 +23,12 @@ export interface ClubCounts {
   teams: number;
   playersOnTeams: number;
   assignmentsThisWeek: number;
+  /** Players who picked a home club (00051) */
+  playersWithClub: number;
+  /** Home clubs with CLUB_COUNT_MIN players or more, biggest first */
+  bigClubs: Array<{ name: string; players: number }>;
+  /** "My club is not listed" suggestions waiting for the founder */
+  suggestionsOpen: number;
 }
 
 export interface ClubRows {
@@ -26,6 +36,8 @@ export interface ClubRows {
   teams: Array<{ id: string; created_by: string | null }>;
   members: Array<{ team_id: string; user_id: string; role: string }>;
   assignmentsThisWeek: Array<{ team_id: string; created_by: string | null }>;
+  playerClubs?: Array<{ user_id: string; club_id: string }>;
+  suggestionsOpen?: number;
 }
 
 export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
@@ -38,7 +50,20 @@ export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
     teams: realTeams.size,
     playersOnTeams: players.size,
     assignmentsThisWeek: rows.assignmentsThisWeek.filter((a) => realTeams.has(a.team_id) && !(a.created_by && excluded.has(a.created_by))).length,
+    ...homeClubCounts(rows.playerClubs ?? [], excluded),
+    suggestionsOpen: rows.suggestionsOpen ?? 0,
   };
+}
+
+function homeClubCounts(rows: Array<{ user_id: string; club_id: string }>, excluded: Set<string>) {
+  const real = rows.filter((r) => !excluded.has(r.user_id));
+  const perClub = new Map<string, number>();
+  for (const r of real) perClub.set(r.club_id, (perClub.get(r.club_id) ?? 0) + 1);
+  const bigClubs = [...perClub]
+    .filter(([, n]) => n >= CLUB_COUNT_MIN)
+    .map(([id, players]) => ({ name: clubById(id)?.name ?? id, players }))
+    .sort((a, b) => b.players - a.players || a.name.localeCompare(b.name, 'en'));
+  return { playersWithClub: real.length, bigClubs };
 }
 
 function pct(count: number, of: number): string {
@@ -72,6 +97,11 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
       `- Teams: ${clubs.teams}`,
       `- Players on a team: ${clubs.playersOnTeams}`,
       `- Assignments posted in the last 7 days: ${clubs.assignmentsThisWeek}`,
+      `- Players who picked a home club: ${clubs.playersWithClub}`,
+      `- Clubs with ${CLUB_COUNT_MIN} or more players: ${
+        clubs.bigClubs.length ? clubs.bigClubs.map((c) => `${c.name} (${c.players})`).join(', ') : 'none yet'
+      }`,
+      `- "Club not listed" suggestions waiting: ${clubs.suggestionsOpen}`,
       ''
     );
   }

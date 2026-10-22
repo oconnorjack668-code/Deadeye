@@ -195,6 +195,13 @@ export default function PrivacyPage() {
             an hour.
           </p>
           <p>
+            You can pick your home club from our list of Irish clubs, or tell us about one that is missing. Your club
+            is private: only you see it, unless you choose to show it as a badge on your player card. If you are under
+            16, that badge is only ever shown to your friends and teammates. We use clubs to bring Deadeye to clubs,
+            and only ever count players per club, never name them, and only for clubs with 5 or more players. Change
+            or remove your club at any time in Settings; it is deleted with your account.
+          </p>
+          <p>
             You can follow the founder of Deadeye to see their posts (challenges, tips and app updates) on your
             dashboard. We store that you follow them. The founder sees how many players follow, never who, and you
             cannot message each other through it. Unfollow at any time from their player card; following is deleted

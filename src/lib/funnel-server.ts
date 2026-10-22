@@ -77,11 +77,14 @@ export async function loadClubCounts(): Promise<ClubCounts | { problem: string }
     if (listError) return { problem: listError.message };
     const excluded = await excludedIds(admin, list.users);
     const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
-    const [coachProfiles, teams, members, assignments] = await Promise.all([
+    const [coachProfiles, teams, members, assignments, playerClubs, suggestions] = await Promise.all([
       admin.from('coach_profiles').select('user_id'),
       admin.from('teams').select('id, created_by'),
       admin.from('team_members').select('team_id, user_id, role'),
       admin.from('team_assignments').select('team_id, created_by').gte('created_at', weekAgo),
+      // Missing before 00051: no home clubs yet
+      admin.from('player_clubs').select('user_id, club_id'),
+      admin.from('club_suggestions').select('id', { count: 'exact', head: true }).eq('resolved', false),
     ]);
     const failed = [coachProfiles, teams, members, assignments].find((r) => r.error);
     if (failed?.error) return { problem: failed.error.message };
@@ -91,6 +94,8 @@ export async function loadClubCounts(): Promise<ClubCounts | { problem: string }
         teams: teams.data ?? [],
         members: members.data ?? [],
         assignmentsThisWeek: assignments.data ?? [],
+        playerClubs: playerClubs.error ? [] : playerClubs.data ?? [],
+        suggestionsOpen: suggestions.error ? 0 : suggestions.count ?? 0,
       },
       excluded
     );

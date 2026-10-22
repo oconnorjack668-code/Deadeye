@@ -1,0 +1,2211 @@
+[
+ {
+  "id": "abbey-lakers-quin-clare",
+  "name": "Abbey Lakers Quin",
+  "aka": [],
+  "town": "Quin",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "abfrc-dublin",
+  "name": "ABFRC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "aer-lingus-bc-dublin",
+  "name": "Aer Lingus BC",
+  "aka": [],
+  "town": "Kinsealey",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "all-saints-galway",
+  "name": "All Saints",
+  "aka": [],
+  "town": "Conamara",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "andersonstown-tigers-antrim",
+  "name": "Andersonstown Tigers",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "annaghdown-bc-galway",
+  "name": "Annaghdown BC",
+  "aka": [],
+  "town": "Athenry-Oranmore",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "antrim-jets-antrim",
+  "name": "Antrim Jets",
+  "aka": [],
+  "town": "Antrim",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "ardcarne-bc-roscommon",
+  "name": "Ardcarne BC",
+  "aka": [],
+  "town": "Rockingham",
+  "county": "Roscommon",
+  "country": "Ireland"
+ },
+ {
+  "id": "armagh-bisons-armagh",
+  "name": "Armagh Bisons",
+  "aka": [],
+  "town": "Armagh",
+  "county": "Armagh",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "athlone-bc-westmeath",
+  "name": "Athlone BC",
+  "aka": [],
+  "town": "Athlone",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "aughrim-red-kites-wicklow",
+  "name": "Aughrim Red Kites",
+  "aka": [],
+  "town": "Arklow",
+  "county": "Wicklow",
+  "country": "Ireland"
+ },
+ {
+  "id": "balbriggan-basketball-club-dublin",
+  "name": "Balbriggan Basketball Club",
+  "aka": [],
+  "town": "Balbriggan",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballina-braves-mayo",
+  "name": "Ballina Braves",
+  "aka": [],
+  "town": "Ballina",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballinamore-blazers-bc-leitrim",
+  "name": "Ballinamore Blazers BC",
+  "aka": [],
+  "town": "Ballinamore",
+  "county": "Leitrim",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballincollig-bc-cork",
+  "name": "Ballincollig BC",
+  "aka": [],
+  "town": "Macroom",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballinrobe-basketball-club-mayo",
+  "name": "Ballinrobe Basketball Club",
+  "aka": [],
+  "town": "Ballinrobe",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballinteer-bulls-dublin",
+  "name": "Ballinteer Bulls",
+  "aka": [],
+  "town": "Dundrum",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballybrack-ladies-dublin",
+  "name": "Ballybrack Ladies",
+  "aka": [],
+  "town": "Dún Laoghaire",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballybunion-wildcats-kerry",
+  "name": "Ballybunion Wildcats",
+  "aka": [],
+  "town": "Ballybunion",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballyfermot-bulls-bc-dublin",
+  "name": "Ballyfermot Bulls BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballymena-bc-antrim",
+  "name": "Ballymena BC",
+  "aka": [],
+  "town": "Ballymena",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "ballyroan-ladies-laois",
+  "name": "Ballyroan Ladies",
+  "aka": [],
+  "town": "Ballyroan",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "ballyshannon-88ers-donegal",
+  "name": "Ballyshannon 88ers",
+  "aka": [],
+  "town": "Ballyshannon",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "baltinglass-bulldogs-wicklow",
+  "name": "Baltinglass Bulldogs",
+  "aka": [],
+  "town": "Baltinglass",
+  "county": "Wicklow",
+  "country": "Ireland"
+ },
+ {
+  "id": "bandon-ravens-cork",
+  "name": "Bandon Ravens",
+  "aka": [],
+  "town": "Bandon",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "bangor-city-warriors-down",
+  "name": "Bangor City Warriors",
+  "aka": [],
+  "town": "Bangor",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "bangor-sharks-down",
+  "name": "Bangor Sharks",
+  "aka": [],
+  "town": "Bangor",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "bantry-bc-cork",
+  "name": "Bantry BC",
+  "aka": [],
+  "town": "Bantry Urban",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "barrow-rovers-dublin",
+  "name": "Barrow Rovers",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "bc-leixlip-zalgiris-kildare",
+  "name": "BC Leixlip Zalgiris",
+  "aka": [],
+  "town": "Leixlip",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "bc-tauras-dublin",
+  "name": "BC Tauras",
+  "aka": [],
+  "town": "Blanchardstown",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "bc-wolves-northern-ireland",
+  "name": "BC Wolves",
+  "aka": [],
+  "town": null,
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "bearna-bc-galway",
+  "name": "Bearna BC",
+  "aka": [],
+  "town": "Galway",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "belfast-bulls-basketball-northern-ireland",
+  "name": "Belfast Bulls Basketball",
+  "aka": [],
+  "town": "Belfast",
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "belfast-hussars-antrim",
+  "name": "Belfast Hussars",
+  "aka": [],
+  "town": "Newtownabbey",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "belfast-phoenix-bc-antrim",
+  "name": "Belfast Phoenix BC",
+  "aka": [],
+  "town": "Lisburn",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "belfast-pumas-antrim",
+  "name": "Belfast Pumas",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "belfast-star-antrim",
+  "name": "Belfast Star",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "berkeley-bc-kilkenny",
+  "name": "Berkeley BC",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "blackwater-steelers-monaghan",
+  "name": "Blackwater Steelers",
+  "aka": [],
+  "town": "Monaghan",
+  "county": "Monaghan",
+  "country": "Ireland"
+ },
+ {
+  "id": "blayney-blazers-monaghan",
+  "name": "Blayney Blazers",
+  "aka": [],
+  "town": "Carrickmacross-Castleblayney",
+  "county": "Monaghan",
+  "country": "Ireland"
+ },
+ {
+  "id": "blue-demons-cork",
+  "name": "Blue Demons",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "bluestars-bc-clare",
+  "name": "Bluestars BC",
+  "aka": [],
+  "town": "Cooraclare",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "boru-blazers-clare",
+  "name": "Boru Blazers",
+  "aka": [],
+  "town": "Killaloe",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "boyle-bc-roscommon",
+  "name": "Boyle BC",
+  "aka": [],
+  "town": "Boyle",
+  "county": "Roscommon",
+  "country": "Ireland"
+ },
+ {
+  "id": "bray-bullets-wicklow",
+  "name": "Bray Bullets",
+  "aka": [],
+  "town": "Брей",
+  "county": "Wicklow",
+  "country": "Ireland"
+ },
+ {
+  "id": "brunell-ladies-cork",
+  "name": "Brunell Ladies",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "cahersiveen-bc-kerry",
+  "name": "Cahersiveen BC",
+  "aka": [],
+  "town": "Cahersiveen",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "carlow-bc-carlow",
+  "name": "Carlow BC",
+  "aka": [],
+  "town": "Carlow",
+  "county": "Carlow",
+  "country": "Ireland"
+ },
+ {
+  "id": "carlow-rock-carlow",
+  "name": "Carlow Rock",
+  "aka": [],
+  "town": "Old Leighlin",
+  "county": "Carlow",
+  "country": "Ireland"
+ },
+ {
+  "id": "carna-bc-galway",
+  "name": "Carna BC",
+  "aka": [],
+  "town": "Conamara",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "carraig-na-bhfear-rebels-cork",
+  "name": "Carraig na bhFear Rebels",
+  "aka": [],
+  "town": "Templebreedy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "carrick-cougars-monaghan",
+  "name": "Carrick Cougars",
+  "aka": [],
+  "town": null,
+  "county": "Monaghan",
+  "country": "Ireland"
+ },
+ {
+  "id": "carrickmacross-bc-monaghan",
+  "name": "Carrickmacross BC",
+  "aka": [],
+  "town": "Carrickmacross",
+  "county": "Monaghan",
+  "country": "Ireland"
+ },
+ {
+  "id": "carrigaline-bc-cork",
+  "name": "Carrigaline BC",
+  "aka": [],
+  "town": "Templebreedy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "castlebar-comets-mayo",
+  "name": "Castlebar Comets",
+  "aka": [],
+  "town": "Castlebar",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "castlecomer-bc-kilkenny",
+  "name": "Castlecomer BC",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "castlerea-cavaliers-roscommon",
+  "name": "Castlerea Cavaliers",
+  "aka": [],
+  "town": "Castlereagh Electoral Division",
+  "county": "Roscommon",
+  "country": "Ireland"
+ },
+ {
+  "id": "cavan-lakers-cavan",
+  "name": "Cavan Lakers",
+  "aka": [],
+  "town": "Redhill",
+  "county": "Cavan",
+  "country": "Ireland"
+ },
+ {
+  "id": "cb-greenbacks-dublin",
+  "name": "CB Greenbacks",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "charlestown-cubs-mayo",
+  "name": "Charlestown Cubs",
+  "aka": [],
+  "town": "Kilbeagh",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "clare-cascaders-clare",
+  "name": "Clare Cascaders",
+  "aka": [],
+  "town": "Ennistimon",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "clare-commets-clare",
+  "name": "Clare Commets",
+  "aka": [],
+  "town": "Doora",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "claregalway-bc-galway",
+  "name": "Claregalway BC",
+  "aka": [],
+  "town": "Athenry-Oranmore",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "clonaslee-bc-laois",
+  "name": "Clonaslee BC",
+  "aka": [],
+  "town": "Borris-in-Ossory",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "club-amber-kelts-kilkenny",
+  "name": "Club Amber Kelts",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "cobh-basketball-club-cork",
+  "name": "Cobh Basketball Club",
+  "aka": [],
+  "town": "Cobh",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "corinthians-basketball-club-dublin",
+  "name": "Corinthians Basketball Club",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "cork-celts-bc-cork",
+  "name": "Cork Celts BC",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "corrib-basketball-club-galway",
+  "name": "Corrib Basketball Club",
+  "aka": [],
+  "town": "Oughterard",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "craigavon-banbridge-eagles-basketball-club-down",
+  "name": "Craigavon/Banbridge Eagles Basketball Club",
+  "aka": [],
+  "town": "Banbridge",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "crosshaven-basketball-club-cork",
+  "name": "Crosshaven Basketball Club",
+  "aka": [],
+  "town": "Templebreedy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "crossmolina-tigers-mayo",
+  "name": "Crossmolina Tigers",
+  "aka": [],
+  "town": "Crossmolina",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "cumann-cispheile-na-ngael-to-check",
+  "name": "Cumann Cispheile na nGael",
+  "aka": [],
+  "town": null,
+  "county": null,
+  "country": null
+ },
+ {
+  "id": "dalkey-dublin",
+  "name": "Dalkey",
+  "aka": [],
+  "town": "Dalkey",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "dcu-mercy-bc-dublin",
+  "name": "DCU Mercy BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "donabate-dublin",
+  "name": "Donabate",
+  "aka": [],
+  "town": "Donabate",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "donegal-town-donegal",
+  "name": "Donegal Town",
+  "aka": [],
+  "town": "Donegal",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "donoughmore-bc-cork",
+  "name": "Donoughmore BC",
+  "aka": [],
+  "town": "Macroom",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "dragon-crew-cork",
+  "name": "Dragon Crew",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "drogheda-bullets-louth",
+  "name": "Drogheda Bullets",
+  "aka": [],
+  "town": "Drogheda",
+  "county": "Louth",
+  "country": "Ireland"
+ },
+ {
+  "id": "drogheda-ladies-meath",
+  "name": "Drogheda Ladies",
+  "aka": [],
+  "town": "Ashbourne",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "drogheda-sparks-louth",
+  "name": "Drogheda Sparks",
+  "aka": [],
+  "town": "Drogheda",
+  "county": "Louth",
+  "country": "Ireland"
+ },
+ {
+  "id": "drogheda-wolves-louth",
+  "name": "Drogheda Wolves",
+  "aka": [],
+  "town": "Drogheda",
+  "county": "Louth",
+  "country": "Ireland"
+ },
+ {
+  "id": "dublin-deaf-basketball-dublin",
+  "name": "Dublin Deaf Basketball",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "dublin-lions-dublin",
+  "name": "Dublin Lions",
+  "aka": [],
+  "town": "Clondalkin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "dublin-raiders-dublin",
+  "name": "Dublin Raiders",
+  "aka": [],
+  "town": "Killiney",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "dublin-sonics-dublin",
+  "name": "Dublin Sonics",
+  "aka": [],
+  "town": "The Ward",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "duhallow-dragons-cork",
+  "name": "Duhallow Dragons",
+  "aka": [],
+  "town": "Rosnalee",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "dundalk-ravens-louth",
+  "name": "Dundalk Ravens",
+  "aka": [],
+  "town": "Dundalk",
+  "county": "Louth",
+  "country": "Ireland"
+ },
+ {
+  "id": "dunshaughlin-rockets-meath",
+  "name": "Dunshaughlin Rockets",
+  "aka": [],
+  "town": "Dunshaughlin",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "dynamites-basketball-club-louth",
+  "name": "Dynamites Basketball Club",
+  "aka": [],
+  "town": "Dundalk",
+  "county": "Louth",
+  "country": "Ireland"
+ },
+ {
+  "id": "eanna-bc-dublin",
+  "name": "Eanna BC",
+  "aka": [],
+  "town": "Ballyboden",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "east-cavan-eagles-cavan",
+  "name": "East Cavan Eagles",
+  "aka": [],
+  "town": "Ballyjamesduff",
+  "county": "Cavan",
+  "country": "Ireland"
+ },
+ {
+  "id": "east-coast-cavaliers-meath",
+  "name": "East Coast Cavaliers",
+  "aka": [],
+  "town": "Julianstown",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "east-cork-glenmary-bc-cork",
+  "name": "East Cork Glenmary BC",
+  "aka": [],
+  "town": "Cobh",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "east-galway-celtics-galway",
+  "name": "East Galway Celtics",
+  "aka": [],
+  "town": "Athenry-Oranmore",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "enniscorthy-basketball-club-wexford",
+  "name": "Enniscorthy Basketball Club",
+  "aka": [],
+  "town": "Enniscorthy",
+  "county": "Wexford",
+  "country": "Ireland"
+ },
+ {
+  "id": "errigal-basketball-donegal",
+  "name": "Errigal Basketball",
+  "aka": [],
+  "town": "Letterkenny",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "fbc-dublin",
+  "name": "FBC",
+  "aka": [],
+  "town": "Clondalkin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "fermoy-bc-cork",
+  "name": "Fermoy BC",
+  "aka": [],
+  "town": "Fermoy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "firhouse-dublin",
+  "name": "Firhouse",
+  "aka": [],
+  "town": "Tallaght",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "foireann-chispheile-na-gaillimhe-galway",
+  "name": "Foireann Chispheile Na Gaillimhe",
+  "aka": [],
+  "town": "Athenry-Oranmore",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "fr-mathews-cork",
+  "name": "Fr Mathews",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "galway-outcasts-galway",
+  "name": "Galway Outcasts",
+  "aka": [],
+  "town": "Galway",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "garda-college-bc-limerick",
+  "name": "Garda College BC",
+  "aka": [],
+  "town": "Abbey A",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "garrymore-mayo",
+  "name": "Garrymore",
+  "aka": [],
+  "town": "Claremorris",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "glanmire-ladies-cork",
+  "name": "Glanmire Ladies",
+  "aka": [],
+  "town": "Cobh",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "glanmire-tornadoes-cork",
+  "name": "Glanmire Tornadoes",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "glasnevin-dublin",
+  "name": "Glasnevin",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "glasnevin-ladies-bc-dublin",
+  "name": "Glasnevin Ladies BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "glen-cruisers-newport-tipperary",
+  "name": "Glen Cruisers Newport",
+  "aka": [],
+  "town": "Newport",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "glenbeigh-falcons-kerry",
+  "name": "Glenbeigh Falcons",
+  "aka": [],
+  "town": "Kenmare",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "gneeveguilla-kerry",
+  "name": "Gneeveguilla",
+  "aka": [],
+  "town": "Rathmore",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "gorey-basketball-club-wexford",
+  "name": "Gorey Basketball Club",
+  "aka": [],
+  "town": "Gorey",
+  "county": "Wexford",
+  "country": "Ireland"
+ },
+ {
+  "id": "greystones-sharks-wicklow",
+  "name": "Greystones Sharks",
+  "aka": [],
+  "town": "Greystones",
+  "county": "Wicklow",
+  "country": "Ireland"
+ },
+ {
+  "id": "haroldites-bc-dublin",
+  "name": "Haroldites BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "hazelwood-hawks-northern-ireland",
+  "name": "Hazelwood Hawks",
+  "aka": [],
+  "town": null,
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "i-t-athlone-westmeath",
+  "name": "I.T. Athlone",
+  "aka": [],
+  "town": "Athlone",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "i-t-carlow-laois",
+  "name": "I.T. Carlow",
+  "aka": [],
+  "town": "Shrule",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "i-t-sligo-sligo",
+  "name": "I.T. Sligo",
+  "aka": [],
+  "town": "Sligo North",
+  "county": "Sligo",
+  "country": "Ireland"
+ },
+ {
+  "id": "inchicore-dublin",
+  "name": "Inchicore",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "kanturk-cork",
+  "name": "Kanturk",
+  "aka": [],
+  "town": "Kanturk",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "kenmare-kestrels-kerry",
+  "name": "Kenmare Kestrels",
+  "aka": [],
+  "town": "Kenmare",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "kestrels-laois",
+  "name": "Kestrels",
+  "aka": [],
+  "town": "Portarlington",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilbride-dublin",
+  "name": "Kilbride",
+  "aka": [],
+  "town": "Blanchardstown",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilcar-bc-donegal",
+  "name": "Kilcar BC",
+  "aka": [],
+  "town": "Kilcar",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilcock-bc-kildare",
+  "name": "Kilcock BC",
+  "aka": [
+   "Kilcock Tigers"
+  ],
+  "town": "Kilcock",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "kildare-gliders-bc-kildare",
+  "name": "Kildare Gliders BC",
+  "aka": [],
+  "town": "Newbridge",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilkeel-knights-bc-down",
+  "name": "Kilkeel-Knights BC",
+  "aka": [],
+  "town": "Kilkeel",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "kilkenny-stars-kilkenny",
+  "name": "Kilkenny Stars",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilkenny-warriors-kilkenny",
+  "name": "Kilkenny Warriors",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "killester-basketball-club-dublin",
+  "name": "Killester Basketball Club",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "killorglin-cyms-bc-kerry",
+  "name": "Killorglin Cyms BC",
+  "aka": [],
+  "town": "Kenmare",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilnamanagh-bc-dublin",
+  "name": "Kilnamanagh BC",
+  "aka": [],
+  "town": "Tallaght",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "kilrush-bc-clare",
+  "name": "Kilrush BC",
+  "aka": [],
+  "town": "Kilrush",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "kiltimagh-giants-mayo",
+  "name": "Kiltimagh Giants",
+  "aka": [],
+  "town": "Kiltamagh Electoral Division",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "kinsale-bc-cork",
+  "name": "Kinsale BC",
+  "aka": [],
+  "town": "Bandon-Kinsale",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "kubs-basketball-club-dublin",
+  "name": "KUBS Basketball Club",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "kyer-kelts-bc-cork",
+  "name": "Kyer Kelts BC",
+  "aka": [],
+  "town": "Fermoy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "larne-lakers-antrim",
+  "name": "Larne Lakers",
+  "aka": [],
+  "town": "Larne",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "lartigue-listowel-kerry",
+  "name": "Lartigue Listowel",
+  "aka": [],
+  "town": "Listowel",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "lee-valley-cork",
+  "name": "Lee Valley",
+  "aka": [],
+  "town": "Macroom",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "legion-lt-westmeath",
+  "name": "Legion LT",
+  "aka": [],
+  "town": "Castlelost",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "letterkenny-blaze-donegal",
+  "name": "Letterkenny Blaze",
+  "aka": [],
+  "town": "Letterkenny",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "liffey-celtics-dublin",
+  "name": "Liffey Celtics",
+  "aka": [],
+  "town": "Lucan",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "limerick-celtics-limerick",
+  "name": "Limerick Celtics",
+  "aka": [],
+  "town": "Dock C",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "limerick-hussars-limerick",
+  "name": "Limerick Hussars",
+  "aka": [],
+  "town": "Ballysimon",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "limerick-lakers-limerick",
+  "name": "Limerick Lakers",
+  "aka": [],
+  "town": "Glentworth A",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "limerick-lions-bc-limerick",
+  "name": "Limerick Lions BC",
+  "aka": [],
+  "town": "Dock D",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "longford-falcons-longford",
+  "name": "Longford Falcons",
+  "aka": [],
+  "town": "Longford Number 2",
+  "county": "Longford",
+  "country": "Ireland"
+ },
+ {
+  "id": "longford-phoenix-longford",
+  "name": "Longford Phoenix",
+  "aka": [],
+  "town": "Longford",
+  "county": "Longford",
+  "country": "Ireland"
+ },
+ {
+  "id": "lurgan-lakers-armagh",
+  "name": "Lurgan Lakers",
+  "aka": [],
+  "town": "Lurgan",
+  "county": "Armagh",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "lyit-ladies-donegal",
+  "name": "LYIT Ladies",
+  "aka": [],
+  "town": "Letterkenny",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "macroom-basketball-club-cork",
+  "name": "Macroom Basketball Club",
+  "aka": [],
+  "town": "Macroom",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "magherafelt-titans-northern-ireland",
+  "name": "Magherafelt Titans",
+  "aka": [],
+  "town": "Magherafelt",
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "malahide-bc-dublin",
+  "name": "Malahide BC",
+  "aka": [],
+  "town": "Malahide",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "mallow-bc-cork",
+  "name": "Mallow BC",
+  "aka": [],
+  "town": "Mallow",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "maol-og-dublin",
+  "name": "Maol Og",
+  "aka": [],
+  "town": "Clondalkin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "marble-city-hawks-kilkenny",
+  "name": "Marble City Hawks",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "maree-bc-galway",
+  "name": "Maree BC",
+  "aka": [],
+  "town": "Ballynacourty",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "mary-immaculate-college-limerick",
+  "name": "Mary Immaculate College",
+  "aka": [],
+  "town": "Dock D",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "medicus-polish-basket-dublin",
+  "name": "Medicus Polish Basket",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "meteors-dublin",
+  "name": "Meteors",
+  "aka": [],
+  "town": "Blackrock",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "midleton-bc-cork",
+  "name": "Midleton BC",
+  "aka": [],
+  "town": "East Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "mitchelstown-bc-legion-cork",
+  "name": "Mitchelstown BC 'Legion'",
+  "aka": [],
+  "town": "Fermoy",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "moate-jets-westmeath",
+  "name": "Moate Jets",
+  "aka": [],
+  "town": "Moate",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "morning-star-basketball-club-limerick",
+  "name": "Morning Star Basketball Club",
+  "aka": [],
+  "town": "Kilmallock",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "mourne-basketball-academy-down",
+  "name": "Mourne Basketball Academy",
+  "aka": [],
+  "town": null,
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "mourne-mavericks-tyrone",
+  "name": "Mourne Mavericks",
+  "aka": [],
+  "town": "Strabane",
+  "county": "Tyrone",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "moycullen-galway",
+  "name": "Moycullen",
+  "aka": [],
+  "town": "Conamara",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "muchno-lakers-ladies-monaghan",
+  "name": "Muchno Lakers Ladies",
+  "aka": [],
+  "town": "Castleblayney",
+  "county": "Monaghan",
+  "country": "Ireland"
+ },
+ {
+  "id": "mulroy-hoops-donegal",
+  "name": "Mulroy Hoops",
+  "aka": [],
+  "town": "Letterkenny",
+  "county": "Donegal",
+  "country": "Ireland"
+ },
+ {
+  "id": "multy-lakers-westmeath",
+  "name": "Multy Lakers",
+  "aka": [],
+  "town": "Multyfarnham",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "n-e-eagles-meath",
+  "name": "N.E. Eagles",
+  "aka": [],
+  "town": "Julianstown",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "naas-serpents-kildare",
+  "name": "Naas Serpents",
+  "aka": [],
+  "town": "Naas",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "navan-cougars-meath",
+  "name": "Navan Cougars",
+  "aka": [],
+  "town": "Navan",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "ncw-newcastle-west-limerick",
+  "name": "NCW (Newcastle West)",
+  "aka": [],
+  "town": "Newcastle West",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "neic-trojans-dublin",
+  "name": "NEIC Trojans",
+  "aka": [],
+  "town": null,
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "nenagh-tipperary",
+  "name": "Nenagh",
+  "aka": [],
+  "town": "Ardcrony",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "neptune-bc-cork",
+  "name": "Neptune BC",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "nets-ladies-basketball-club-dublin",
+  "name": "Nets Ladies Basketball Club",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "new-inn-rosegreen-tipperary",
+  "name": "New Inn/Rosegreen",
+  "aka": [],
+  "town": "Cahir",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "new-ross-sparks-wexford",
+  "name": "New Ross Sparks",
+  "aka": [],
+  "town": "New Ross",
+  "county": "Wexford",
+  "country": "Ireland"
+ },
+ {
+  "id": "newry-eagles-down",
+  "name": "Newry Eagles",
+  "aka": [],
+  "town": "Newry",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "newry-fliers-down",
+  "name": "Newry Fliers",
+  "aka": [],
+  "town": "Newry",
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "nomads-bc-dublin",
+  "name": "Nomads BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "north-down-tridents-down",
+  "name": "North Down Tridents",
+  "aka": [],
+  "town": null,
+  "county": "Down",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "north-kildare-eagles-kildare",
+  "name": "North Kildare Eagles",
+  "aka": [],
+  "town": "Maynooth",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "north-star-derry",
+  "name": "North Star",
+  "aka": [
+   "North Star Warriors"
+  ],
+  "town": "Derry/Londonderry",
+  "county": "Derry",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "northside-eclipse-dublin",
+  "name": "Northside Eclipse",
+  "aka": [],
+  "town": null,
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "oblate-dynamos-dublin",
+  "name": "Oblate Dynamos",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "oblates-basketball-club-dublin",
+  "name": "Oblates Basketball club",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "old-leighlin-bc-carlow",
+  "name": "Old Leighlin BC",
+  "aka": [],
+  "town": "Leighlinbridge",
+  "county": "Carlow",
+  "country": "Ireland"
+ },
+ {
+  "id": "oldcastle-meath",
+  "name": "Oldcastle",
+  "aka": [],
+  "town": "Oldcastle",
+  "county": "Meath",
+  "country": "Ireland"
+ },
+ {
+  "id": "omagh-thunder-bc-northern-ireland",
+  "name": "Omagh Thunder BC",
+  "aka": [],
+  "town": "Omagh",
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "ongar-chasers-dublin",
+  "name": "Ongar Chasers",
+  "aka": [],
+  "town": "Ongar",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "pacers-bc-mayo",
+  "name": "Pacers BC",
+  "aka": [],
+  "town": "Ballina",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "panda-bc-dublin",
+  "name": "Panda BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "parish-panthers-clare",
+  "name": "Parish Panthers",
+  "aka": [],
+  "town": "Kilraghtis",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "peaceplayers-intl-antrim",
+  "name": "PeacePlayers Intl.",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "pegasus-dublin",
+  "name": "Pegasus",
+  "aka": [],
+  "town": "Ballyboden",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "phoenix-shannon-ladies-bc-clare",
+  "name": "Phoenix Shannon Ladies BC",
+  "aka": [],
+  "town": "Shannon",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "portlaoise-bc-laois",
+  "name": "Portlaoise BC",
+  "aka": [],
+  "town": "Portlaoise",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "portlaoise-panthers-laois",
+  "name": "Portlaoise Panthers",
+  "aka": [],
+  "town": "Portlaoise",
+  "county": "Laois",
+  "country": "Ireland"
+ },
+ {
+  "id": "poyntzpass-pumas-armagh",
+  "name": "Poyntzpass Pumas",
+  "aka": [],
+  "town": "Poyntzpass",
+  "county": "Armagh",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "q-u-b-bc-antrim",
+  "name": "Q.U.B. BC",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "queens-bc-antrim",
+  "name": "Queens BC",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "rangers-bc-dublin",
+  "name": "Rangers BC",
+  "aka": [],
+  "town": "Portmarnock",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "rathangan-kildare",
+  "name": "Rathangan",
+  "aka": [],
+  "town": "Rathangan",
+  "county": "Kildare",
+  "country": "Ireland"
+ },
+ {
+  "id": "rathdrum-dublin",
+  "name": "Rathdrum",
+  "aka": [],
+  "town": "Killiney",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "rathmines-dublin",
+  "name": "Rathmines",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "rathmore-bc-kerry",
+  "name": "Rathmore BC",
+  "aka": [],
+  "town": "Rathmore",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "red-hawks-bc-sligo",
+  "name": "Red Hawks BC",
+  "aka": [],
+  "town": "Skreen",
+  "county": "Sligo",
+  "country": "Ireland"
+ },
+ {
+  "id": "renegades-dublin",
+  "name": "Renegades",
+  "aka": [],
+  "town": "Blanchardstown",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "rising-stars-antrim",
+  "name": "Rising Stars",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "scott-lakers-killarney-kerry",
+  "name": "Scott Lakers Killarney",
+  "aka": [],
+  "town": "Killarney",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "securitas-longford-torpedo-bc-longford",
+  "name": "Securitas Longford Torpedo BC",
+  "aka": [],
+  "town": "Edgeworthstown",
+  "county": "Longford",
+  "country": "Ireland"
+ },
+ {
+  "id": "shannon-jets-clare",
+  "name": "Shannon Jets",
+  "aka": [],
+  "town": "Shannon",
+  "county": "Clare",
+  "country": "Ireland"
+ },
+ {
+  "id": "skibbereen-eagles-cork",
+  "name": "Skibbereen Eagles",
+  "aka": [],
+  "town": "Skibbereen",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "sligo-all-stars-bc-sligo",
+  "name": "Sligo All Stars BC",
+  "aka": [],
+  "town": "Sligo",
+  "county": "Sligo",
+  "country": "Ireland"
+ },
+ {
+  "id": "sligo-giant-warriors-sligo",
+  "name": "Sligo Giant Warriors",
+  "aka": [],
+  "town": "Sligo",
+  "county": "Sligo",
+  "country": "Ireland"
+ },
+ {
+  "id": "south-tipp-titans-tipperary",
+  "name": "South Tipp Titans",
+  "aka": [],
+  "town": "Clonmel",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "southern-warriors-bc-cork",
+  "name": "Southern Warriors BC",
+  "aka": [],
+  "town": "Bandon-Kinsale",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "springfield-bc-limerick",
+  "name": "Springfield BC",
+  "aka": [],
+  "town": "Newcastle West",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "springfield-ladies-dublin",
+  "name": "Springfield Ladies",
+  "aka": [],
+  "town": "Clondalkin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-colmans-bc-milltown-kerry",
+  "name": "St Colmans BC Milltown",
+  "aka": [],
+  "town": "Kenmare",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-anne-s-farrantore-kerry",
+  "name": "St. Anne's Farrantore",
+  "aka": [],
+  "town": "Molahiffe",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-anthonys-cork",
+  "name": "St. Anthonys",
+  "aka": [],
+  "town": "Cork",
+  "county": "Cork",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-brendans-bc-kerry",
+  "name": "St. Brendans BC",
+  "aka": [],
+  "town": "Tralee",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-bridgets-kerry",
+  "name": "St. Bridgets",
+  "aka": [],
+  "town": "Killeentierna",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-colms-limerick",
+  "name": "St. Colms",
+  "aka": [],
+  "town": "Glentworth A",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-declans-dublin",
+  "name": "St. Declans",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-joseph-s-bc-kerry",
+  "name": "St. Joseph's BC",
+  "aka": [],
+  "town": "Listowel",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-marks-dublin",
+  "name": "St. Marks",
+  "aka": [],
+  "town": "Clondalkin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-marys-castleisland-kerry",
+  "name": "St. Marys Castleisland",
+  "aka": [],
+  "town": "Castleisland",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-michael-s-lixnaw-kerry",
+  "name": "St. Michael's Lixnaw",
+  "aka": [],
+  "town": "Listowel",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-patricks-kilkenny",
+  "name": "St. Patricks",
+  "aka": [],
+  "town": "Kilkenny",
+  "county": "Kilkenny",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-paul-s-kerry",
+  "name": "St. Paul's",
+  "aka": [],
+  "town": "Killarney",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-paul-s-juvenile-kerry",
+  "name": "St. Paul's Juvenile",
+  "aka": [],
+  "town": "Killarney",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "st-vincents-bc-dublin",
+  "name": "St. Vincents BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "streete-warriors-westmeath",
+  "name": "Streete Warriors",
+  "aka": [],
+  "town": "Boherquill",
+  "county": "Westmeath",
+  "country": "Ireland"
+ },
+ {
+  "id": "swinford-tigers-mayo",
+  "name": "Swinford Tigers",
+  "aka": [],
+  "town": "Swineford Electoral Division",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "swords-dublin",
+  "name": "Swords",
+  "aka": [],
+  "town": "Airport",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "team-kerry-kerry",
+  "name": "Team Kerry",
+  "aka": [],
+  "town": "Ballyegan",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "templeogue-bc-dublin",
+  "name": "Templeogue BC",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "the-rockets-limerick",
+  "name": "The Rockets",
+  "aka": [],
+  "town": "Ballynanty",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "tipperary-knights-tipperary",
+  "name": "Tipperary Knights",
+  "aka": [],
+  "town": "Thurles",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "tipperary-talons-tipperary",
+  "name": "Tipperary Talons",
+  "aka": [],
+  "town": "Thurles Rural",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "tipperary-tornados-tipperary",
+  "name": "Tipperary Tornados",
+  "aka": [],
+  "town": "Tipperary",
+  "county": "Tipperary",
+  "country": "Ireland"
+ },
+ {
+  "id": "titans-bc-galway",
+  "name": "Titans BC",
+  "aka": [],
+  "town": "Galway",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "tolka-rovers-dublin",
+  "name": "Tolka Rovers",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "tralee-magic-kerry",
+  "name": "Tralee Magic",
+  "aka": [],
+  "town": "Tralee",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "tralee-tigers-kerry",
+  "name": "Tralee Tigers",
+  "aka": [],
+  "town": "Tralee",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "tramore-waterford",
+  "name": "Tramore",
+  "aka": [],
+  "town": "Tramore",
+  "county": "Waterford",
+  "country": "Ireland"
+ },
+ {
+  "id": "tribes-bc-galway",
+  "name": "Tribes BC",
+  "aka": [],
+  "town": "Galway",
+  "county": "Galway",
+  "country": "Ireland"
+ },
+ {
+  "id": "tridents-dublin",
+  "name": "Tridents",
+  "aka": [],
+  "town": "Blanchardstown",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "trinity-dublin",
+  "name": "Trinity",
+  "aka": [],
+  "town": "Dublin",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "tullamore-bc-offaly",
+  "name": "Tullamore BC",
+  "aka": [],
+  "town": "Tullamore",
+  "county": "Offaly",
+  "country": "Ireland"
+ },
+ {
+  "id": "tyrone-towers-bc-northern-ireland",
+  "name": "Tyrone Towers BC",
+  "aka": [
+   "Tyrone Tower"
+  ],
+  "town": "Mid-Ulster",
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "ucd-ladies-bc-dublin",
+  "name": "UCD Ladies BC",
+  "aka": [],
+  "town": "Dundrum",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ucd-marian-bc-dublin",
+  "name": "UCD Marian BC",
+  "aka": [],
+  "town": "Blackrock",
+  "county": "Dublin",
+  "country": "Ireland"
+ },
+ {
+  "id": "ul-eagles-limerick",
+  "name": "UL Eagles",
+  "aka": [],
+  "town": "Ballysimon",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "ul-huskies-limerick",
+  "name": "UL Huskies",
+  "aka": [],
+  "town": "Ballysimon",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "ulster-elks-antrim",
+  "name": "Ulster Elks",
+  "aka": [],
+  "town": "Newtownabbey",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "ulster-rockets-antrim",
+  "name": "Ulster Rockets",
+  "aka": [],
+  "town": "Belfast",
+  "county": "Antrim",
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "uu-tigers-northern-ireland",
+  "name": "UU Tigers",
+  "aka": [],
+  "town": null,
+  "county": null,
+  "country": "Northern Ireland"
+ },
+ {
+  "id": "vixens-basketball-club-limerick",
+  "name": "Vixens Basketball Club",
+  "aka": [],
+  "town": "Newcastle West",
+  "county": "Limerick",
+  "country": "Ireland"
+ },
+ {
+  "id": "warriors-bc-tralee-kerry",
+  "name": "Warriors BC Tralee",
+  "aka": [],
+  "town": "Tralee",
+  "county": "Kerry",
+  "country": "Ireland"
+ },
+ {
+  "id": "waterford-vikings-waterford",
+  "name": "Waterford Vikings",
+  "aka": [],
+  "town": "Waterford",
+  "county": "Waterford",
+  "country": "Ireland"
+ },
+ {
+  "id": "westport-warriors-mayo",
+  "name": "Westport Warriors",
+  "aka": [],
+  "town": "Westport",
+  "county": "Mayo",
+  "country": "Ireland"
+ },
+ {
+  "id": "wexford-bc-wexford",
+  "name": "Wexford BC",
+  "aka": [
+   "Wexford Basketball Club",
+   "Wexford Blazers"
+  ],
+  "town": "Wexford",
+  "county": "Wexford",
+  "country": "Ireland"
+ },
+ {
+  "id": "wicklow-lady-gators-wicklow",
+  "name": "Wicklow Lady Gators",
+  "aka": [],
+  "town": "Greystones",
+  "county": "Wicklow",
+  "country": "Ireland"
+ },
+ {
+  "id": "wit-wildcats-waterford",
+  "name": "WIT Wildcats",
+  "aka": [],
+  "town": "Military Road",
+  "county": "Waterford",
+  "country": "Ireland"
+ },
+ {
+  "id": "youghal-cork",
+  "name": "Youghal",
+  "aka": [],
+  "town": "Youghal",
+  "county": "Cork",
+  "country": "Ireland"
+ }
+]
