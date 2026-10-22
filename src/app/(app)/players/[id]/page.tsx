@@ -7,6 +7,9 @@ import Link from 'next/link';
 import { requireUser, getCurrentProfile, checkIsOwner } from '@/lib/auth';
 import { ResetNameButton } from './ResetNameButton';
 import { FriendButton, type FriendState } from './FriendButton';
+import { FollowButton } from './FollowButton';
+import { FounderPostList } from '@/components/FounderPostList';
+import type { FounderPost } from '@/lib/founderPosts';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { countryName } from '@/lib/regions';
@@ -65,6 +68,18 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   // player_card only returns the path when this viewer may see the photo
   const [photoUrl, owners] = await Promise.all([signedPhotoUrl(card?.photo_path), ownersAmong(card ? [card.user_id] : [])]);
   const isFounder = !!card && owners.has(card.user_id);
+  // The founder card has Follow instead of Add friend, and their posts (00050).
+  // Before 00050 runs these all fail, and the card shows neither.
+  const [posts, follow, followers] = isFounder
+    ? await Promise.all([
+        supabase.from('founder_posts').select('id, kind, body, created_at').eq('author_id', card.user_id).order('created_at', { ascending: false }).limit(5),
+        card.is_me
+          ? null
+          : supabase.from('follows').select('followed_id').eq('follower_id', user.id).eq('followed_id', card.user_id).maybeSingle(),
+        card.is_me ? supabase.rpc('follower_count') : null,
+      ])
+    : [null, null, null];
+  const founderPosts = (posts?.data ?? []) as FounderPost[];
   const tier = card?.level ? tierFor(card.level) : null;
   const theme = tier ? TIER_THEME[tier.name] : null;
 
@@ -114,17 +129,31 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 </p>
               )}
               {card.is_me ? (
-                <Link href="/settings" className="mt-3 inline-block text-xs text-cyan-400 underline">
-                  Choose what others see in Settings → Privacy
-                </Link>
+                <>
+                  {isFounder && followers && !followers.error && (
+                    <p className="mt-3 text-sm text-zinc-300">
+                      <span className="font-bold text-white">{followers.data ?? 0}</span> following you ·{' '}
+                      <Link href="/admin/posts" className="font-semibold text-orange-300 underline">
+                        Write a post
+                      </Link>
+                    </p>
+                  )}
+                  <Link href="/settings" className="mt-3 block text-xs text-cyan-400 underline">
+                    Choose what others see in Settings → Privacy
+                  </Link>
+                </>
               ) : isFounder && friend.kind === 'none' ? (
-                // No Add friend on the founder's card, which every player on the
-                // public board can open. An existing friendship or request keeps its button.
-                null
+                // Follow instead of Add friend on the founder's card, which every
+                // player on the public board can open. An existing friendship or
+                // request keeps its button below.
+                follow && !follow.error ? <FollowButton userId={card.user_id} initial={!!follow.data} /> : null
               ) : (
-                // Keyed on the state the server read, so a refresh after a
-                // request starts it fresh with the new request's id
-                <FriendButton key={JSON.stringify(friend)} userId={card.user_id} initial={friend} />
+                <>
+                  {/* Keyed on the state the server read, so a refresh after a
+                      request starts it fresh with the new request's id */}
+                  <FriendButton key={JSON.stringify(friend)} userId={card.user_id} initial={friend} />
+                  {isFounder && follow && !follow.error && <FollowButton userId={card.user_id} initial={!!follow.data} />}
+                </>
               )}
             </div>
 
@@ -145,6 +174,13 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 <div className="text-[11px] text-zinc-500">day streak</div>
               </div>
             </div>
+
+            {founderPosts.length > 0 && (
+              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+                <h2 className="text-sm font-semibold text-zinc-300 mb-2">Posts</h2>
+                <FounderPostList posts={founderPosts} />
+              </div>
+            )}
 
             {card.badge_titles.length > 0 && (
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">

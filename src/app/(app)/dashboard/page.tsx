@@ -23,6 +23,8 @@ import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
 import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
 import { StarterSteps } from '@/components/StarterSteps';
+import { FounderPostCard } from '@/components/FounderPostCard';
+import type { FounderPost } from '@/lib/founderPosts';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
 import { appModeFor } from '@/lib/coachSide';
@@ -101,7 +103,7 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient();
-  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad, iqAnswers] = await Promise.all([
+  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad, iqAnswers, follows] = await Promise.all([
     getCurrentSubscription(),
     calculateDashboardMetrics(user.id),
     getShootingByZone(user.id),
@@ -114,7 +116,19 @@ export default async function DashboardPage() {
     supabase.rpc('friends_overview'),
     // One of the starting steps: has the daily IQ question ever been answered
     supabase.from('daily_iq_answers').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
+    // Who this player follows, for the founder post card (00050; an error before it runs)
+    supabase.from('follows').select('followed_id').eq('follower_id', user.id),
   ]);
+  const followed = (follows.data ?? []).map((f) => f.followed_id);
+  const { data: latestPost } = followed.length
+    ? await supabase
+        .from('founder_posts')
+        .select('id, author_id, kind, body, created_at')
+        .in('author_id', followed)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : { data: null };
   // Shown until the bonus for finishing them is paid; it is in the XP once paid
   const showStarterSteps = achievements.xpParts.bonus === 0;
   // Nothing logged yet, hoops or gym, and no program on the go
@@ -248,6 +262,9 @@ export default async function DashboardPage() {
             heads-up in the last week of a founding member's free months. Under
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
+
+        {/* Only for a player who follows the founder, once there is a post */}
+        {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}
 
         {/* Until the first log, everything below is numbers that are all still
             zero, under a Today card asking for one thing. Folded away so a new

@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 21, 2026';
+const LAST_UPDATED = 'October 22, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -193,6 +193,12 @@ export default function PrivacyPage() {
             approval again. They can remove it at any time from the link they were sent. Photos are never shown on the
             website, in search engines or to anyone not signed in, and are only sent through links that expire within
             an hour.
+          </p>
+          <p>
+            You can follow the founder of Deadeye to see their posts (challenges, tips and app updates) on your
+            dashboard. We store that you follow them. The founder sees how many players follow, never who, and you
+            cannot message each other through it. Unfollow at any time from their player card; following is deleted
+            with your account.
           </p>
           <p>
             AI Coach chat messages are stored in your account so the conversation continues; you can clear them at any

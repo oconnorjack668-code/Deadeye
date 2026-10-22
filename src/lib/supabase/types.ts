@@ -321,6 +321,20 @@ export interface Database {
         };
         Relationships: [];
       };
+      // Following the founder (00050): written only through set_follow
+      follows: {
+        Row: { follower_id: string; followed_id: string; created_at: string };
+        Insert: { follower_id: string; followed_id: string; created_at?: string };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      // Founder posts (00050): written only by the server, read by every signed-in player
+      founder_posts: {
+        Row: { id: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at: string };
+        Insert: { id?: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at?: string };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       player_levels: {
         Row: { user_id: string; level: number; xp: number; updated_at: string };
         Insert: { user_id: string; level: number; xp: number; updated_at?: string };
@@ -1975,6 +1989,9 @@ export interface Database {
       };
       coach_player_detail: { Args: { p_team: string; p_user: string }; Returns: Json };
       player_card: { Args: { p_user: string }; Returns: Json };
+      // Follow or unfollow the founder, and how many follow you (00050)
+      set_follow: { Args: { p_user: string; p_follow: boolean }; Returns: 'following' | 'not_following' | 'not_followable' };
+      follower_count: { Args: Record<string, never>; Returns: number };
       // The photo paths this viewer may see, by player_card's rule (00049)
       visible_photo_paths: { Args: { p_users: string[] }; Returns: { user_id: string; path: string }[] };
       my_shot_totals: { Args: Record<string, never>; Returns: { shot_zone: string; makes: number; attempts: number }[] };
