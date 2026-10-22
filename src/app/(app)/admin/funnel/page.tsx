@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { testAccountEmails } from '@/lib/testAccounts';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { buildFunnel, type Funnel, type FunnelSession } from '@/lib/funnel';
 import { Filter } from 'lucide-react';
@@ -40,7 +41,7 @@ async function inBatches<T>(ids: string[], load: (batch: string[]) => PromiseLik
  */
 async function excludedIds(admin: Admin, users: Array<{ id: string; email?: string }>): Promise<Set<string>> {
   const emails = new Set(
-    [process.env.OWNER_EMAIL, ...(process.env.TEST_ACCOUNT_EMAILS ?? '').split(',')]
+    [process.env.OWNER_EMAIL, ...testAccountEmails()]
       .map((e) => e?.toLowerCase().trim())
       .filter((e): e is string => !!e)
   );
