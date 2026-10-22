@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -68,6 +68,15 @@ export default async function AdminPage() {
       badge: null,
       tile: 'bg-emerald-600/20',
       iconColor: 'text-emerald-400',
+    },
+    {
+      href: '/admin/posts',
+      icon: Megaphone,
+      title: 'Founder posts',
+      desc: 'Challenges, tips and app updates for the players who follow you',
+      badge: null,
+      tile: 'bg-red-600/20',
+      iconColor: 'text-red-400',
     },
     {
       href: '/admin/demo-videos',
