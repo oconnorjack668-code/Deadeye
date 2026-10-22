@@ -5,12 +5,11 @@ test accounts subtracted). The only data is from 2026-10-19. It predates the wel
 starting steps (10-21), and tracker `app_events` were not yet recorded, so it cannot show their effect.
 
 **Update, later on 2026-10-22: fresh counts in [`data/2026-10-22-funnel.md`](../data/2026-10-22-funnel.md).**
-They come from `/admin/funnel` and leave out different accounts than the 10-19 SQL, so they are a new
-baseline, not a week-on-week change. The biggest drop is the same step and worse: 0 of 12 who finished setup
-logged a session (was 3 of 17), so activation is 0%, not 18%. Only 2 of 17 saw the welcome screen since it was
-recorded (10-21), and none played the sample or opened the tracker. The few new players who reach the app go
-nowhere near the camera, which strengthens the case for a by-hand first log: E1 stays NEXT. E3's markers would
-show where those 12 stop.
+They come from `/admin/funnel`, not the 10-19 SQL, so read the change as a hint. The biggest drop is the same
+step and worse: all-time, 2 of 18 who finished setup logged a session (11%, was 3 of 17); of the 12 who set up
+in the last 7 days, none has. Only 2 players saw the welcome screen since it was recorded (10-21), and none
+played the sample or opened the tracker. New players are not reaching the camera, which strengthens the case
+for a by-hand first log: E1 stays NEXT. E3's markers would show where the 12 stop.
 
 ## Numbers (2026-10-19, all-time)
 

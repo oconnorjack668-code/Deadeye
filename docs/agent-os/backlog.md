@@ -29,8 +29,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
   logger in Enter totals. A saved preference still wins, so returning players are unchanged. Update
   `__tests__/hoops-logging.test.tsx`.
 - Signal: finished setup to first hoops session within 7 days, from 18% (3 of 17) towards 30%, read over 2
-  weekly data files. Under 30 players this is a hint; weight E0 notes above it. New baseline from
-  `/admin/funnel` on 2026-10-22: 0 of 12 ([data](data/2026-10-22-funnel.md)); compare against that.
+  weekly data files. Under 30 players this is a hint; weight E0 notes above it. Baseline from
+  `/admin/funnel` on 2026-10-22 ([data](data/2026-10-22-funnel.md)): 2 of 18 all-time (11%), 0 of 12 who
+  joined in the last 7 days; compare against that.
 - Built: the session-count check the first-log tips already make (`basketball/new/page.tsx`) now also
   sets Enter totals when the count is 0 and `hoopiq-hoops-prefs-v1` is empty. Nothing is written to the
   phone until the player changes mode. Offline, signed out, or no answer: Track every shot, as before.
