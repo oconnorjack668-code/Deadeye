@@ -7,6 +7,8 @@ import { revalidatePath } from 'next/cache';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Bug, CheckCircle2 } from 'lucide-react';
+import { reportsForAgents } from '@/lib/redact';
+import { CopyForAgents } from './CopyForAgents';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'App errors - Deadeye' };
@@ -115,6 +117,16 @@ export default async function AdminErrorsPage() {
   }
   const list = [...groups.values()].sort((a, b) => b.count - a.count);
 
+  // For support-triage: the same reports and crashes, with every player name
+  // the app knows taken out of the text along with contact details
+  const { data: nameRows } = await createAdminClient().from('profiles').select('display_name').limit(5000);
+  const agentText = reportsForAgents(
+    new Date().toISOString().slice(0, 10),
+    reports.map((r) => ({ created_at: r.created_at, message: r.message, context: r.context, page: (r.url || 'unknown page').split('?')[0], device: device(r.user_agent) })),
+    list.map((g) => ({ message: g.latest.message, count: g.count, players: g.players.size, pages: [...g.pages] })),
+    (nameRows || []).map((n) => n.display_name).filter((n): n is string => !!n)
+  );
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-4">
@@ -134,6 +146,7 @@ export default async function AdminErrorsPage() {
             what went wrong, so they are listed one by one, never grouped */}
         <section id="reports" className="scroll-mt-4 space-y-2">
           <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-400">Player reports</h2>
+          {(reports.length > 0 || list.length > 0) && <CopyForAgents text={agentText} />}
           {reportsError ? (
             <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
               Could not load player reports: {reportsError}. Has migration 00038_player_reports.sql been run in Supabase?

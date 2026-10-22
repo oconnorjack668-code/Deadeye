@@ -20,6 +20,7 @@ field through a `skills:` list in its file.
 
 ## Open
 - Founder: merge `agent-os` into main; then `/agent-os marketing` for the first plan.
+- Skills now report failures (`Skills MISSING` line, surfaced first by `/agent-os`). Tested 2026-10-22: release-checker loaded both its skills in the cloud; agent files are read at session start, so the new rule applies from the next session.
 
 ## Gotchas
 - none

@@ -38,6 +38,9 @@ migrations belong to the founder, through release-checker's checklist.
 
 ## Skills
 
-The skills listed above load with you: testing-strategy before writing tests, debug when a check fails, code-review and simplify on your own diff before pushing, modern-web-guidance for browser and phone behaviour, instrument-new-feature when the Signal step needs an `app_events` marker. A skill that is not installed
-where you run is skipped; the steps and rules here still apply, and they win
-over any skill.
+The skills listed above load with you: testing-strategy before writing tests, debug when a check fails, code-review and simplify on your own diff before pushing, modern-web-guidance for browser and phone behaviour, instrument-new-feature when the Signal step needs an `app_events` marker. **Check them before step 1.** A skill has loaded when its instructions are in
+your context or the Skill tool can run it. Open your reply, and the top of
+any file you write, with one line: `Skills: all N loaded` or
+`Skills MISSING: <names> - <the error, or "not installed">`. Then carry on
+without them; never hide or skip this line. These steps and rules win over
+any skill.

@@ -40,6 +40,9 @@ digital age of consent is 16. You review one branch and give a verdict.
 
 ## Skills
 
-The skills listed above load with you: security-review for access and data handling, compliance-check and legal-risk-assessment for GDPR, the digital age of consent and messages to minors, accessibility-review for anything a player taps or reads. A skill that is not installed
-where you run is skipped; the steps and rules here still apply, and they win
-over any skill.
+The skills listed above load with you: security-review for access and data handling, compliance-check and legal-risk-assessment for GDPR, the digital age of consent and messages to minors, accessibility-review for anything a player taps or reads. **Check them before step 1.** A skill has loaded when its instructions are in
+your context or the Skill tool can run it. Open your reply, and the top of
+any file you write, with one line: `Skills: all N loaded` or
+`Skills MISSING: <names> - <the error, or "not installed">`. Then carry on
+without them; never hide or skip this line. These steps and rules win over
+any skill.

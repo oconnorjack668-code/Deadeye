@@ -9,6 +9,14 @@
     {
       "path": "/api/cron/weekly-report",
       "schedule": "0 17 * * 0,1"
+    },
+    {
+      "path": "/api/cron/agent-counts",
+      "schedule": "30 7 * * 1"
+    },
+    {
+      "path": "/api/cron/agent-counts",
+      "schedule": "30 8 * * 1"
     }
   ]
 }
