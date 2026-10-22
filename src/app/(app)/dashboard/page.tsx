@@ -24,6 +24,7 @@ import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
 import { StarterSteps } from '@/components/StarterSteps';
 import { FounderPostCard } from '@/components/FounderPostCard';
+import { DashboardClubCard } from '@/components/clubs/DashboardClubCard';
 import type { FounderPost } from '@/lib/founderPosts';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
@@ -103,7 +104,7 @@ export default async function DashboardPage() {
   }
 
   const supabase = await createClient();
-  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad, iqAnswers, follows] = await Promise.all([
+  const [subscription, metrics, shootingByZone, activeProgram, achievements, squad, iqAnswers, follows, homeClub] = await Promise.all([
     getCurrentSubscription(),
     calculateDashboardMetrics(user.id),
     getShootingByZone(user.id),
@@ -118,6 +119,8 @@ export default async function DashboardPage() {
     supabase.from('daily_iq_answers').select('id', { count: 'exact', head: true }).eq('user_id', user.id),
     // Who this player follows, for the founder post card (00050; an error before it runs)
     supabase.from('follows').select('followed_id').eq('follower_id', user.id),
+    // The player's home club (00051); an error before it runs, which hides the card
+    supabase.from('player_clubs').select('club_id').eq('user_id', user.id).maybeSingle(),
   ]);
   const followed = (follows.data ?? []).map((f) => f.followed_id);
   const { data: latestPost } = followed.length
@@ -265,6 +268,10 @@ export default async function DashboardPage() {
 
         {/* Only for a player who follows the founder, once there is a post */}
         {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}
+
+        {/* Until a home club is picked, and only after the first log so a new
+            player's first screen still asks for one thing */}
+        {!firstRun && !homeClub.error && !homeClub.data && <DashboardClubCard />}
 
         {/* Until the first log, everything below is numbers that are all still
             zero, under a Today card asking for one thing. Folded away so a new
