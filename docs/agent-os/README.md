@@ -29,6 +29,20 @@ Run it with `/agent-os` (`.claude/skills/agent-os/SKILL.md`).
 The agents are defined in `.claude/agents/`. Codex can take the builder role
 by working the `NEXT` item under the same rules.
 
+Each agent loads skills for its field (the `skills:` list in its file), such
+as testing for the builder and compliance for the safety reviewer. A skill
+that is not installed where the agent runs is skipped; the agent's own rules
+always win.
+
+## Marketing
+
+**marketing** (`.claude/agents/marketing.md`) runs on its own with
+`/agent-os marketing`: TikTok and Instagram ideas, video scripts, a posting
+calendar and founder posts, in `docs/agent-os/marketing/`. It aims content at
+the same goal: a new player logging a first session. It only drafts. Every
+post, message, ad and payment is the founder's, and no under-18 player is
+shown or named without a parent's written consent.
+
 ## Permissions
 
 | Tier | What |
@@ -49,7 +63,6 @@ Add these when activation meets its target, or when their trigger comes first:
 
 - **club-growth**: when the Wexford Blazers trial starts.
 - **support-triage**: when player problem reports pass about 5 a week.
-- **content**: promo videos and posts.
 
 ## Where it runs
 
