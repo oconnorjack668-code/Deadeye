@@ -1,11 +1,40 @@
 competition,level,gender,age_groups,run_by,region,format,source,status,last_checked
-Super League,national senior,men,senior,Basketball Ireland,all-Ireland,top national tier,https://ireland.basketball/,verified,2026-10-22
-Super League,national senior,women,senior,Basketball Ireland,all-Ireland,top national tier,https://ireland.basketball/,verified,2026-10-22
-National League Division 1,national senior,men,senior,Basketball Ireland,all-Ireland,second national tier,https://ireland.basketball/,verified,2026-10-22
-National League Division 1,national senior,women,senior,Basketball Ireland,all-Ireland,second national tier,https://ireland.basketball/,verified,2026-10-22
+Super League,national senior,men,senior,Basketball Ireland,all-Ireland,top national league tier,https://ireland.basketball/nationalleague,verified,2026-10-22
+Super League,national senior,women,senior,Basketball Ireland,all-Ireland,top national league tier,https://ireland.basketball/nationalleague,verified,2026-10-22
+Division One,national senior,men,senior,Basketball Ireland,all-Ireland,second national league tier,https://ireland.basketball/nationalleague,verified,2026-10-22
+Division One,national senior,women,senior,Basketball Ireland,all-Ireland,second national league tier,https://ireland.basketball/nationalleague,verified,2026-10-22
+Division Two,national senior,men,senior,Basketball Ireland,all-Ireland,third national league tier (men only),https://ireland.basketball/nationalleague,verified,2026-10-22
+Basketball Ireland Development League (BIDL),national development,to check,to check,Basketball Ireland,all-Ireland,development league alongside the National League,https://ireland.basketball/nationalleague,verified,2026-10-22
 U20 National League,national underage,men,U20,Basketball Ireland,all-Ireland,regional conferences then play-offs,https://ireland.basketball/-expressions-of-interest-requested-for-bidl-and-u20-men-s-national-league-2025-26,verified,2026-10-22
-National Cup U20,national underage cup,men and women,U20,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/national-cup-competitions,verified,2026-10-22
-National Cup U18,national underage cup,men and women,U18,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/national-cup-competitions,verified,2026-10-22
-National Cup U18 Shield,national underage cup,to check,U18,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/national-cup-competitions,to check,2026-10-22
-Area board underage leagues,area board underage,girls and boys,U10 U12 U14 U16 U18,each Basketball Ireland area board,by area board,local leagues; U14 and U16 club teams play in their own area board,https://ireland.basketball/uploads/ed/Images-general/Basketball%20Ireland%20National%20Area%20Board%20Regulations%202022-2023_1.pdf,verified,2026-10-22
-North East Basketball Board juvenile leagues,area board underage,to check,to check,North East Basketball Board,Cavan Monaghan Louth Meath,juvenile leagues,https://www.nebb.ie/,verified,2026-10-22
+National Cup: Pat Duffy Cup,national senior cup,men,senior,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+National Cup: Presidents' Cup,national senior cup,men,senior,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+National Cup: Paudie O'Connor Cup,national senior cup,women,senior,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+National Cup: Division One Cup,national senior cup,women,senior,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+National Intermediate Club Cup (NICC),national senior cup,men and women,senior,Basketball Ireland,all-Ireland,cup for club teams not in the National League,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+U20 National Cup,national underage cup,men and women,U20,Basketball Ireland (National Area Boards Committee),all-Ireland,cup,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+U18 National Cup,national underage cup,men and women,U18,Basketball Ireland,all-Ireland,cup; no U15 player may take part,https://ireland.basketball/nationalcupcompetitions,verified,2026-10-22
+U18 Shield,national underage cup,to check,U18,Basketball Ireland,all-Ireland,cup,https://ireland.basketball/national-cup-competitions,to check,2026-10-22
+All-Ireland Club Championship U14,national underage club championship,girls,U14,Basketball Ireland (National Area Boards Committee),all-Ireland,clubs qualify through their own area board,https://ireland.basketball/AICC,verified,2026-10-22
+All-Ireland Club Championship U14,national underage club championship,boys,U14,Basketball Ireland (National Area Boards Committee),all-Ireland,clubs qualify through their own area board,https://ireland.basketball/AICC,verified,2026-10-22
+All-Ireland Club Championship U16,national underage club championship,girls,U16,Basketball Ireland (National Area Boards Committee),all-Ireland,clubs qualify through their own area board,https://ireland.basketball/AICC,verified,2026-10-22
+All-Ireland Club Championship U16,national underage club championship,boys,U16,Basketball Ireland (National Area Boards Committee),all-Ireland,clubs qualify through their own area board,https://ireland.basketball/AICC,verified,2026-10-22
+Schools League: Minor A,schools,to check,Minor (schools grade),Post Primary Schools Committee (PPSC),all-Ireland,school teams; regional then All-Ireland play-offs,https://ireland.basketball/schoolsleague,verified,2026-10-22
+Schools League: Minor B and C,schools,to check,Minor (schools grade),Post Primary Schools Committee (PPSC),all-Ireland,school teams,https://ireland.basketball/schoolsleague,verified,2026-10-22
+"Schools League: Junior A, B and C",schools,to check,Junior (schools grade),Post Primary Schools Committee (PPSC),all-Ireland,school teams,https://ireland.basketball/schoolsleague,verified,2026-10-22
+"All-Ireland Schools Cup U19 A, B and C",schools cup,boys,U19,Post Primary Schools Committee (PPSC),all-Ireland,cup,https://ireland.basketball/schools-cup-boys,verified,2026-10-22
+"All-Ireland Schools Cup U16 A, B and C",schools cup,boys,U16,Post Primary Schools Committee (PPSC),all-Ireland,cup,https://ireland.basketball/schools-cup-boys,verified,2026-10-22
+"All-Ireland Schools Cup U19 A, B and C",schools cup,girls,U19,Post Primary Schools Committee (PPSC),all-Ireland,cup,https://ireland.basketball/20210730135704-schools-cup-girls,verified,2026-10-22
+All-Ireland Schools Cup U16 A,schools cup,girls,U16,Post Primary Schools Committee (PPSC),all-Ireland,cup,https://ireland.basketball/20210730135704-schools-cup-girls,verified,2026-10-22
+North East Basketball Board leagues,area board underage and senior,to check,underage (U16 to U18 seen) and senior,North East Basketball Board,"Cavan, Monaghan, Louth, Meath",local leagues,https://www.nebb.ie/,verified,2026-10-22
+DLBB leagues,area board underage and senior,to check (listed elsewhere as the Dublin ladies board),junior and senior,DLBB,Dublin,local leagues and the NBN23 Cup,https://www.dlbb.ie/,verified,2026-10-22
+Dublin men's area board leagues,area board underage and senior,boys and men,to check,Dublin Men's Basketball Board (to check),Dublin,local leagues,https://eirball.basketball/basketball-area-boards/ (unofficial archive),to check,2026-10-22
+Cork area board leagues,area board underage and senior,to check,to check,Basketball Cork (to check),Cork,local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+Kerry area board leagues,area board underage and senior,to check,to check,Kerry Area Basketball Board (to check),Kerry,local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+North Munster area board leagues,area board underage and senior,to check,to check,North Munster area boards (to check),"Tipperary, Limerick, Clare",local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+Galway area board leagues,area board underage and senior,to check,to check,Galway Area Basketball Board (to check),Galway,local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+Mayo area board leagues,area board underage and senior,to check,to check,Mayo Area Basketball Board (to check),Mayo,local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+North Connacht area board leagues,area board underage and senior,to check,to check,North Connacht boards (to check),"Sligo, Roscommon, Leitrim, Longford",local leagues,https://eirball.ie/area-boards-west-coast/ (unofficial archive),to check,2026-10-22
+North West area board leagues,area board underage and senior,to check,to check,North West boards (to check),Donegal and neighbouring counties,local leagues,https://eirball.ie/north-west-area-board/ (unofficial archive),to check,2026-10-22
+Midlands area board leagues,area board underage and senior,to check,to check,Midlands Area Basketball Board (to check),"Westmeath, Offaly, Laois and others",local leagues,https://eirball.basketball/basketball-area-boards/ (unofficial archive),to check,2026-10-22
+Kilkenny and South East area board leagues,area board underage and senior,to check,to check,Kilkenny and South East board (to check),Kilkenny and the South East (Wexford to check),local leagues; find out where Wexford clubs play,https://eirball.basketball/basketball-area-boards/ (unofficial archive),to check,2026-10-22
+Basketball NI leagues,area board underage and senior,to check,to check,Basketball Northern Ireland,Northern Ireland,local leagues,https://basketballni.com/,to check,2026-10-22
