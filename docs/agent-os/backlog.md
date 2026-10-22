@@ -28,10 +28,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
 - Change: a player with no saved session and no saved mode preference (`hoopiq-hoops-prefs-v1`) opens the
   logger in Enter totals. A saved preference still wins, so returning players are unchanged. Update
   `__tests__/hoops-logging.test.tsx`.
-- Signal: finished setup to first hoops session within 7 days, from 18% (3 of 17) towards 30%, read over 2
-  weekly data files. Under 30 players this is a hint; weight E0 notes above it. Baseline from
-  `/admin/funnel` on 2026-10-22 ([data](data/2026-10-22-funnel.md)): 2 of 18 all-time (11%), 0 of 12 who
-  joined in the last 7 days; compare against that.
+- Signal: finished setup to first hoops session within 7 days, from 11% (2 of 18,
+  [2026-10-22](data/2026-10-22-funnel.md)) towards 30%, read over 2 weekly data files. Under 30 players this
+  is a hint; weight E0 notes above it.
 - Built: the session-count check the first-log tips already make (`basketball/new/page.tsx`) now also
   sets Enter totals when the count is 0 and `hoopiq-hoops-prefs-v1` is empty. Nothing is written to the
   phone until the player changes mode. Offline, signed out, or no answer: Track every shot, as before.
@@ -69,7 +68,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md)
   offer reminders, the IQ question and the tracker, but never logging a session they already trained today.
 - Change: a "Trained today already? Log it by hand" link to `/basketball/new` on the "later" branch, and a
   "Log shots by hand" button beside "Open the tracker" in the sample's end card.
-- Signal: first session within 7 days of setup, 18% towards 30%; and first sessions saved on the day of setup.
+- Signal: first session within 7 days of setup, 11% towards 30%; and first sessions saved on the day of setup.
 - Safety:
 - Founder checklist:
 - Result:
