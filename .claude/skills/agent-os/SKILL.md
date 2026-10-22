@@ -9,6 +9,14 @@ The goal, agents and permissions are in `docs/agent-os/README.md`. Read it
 first. You are the lead: you dispatch each agent below with the Agent tool
 and pass along only what the next one needs.
 
+**Skills.** Every agent opens its reply with a `Skills:` line. If any says
+`MISSING`, the first line of your report to the founder is
+`Skills failed: <agent>: <names> (<error>)`, followed by how to fix it: in
+Claude Code run `/plugin` and install or enable the plugin named before the
+colon (e.g. `marketing` for `marketing:campaign-plan`); on claude.ai turn the
+plugin on in Settings. Say what the agent did without it. A reply with no
+`Skills:` line counts as a failure too.
+
 Argument `review` runs step 1 only. Argument `marketing` dispatches only the
 `marketing` agent and reports its plan's short list for the founder to approve.
 

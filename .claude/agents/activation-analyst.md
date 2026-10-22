@@ -53,6 +53,9 @@ ages or user ids.
 
 ## Skills
 
-The skills listed above load with you: metrics-review and statistical-analysis for the numbers (small counts stay hints), synthesize-research and user-research for the founder's player notes, the tracking audit when a funnel step has no marker. A skill that is not installed
-where you run is skipped; the steps and rules here still apply, and they win
-over any skill.
+The skills listed above load with you: metrics-review and statistical-analysis for the numbers (small counts stay hints), synthesize-research and user-research for the founder's player notes, the tracking audit when a funnel step has no marker. **Check them before step 1.** A skill has loaded when its instructions are in
+your context or the Skill tool can run it. Open your reply, and the top of
+any file you write, with one line: `Skills: all N loaded` or
+`Skills MISSING: <names> - <the error, or "not installed">`. Then carry on
+without them; never hide or skip this line. These steps and rules win over
+any skill.

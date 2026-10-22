@@ -31,8 +31,9 @@ by working the `NEXT` item under the same rules.
 
 Each agent loads skills for its field (the `skills:` list in its file), such
 as testing for the builder and compliance for the safety reviewer. A skill
-that is not installed where the agent runs is skipped; the agent's own rules
-always win.
+that fails to load is reported, never hidden: the agent opens its reply with a
+`Skills MISSING` line, and `/agent-os` puts it first in the report to the
+founder with the fix. The agent's own rules always win.
 
 ## Marketing
 
