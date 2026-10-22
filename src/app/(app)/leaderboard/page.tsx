@@ -97,7 +97,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
   const podiumIds = new Set(podium.map((p) => p.user_id));
   const rest = listed.filter((s) => !podiumIds.has(s.user_id));
   const leaderPoints = listed[0]?.points ?? 0;
-  const looks = needsLocation ? new Map<string, RowLook>() : await leaderboardLooks(standings.map((s) => s.user_id));
+  const looks = needsLocation ? new Map<string, RowLook>() : await leaderboardLooks(supabase, standings.map((s) => s.user_id));
   const chase = chaseFor(standings, LIST_LIMIT);
   const ranked = !!meRow && meRow.points > 0;
 
@@ -125,7 +125,13 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
               <section className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-950/70 via-zinc-900 to-zinc-950 p-5">
                 <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-red-600/20 blur-3xl" />
                 <div className="relative flex items-center gap-4">
-                  <Avatar name={profile?.display_name || meRow.player_name} emoji={profile?.avatar_emoji} color={profile?.avatar_color} size={60} />
+                  <Avatar
+                    name={profile?.display_name || meRow.player_name}
+                    emoji={profile?.avatar_emoji}
+                    color={profile?.avatar_color}
+                    photoUrl={looks.get(meRow.user_id)?.photoUrl}
+                    size={60}
+                  />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[11px] font-bold uppercase tracking-widest text-red-300/80">You · {activeLabel}</p>
                     <div className="flex items-baseline gap-2">

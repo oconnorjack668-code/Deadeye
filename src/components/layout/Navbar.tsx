@@ -15,13 +15,15 @@ import type { AppMode } from '@/lib/supabase/types';
 
 interface NavbarProps {
   profile: Profile | null;
+  /** The player's own photo, a short-lived link; the emoji shows without one */
+  photoUrl?: string | null;
   isOwner?: boolean;
   mode?: AppMode;
   /** Plays and coaches: shows the Playing / Coaching switch */
   canSwitch?: boolean;
 }
 
-export function Navbar({ profile, isOwner = false, mode: savedMode = 'playing', canSwitch = false }: NavbarProps) {
+export function Navbar({ profile, photoUrl = null, isOwner = false, mode: savedMode = 'playing', canSwitch = false }: NavbarProps) {
   // Signing out lives in Settings, as a labelled button. An unlabelled icon here,
   // right beside Settings, was easy to tap by mistake.
   const pathname = usePathname();
@@ -86,7 +88,7 @@ export function Navbar({ profile, isOwner = false, mode: savedMode = 'playing', 
                 : 'border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 text-zinc-300'
             }`}
           >
-            <Avatar name={profile?.display_name || 'Player'} emoji={profile?.avatar_emoji} color={profile?.avatar_color} size={24} />
+            <Avatar name={profile?.display_name || 'Player'} emoji={profile?.avatar_emoji} color={profile?.avatar_color} photoUrl={photoUrl} size={24} />
             <span className="text-xs font-medium hidden sm:inline">
               {profile?.display_name || 'Player'}
             </span>
