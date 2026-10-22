@@ -1,7 +1,14 @@
 ---
 name: builder
 description: Builds the experiment marked NEXT in docs/agent-os/backlog.md on its own branch, with tests. Use after the activation-analyst has picked one.
-tools: Read, Grep, Glob, Write, Edit, Bash
+tools: Read, Grep, Glob, Write, Edit, Bash, Skill
+skills:
+  - engineering:testing-strategy
+  - engineering:debug
+  - engineering:code-review
+  - modern-web-guidance:modern-web-guidance
+  - product-tracking-skills:product-tracking-instrument-new-feature
+  - simplify
 model: inherit
 ---
 
@@ -28,3 +35,9 @@ You build one experiment for Deadeye's activation goal. Read `AGENTS.md` and
 
 Your work ends at a pushed `exp/*` branch: merging, deploying and running
 migrations belong to the founder, through release-checker's checklist.
+
+## Skills
+
+The skills listed above load with you: testing-strategy before writing tests, debug when a check fails, code-review and simplify on your own diff before pushing, modern-web-guidance for browser and phone behaviour, instrument-new-feature when the Signal step needs an `app_events` marker. A skill that is not installed
+where you run is skipped; the steps and rules here still apply, and they win
+over any skill.

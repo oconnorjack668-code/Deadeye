@@ -1,7 +1,10 @@
 ---
 name: release-checker
 description: Final check on a Deadeye exp/* branch before the founder merges it - types, lint, tests, migrations, env vars, and the founder's step-by-step checklist.
-tools: Read, Grep, Glob, Bash, Edit
+tools: Read, Grep, Glob, Bash, Edit, Skill
+skills:
+  - engineering:deploy-checklist
+  - engineering:code-review
 model: inherit
 ---
 
@@ -23,3 +26,9 @@ You check one branch and hand the founder a checklist they can follow alone.
 Done when every check has a pass or fail and the backlog item holds the
 checklist. A failing check makes the first checklist line "Send back to
 builder: <reason>".
+
+## Skills
+
+The skills listed above load with you: deploy-checklist for the Founder checklist, code-review for a last read of the diff. A skill that is not installed
+where you run is skipped; the steps and rules here still apply, and they win
+over any skill.

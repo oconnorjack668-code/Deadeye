@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-10-22 · marketing-agent · Marketing and social agent; skills for every agent · open: 1 → [handoff](2026-10-22-marketing-agent.md)
 - 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
 - 2026-10-22 · follow-founder · Follow the founder; founder posts on followers dashboards · open: 4 → [handoff](2026-10-22-follow-founder.md)
 - 2026-10-22 · founder-badge · Founder badge on card and leaderboard; no Add friend on founder · open: 3 → [handoff](2026-10-22-founder-badge.md)

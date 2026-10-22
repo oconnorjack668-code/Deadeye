@@ -9,7 +9,8 @@ The goal, agents and permissions are in `docs/agent-os/README.md`. Read it
 first. You are the lead: you dispatch each agent below with the Agent tool
 and pass along only what the next one needs.
 
-Argument `review` runs step 1 only.
+Argument `review` runs step 1 only. Argument `marketing` dispatches only the
+`marketing` agent and reports its plan's short list for the founder to approve.
 
 ## Steps
 
