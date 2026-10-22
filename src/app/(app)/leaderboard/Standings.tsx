@@ -38,7 +38,7 @@ function PodiumSpot({ player, look, first }: { player: Standing; look?: RowLook;
       <Crown className={`mb-1 h-6 w-6 text-amber-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] ${first ? '' : 'invisible'}`} aria-hidden />
       <div className={`rounded-full bg-gradient-to-b p-[3px] ${tier.ring}`}>
         <div className="rounded-full bg-zinc-950">
-          <Avatar name={player.player_name} emoji={look?.emoji} color={look?.color} size={first ? 76 : 58} />
+          <Avatar name={player.player_name} emoji={look?.emoji} color={look?.color} photoUrl={look?.photoUrl} size={first ? 76 : 58} />
         </div>
       </div>
       <span className="mt-2 w-full truncate text-center text-sm font-bold text-white group-hover:underline">{player.player_name}</span>
@@ -86,7 +86,7 @@ export function StandingRow({ player, look, leaderPoints }: { player: Standing; 
       <span className={`w-7 flex-shrink-0 text-center text-sm font-black tabular-nums ${player.is_me ? 'text-red-300' : 'text-zinc-500'}`}>
         {player.rank}
       </span>
-      <Avatar name={player.player_name} emoji={look?.emoji} color={look?.color} size={40} />
+      <Avatar name={player.player_name} emoji={look?.emoji} color={look?.color} photoUrl={look?.photoUrl} size={40} />
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="truncate font-semibold text-white">{player.player_name}</span>

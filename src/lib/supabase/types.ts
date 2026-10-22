@@ -1975,6 +1975,8 @@ export interface Database {
       };
       coach_player_detail: { Args: { p_team: string; p_user: string }; Returns: Json };
       player_card: { Args: { p_user: string }; Returns: Json };
+      // The photo paths this viewer may see, by player_card's rule (00049)
+      visible_photo_paths: { Args: { p_users: string[] }; Returns: { user_id: string; path: string }[] };
       my_shot_totals: { Args: Record<string, never>; Returns: { shot_zone: string; makes: number; attempts: number }[] };
       // Service role only (00037)
       claim_founding_pro: { Args: { p_user: string; p_limit: number; p_months: number }; Returns: 'claimed' | 'already' | 'has_pro' | 'full' };
