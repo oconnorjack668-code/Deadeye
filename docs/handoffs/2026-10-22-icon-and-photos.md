@@ -31,7 +31,8 @@ friend request hidden; nothing signed out; anon refused. Safety: PASS. Migration
 ## Open
 - Founder: run `supabase/migrations/00049_photos_on_lists.sql` in the Supabase SQL editor.
 - Founder: merge `exp/profile-photos` into main through a pull request.
-- Founder: live check (below in the reply): own photo in the top bar and on the leaderboard; a friend sees it.
+- Founder: live check: own photo in the top bar and leaderboard; a friend sees an approved friends photo;
+  a photo set to only me stays an emoji for others.
 
 ## Gotchas
 - Postgres here refuses to run as root and cannot reach the scratchpad: it needed traverse permission on
