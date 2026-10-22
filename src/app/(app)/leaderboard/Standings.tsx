@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { Avatar } from '@/components/Avatar';
+import { FounderBadge } from '@/components/FounderBadge';
 import { Badge } from '@/components/ui/Badge';
 import { shareOfLeader } from '@/lib/leaderboard';
 import type { RowLook } from '@/lib/leaderboard-server';
@@ -46,6 +47,8 @@ function PodiumSpot({ player, look, first }: { player: Standing; look?: RowLook;
         <Badge variant="brand" className="mt-0.5 px-2 py-0 text-[10px]">
           You
         </Badge>
+      ) : look?.isOwner ? (
+        <FounderBadge className="mt-0.5" />
       ) : look?.level ? (
         <span className="mt-0.5 text-[11px] font-semibold text-zinc-500">Lv {look.level}</span>
       ) : null}
@@ -95,6 +98,7 @@ export function StandingRow({ player, look, leaderPoints }: { player: Standing; 
               You
             </Badge>
           )}
+          {look?.isOwner && <FounderBadge />}
           {look?.level ? (
             <span className="flex-shrink-0 rounded-md bg-zinc-800 px-1.5 py-px text-[10px] font-bold text-zinc-300">Lv {look.level}</span>
           ) : null}

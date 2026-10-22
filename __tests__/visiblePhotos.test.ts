@@ -10,7 +10,7 @@ const storage = {
   signed: [] as Array<{ path: string | null; signedUrl: string | null; error: string | null }>,
   asked: [] as string[][],
 };
-const tables: Record<string, unknown[]> = { profiles: [], player_levels: [] };
+const tables: Record<string, Array<Record<string, unknown>>> = { profiles: [], player_levels: [], user_roles: [] };
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
     storage: {
@@ -21,7 +21,18 @@ vi.mock('@/lib/supabase/admin', () => ({
         },
       }),
     },
-    from: (table: string) => ({ select: () => ({ in: async () => ({ data: tables[table] }) }) }),
+    from: (table: string) => {
+      // select, then any eq filters, then in: rows matching the eq filters
+      const filters: Array<[string, unknown]> = [];
+      const query = {
+        eq: (column: string, value: unknown) => {
+          filters.push([column, value]);
+          return query;
+        },
+        in: async () => ({ data: tables[table].filter((row) => filters.every(([c, v]) => row[c] === v)) }),
+      };
+      return { select: () => query };
+    },
   }),
 }));
 
@@ -39,6 +50,7 @@ beforeEach(() => {
   storage.asked = [];
   tables.profiles = [];
   tables.player_levels = [];
+  tables.user_roles = [];
 });
 
 describe('visiblePhotoUrls', () => {
@@ -90,7 +102,22 @@ describe('leaderboardLooks', () => {
     storage.signed = [{ path: 'b/photo.jpg', signedUrl: 'https://cdn/b', error: null }];
 
     const looks = await leaderboardLooks(client, ['b', 'c']);
-    expect(looks.get('b')).toEqual({ emoji: '🏀', color: 'red', level: 4, photoUrl: 'https://cdn/b' });
-    expect(looks.get('c')).toEqual({ emoji: '🔥', color: 'blue', level: null, photoUrl: null });
+    expect(looks.get('b')).toEqual({ emoji: '🏀', color: 'red', level: 4, photoUrl: 'https://cdn/b', isOwner: false });
+    expect(looks.get('c')).toEqual({ emoji: '🔥', color: 'blue', level: null, photoUrl: null, isOwner: false });
+  });
+
+  it('marks the owner for the Founder badge, from the owner role only', async () => {
+    tables.profiles = [
+      { id: 'owner', avatar_emoji: null, avatar_color: null },
+      { id: 'player', avatar_emoji: null, avatar_color: null },
+    ];
+    tables.user_roles = [
+      { user_id: 'owner', role: 'owner' },
+      { user_id: 'player', role: 'player' },
+    ];
+    const { client } = viewer([]);
+    const looks = await leaderboardLooks(client, ['owner', 'player']);
+    expect(looks.get('owner')?.isOwner).toBe(true);
+    expect(looks.get('player')?.isOwner).toBe(false);
   });
 });

@@ -14,6 +14,8 @@ import { Award, Flame, Lock, MapPin, Trophy } from 'lucide-react';
 import { Avatar } from '@/components/Avatar';
 import { BackButton } from '@/components/BackButton';
 import { signedPhotoUrl } from '@/lib/photos-server';
+import { ownersAmong } from '@/lib/owners-server';
+import { FounderBadge } from '@/components/FounderBadge';
 import { tierFor } from '@/lib/achievements';
 import { TIER_THEME } from '@/lib/tierTheme';
 
@@ -61,7 +63,8 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
   }
   const units = asMeasurementSystem(me?.measurement_system);
   // player_card only returns the path when this viewer may see the photo
-  const photoUrl = await signedPhotoUrl(card?.photo_path);
+  const [photoUrl, owners] = await Promise.all([signedPhotoUrl(card?.photo_path), ownersAmong(card ? [card.user_id] : [])]);
+  const isFounder = !!card && owners.has(card.user_id);
   const tier = card?.level ? tierFor(card.level) : null;
   const theme = tier ? TIER_THEME[tier.name] : null;
 
@@ -92,6 +95,11 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 className="mx-auto mb-3"
               />
               <h1 className="text-2xl font-black text-white">{card.display_name}</h1>
+              {isFounder && (
+                <div className="mt-1 flex justify-center">
+                  <FounderBadge className="px-2.5 py-0.5 text-xs" />
+                </div>
+              )}
               {tier && theme && (
                 <div className={`mt-1 inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold ${theme.chip}`}>
                   Level {card.level} · {tier.name}
@@ -109,6 +117,10 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 <Link href="/settings" className="mt-3 inline-block text-xs text-cyan-400 underline">
                   Choose what others see in Settings → Privacy
                 </Link>
+              ) : isFounder && friend.kind === 'none' ? (
+                // No Add friend on the founder's card, which every player on the
+                // public board can open. An existing friendship or request keeps its button.
+                null
               ) : (
                 // Keyed on the state the server read, so a refresh after a
                 // request starts it fresh with the new request's id
