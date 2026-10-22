@@ -15,7 +15,7 @@ const ShotTracker = dynamic(() => import('@/components/video/ShotTracker').then(
 const FormCheck = dynamic(() => import('@/components/video/FormCheck').then((m) => m.FormCheck), { ssr: false, loading: Loading });
 const JumpTest = dynamic(() => import('@/components/video/JumpTest').then((m) => m.JumpTest), { ssr: false, loading: Loading });
 
-type Tab = 'shots' | 'form' | 'jump' | 'film' | 'clips';
+export type Tab = 'shots' | 'form' | 'jump' | 'film' | 'clips';
 
 // Each tab carries a one-word label for phones: five two-word labels in a
 // five-column grid gives each cell about 68px at 360px wide, so they wrapped
@@ -33,13 +33,16 @@ export function VideoHub({
   position,
   hand,
   units,
+  initialTab = 'shots',
 }: {
   heightCm: number | null;
   position: string | null;
   hand: 'right' | 'left';
   units: MeasurementSystem;
+  /** From ?tab=, so search can open Form check or the jump test directly */
+  initialTab?: Tab;
 }) {
-  const [tab, setTab] = useState<Tab>('shots');
+  const [tab, setTab] = useState<Tab>(initialTab);
   const [formFile, setFormFile] = useState<File | null>(null);
   const [formShotMs, setFormShotMs] = useState<number | null>(null);
   const [formKey, setFormKey] = useState(0);

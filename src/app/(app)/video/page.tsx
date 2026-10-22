@@ -2,7 +2,7 @@
 import React from 'react';
 import { requireUser, getCurrentProfile, getHasPro } from '@/lib/auth';
 import { ProLock } from '@/components/ProGate';
-import { VideoHub } from './VideoHub';
+import { VideoHub, type Tab } from './VideoHub';
 import { FormTrends } from './FormTrends';
 import { createClient } from '@/lib/supabase/server';
 import { asMeasurementSystem } from '@/lib/units';
@@ -14,8 +14,13 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'Video AI - Deadeye' };
 
-export default async function VideoPage() {
+const TABS: readonly Tab[] = ['shots', 'form', 'jump', 'film', 'clips'];
+
+export default async function VideoPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const user = await requireUser();
+  // ?tab= opens one tab directly, for app search
+  const asked = (await searchParams).tab;
+  const initialTab = TABS.find((t) => t === asked) ?? 'shots';
   const [profile, isPro] = await Promise.all([getCurrentProfile(), getHasPro()]);
 
   // Form checks have been saved here since the feature shipped; this is the
@@ -53,6 +58,7 @@ export default async function VideoPage() {
           position={profile?.position ?? null}
           hand={profile?.dominant_hand === 'left' ? 'left' : 'right'}
           units={asMeasurementSystem(profile?.measurement_system)}
+          initialTab={initialTab}
         />
         {/* Each form check is free; how your form changes across them is Pro.
             Only mentioned once there are enough checks for a trend to exist,

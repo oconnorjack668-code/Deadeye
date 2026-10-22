@@ -216,7 +216,7 @@ export function SettingsClient({
         </div>
       )}
 
-      <Section icon={User} title="Account">
+      <Section icon={User} title="Account" id="account">
         <Row>
           <label className="block text-xs text-zinc-400 mb-1" htmlFor="display-name">
             Display name (shown to friends, teammates and on the leaderboard)
@@ -332,7 +332,7 @@ export function SettingsClient({
         </Row>
       </Section>
 
-      <Section icon={Lock} title="Privacy">
+      <Section icon={Lock} title="Privacy" id="privacy">
         <Toggle
           label="Show me on the public leaderboard"
           hint="Everyone, country and county rankings. Friends and teammates can always see you."
@@ -361,7 +361,7 @@ export function SettingsClient({
         </Row>
       </Section>
 
-      <Section icon={Sparkles} title="AI coaching">
+      <Section icon={Sparkles} title="AI coaching" id="ai-coaching">
         <Toggle
           label="AI coaching"
           hint="Off hides Coach everywhere and stops your weekly report being written. Your sessions, stats and video all keep working exactly as they do now - this only turns off the commentary on top of them."
@@ -384,7 +384,7 @@ export function SettingsClient({
         </div>
       </Section>
 
-      <Section icon={Globe} title="Region">
+      <Section icon={Globe} title="Region" id="region">
         <Row>
           <label className="block text-xs text-zinc-400 mb-1" htmlFor="country">
             Country
@@ -470,7 +470,7 @@ export function SettingsClient({
         </Row>
       </Section>
 
-      <Section icon={Ruler} title="Units">
+      <Section icon={Ruler} title="Units" id="units">
         <Row>
           <div className="grid grid-cols-2 gap-2">
             {(['metric', 'imperial'] as MeasurementSystem[]).map((u) => (
@@ -488,11 +488,11 @@ export function SettingsClient({
         </Row>
       </Section>
 
-      <Section icon={Bell} title="Notifications">
+      <Section icon={Bell} title="Notifications" id="notifications">
         <div className="p-2">{notifications}</div>
       </Section>
 
-      <Section icon={Crown} title="Subscription">
+      <Section icon={Crown} title="Subscription" id="subscription">
         <Link href="/pro" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           <span>
             Plan: <span className="font-semibold">{plan}</span>
@@ -501,11 +501,11 @@ export function SettingsClient({
         </Link>
       </Section>
 
-      <Section icon={Database} title="Your data">
+      <Section icon={Database} title="Your data" id="data">
         <div className="px-2 pb-2 -mt-4">{dataControls}</div>
       </Section>
 
-      <Section icon={Info} title="About">
+      <Section icon={Info} title="About" id="about">
         {/* ?site=1: opened on purpose, so the installed app shows the website
             instead of bouncing back to the dashboard (StandaloneRedirect) */}
         <Link href="/?site=1" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">

@@ -15,10 +15,11 @@ export const metadata = { title: 'Exercise Library - Deadeye' };
 export default async function ExerciseLibraryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ muscle?: string }>;
+  searchParams: Promise<{ muscle?: string; open?: string }>;
 }) {
   await requireUser();
-  const { muscle } = await searchParams;
+  // ?open=<id> opens that exercise, for app search; its #ex-<id> scrolls to it
+  const { muscle, open } = await searchParams;
   const selected = MUSCLE_GROUPS.find((m) => m.id === muscle)?.id;
   const supabase = await createClient();
 
@@ -68,7 +69,12 @@ export default async function ExerciseLibraryPage({
 
         <div className="space-y-2">
           {exercises.map((e) => (
-            <details key={e.id} className="group rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+            <details
+              key={e.id}
+              id={`ex-${e.id}`}
+              open={e.id === open}
+              className="group scroll-mt-20 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"
+            >
               <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
                 <div>
                   <div className="font-semibold text-white flex items-center gap-1.5">
