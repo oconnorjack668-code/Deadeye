@@ -1,6 +1,6 @@
 ---
 name: agent-os
-description: Runs Deadeye's Agent OS weekly loop - support triage, activation review, build, safety review, release check, pull request, marketing. Use when the founder says /agent-os or weekly review, when the Monday scheduled run starts, or when the founder asks what the agents should work on next.
+description: Runs Deadeye's Agent OS weekly loop - support triage, activation review, build, safety review, release check, pull request, marketing, clubs. Use when the founder says /agent-os or weekly review, when the Monday scheduled run starts, or when the founder asks what the agents should work on next.
 ---
 
 # Agent OS
@@ -18,8 +18,8 @@ plugin on in Settings. Say what the agent did without it. A reply with no
 `Skills:` line counts as a failure too.
 
 Arguments: `review` runs steps 1 and 2 only. `support` runs step 1 only.
-`marketing` runs step 8 only. No argument runs everything, as the Monday
-09:00 scheduled run does.
+`marketing` runs step 8 only. `clubs` runs step 8b only. No argument runs
+everything, as the Monday 09:00 scheduled run does.
 
 ## Steps
 
@@ -48,10 +48,14 @@ Arguments: `review` runs steps 1 and 2 only. `support` runs step 1 only.
    (`.claude/skills/handoff/SKILL.md`) on `agent-os`, push it, and open or
    update the pull request from `agent-os` into `main`.
 8. Dispatch `marketing`. Done when its plan exists.
+8b. Dispatch `club-growth` when `docs/agent-os/clubs/pipeline.md` has a club
+   in `talking`, `trial` or `active`, and on the first Monday of each month
+   in any case. Done when its plan exists.
 9. Report to the founder in under 20 lines: any `Skills failed` line first,
    then the numbers and biggest drop, problems found and their ranks, what
    was built, the safety verdict, the pull request links, the marketing
-   short list, and the Founder checklist. End with the exact words to send
+   short list, the clubs (stages, health, outreach drafts waiting), and the
+   Founder checklist. End with the exact words to send
    to merge, e.g. `merge 31`.
 
 ## Merging, only on the founder's word

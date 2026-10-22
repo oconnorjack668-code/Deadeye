@@ -29,7 +29,8 @@ session), or on demand with `/agent-os` (`.claude/skills/agent-os/SKILL.md`).
    messages to people.
 6. **release-checker** runs the checks and writes the founder's checklist.
 7. The lead opens a **pull request**; GitHub runs the `checks` workflow on it.
-8. **marketing** drafts the week's posts and video ideas.
+8. **marketing** drafts the week's posts and video ideas; **club-growth**
+   plans clubs (when one is in talks, on trial or active, and monthly).
 9. **Founder** reads the report and replies `merge <number>`; the agent
    merges. The founder runs any migration, checks it live and posts the
    approved content.
@@ -72,11 +73,15 @@ live app without a pull request and green checks, whoever pushes.
 - `data/`: weekly counts and paraphrased player notes, added by the founder.
 - `reports/`: one activation report per week, written by the analyst.
 
-## Parked agents
+## Clubs
 
-Add these when activation meets its target, or when their trigger comes first:
-
-- **club-growth**: when the Wexford Blazers trial starts.
+**club-growth** (`.claude/agents/club-growth.md`, `/agent-os clubs`) grows
+Deadeye through clubs, schools and academies: a pipeline of clubs in
+`docs/agent-os/clubs/pipeline.md`, outreach drafts, trial plans, each club's
+health from the weekly counts, and the coach-side features clubs need (`C`
+items in the backlog). The Wexford Blazers are the first trial. It records
+organisations and roles, never private contact details or player data, and
+every contact, offer and agreement is the founder's.
 
 ## Where it runs
 

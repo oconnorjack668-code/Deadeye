@@ -13,11 +13,39 @@ export interface ReportCounts {
   crashesOpen: number;
 }
 
+/** How clubs use Deadeye, for club-growth. Owner and test accounts are left out. */
+export interface ClubCounts {
+  coaches: number;
+  teams: number;
+  playersOnTeams: number;
+  assignmentsThisWeek: number;
+}
+
+export interface ClubRows {
+  coachProfiles: Array<{ user_id: string }>;
+  teams: Array<{ id: string; created_by: string | null }>;
+  members: Array<{ team_id: string; user_id: string; role: string }>;
+  assignmentsThisWeek: Array<{ team_id: string; created_by: string | null }>;
+}
+
+export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
+  const realTeams = new Set(rows.teams.filter((t) => !t.created_by || !excluded.has(t.created_by)).map((t) => t.id));
+  const players = new Set(
+    rows.members.filter((m) => m.role === 'player' && realTeams.has(m.team_id) && !excluded.has(m.user_id)).map((m) => m.user_id)
+  );
+  return {
+    coaches: rows.coachProfiles.filter((c) => !excluded.has(c.user_id)).length,
+    teams: realTeams.size,
+    playersOnTeams: players.size,
+    assignmentsThisWeek: rows.assignmentsThisWeek.filter((a) => realTeams.has(a.team_id) && !(a.created_by && excluded.has(a.created_by))).length,
+  };
+}
+
 function pct(count: number, of: number): string {
   return of > 0 ? ` (${Math.round((count / of) * 100)}%)` : '';
 }
 
-export function countsFile(date: string, everyone: Funnel, week: Funnel, reports: ReportCounts): string {
+export function countsFile(date: string, everyone: Funnel, week: Funnel, reports: ReportCounts, clubs?: ClubCounts): string {
   const lines = [
     `# Funnel, ${date}`,
     '',
@@ -35,6 +63,17 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
   lines.push('');
   if (everyone.biggestDrop) {
     lines.push(`Biggest drop (everyone): ${everyone.biggestDrop.from} to ${everyone.biggestDrop.to}, ${everyone.biggestDrop.lost} lost.`, '');
+  }
+  if (clubs) {
+    lines.push(
+      '## Clubs',
+      '',
+      `- Coaches set up: ${clubs.coaches}`,
+      `- Teams: ${clubs.teams}`,
+      `- Players on a team: ${clubs.playersOnTeams}`,
+      `- Assignments posted in the last 7 days: ${clubs.assignmentsThisWeek}`,
+      ''
+    );
   }
   lines.push(
     '## Problems',

@@ -10,7 +10,7 @@
 // write, and nothing else. AGENT_DATA_REPO and AGENT_DATA_BRANCH default to
 // oconnorjack668-code/deadeye and agent-os.
 import { createAdminClient } from '@/lib/supabase/admin';
-import { loadFunnel } from '@/lib/funnel-server';
+import { loadClubCounts, loadFunnel } from '@/lib/funnel-server';
 import { countsFile, countsPath, isIrishRunHour, type ReportCounts } from '@/lib/agentCounts';
 import { saveToGitHub } from '@/lib/githubFile';
 
@@ -44,7 +44,9 @@ export async function GET(request: Request) {
     return Response.json({ error: 'problem' in everyone ? everyone.problem : (week as { problem: string }).problem }, { status: 500 });
   }
   const { date, path } = countsPath(new Date());
-  const file = countsFile(date, everyone.funnel, week.funnel, await reportCounts());
+  // Club numbers are a bonus: if they fail, the funnel file still goes out
+  const [reports, clubs] = await Promise.all([reportCounts(), loadClubCounts()]);
+  const file = countsFile(date, everyone.funnel, week.funnel, reports, 'problem' in clubs ? undefined : clubs);
   const saved = await saveToGitHub(path, file, `Weekly counts for the Agent OS, ${date}`);
   if (!saved.ok) return Response.json({ error: saved.error }, { status: 502 });
   return Response.json({ saved: path });
