@@ -5,10 +5,29 @@
 // way the player likes to log remembered on the phone.
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, waitFor, act } from '@testing-library/react';
+
+// How many sessions the database says the player has saved. null is a player it
+// cannot answer for (signed out, or the request failed), as an empty client gives.
+const db = vi.hoisted(() => ({ sessions: null as number | null, asked: 0 }));
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
-vi.mock('@/lib/supabase/client', () => ({ createClient: () => ({}) }));
+vi.mock('@/lib/supabase/client', () => ({
+  createClient: () =>
+    db.sessions === null
+      ? {}
+      : {
+          auth: { getUser: async () => ({ data: { user: { id: 'player' } }, error: null }) },
+          from: () => ({
+            select: () => ({
+              eq: async () => {
+                db.asked++;
+                return { count: db.sessions, error: null };
+              },
+            }),
+          }),
+        },
+}));
 // jsdom has no layout, so no scrollIntoView; the page scrolls its error into view
 Element.prototype.scrollIntoView = vi.fn();
 
@@ -142,11 +161,53 @@ describe('Hoops session: remembered on the phone', () => {
     expect(sessionTotal()).toBe('2/2 · 100%');
   });
 
-  it('starts a new player on tracking every shot, with 10 per spot ready', async () => {
+  it('stays on tracking every shot when the database cannot say whether the player is new', async () => {
     render(<NewBasketballSessionPage />);
     expect((await screen.findByRole('button', { name: 'Track every shot' })).getAttribute('aria-pressed')).toBe('true');
-    await openTotals();
+  });
+});
+
+// The welcome screen, the Today card and the starting steps all describe
+// logging as "tap where you shot from, then how many went in", so a player's
+// first log opens there rather than on a tap after every shot.
+describe("Hoops session: a new player's first log", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    db.sessions = null;
+    db.asked = 0;
+  });
+
+  /** Waits until the page has asked the database about saved sessions, and acted on the answer */
+  async function answered() {
+    await waitFor(() => expect(db.asked).toBe(1));
+    await act(async () => {});
+  }
+
+  function pressed(name: string) {
+    return screen.getByRole('button', { name }).getAttribute('aria-pressed');
+  }
+
+  it('opens in Enter totals, with 10 per spot ready', async () => {
+    db.sessions = 0;
+    render(<NewBasketballSessionPage />);
+    await waitFor(() => expect(pressed('Enter totals')).toBe('true'));
     const tens = within(screen.getByText('How many went in?').parentElement!).getAllByRole('button');
     expect(tens).toHaveLength(11);
+    expect(localStorage.getItem(PREFS_KEY)).toBeNull();
+  });
+
+  it('keeps tracking every shot for a player who has logged a session before', async () => {
+    db.sessions = 3;
+    render(<NewBasketballSessionPage />);
+    await answered();
+    expect(pressed('Track every shot')).toBe('true');
+  });
+
+  it('keeps the mode a new player already picked on this phone', async () => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify({ mode: 'track', attempts: 10 }));
+    db.sessions = 0;
+    render(<NewBasketballSessionPage />);
+    await answered();
+    expect(pressed('Track every shot')).toBe('true');
   });
 });
