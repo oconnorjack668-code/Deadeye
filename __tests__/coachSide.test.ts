@@ -15,7 +15,8 @@ import {
 } from '@/lib/coachSide';
 
 const migrations = path.join(__dirname, '..', 'supabase', 'migrations');
-const details = fs.readFileSync(path.join(migrations, '00024_settings_region_coach.sql'), 'utf8');
+// The newest teams_details_check: 00052 widened the age groups from 00024
+const details = fs.readFileSync(path.join(migrations, '00052_team_league.sql'), 'utf8');
 const coachSide = fs.readFileSync(path.join(migrations, '00047_coach_side.sql'), 'utf8');
 const quoted = (sql: string) => [...sql.matchAll(/'([^']+)'/g)].map((m) => m[1]);
 

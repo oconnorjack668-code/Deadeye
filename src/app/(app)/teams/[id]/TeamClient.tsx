@@ -13,6 +13,8 @@ import { isSafeAppPath } from '@/lib/safePath';
 import { localDateString } from '@/lib/dates';
 import { AGE_GROUPS, ASSIGNMENT_LINKS, ROLE_LABELS, TEAM_LEVELS, type TeamRole } from '@/lib/coachSide';
 import { TeamShare } from '@/components/coach/TeamShare';
+import { LeagueOptions } from '@/components/coach/LeagueOptions';
+import { teamLeagueText } from '@/lib/leagues';
 import { ReportProblem } from '@/components/ReportProblem';
 
 export interface RosterRow {
@@ -43,6 +45,7 @@ export interface TeamDetails {
   age_group: string | null;
   level: string | null;
   season: string | null;
+  league_id: string | null;
 }
 
 export interface Assignment {
@@ -119,6 +122,8 @@ export function TeamClient({
             age_group: info.age_group || null,
             level: info.level || null,
             season: clean(info.season, 20),
+            // Sent only when changed, so the rest still saves where 00052 is not run yet
+            ...(info.league_id !== team.league_id ? { league_id: info.league_id || null } : {}),
           })
           .eq('id', teamId),
       'Team details saved.'
@@ -189,9 +194,16 @@ export function TeamClient({
         </Alert>
       )}
 
-      {(team.club_name || team.region || team.age_group || team.level || team.season) && (
+      {(team.club_name || team.region || team.age_group || team.level || team.season || teamLeagueText(team.league_id)) && (
         <p className="text-sm text-zinc-400">
-          {[team.club_name, team.age_group, team.level && team.level[0].toUpperCase() + team.level.slice(1), team.region, team.season]
+          {[
+            team.club_name,
+            team.age_group,
+            team.level && team.level[0].toUpperCase() + team.level.slice(1),
+            teamLeagueText(team.league_id),
+            team.region,
+            team.season,
+          ]
             .filter(Boolean)
             .join(' · ')}
         </p>
@@ -277,6 +289,14 @@ export function TeamClient({
                 className="rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white"
               />
             )}
+            <select
+              value={info.league_id || ''}
+              onChange={(e) => setInfo({ ...info, league_id: e.target.value || null })}
+              aria-label="League"
+              className="col-span-2 rounded-lg bg-zinc-800 px-2 py-2 text-sm text-white"
+            >
+              <LeagueOptions ageGroup={info.age_group} level={info.level} county={info.country === 'IE' ? info.region : null} />
+            </select>
             <input
               value={info.season || ''}
               onChange={(e) => setInfo({ ...info, season: e.target.value })}

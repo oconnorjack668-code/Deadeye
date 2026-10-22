@@ -1,0 +1,397 @@
+[
+ {
+  "id": "super-league-men",
+  "name": "Super League",
+  "kind": "national",
+  "cup": false,
+  "gender": "men",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "super-league-women",
+  "name": "Super League",
+  "kind": "national",
+  "cup": false,
+  "gender": "women",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "division-one-men",
+  "name": "Division One",
+  "kind": "national",
+  "cup": false,
+  "gender": "men",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "division-one-women",
+  "name": "Division One",
+  "kind": "national",
+  "cup": false,
+  "gender": "women",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "division-two-men",
+  "name": "Division Two",
+  "kind": "national",
+  "cup": false,
+  "gender": "men",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "basketball-ireland-development-league-bidl",
+  "name": "Basketball Ireland Development League (BIDL)",
+  "kind": "national",
+  "cup": false,
+  "gender": null,
+  "ages": [],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "u20-national-league-men",
+  "name": "U20 National League",
+  "kind": "national",
+  "cup": false,
+  "gender": "men",
+  "ages": [
+   "U20"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "national-cup-pat-duffy-cup-men",
+  "name": "National Cup: Pat Duffy Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "men",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "national-cup-presidents-cup-men",
+  "name": "National Cup: Presidents' Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "men",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "national-cup-paudie-o-connor-cup-women",
+  "name": "National Cup: Paudie O'Connor Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "women",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "national-cup-division-one-cup-women",
+  "name": "National Cup: Division One Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "women",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "national-intermediate-club-cup-nicc-men-and-women",
+  "name": "National Intermediate Club Cup (NICC)",
+  "kind": "national",
+  "cup": true,
+  "gender": "men and women",
+  "ages": [
+   "Senior"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "u20-national-cup-men-and-women",
+  "name": "U20 National Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "men and women",
+  "ages": [
+   "U20"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "u18-national-cup-men-and-women",
+  "name": "U18 National Cup",
+  "kind": "national",
+  "cup": true,
+  "gender": "men and women",
+  "ages": [
+   "U18"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "u18-shield",
+  "name": "U18 Shield",
+  "kind": "national",
+  "cup": true,
+  "gender": null,
+  "ages": [
+   "U18"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-club-championship-u14-girls",
+  "name": "All-Ireland Club Championship U14",
+  "kind": "national",
+  "cup": true,
+  "gender": "girls",
+  "ages": [
+   "U14"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-club-championship-u14-boys",
+  "name": "All-Ireland Club Championship U14",
+  "kind": "national",
+  "cup": true,
+  "gender": "boys",
+  "ages": [
+   "U14"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-club-championship-u16-girls",
+  "name": "All-Ireland Club Championship U16",
+  "kind": "national",
+  "cup": true,
+  "gender": "girls",
+  "ages": [
+   "U16"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-club-championship-u16-boys",
+  "name": "All-Ireland Club Championship U16",
+  "kind": "national",
+  "cup": true,
+  "gender": "boys",
+  "ages": [
+   "U16"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "schools-league-minor-a",
+  "name": "Schools League: Minor A",
+  "kind": "schools",
+  "cup": false,
+  "gender": null,
+  "ages": [],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "schools-league-minor-b-and-c",
+  "name": "Schools League: Minor B and C",
+  "kind": "schools",
+  "cup": false,
+  "gender": null,
+  "ages": [],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "schools-league-junior-a-b-and-c",
+  "name": "Schools League: Junior A, B and C",
+  "kind": "schools",
+  "cup": false,
+  "gender": null,
+  "ages": [],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-schools-cup-u19-a-b-and-c-boys",
+  "name": "All-Ireland Schools Cup U19 A, B and C",
+  "kind": "schools",
+  "cup": true,
+  "gender": "boys",
+  "ages": [
+   "U19"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-schools-cup-u16-a-b-and-c-boys",
+  "name": "All-Ireland Schools Cup U16 A, B and C",
+  "kind": "schools",
+  "cup": true,
+  "gender": "boys",
+  "ages": [
+   "U16"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-schools-cup-u19-a-b-and-c-girls",
+  "name": "All-Ireland Schools Cup U19 A, B and C",
+  "kind": "schools",
+  "cup": true,
+  "gender": "girls",
+  "ages": [
+   "U19"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "all-ireland-schools-cup-u16-a-girls",
+  "name": "All-Ireland Schools Cup U16 A",
+  "kind": "schools",
+  "cup": true,
+  "gender": "girls",
+  "ages": [
+   "U16"
+  ],
+  "region": "all-Ireland"
+ },
+ {
+  "id": "north-east-basketball-board-leagues",
+  "name": "North East Basketball Board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Cavan, Monaghan, Louth, Meath"
+ },
+ {
+  "id": "dlbb-leagues",
+  "name": "DLBB leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Dublin"
+ },
+ {
+  "id": "dublin-men-s-area-board-leagues",
+  "name": "Dublin men's area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Dublin"
+ },
+ {
+  "id": "cork-area-board-leagues",
+  "name": "Cork area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Cork"
+ },
+ {
+  "id": "kerry-area-board-leagues",
+  "name": "Kerry area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Kerry"
+ },
+ {
+  "id": "north-munster-area-board-leagues",
+  "name": "North Munster area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Tipperary, Limerick, Clare"
+ },
+ {
+  "id": "galway-area-board-leagues",
+  "name": "Galway area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Galway"
+ },
+ {
+  "id": "mayo-area-board-leagues",
+  "name": "Mayo area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Mayo"
+ },
+ {
+  "id": "north-connacht-area-board-leagues",
+  "name": "North Connacht area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Sligo, Roscommon, Leitrim, Longford"
+ },
+ {
+  "id": "north-west-area-board-leagues",
+  "name": "North West area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Donegal and neighbouring counties"
+ },
+ {
+  "id": "midlands-area-board-leagues",
+  "name": "Midlands area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Westmeath, Offaly, Laois and others"
+ },
+ {
+  "id": "kilkenny-and-south-east-area-board-leagues",
+  "name": "Kilkenny and South East area board leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Kilkenny and the South East (Wexford to check)"
+ },
+ {
+  "id": "basketball-ni-leagues",
+  "name": "Basketball NI leagues",
+  "kind": "area",
+  "cup": false,
+  "gender": null,
+  "ages": "all",
+  "region": "Northern Ireland"
+ }
+]

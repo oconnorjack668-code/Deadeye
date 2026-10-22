@@ -55,7 +55,9 @@ promise a feature that is not there.
    `last_checked` rows. For leagues, cover every age group (U10 to U20 and
    senior), girls and boys, national, area board and schools. Every row
    names its `source`; a value the source does not give stays `to check`.
-   Never guess, and never copy a person's name, email or phone. If a source
+   Never guess, and never copy a person's name, email or phone. Never change
+   an `id` (the app stores it); leave it empty on a new row, then run
+   `node scripts/build-clubs.mjs` and commit the CSVs and JSON. If a source
    site cannot be reached, say which in your reply (the environment's
    network may block it) and carry on with the rest.
 3. Write `docs/agent-os/clubs/YYYY-MM-DD-clubs.md`, under 100 lines:
