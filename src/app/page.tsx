@@ -411,8 +411,8 @@ export default async function Home() {
                 ))}
               </ul>
               <p className="mt-3 text-sm text-zinc-400">
-                Paid club plans open soon, and coaching a team is free today. Founding club offer: our first 3 clubs get 3 months
-                free, then €59.99 per team per season for two seasons. Closes 31 December 2026.
+                Paid club plans open soon, and coaching a team is free today. Founding club offer: our first 3 clubs are free until
+                31 January 2027, then pay €59.99 per team per season for as long as they stay subscribed. Closes 31 December 2026.
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-3">
                 <a
