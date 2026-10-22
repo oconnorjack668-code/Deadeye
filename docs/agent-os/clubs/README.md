@@ -3,16 +3,15 @@
 Kept by the club-growth agent (`.claude/agents/club-growth.md`). Both files
 open in Excel or Google Sheets.
 
-- `directory.csv`: every basketball club on Basketball Ireland's club finder
-  (https://ireland.basketball/find-a-club), Northern Ireland included, one
-  row each: 254 on 2026-10-22, with town and county from each club's map
-  position (OpenStreetMap). The finder can include clubs that have stopped,
-  so `status` is `listed by Basketball Ireland` until a club's own site or a
-  league confirms it is active. Organisations only: the club's name,
-  town, county, area board, levels, underage, girls' and boys' teams,
-  website and its public club contact channel. Never a person's name,
-  private email or phone, even when a club website shows one; roles such as
-  "Children's Officer" are fine.
+- `directory.csv`: Irish basketball clubs, Northern Ireland included, one
+  row each: 277 on 2026-10-22. The base is Basketball Ireland's club finder
+  (https://ireland.basketball/find-a-club, 254 clubs, town and county from
+  each map position via OpenStreetMap). The finder misses clubs, so rows
+  also come from the area boards' own club lists (DLBB, Basketball NI), club
+  pages, local news and the founder. `status` says which: `verified (...)`
+  when a club's own page or a board list shows it, `listed by Basketball
+  Ireland` for finder entries not yet confirmed active, `to check (...)`
+  when only news or an old source mentions it.
 - `leagues.csv`: the competitions a team can play in, by level, gender and
   age group: national senior leagues, national underage leagues and cups,
   each area board's underage leagues, and schools competitions.
