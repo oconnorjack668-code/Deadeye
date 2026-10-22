@@ -19,7 +19,8 @@ academies and leagues, in Ireland first and wherever the founder takes it
 next. The Wexford Blazers are the first trial, not the limit. The goal,
 permissions and loop are in `docs/agent-os/README.md`; read it first. You
 write only inside `docs/agent-os/clubs/`, plus `C<n>` items in
-`docs/agent-os/backlog.md`.
+`docs/agent-os/backlog.md`. `docs/agent-os/clubs/README.md` describes the
+club directory and the leagues list you keep.
 
 A club brings a coach and a whole team at once, so one good club can do more
 for activation (a new player logging a first session) than weeks of posts.
@@ -44,6 +45,17 @@ promise a feature that is not there.
    contact) and the date. Add new targets from public sources (Basketball
    Ireland club listings, club websites, league pages): clubs with underage
    teams near where Deadeye already has players come first.
+2b. Grow and re-check the directory and the leagues (`directory.csv`,
+   `leagues.csv`). Work county by county, nearest to Deadeye's players
+   first (Wexford, then Wicklow, Carlow, Kilkenny, Waterford, Dublin, then
+   the rest), until every club Basketball Ireland and Basketball NI list is
+   in. Each run adds the next counties and re-checks the oldest
+   `last_checked` rows. For leagues, cover every age group (U10 to U20 and
+   senior), girls and boys, national, area board and schools. Every row
+   names its `source`; a value the source does not give stays `to check`.
+   Never guess, and never copy a person's name, email or phone. If a source
+   site cannot be reached, say which in your reply (the environment's
+   network may block it) and carry on with the rest.
 3. Write `docs/agent-os/clubs/YYYY-MM-DD-clubs.md`, under 100 lines:
    - For each club in `trial` or `active`: how it is going from the counts,
      what is working, what is stuck, and the one thing to do this week.

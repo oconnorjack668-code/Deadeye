@@ -20,6 +20,7 @@ gains a Clubs section (coaches, teams, players on a team, assignments in 7 days;
 
 ## Open
 - Founder: merge the pull request; fill in the Blazers' level, age groups and trial date in the pipeline.
+- Directory and leagues started (`docs/agent-os/clubs/directory.csv`, `leagues.csv`): 2 Wexford clubs and 10 competitions, verified by web search. The cloud network blocks ireland.basketball, basketballni.com, nebb.ie and club sites; founder to allow them so the agent can finish the list.
 
 ## Gotchas
 - none

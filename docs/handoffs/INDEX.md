@@ -2,7 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
-- 2026-10-22 · club-growth · Club-growth agent for any club; club counts in Monday file · open: 1 → [handoff](2026-10-22-club-growth.md)
+- 2026-10-22 · club-growth · Club-growth agent, club directory and leagues started · open: 2 → [handoff](2026-10-22-club-growth.md)
 - 2026-10-22 · agent-automation · Monday auto-run, counts job, support-triage, PRs, merge on founder word · open: 2 → [handoff](2026-10-22-agent-automation.md)
 - 2026-10-22 · marketing-agent · Marketing and social agent; skills for every agent, failures reported · open: 2 → [handoff](2026-10-22-marketing-agent.md)
 - 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
