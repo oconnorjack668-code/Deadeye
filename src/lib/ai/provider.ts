@@ -23,10 +23,35 @@ export interface CoachingOutput {
   comparisonToPrevious?: string;
 }
 
+/** What a call is for: a chat answer, or a report (session, video, weekly, style match). */
+export type AIUse = 'chat' | 'report';
+
 export interface AIProviderConfig {
   apiKey: string;
   model: string;
+  /** The longest answer wanted, in tokens */
   maxTokens: number;
+  use?: AIUse;
+}
+
+/**
+ * The size and effort of a Claude request.
+ *
+ * Current Claude models (the 4.6 line on, and every 5 model) think before they
+ * answer, and that thinking counts against max_tokens. With max_tokens set to
+ * the answer length alone, a long think left a short or empty answer. So these
+ * models get an effort level (low for chat: quick, cheap; medium for reports:
+ * worth thinking about) and room for that thinking on top of the answer.
+ * Older models take neither.
+ */
+export function claudeRequestShape(model: string, maxTokens: number, use: AIUse = 'report'): {
+  max_tokens: number;
+  output_config?: { effort: 'low' | 'medium' };
+} {
+  if (!/^claude-(opus|sonnet|haiku|fable|mythos)-(5|4-[678])/.test(model)) return { max_tokens: maxTokens };
+  return use === 'chat'
+    ? { max_tokens: maxTokens + 1024, output_config: { effort: 'low' } }
+    : { max_tokens: maxTokens + 4096, output_config: { effort: 'medium' } };
 }
 
 export abstract class AIProvider {
@@ -204,15 +229,16 @@ export class AnthropicProvider extends AIProvider {
         'anthropic-version': AnthropicProvider.API_VERSION,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ model: config.model, max_tokens: config.maxTokens, system, messages }),
+      body: JSON.stringify({ model: config.model, ...claudeRequestShape(config.model, config.maxTokens, config.use), system, messages }),
     });
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: { message?: string } } | null;
       throw new Error(`Anthropic API error (${response.status}): ${body?.error?.message || response.statusText}`);
     }
-    const data = (await response.json()) as { content: Array<{ type: string; text?: string }> };
+    const data = (await response.json()) as { content: Array<{ type: string; text?: string }>; stop_reason?: string };
+    // Thinking blocks come first; the answer is the text block after them
     const text = data.content?.find((block) => block.type === 'text')?.text;
-    if (!text) throw new Error('No response from Anthropic');
+    if (!text) throw new Error(data.stop_reason === 'refusal' ? 'The AI coach declined to answer that' : 'No response from Anthropic');
     return text;
   }
 

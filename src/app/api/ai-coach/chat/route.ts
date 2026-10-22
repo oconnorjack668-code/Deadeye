@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
   let ai: ReturnType<typeof getConfiguredAI>;
   try {
-    ai = getConfiguredAI(700);
+    ai = getConfiguredAI(700, 'chat');
   } catch (err) {
     if (err instanceof AINotConfiguredError) return Response.json({ error: err.message }, { status: err.status });
     throw err;

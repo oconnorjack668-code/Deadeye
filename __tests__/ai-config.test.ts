@@ -16,10 +16,14 @@ beforeEach(() => {
     AI_PROVIDER: process.env.AI_PROVIDER,
     AI_API_KEY: process.env.AI_API_KEY,
     AI_MODEL: process.env.AI_MODEL,
+    AI_CHAT_MODEL: process.env.AI_CHAT_MODEL,
+    AI_REPORT_MODEL: process.env.AI_REPORT_MODEL,
   };
   delete process.env.AI_PROVIDER;
   delete process.env.AI_API_KEY;
   delete process.env.AI_MODEL;
+  delete process.env.AI_CHAT_MODEL;
+  delete process.env.AI_REPORT_MODEL;
 });
 
 afterEach(() => {
@@ -61,7 +65,35 @@ describe('getConfiguredAI', () => {
     process.env.AI_API_KEY = ANTHROPIC_KEY;
     const { provider, config } = getConfiguredAI(100);
     expect(provider.name).toBe('anthropic');
-    expect(config.model).toBe('claude-sonnet-5');
+    expect(config.model).toBe('claude-sonnet-5-5');
+  });
+
+  it('uses the cheap model for chat and the better one for reports', () => {
+    process.env.AI_API_KEY = ANTHROPIC_KEY;
+    expect(getConfiguredAI(700, 'chat').config).toMatchObject({ model: 'claude-haiku-5-5', use: 'chat' });
+    expect(getConfiguredAI(800).config).toMatchObject({ model: 'claude-sonnet-5-5', use: 'report' });
+    process.env.AI_API_KEY = OPENAI_KEY;
+    expect(getConfiguredAI(700, 'chat').config.model).toBe('gpt-4o-mini');
+  });
+
+  it('lets AI_CHAT_MODEL and AI_REPORT_MODEL each override AI_MODEL', () => {
+    process.env.AI_API_KEY = ANTHROPIC_KEY;
+    process.env.AI_MODEL = 'claude-opus-5-5';
+    expect(getConfiguredAI(100, 'chat').config.model).toBe('claude-opus-5-5');
+    process.env.AI_CHAT_MODEL = 'claude-haiku-5-5';
+    process.env.AI_REPORT_MODEL = 'claude-sonnet-5-5';
+    expect(getConfiguredAI(100, 'chat').config.model).toBe('claude-haiku-5-5');
+    expect(getConfiguredAI(100, 'report').config.model).toBe('claude-sonnet-5-5');
+  });
+
+  it('says which setting is wrong when the model belongs to the other provider', () => {
+    // The switch-over trap: an Anthropic key with AI_MODEL still gpt-4o-mini
+    process.env.AI_API_KEY = ANTHROPIC_KEY;
+    process.env.AI_MODEL = 'gpt-4o-mini';
+    expect(() => getConfiguredAI(100)).toThrow(/provider is Anthropic but the model is "gpt-4o-mini"/);
+    process.env.AI_API_KEY = OPENAI_KEY;
+    process.env.AI_MODEL = 'claude-haiku-5-5';
+    expect(() => getConfiguredAI(100)).toThrow(/provider is OpenAI/);
   });
 
   it('lets an explicit AI_PROVIDER win over the key shape', () => {
