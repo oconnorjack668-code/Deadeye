@@ -2,7 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
-- 2026-10-22 · pricing-and-claude · Club pricing sheet; AI switched to Claude Haiku/Sonnet 5.5 · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)
+- 2026-10-22 · pricing-and-claude · Club pricing sheet and founding offer; AI on Claude; club picker · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)
 - 2026-10-22 · league-and-club-board · League picker for teams; club boards with founder approval · open: 2 → [handoff](2026-10-22-league-and-club-board.md)
 - 2026-10-22 · home-club · Players pick a home club; not-listed suggestions; opt-in card badge · open: 2 → [handoff](2026-10-22-home-club.md)
 - 2026-10-22 · club-growth · Club-growth agent, club directory and leagues started · open: 2 → [handoff](2026-10-22-club-growth.md)
