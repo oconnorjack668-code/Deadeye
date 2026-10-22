@@ -49,7 +49,9 @@ promise a feature that is not there.
    `leagues.csv`). Work county by county, nearest to Deadeye's players
    first (Wexford, then Wicklow, Carlow, Kilkenny, Waterford, Dublin, then
    the rest), until every club Basketball Ireland and Basketball NI list is
-   in. Each run adds the next counties and re-checks the oldest
+   in. The finder misses clubs (Enniscorthy Basketball Club was not on it),
+   so also search each town for clubs with their own site or social page,
+   and add them with that page as the source. Each run adds the next counties and re-checks the oldest
    `last_checked` rows. For leagues, cover every age group (U10 to U20 and
    senior), girls and boys, national, area board and schools. Every row
    names its `source`; a value the source does not give stays `to check`.
