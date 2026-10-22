@@ -1,0 +1,30 @@
+# Types, lint and tests on every pull request into main, so no change, by a
+# person or an agent, merges without them passing. Make "checks" a required
+# status check on main (Settings → Branches) to enforce it.
+name: checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Next writes route types (LayoutProps) here; tsc needs them in a fresh checkout
+      - run: npx next typegen
+      - run: npx tsc --noEmit
+      - run: npx eslint .
+      - run: npm test
