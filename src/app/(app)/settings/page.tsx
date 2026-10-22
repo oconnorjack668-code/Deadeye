@@ -9,6 +9,7 @@ import { hasPro, planLabel } from '@/lib/entitlements';
 import { isTestAccount } from '@/lib/testAccounts';
 import { SettingsClient } from './SettingsClient';
 import { ResetTesterCard } from './ResetTesterCard';
+import { HomeClubCard } from './HomeClubCard';
 import { RemindersCard } from '../profile/RemindersCard';
 import { ProfileSettings } from '../profile/ProfileSettings';
 import { Settings as SettingsIcon } from 'lucide-react';
@@ -20,7 +21,7 @@ export const metadata = { title: 'Settings - Deadeye' };
 export default async function SettingsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [profile, subscription, ageCheck, { data: photoRow }, { data: coachProfile }] = await Promise.all([
+  const [profile, subscription, ageCheck, { data: photoRow }, { data: coachProfile }, { data: homeClub }] = await Promise.all([
     getCurrentProfile(),
     getCurrentSubscription(),
     getCurrentAgeCheck(),
@@ -28,6 +29,8 @@ export default async function SettingsPage() {
     supabase.from('profile_photos').select('path, status, visibility').eq('user_id', user.id).maybeSingle(),
     // Missing before 00047, which reads as not set up
     supabase.from('coach_profiles').select('user_id').eq('user_id', user.id).maybeSingle(),
+    // The player's own home club; missing before 00051, which reads as none
+    supabase.from('player_clubs').select('club_id, show_on_card').eq('user_id', user.id).maybeSingle(),
   ]);
   const photo: OwnPhoto | null = photoRow
     ? { url: await signedPhotoUrl(photoRow.path), status: photoRow.status, visibility: photoRow.visibility }
@@ -88,6 +91,13 @@ export default async function SettingsPage() {
           />
         ) : (
           <p className="text-sm text-amber-300">Could not load your settings. Please refresh the page.</p>
+        )}
+
+        {profile && (
+          <HomeClubCard
+            initial={homeClub ? { clubId: homeClub.club_id, showOnCard: homeClub.show_on_card } : null}
+            is16Plus={ageCheck?.is_16_plus ?? false}
+          />
         )}
 
         {canResetTester && user.email && <ResetTesterCard email={user.email} />}

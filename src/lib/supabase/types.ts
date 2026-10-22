@@ -321,6 +321,20 @@ export interface Database {
         };
         Relationships: [];
       };
+      // A player home club (00051): only the player reads it; written by api/profile/club
+      player_clubs: {
+        Row: { user_id: string; club_id: string; show_on_card: boolean; updated_at: string };
+        Insert: { user_id: string; club_id: string; show_on_card?: boolean; updated_at?: string };
+        Update: { club_id?: string; show_on_card?: boolean; updated_at?: string };
+        Relationships: [];
+      };
+      // "My club is not listed" (00051): written by api/clubs/suggest, read by the player and the owner
+      club_suggestions: {
+        Row: { id: string; user_id: string; club_name: string; town: string | null; county: string | null; resolved: boolean; created_at: string };
+        Insert: { id?: string; user_id: string; club_name: string; town?: string | null; county?: string | null; resolved?: boolean; created_at?: string };
+        Update: { resolved?: boolean };
+        Relationships: [];
+      };
       // Following the founder (00050): written only through set_follow
       follows: {
         Row: { follower_id: string; followed_id: string; created_at: string };
@@ -1989,6 +2003,8 @@ export interface Database {
       };
       coach_player_detail: { Args: { p_team: string; p_user: string }; Returns: Json };
       player_card: { Args: { p_user: string }; Returns: Json };
+      // The club to show on a player card, or null (00051)
+      player_club_badge: { Args: { p_user: string }; Returns: string | null };
       // Follow or unfollow the founder, and how many follow you (00050)
       set_follow: { Args: { p_user: string; p_follow: boolean }; Returns: 'following' | 'not_following' | 'not_followable' };
       follower_count: { Args: Record<string, never>; Returns: number };

@@ -17,6 +17,11 @@ open in Excel or Google Sheets.
   each area board's underage leagues, and schools competitions.
 - `pipeline.md`: the clubs Deadeye is talking to, by stage.
 
+The app's club picker (`src/data/clubs.json`) is built from
+`directory.csv` with `node scripts/build-clubs.mjs`; run it after the
+directory changes. `also_known_as` holds other names players search by
+(for example the Wexford Blazers for Wexford BC), separated by `;`.
+
 ## Age groups
 
 Basketball Ireland's national underage rules

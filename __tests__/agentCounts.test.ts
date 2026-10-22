@@ -22,7 +22,7 @@ const funnel = (joined: number, setup: number, first: number): Funnel => ({
 
 vi.mock('@/lib/funnel-server', () => ({
   loadFunnel: async (days: number) => ({ funnel: days === 0 ? funnel(24, 18, 2) : funnel(17, 12, 0), excluded: 2, eventsSince: null }),
-  loadClubCounts: async () => ({ coaches: 2, teams: 1, playersOnTeams: 9, assignmentsThisWeek: 3 }),
+  loadClubCounts: async () => ({ coaches: 2, teams: 1, playersOnTeams: 9, assignmentsThisWeek: 3, playersWithClub: 7, bigClubs: [{ name: 'Wexford BC', players: 6 }], suggestionsOpen: 1 }),
 }));
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -96,13 +96,35 @@ describe('clubCounts', () => {
       },
       excluded
     );
-    expect(counts).toEqual({ coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1 });
+    expect(counts).toEqual({ coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0 });
+  });
+
+  it('names a home club only with 5 or more players, leaving out owner and test accounts', () => {
+    const picks = (club: string, n: number, prefix: string) => Array.from({ length: n }, (_, i) => ({ user_id: `${prefix}${i}`, club_id: club }));
+    const counts = clubCounts(
+      {
+        coachProfiles: [],
+        teams: [],
+        members: [],
+        assignmentsThisWeek: [],
+        playerClubs: [
+          ...picks('wexford-bc-wexford', 5, 'w'),
+          ...picks('gorey-basketball-club-wexford', 4, 'g'),
+          { user_id: 'tester', club_id: 'gorey-basketball-club-wexford' },
+        ],
+        suggestionsOpen: 2,
+      },
+      new Set(['tester'])
+    );
+    expect(counts.playersWithClub).toBe(9);
+    expect(counts.bigClubs).toEqual([{ name: 'Wexford BC', players: 5 }]);
+    expect(counts.suggestionsOpen).toBe(2);
   });
 
   it('adds a Clubs section to the file only when there are club counts', () => {
     const base = [funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 }] as const;
     expect(countsFile('2026-10-26', ...base)).not.toContain('## Clubs');
-    expect(countsFile('2026-10-26', ...base, { coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1 })).toContain(
+    expect(countsFile('2026-10-26', ...base, { coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0 })).toContain(
       '- Players on a team: 2'
     );
   });
@@ -129,6 +151,8 @@ describe('GET /api/cron/agent-counts', () => {
     const saved = Buffer.from(body.content, 'base64').toString('utf8');
     expect(saved).toContain('| Joined | 24 (100%) | 17 (100%) |');
     expect(saved).toContain('- Assignments posted in the last 7 days: 3');
+    expect(saved).toContain('- Clubs with 5 or more players: Wexford BC (6)');
+    expect(saved).toContain('- "Club not listed" suggestions waiting: 1');
   });
 
   it('replaces this week file when the job runs twice', async () => {

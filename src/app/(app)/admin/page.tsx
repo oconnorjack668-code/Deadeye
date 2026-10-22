@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -77,6 +77,15 @@ export default async function AdminPage() {
       badge: null,
       tile: 'bg-red-600/20',
       iconColor: 'text-red-400',
+    },
+    {
+      href: '/admin/clubs',
+      icon: Shield,
+      title: 'Club suggestions',
+      desc: 'Clubs players say are missing from the list, ready to add',
+      badge: null,
+      tile: 'bg-orange-600/20',
+      iconColor: 'text-orange-400',
     },
     {
       href: '/admin/demo-videos',
