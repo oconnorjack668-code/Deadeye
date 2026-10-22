@@ -22,6 +22,7 @@ const funnel = (joined: number, setup: number, first: number): Funnel => ({
 
 vi.mock('@/lib/funnel-server', () => ({
   loadFunnel: async (days: number) => ({ funnel: days === 0 ? funnel(24, 18, 2) : funnel(17, 12, 0), excluded: 2, eventsSince: null }),
+  loadClubCounts: async () => ({ coaches: 2, teams: 1, playersOnTeams: 9, assignmentsThisWeek: 3 }),
 }));
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -34,7 +35,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 
-import { countsFile, countsPath } from '@/lib/agentCounts';
+import { clubCounts, countsFile, countsPath } from '@/lib/agentCounts';
 import { GET } from '@/app/api/cron/agent-counts/route';
 
 const fetchMock = vi.fn();
@@ -71,6 +72,42 @@ describe('countsFile', () => {
   });
 });
 
+describe('clubCounts', () => {
+  it('counts coaches, teams, players and this week assignments, leaving out owner and test accounts', () => {
+    const excluded = new Set(['owner', 'tester']);
+    const counts = clubCounts(
+      {
+        coachProfiles: [{ user_id: 'coach-1' }, { user_id: 'tester' }],
+        teams: [
+          { id: 'blazers', created_by: 'coach-1' },
+          { id: 'test-team', created_by: 'tester' },
+        ],
+        members: [
+          { team_id: 'blazers', user_id: 'coach-1', role: 'coach' },
+          { team_id: 'blazers', user_id: 'p1', role: 'player' },
+          { team_id: 'blazers', user_id: 'p2', role: 'player' },
+          { team_id: 'blazers', user_id: 'owner', role: 'player' },
+          { team_id: 'test-team', user_id: 'p3', role: 'player' },
+        ],
+        assignmentsThisWeek: [
+          { team_id: 'blazers', created_by: 'coach-1' },
+          { team_id: 'test-team', created_by: 'tester' },
+        ],
+      },
+      excluded
+    );
+    expect(counts).toEqual({ coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1 });
+  });
+
+  it('adds a Clubs section to the file only when there are club counts', () => {
+    const base = [funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 }] as const;
+    expect(countsFile('2026-10-26', ...base)).not.toContain('## Clubs');
+    expect(countsFile('2026-10-26', ...base, { coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1 })).toContain(
+      '- Players on a team: 2'
+    );
+  });
+});
+
 describe('GET /api/cron/agent-counts', () => {
   it('refuses a request without Vercel Cron secret', async () => {
     expect((await call()).status).toBe(401);
@@ -89,7 +126,9 @@ describe('GET /api/cron/agent-counts', () => {
     const body = JSON.parse(init.body) as { branch: string; content: string; sha?: string };
     expect(body.branch).toBe('agent-os');
     expect(body.sha).toBeUndefined();
-    expect(Buffer.from(body.content, 'base64').toString('utf8')).toContain('| Joined | 24 (100%) | 17 (100%) |');
+    const saved = Buffer.from(body.content, 'base64').toString('utf8');
+    expect(saved).toContain('| Joined | 24 (100%) | 17 (100%) |');
+    expect(saved).toContain('- Assignments posted in the last 7 days: 3');
   });
 
   it('replaces this week file when the job runs twice', async () => {

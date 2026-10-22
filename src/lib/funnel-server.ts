@@ -6,6 +6,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { testAccountEmails } from '@/lib/testAccounts';
 import { buildFunnel, type Funnel, type FunnelSession } from '@/lib/funnel';
+import { clubCounts, type ClubCounts } from '@/lib/agentCounts';
 
 type Admin = ReturnType<typeof createAdminClient>;
 
@@ -65,5 +66,35 @@ export async function loadFunnel(days: number): Promise<{ funnel: Funnel; exclud
     return {
       problem: /app_events/.test(message) ? 'Run 00045_app_events.sql in the Supabase SQL editor to turn this on.' : message,
     };
+  }
+}
+
+/** Coaches, teams, players on teams and this week's assignments, without owner and test accounts */
+export async function loadClubCounts(): Promise<ClubCounts | { problem: string }> {
+  try {
+    const admin = createAdminClient();
+    const { data: list, error: listError } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    if (listError) return { problem: listError.message };
+    const excluded = await excludedIds(admin, list.users);
+    const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
+    const [coachProfiles, teams, members, assignments] = await Promise.all([
+      admin.from('coach_profiles').select('user_id'),
+      admin.from('teams').select('id, created_by'),
+      admin.from('team_members').select('team_id, user_id, role'),
+      admin.from('team_assignments').select('team_id, created_by').gte('created_at', weekAgo),
+    ]);
+    const failed = [coachProfiles, teams, members, assignments].find((r) => r.error);
+    if (failed?.error) return { problem: failed.error.message };
+    return clubCounts(
+      {
+        coachProfiles: coachProfiles.data ?? [],
+        teams: teams.data ?? [],
+        members: members.data ?? [],
+        assignmentsThisWeek: assignments.data ?? [],
+      },
+      excluded
+    );
+  } catch (e) {
+    return { problem: e instanceof Error ? e.message : 'could not load club counts' };
   }
 }
