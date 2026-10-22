@@ -10,6 +10,7 @@ import type { Profile } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
 import { COACH_NAV_ITEMS, DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
 import { ModeSwitch } from './ModeSwitch';
+import { AppSearch } from '@/components/search/AppSearch';
 import { MODE_HOME, shownMode } from '@/lib/coachSide';
 import type { AppMode } from '@/lib/supabase/types';
 
@@ -66,7 +67,7 @@ export function Navbar({ profile, photoUrl = null, isOwner = false, mode: savedM
           })}
         </nav>
 
-        {/* Right side: Owner badge, Profile link, Settings */}
+        {/* Right side: Owner badge, Search, Profile link, Settings */}
         <div className="flex items-center gap-2 sm:gap-3">
           {canSwitch && <ModeSwitch mode={mode} />}
           {isOwner && (
@@ -79,6 +80,8 @@ export function Navbar({ profile, photoUrl = null, isOwner = false, mode: savedM
               <span className="hidden sm:inline">Owner Access</span>
             </Link>
           )}
+
+          <AppSearch mode={mode} isOwner={isOwner} />
 
           <Link
             href="/profile"

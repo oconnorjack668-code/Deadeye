@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { DRILL_LEVELS, DRILL_PLAYERS, DRILL_SKILLS, skillLabel, type Drill } from '@/lib/drills';
+import { cleanSearch } from '@/lib/search';
 import { ListChecks, Clock, Search, Star, User, Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -11,16 +12,6 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Drill Library - Deadeye' };
 
 type Filters = { skill?: string; level?: string; players?: string; q?: string; fav?: string; hoop?: string };
-
-/**
- * A search as typed, cut down to letters, digits, spaces, hyphens and
- * apostrophes. It goes inside a PostgREST filter, where commas, brackets and
- * wildcards would mean something.
- */
-function cleanSearch(raw: string | undefined): string | undefined {
-  const q = (raw || '').replace(/[^\p{L}\p{N} '-]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
-  return q || undefined;
-}
 
 function hrefWith(current: Filters, change: Filters): string {
   const next = { ...current, ...change };
