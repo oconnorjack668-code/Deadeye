@@ -71,7 +71,7 @@ export async function GET() {
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
 
   const admin = createAdminClient();
-  const [authUser, friendships, filmQuestions, follows, founderPosts, profile, ...tables] = await Promise.all([
+  const [authUser, friendships, filmQuestions, follows, founderPosts, clubNotices, profile, ...tables] = await Promise.all([
     admin.auth.admin.getUserById(user.id),
     admin.from('friendships').select('*').or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`),
     // Keyed by player_id rather than user_id
@@ -81,6 +81,8 @@ export async function GET() {
     admin.from('follows').select('*').eq('follower_id', user.id),
     // Posts this account wrote, for the founder
     admin.from('founder_posts').select('*').eq('author_id', user.id),
+    // Club board notices this account posted as a coach (00053)
+    admin.from('club_notices').select('*').eq('author_id', user.id),
     admin.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     ...USER_TABLES.map((table) => admin.from(table).select('*').eq('user_id', user.id)),
   ]);
@@ -105,6 +107,7 @@ export async function GET() {
   data.film_questions = filmQuestions.error ? { error: 'unavailable' } : filmQuestions.data || [];
   data.follows = follows.error ? { error: 'unavailable' } : follows.data || [];
   data.founder_posts = founderPosts.error ? { error: 'unavailable' } : founderPosts.data || [];
+  data.club_notices = clubNotices.error ? { error: 'unavailable' } : clubNotices.data || [];
 
   const body = {
     exported_at: new Date().toISOString(),

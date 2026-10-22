@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -18,6 +18,19 @@ export const metadata = { title: 'Owner tools - Deadeye' };
  * Each tool is counted on its own, so a table that does not exist yet - a
  * migration not run - shows up on its own tile instead of breaking the page.
  */
+/** Teams waiting to join a club board (00053), or null before the migration */
+async function pendingBoardLinks(): Promise<number | null> {
+  try {
+    const { count, error } = await createAdminClient()
+      .from('club_team_links')
+      .select('team_id', { count: 'exact', head: true })
+      .eq('status', 'pending');
+    return error ? null : count ?? 0;
+  } catch {
+    return null;
+  }
+}
+
 async function unread(table: 'player_reports' | 'app_errors'): Promise<{ count: number } | { problem: string }> {
   try {
     const { count, error } = await createAdminClient()
@@ -34,7 +47,7 @@ async function unread(table: 'player_reports' | 'app_errors'): Promise<{ count: 
 export default async function AdminPage() {
   if (!(await checkIsOwner())) notFound();
 
-  const [reports, crashes] = await Promise.all([unread('player_reports'), unread('app_errors')]);
+  const [reports, crashes, boardRequests] = await Promise.all([unread('player_reports'), unread('app_errors'), pendingBoardLinks()]);
 
   // Player reports have their own tile, first. They sat at the top of the
   // errors page, under a tile called "App errors", and could not be found.
@@ -84,6 +97,15 @@ export default async function AdminPage() {
       title: 'Club suggestions',
       desc: 'Clubs players say are missing from the list, ready to add',
       badge: null,
+      tile: 'bg-orange-600/20',
+      iconColor: 'text-orange-400',
+    },
+    {
+      href: '/admin/club-boards',
+      icon: Users,
+      title: 'Club boards',
+      desc: boardRequests === null ? 'Run 00053_club_board.sql in the Supabase SQL editor to turn these on' : 'Approve teams asking to join their club board',
+      badge: boardRequests ? `${boardRequests} waiting` : null,
       tile: 'bg-orange-600/20',
       iconColor: 'text-orange-400',
     },

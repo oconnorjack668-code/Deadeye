@@ -26,7 +26,7 @@ export default async function TeamPage({
   const { data: team } = await supabase.from('teams').select('id, name, join_code, club_name, country, region, age_group, level, season').eq('id', id).maybeSingle();
   if (!team) notFound(); // not a member (RLS) or no such team
 
-  const [roster, assignments, completions, league] = await Promise.all([
+  const [roster, assignments, completions, league, clubLink] = await Promise.all([
     supabase.rpc('team_roster', { p_team: id }),
     supabase
       .from('team_assignments')
@@ -37,6 +37,8 @@ export default async function TeamPage({
     supabase.from('team_assignment_completions').select('assignment_id, user_id, team_assignments!inner(team_id)').eq('team_assignments.team_id', id),
     // On its own, so the team still opens where 00052 is not run yet
     supabase.from('teams').select('league_id').eq('id', id).maybeSingle(),
+    // Missing before 00053: no club board yet
+    supabase.from('club_team_links').select('club_id, status').eq('team_id', id).maybeSingle(),
   ]);
   const rows = (roster.data || []) as RosterRow[];
   const me = rows.find((r) => r.user_id === user.id);
@@ -67,6 +69,7 @@ export default async function TeamPage({
           isStaff={isStaff(me?.role)}
           myName={profile?.display_name || 'Coach'}
           openShare={share === '1'}
+          clubLink={clubLink.error ? null : clubLink.data ?? null}
           team={{
             club_name: team.club_name ?? null,
             country: team.country ?? null,

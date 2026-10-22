@@ -335,6 +335,20 @@ export interface Database {
         Update: { resolved?: boolean };
         Relationships: [];
       };
+      // Club board (00053): a team on its club board once the owner approves; written through request_club_link
+      club_team_links: {
+        Row: { team_id: string; club_id: string; status: 'pending' | 'approved'; requested_by: string | null; created_at: string; approved_at: string | null };
+        Insert: { team_id: string; club_id: string; status?: 'pending' | 'approved'; requested_by?: string | null; created_at?: string; approved_at?: string | null };
+        Update: { club_id?: string; status?: 'pending' | 'approved'; approved_at?: string | null };
+        Relationships: [];
+      };
+      // Club board notices (00053): written through post_club_notice, read through club_notices_for
+      club_notices: {
+        Row: { id: string; club_id: string; team_id: string | null; author_id: string; body: string; created_at: string };
+        Insert: { id?: string; club_id: string; team_id?: string | null; author_id: string; body: string; created_at?: string };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       // Following the founder (00050): written only through set_follow
       follows: {
         Row: { follower_id: string; followed_id: string; created_at: string };
@@ -2009,6 +2023,36 @@ export interface Database {
       player_card: { Args: { p_user: string }; Returns: Json };
       // The club to show on a player card, or null (00051)
       player_club_badge: { Args: { p_user: string }; Returns: string | null };
+      // Club board (00053)
+      can_read_club: { Args: { p_club: string }; Returns: boolean };
+      request_club_link: { Args: { p_team: string; p_club: string }; Returns: 'pending' | 'approved' };
+      remove_club_link: { Args: { p_team: string }; Returns: void };
+      post_club_notice: { Args: { p_team: string; p_body: string }; Returns: string };
+      delete_club_notice: { Args: { p_id: string }; Returns: void };
+      club_notices_for: {
+        Args: { p_club: string };
+        Returns: { id: string; body: string; created_at: string; author_name: string; team_name: string | null; mine: boolean }[];
+      };
+      club_teams: {
+        Args: { p_club: string };
+        Returns: {
+          team_id: string;
+          name: string;
+          age_group: string | null;
+          league_id: string | null;
+          players: number;
+          sessions_7d: number | null;
+          shots_7d: number | null;
+          active_7d: number | null;
+          mine: boolean;
+        }[];
+      };
+      set_club_challenge: { Args: { p_team: string; p_metric: 'sessions' | 'shots'; p_target: number; p_days: number }; Returns: void };
+      end_club_challenge: { Args: { p_team: string }; Returns: void };
+      club_challenge_for: {
+        Args: { p_club: string };
+        Returns: { metric: 'sessions' | 'shots'; target: number; starts_on: string; ends_on: string; progress: number }[];
+      };
       // Follow or unfollow the founder, and how many follow you (00050)
       set_follow: { Args: { p_user: string; p_follow: boolean }; Returns: 'following' | 'not_following' | 'not_followable' };
       follower_count: { Args: Record<string, never>; Returns: number };

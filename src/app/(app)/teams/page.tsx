@@ -1,11 +1,13 @@
 // src/app/(app)/teams/page.tsx
 import React from 'react';
 import Link from 'next/link';
+import { ClubBoardLink } from '@/components/clubs/ClubBoardLink';
 import { requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { TeamsActions } from './TeamsActions';
 import { Shield, ChevronRight } from 'lucide-react';
 import { isStaff, ROLE_LABELS, type TeamRole } from '@/lib/coachSide';
+import { clubById } from '@/lib/clubs';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Teams - Deadeye' };
@@ -15,6 +17,11 @@ export default async function TeamsPage() {
   const supabase = await createClient();
   const { data, error } = await supabase.from('team_members').select('role, teams(id, name)').eq('user_id', user.id);
   const teams = ((data || []) as unknown as Array<{ role: TeamRole; teams: { id: string; name: string } | null }>).filter((m) => m.teams);
+  // The club boards your teams are on (00053); none before the migration
+  const { data: links } = teams.length
+    ? await supabase.from('club_team_links').select('club_id').eq('status', 'approved').in('team_id', teams.map((m) => m.teams!.id))
+    : { data: [] };
+  const boards = [...new Set((links || []).map((l) => l.club_id))].map(clubById).filter((c) => c !== null);
 
   return (
     <div className="flex-1 overflow-auto">
@@ -40,6 +47,9 @@ export default async function TeamsPage() {
                 Coach home: all your teams this week <ChevronRight className="h-4 w-4" />
               </Link>
             )}
+            {boards.map((club) => (
+              <ClubBoardLink key={club.id} club={club} />
+            ))}
             {teams.length > 0 && (
               <section className="space-y-2">
                 {teams.map((m) => (

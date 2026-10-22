@@ -202,6 +202,14 @@ export default function PrivacyPage() {
             or remove your club at any time in Settings; it is deleted with your account.
           </p>
           <p>
+            A team can join its club board once we have checked with the club. The board is for that club&apos;s
+            teams only: their players and coaches. It shows notices from head coaches and each team&apos;s training
+            totals for the week, only for teams of 3 or more players, and never a single player&apos;s name or
+            numbers. Nobody can reply to a notice or message anyone through it, and notices cannot hold emails,
+            phone numbers or links. A coach&apos;s notices are in their data download and are deleted with their
+            account.
+          </p>
+          <p>
             You can follow the founder of Deadeye to see their posts (challenges, tips and app updates) on your
             dashboard. We store that you follow them. The founder sees how many players follow, never who, and you
             cannot message each other through it. Unfollow at any time from their player card; following is deleted
