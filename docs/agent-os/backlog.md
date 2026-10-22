@@ -17,7 +17,7 @@ Each item:
 - Result: <after a week live: the numbers, then kept or dropped>
 ```
 
-## E1 · First log opens in "Enter totals" · review (exp/E1-totals-first-log)
+## E1 · First log opens in "Enter totals" · shipped 2026-10-22
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals-first-log` (commit 34cd6a8, 1 commit ahead of main)
 
@@ -56,7 +56,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
      "Track every shot" for a moment while the app checks for saved sessions.
   5. With an account that has logged before, Log shots still opens in "Track every shot", unless that
      phone has a mode saved.
-- Result:
+- Live check (2026-10-22, founder): merged to main (pull request 18). A new account's first log opens in
+  Enter totals; an account that has logged before still opens in Track every shot.
+- Result: read after a week live, from `/admin/funnel` "Everyone", against 2 of 18 (11%).
 
 ## E2 · "Trained already? Log it" for players away from a court · idea
 
