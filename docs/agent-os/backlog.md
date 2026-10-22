@@ -17,9 +17,9 @@ Each item:
 - Result: <after a week live: the numbers, then kept or dropped>
 ```
 
-## E1 · First log opens in "Enter totals" · NEXT
+## E1 · First log opens in "Enter totals" · review (exp/E1-totals-first-log)
 
-Report: [2026-10-22](reports/2026-10-22-activation.md)
+Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals-first-log` (commit 34cd6a8, 1 commit ahead of main)
 
 - Hypothesis: the welcome screen, the Today card and the starting steps all promise "tap where you shot from,
   then how many went in" (Enter totals). But `src/app/(app)/basketball/new/page.tsx` opens a new player in
@@ -29,9 +29,32 @@ Report: [2026-10-22](reports/2026-10-22-activation.md)
   logger in Enter totals. A saved preference still wins, so returning players are unchanged. Update
   `__tests__/hoops-logging.test.tsx`.
 - Signal: finished setup to first hoops session within 7 days, from 18% (3 of 17) towards 30%, read over 2
-  weekly data files. Under 30 players this is a hint; weight E0 notes above it.
-- Safety:
+  weekly data files. Under 30 players this is a hint; weight E0 notes above it. New baseline from
+  `/admin/funnel` on 2026-10-22: 0 of 12 ([data](data/2026-10-22-funnel.md)); compare against that.
+- Built: the session-count check the first-log tips already make (`basketball/new/page.tsx`) now also
+  sets Enter totals when the count is 0 and `hoopiq-hoops-prefs-v1` is empty. Nothing is written to the
+  phone until the player changes mode. Offline, signed out, or no answer: Track every shot, as before.
+  3 new tests in `__tests__/hoops-logging.test.tsx`; the new-player test fails on main.
+- Safety: PASS (2026-10-22). Files: `src/app/(app)/basketball/new/page.tsx`, `__tests__/hoops-logging.test.tsx`.
+  Parent gate: no new feature, only the default of the existing logger behind the app's age gate. New
+  personal data: none; reads the player's own session count (already read for the tips) and a key on the
+  phone, writes nothing. Messages: no new copy; the existing Enter totals tip is neutral. AI provider, public
+  surfaces: not touched. Access: client query on `training_sessions` for the signed-in user, under its
+  existing row-level security (00002); no new route or table. Test file: no rules apply.
+- Release check (2026-10-22): `npx tsc --noEmit` pass (a fresh clone needs `npx next typegen` first, for
+  `LayoutProps` in `src/app/layout.tsx`; not this branch). `npx eslint` on both changed files pass.
+  `npm test` pass, 729 passed, 1 skipped. New migrations: none. New `.env.example` variables: none.
 - Founder checklist:
+  1. Migrations to run in the Supabase SQL editor: none.
+  2. Env vars to set in Vercel: none.
+  3. Merge: on github.com open a pull request from `exp/E1-totals-first-log` into `main` and merge it.
+     (Locally: `git checkout main && git merge --ff-only exp/E1-totals-first-log && git push`.) Then merge
+     `agent-os` into `main` the same way, so the backlog and reports land too.
+  4. After Vercel deploys, check deadeyeapp.vercel.app with a tester account that has no saved session,
+     in a private window: Log shots opens with "Enter totals" pressed and the "Step 1 of 3" tip. It may show
+     "Track every shot" for a moment while the app checks for saved sessions.
+  5. With an account that has logged before, Log shots still opens in "Track every shot", unless that
+     phone has a mode saved.
 - Result:
 
 ## E2 · "Trained already? Log it" for players away from a court · idea
