@@ -34,6 +34,9 @@ instead.
 - Session handoffs: before picking up earlier work, read
   `docs/handoffs/INDEX.md`; when a session ends, write one, following
   `.claude/skills/handoff/SKILL.md`.
+- Agent OS: activation work (the weekly funnel loop, its backlog, its agents
+  and their permissions) runs from `docs/agent-os/README.md`. Read it before
+  taking a backlog item.
 - Never read, print, commit, or modify `.env.local`. Use `.env.example` for
   configuration requirements.
 - Before handing work over, run the smallest relevant verification, report the
