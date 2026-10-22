@@ -2,7 +2,7 @@
 // __tests__/agentCounts.test.ts
 // The weekly counts job (api/cron/agent-counts): Vercel's secret is required,
 // the file holds counts only, and it lands on the agent branch in GitHub.
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Funnel } from '@/lib/funnel';
 
 const funnel = (joined: number, setup: number, first: number): Funnel => ({
@@ -39,10 +39,17 @@ import { GET } from '@/app/api/cron/agent-counts/route';
 
 const fetchMock = vi.fn();
 beforeEach(() => {
+  // A Monday at 07:30 UTC in summer: 08:30 in Ireland, the run that works
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-07-27T07:30:00Z'));
   process.env.CRON_SECRET = 'cron-secret';
   process.env.AGENT_DATA_GITHUB_TOKEN = 'gh-token';
   fetchMock.mockReset();
   vi.stubGlobal('fetch', fetchMock);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });
 
 const call = (auth?: string) => GET(new Request('http://localhost/api/cron/agent-counts', { headers: auth ? { authorization: auth } : {} }));
@@ -89,6 +96,20 @@ describe('GET /api/cron/agent-counts', () => {
     fetchMock.mockResolvedValueOnce({ ok: true, json: async () => ({ sha: 'abc' }) }).mockResolvedValueOnce({ ok: true, status: 200 });
     await call('Bearer cron-secret');
     expect(JSON.parse((fetchMock.mock.calls[1][1] as { body: string }).body).sha).toBe('abc');
+  });
+
+  it('works only on the Monday run that is 08:30 in Ireland, summer or winter', async () => {
+    // Summer: the 08:30 UTC run is 09:30 in Ireland, so it does nothing
+    vi.setSystemTime(new Date('2026-07-27T08:30:00Z'));
+    expect((await (await call('Bearer cron-secret')).json()).skipped).toBeTruthy();
+    // Winter: 07:30 UTC is 07:30 in Ireland, so that one does nothing
+    vi.setSystemTime(new Date('2026-01-26T07:30:00Z'));
+    expect((await (await call('Bearer cron-secret')).json()).skipped).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+    // Winter: 08:30 UTC is 08:30 in Ireland, so it works
+    vi.setSystemTime(new Date('2026-01-26T08:30:00Z'));
+    fetchMock.mockResolvedValueOnce({ ok: false, status: 404 }).mockResolvedValueOnce({ ok: true, status: 201 });
+    expect((await call('Bearer cron-secret')).status).toBe(200);
   });
 
   it('says so when the GitHub token is missing', async () => {

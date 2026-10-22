@@ -22,6 +22,10 @@ write only inside `docs/agent-os/`.
   reports themselves, copied from Owner tools → Player reports → "Copy for
   the agents", with names and contact details taken out.
 
+A report marked "Held back" could say who a player is, so its text stayed in
+Owner tools. Count it, rank it from its page if you can, and ask the founder
+to describe the problem in their own words.
+
 If the counts say reports are open and you have no report text newer than
 them, say so first and ask the founder to copy it. Then triage what you have.
 

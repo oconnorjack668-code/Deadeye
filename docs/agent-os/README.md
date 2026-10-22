@@ -17,7 +17,7 @@ Everything the agents build serves that number until the target is met.
 It runs by itself every Monday at 09:00 Irish time (a scheduled cloud
 session), or on demand with `/agent-os` (`.claude/skills/agent-os/SKILL.md`).
 
-1. **Weekly counts job** (`api/cron/agent-counts`, Monday 07:00 UTC) saves
+1. **Weekly counts job** (`api/cron/agent-counts`, Monday 08:30 Irish time) saves
    this week's funnel and problem counts to `data/`. Counts only. Without
    its token set, the founder pastes them as before (`data/README.md`).
 2. **support-triage** reads problem and crash reports, finds causes, ranks

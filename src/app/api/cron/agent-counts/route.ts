@@ -1,17 +1,17 @@
 // src/app/api/cron/agent-counts/route.ts
-// Every Monday before the 9:00 Agent OS run: works out this week's funnel and
+// Every Monday at 08:30 Irish time, before the 9:00 Agent OS run: works out this week's funnel and
 // problem counts and saves them to docs/agent-os/data/ on the agent branch in
 // GitHub, so the agents get fresh numbers without the founder pasting them.
 // Agents never touch the database; only these counts leave it.
 //
-// Protected by CRON_SECRET (sent by Vercel Cron). Monday 07:00 UTC, before 9:00
-// Irish time in summer and winter. Needs AGENT_DATA_GITHUB_TOKEN (githubFile.ts),
+// Protected by CRON_SECRET (sent by Vercel Cron). Scheduled at 07:30 and 08:30
+// UTC; only the one that is 08:30 in Ireland works (isIrishRunHour). Needs AGENT_DATA_GITHUB_TOKEN (githubFile.ts),
 // a fine-grained GitHub token for this one repository with Contents read and
 // write, and nothing else. AGENT_DATA_REPO and AGENT_DATA_BRANCH default to
 // oconnorjack668-code/deadeye and agent-os.
 import { createAdminClient } from '@/lib/supabase/admin';
 import { loadFunnel } from '@/lib/funnel-server';
-import { countsFile, countsPath, type ReportCounts } from '@/lib/agentCounts';
+import { countsFile, countsPath, isIrishRunHour, type ReportCounts } from '@/lib/agentCounts';
 import { saveToGitHub } from '@/lib/githubFile';
 
 export const dynamic = 'force-dynamic';
@@ -33,6 +33,10 @@ export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return Response.json({ error: 'Not allowed.' }, { status: 401 });
+  }
+  // ?now=1 runs it at once, for a check by hand with the secret
+  if (!isIrishRunHour(new Date()) && new URL(request.url).searchParams.get('now') !== '1') {
+    return Response.json({ skipped: 'Not 08:30 in Ireland; the other Monday run does the work.' });
   }
 
   const [everyone, week] = await Promise.all([loadFunnel(0), loadFunnel(7)]);

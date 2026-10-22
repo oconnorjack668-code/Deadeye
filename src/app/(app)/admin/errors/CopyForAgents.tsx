@@ -1,7 +1,7 @@
 // src/app/(app)/admin/errors/CopyForAgents.tsx
 // "Copy for the agents": the open reports with names and contact details
-// taken out (src/lib/redact.ts), for support-triage. Shown first, so the
-// founder sees exactly what they are copying.
+// taken out, and any report that could still say who someone is held back
+// (src/lib/redact.ts), for support-triage.
 'use client';
 
 import React, { useState } from 'react';
@@ -24,8 +24,9 @@ export function CopyForAgents({ text }: { text: string }) {
     <details className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
       <summary className="cursor-pointer text-sm font-semibold text-white">Copy for the agents</summary>
       <p className="mt-2 text-xs text-zinc-400">
-        Open reports and crashes with names, emails, numbers and links taken out. Read it before you paste it: free text can
-        still hold something no rule catches. Paste it to support-triage, or save it as docs/agent-os/data/YYYY-MM-DD-reports.md.
+        Open reports and crashes with names, emails, numbers, links and ages taken out. A report that could still say who
+        someone is (a school, a place, an address or a name) is held back, and you read it here yourself. Paste the rest to
+        support-triage, or save it as docs/agent-os/data/YYYY-MM-DD-reports.md.
       </p>
       <textarea readOnly value={text} rows={10} className="mt-3 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3 font-mono text-xs text-zinc-200" />
       <button

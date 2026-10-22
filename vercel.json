@@ -12,7 +12,11 @@
     },
     {
       "path": "/api/cron/agent-counts",
-      "schedule": "0 7 * * 1"
+      "schedule": "30 7 * * 1"
+    },
+    {
+      "path": "/api/cron/agent-counts",
+      "schedule": "30 8 * * 1"
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 Agents cannot read the live database, so this folder is all the data they get.
 
-- `YYYY-MM-DD-funnel.md`: written every Monday at 07:00 UTC by the weekly
+- `YYYY-MM-DD-funnel.md`: written every Monday at 08:30 Irish time by the weekly
   counts job (`api/cron/agent-counts`), from the same numbers as
   `/admin/funnel`, owner and test accounts left out, plus how many problem and
   crash reports are open. Counts only. Until `AGENT_DATA_GITHUB_TOKEN` is set

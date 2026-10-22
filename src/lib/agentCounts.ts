@@ -51,6 +51,16 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
   return lines.join('\n');
 }
 
+/**
+ * Vercel Cron runs in UTC, so the job is scheduled at 07:30 and 08:30 UTC on
+ * Mondays and only works on the run that is 08:30 in Ireland: 07:30 UTC in
+ * summer time, 08:30 UTC in winter. The other run does nothing.
+ */
+export function isIrishRunHour(now: Date): boolean {
+  const hour = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Dublin', hour: '2-digit', hourCycle: 'h23' }).format(now);
+  return hour === '08';
+}
+
 /** The file's date and path: the Monday it runs, in Irish time */
 export function countsPath(now: Date): { date: string; path: string } {
   const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Dublin' }).format(now);
