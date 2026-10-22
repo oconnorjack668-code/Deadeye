@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-10-22 · signup-email-limit · Auth email via Gmail SMTP, friendly limit message, test page hydration fix · open: 2 → [handoff](2026-10-22-signup-email-limit.md)
 - 2026-10-21 · training-gaps · Warm-ups, off-ball drills, drill timer, easier versions, metre sprints; live, tester-checked · open: 2 → [handoff](2026-10-21-training-gaps.md)
 - 2026-10-21 · coach-side-c1-c2 · Coach setup, coach home, mode switch, safeguarding; live, tester-checked · open: 5 → [handoff](2026-10-21-coach-side-c1-c2.md)
 - 2026-10-21 · funnel-demo-progress-coach-plan · Player funnel, landing demo, progress cards, add friend, FAQ; coach plan · open: 8 → [handoff](2026-10-21-funnel-demo-progress-coach-plan.md)
