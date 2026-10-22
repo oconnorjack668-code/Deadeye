@@ -1,12 +1,14 @@
 // src/app/(app)/settings/page.tsx
 import React from 'react';
-import { requireUser, getCurrentProfile, getCurrentSubscription, getCurrentAgeCheck } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getCurrentSubscription, getCurrentAgeCheck, checkIsOwner } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { signedPhotoUrl } from '@/lib/photos-server';
 import { AvatarEditor, type OwnPhoto } from '@/components/profile/AvatarEditor';
 import { asMeasurementSystem } from '@/lib/units';
 import { hasPro, planLabel } from '@/lib/entitlements';
+import { isTestAccount } from '@/lib/testAccounts';
 import { SettingsClient } from './SettingsClient';
+import { ResetTesterCard } from './ResetTesterCard';
 import { RemindersCard } from '../profile/RemindersCard';
 import { ProfileSettings } from '../profile/ProfileSettings';
 import { Settings as SettingsIcon } from 'lucide-react';
@@ -32,6 +34,8 @@ export default async function SettingsPage() {
     : null;
   const plan = planLabel(subscription);
   const isPro = hasPro(subscription);
+  // The same check /api/account/reset-tester makes: tester logins only, never the owner
+  const canResetTester = isTestAccount(user.email) && !(await checkIsOwner().catch(() => true));
 
   return (
     <div className="flex-1 overflow-auto">
@@ -85,6 +89,8 @@ export default async function SettingsPage() {
         ) : (
           <p className="text-sm text-amber-300">Could not load your settings. Please refresh the page.</p>
         )}
+
+        {canResetTester && user.email && <ResetTesterCard email={user.email} />}
       </div>
     </div>
   );

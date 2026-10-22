@@ -1,6 +1,6 @@
 # Agent OS first loop: review, fresh counts, E1 built (2026-10-22)
 
-Agent: Claude Code, Opus 5.5 · Commits: a0bf61c, 08822dc, 608c6a2 and the counts fix (agent-os); 34cd6a8 (exp/E1-totals-first-log) · Status: in progress (both branches pushed, not merged)
+Agent: Claude Code, Opus 5.5 · Commits: a0bf61c, 08822dc, 608c6a2 and the counts fix (agent-os); 34cd6a8 (exp/E1-totals-first-log) · Status: merged to main (8a7fc36); live check pending
 
 ## Outcome
 First run of the weekly loop. The activation analyst wrote the first report and ranked E1-E3. Fresh
