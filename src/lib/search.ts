@@ -50,6 +50,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   { id: 'perf-test', group: 'do', title: 'Run a performance test', hint: 'Sprints, agility and more, to track over time', href: '/workouts/tests/new', keywords: ['test', 'sprint', 'speed', 'agility', 'benchmark', 'fitness', 'metres', 'meters'] },
   { id: 'add-friend', group: 'do', title: 'Add a friend', hint: 'Swap friend codes', href: '/friends', keywords: ['friend', 'friend code', 'invite', 'add', 'mates'] },
   { id: 'join-team', group: 'do', title: 'Join a team', hint: 'With the code your coach gave you', href: '/teams', keywords: ['team', 'team code', 'club', 'join', 'squad'] },
+  { id: 'home-club', group: 'do', title: 'Pick your club', hint: 'The club you play for, private unless you show it', href: '/settings#club', keywords: ['club', 'home club', 'team', 'badge'], modes: BOTH },
   { id: 'reminders', group: 'do', title: 'Set a reminder', hint: 'A nudge on the days you want to train', href: '/settings#notifications', keywords: ['reminder', 'notification', 'notifications', 'push', 'alert', 'nudge'], modes: BOTH },
   { id: 'sample', group: 'do', title: 'Watch the tracker call a session', hint: 'A 30-second sample clip', href: '/welcome/sample', keywords: ['sample', 'demo', 'try', 'example', 'how it works'] },
   { id: 'install', group: 'do', title: 'Add Deadeye to your home screen', hint: 'It opens full screen, like any app', href: '/install', keywords: ['install', 'home screen', 'app', 'download', 'iphone', 'android', 'shortcut'], modes: BOTH },
