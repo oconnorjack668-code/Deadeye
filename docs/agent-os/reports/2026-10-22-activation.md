@@ -6,7 +6,7 @@ starting steps (10-21), and tracker `app_events` were not yet recorded, so it ca
 
 **Update, later on 2026-10-22: fresh counts in [`data/2026-10-22-funnel.md`](../data/2026-10-22-funnel.md).**
 They come from `/admin/funnel`, not the 10-19 SQL, so read the change as a hint. The biggest drop is the same
-step and worse: all-time, 2 of 18 who finished setup logged a session (11%, was 3 of 17); of the 12 who set up
+step and worse: all-time, 2 of 18 who finished setup logged a session (11%; the 10-19 count of 3 of 17 most likely included the founder's own account); of the 12 who set up
 in the last 7 days, none has. Only 2 players saw the welcome screen since it was recorded (10-21), and none
 played the sample or opened the tracker. New players are not reaching the camera, which strengthens the case
 for a by-hand first log: E1 stays NEXT. E3's markers would show where the 12 stop.

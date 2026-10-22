@@ -3,7 +3,10 @@
 A small team of agents working on one goal: **activation**, a new player
 logging their first session within 7 days of finishing setup.
 
-- Baseline, 2026-10-19: 3 of 17 players who finished setup (18%).
+- Baseline, 2026-10-22: 2 of 18 players who finished setup (11%), from
+  `/admin/funnel` "Everyone" with owner and test accounts left out. The first
+  count (2026-10-19: 3 of 17, 18%) most likely included the founder's own
+  account.
 - Target: 40% by 2026-11-19. On that date the founder keeps, raises or
   replaces the target.
 
