@@ -1,6 +1,6 @@
 # Tester reset: start a tester login again as a new player (2026-10-22)
 
-Agent: Claude Code, Opus 5.5 · Commits: 7af585b (exp/tester-reset) · Status: in progress (branch pushed, not merged)
+Agent: Claude Code, Opus 5.5 · Commits: 7af585b (exp/tester-reset) · Status: shipped (merged 4a418a3, founder checked it live)
 
 ## Outcome
 Logins in `TEST_ACCOUNT_EMAILS`, never the owner, get a "Tester: start again as a new player" card at the
@@ -25,13 +25,11 @@ can re-run the E1 live check, and any first-run check, without a new email addre
 ## Checks
 tsc, eslint on the 7 changed files, `npm test` (739 passed, 1 skipped): pass. Safety: PASS (no new personal
 data kept, no messages to players, server-side access check, no new table). No migrations, no new env vars.
-Not run against a live Supabase: this session has no credentials.
+Checked live by the founder after the merge.
 
 ## Open
-- Founder: put the tester's email in `TEST_ACCOUNT_EMAILS` in Vercel and redeploy, if it is not there already.
-- Founder: merge `exp/tester-reset` into main through a pull request.
-- Founder: on the tester, Settings → bottom card → password, RESET, "Reset to a new player"; then the E1 check.
-- After the live check passes: mark E1 `shipped 2026-10-22` in `docs/agent-os/backlog.md`.
+- none. Done 2026-10-22: merged to main, tester email in `TEST_ACCOUNT_EMAILS`, reset checked live by the
+  founder, E1 marked `shipped`.
 
 ## Gotchas
 - If Supabase refuses the password after the delete (its own policy can be stricter), the old account is gone
