@@ -11,12 +11,15 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import type { createClient } from '@/lib/supabase/server';
 import { visiblePhotoUrls } from '@/lib/photos-server';
+import { ownersAmong } from '@/lib/owners-server';
 
 export interface RowLook {
   emoji: string | null;
   color: string | null;
   level: number | null;
   photoUrl: string | null;
+  /** The Deadeye owner, shown with the Founder badge */
+  isOwner: boolean;
 }
 
 export async function leaderboardLooks(
@@ -28,10 +31,11 @@ export async function leaderboardLooks(
   if (ids.length === 0) return looks;
   try {
     const admin = createAdminClient();
-    const [{ data: profiles }, { data: levels }, photos] = await Promise.all([
+    const [{ data: profiles }, { data: levels }, photos, owners] = await Promise.all([
       admin.from('profiles').select('id, avatar_emoji, avatar_color').in('id', ids),
       admin.from('player_levels').select('user_id, level').in('user_id', ids),
       visiblePhotoUrls(viewer, ids),
+      ownersAmong(ids),
     ]);
     const levelOf = new Map((levels || []).map((l) => [l.user_id, l.level]));
     for (const p of profiles || []) {
@@ -40,6 +44,7 @@ export async function leaderboardLooks(
         color: p.avatar_color,
         level: levelOf.get(p.id) ?? null,
         photoUrl: photos.get(p.id) ?? null,
+        isOwner: owners.has(p.id),
       });
     }
   } catch {
