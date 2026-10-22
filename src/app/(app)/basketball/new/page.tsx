@@ -264,9 +264,12 @@ export default function NewBasketballSessionPage() {
   // First-time tips, only for a player with no session saved yet. Asked of the
   // database rather than remembered on the phone, so a player who logged on
   // another device is not walked through it again. Offline, no tips.
+  //
+  // That first log also opens in "Enter totals", the where-then-how-many the
+  // welcome screen and Today card describe, unless the player has already
+  // picked a mode on this phone.
   const [guideOn, setGuideOn] = useState(false);
   useEffect(() => {
-    if (readFlag(LOG_GUIDE_HIDDEN_KEY)) return;
     let cancelled = false;
     (async () => {
       try {
@@ -277,7 +280,9 @@ export default function NewBasketballSessionPage() {
           .from('training_sessions')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', userId);
-        if (!cancelled && !error && count === 0) setGuideOn(true);
+        if (cancelled || error || count !== 0) return;
+        if (!readFlag(LOG_GUIDE_HIDDEN_KEY)) setGuideOn(true);
+        if (!localStorage.getItem(PREFS_KEY)) setMode('totals');
       } catch {
         // Tips are a nicety: without an answer, the page works as it always did
       }
