@@ -34,7 +34,8 @@ export function shownMode(saved: AppMode, pathname: string): AppMode {
 export const MODE_HOME: Record<AppMode, string> = { playing: '/dashboard', coaching: '/coach' };
 
 /** Age groups and levels, exactly as teams_details_check (00024) accepts them. */
-export const AGE_GROUPS = ['U10', 'U12', 'U14', 'U16', 'U18', 'U20', 'Senior', 'Masters', 'Mixed'] as const;
+// Basketball Ireland grades U9 to U18 by year of birth, then U20 (00052)
+export const AGE_GROUPS = ['U9', 'U10', 'U11', 'U12', 'U13', 'U14', 'U15', 'U16', 'U17', 'U18', 'U20', 'Senior', 'Masters', 'Mixed'] as const;
 export const TEAM_LEVELS = [
   { value: 'recreational', label: 'Recreational' },
   { value: 'school', label: 'School' },

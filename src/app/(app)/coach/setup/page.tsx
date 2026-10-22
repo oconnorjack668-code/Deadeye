@@ -20,6 +20,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { Alert } from '@/components/ui/Alert';
 import { TeamShare } from '@/components/coach/TeamShare';
+import { LeagueOptions } from '@/components/coach/LeagueOptions';
 import { AGE_GROUPS, TEAM_LEVELS, clearTeamInvite, pendingTeamInvite } from '@/lib/coachSide';
 import { normaliseCode } from '@/lib/friends';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
@@ -55,6 +56,7 @@ export default function CoachSetupPage() {
   const [teamName, setTeamName] = useState('');
   const [ageGroup, setAgeGroup] = useState('');
   const [level, setLevel] = useState('club');
+  const [league, setLeague] = useState('');
   const [joinCode, setJoinCode] = useState('');
   const [team, setTeam] = useState<{ name: string; code: string } | null>(null);
 
@@ -150,6 +152,11 @@ export default function CoachSetupPage() {
       p_level: level,
     });
     if (createError || !id) return fail(createError?.message || 'Could not create the team. Please try again.');
+    // The league is a team detail like the others, set once the team exists
+    if (league) {
+      const { error: leagueError } = await supabase.from('teams').update({ league_id: league }).eq('id', id);
+      if (leagueError) setError('Your team is made, but its league did not save. Set it in Team details on the team page.');
+    }
     const { data: created } = await supabase.from('teams').select('name, join_code').eq('id', id).maybeSingle();
     setBusy(false);
     if (!created) {
@@ -283,6 +290,15 @@ export default function CoachSetupPage() {
                 options={[{ value: '', label: 'Choose' }, ...AGE_GROUPS.map((a) => ({ value: a, label: a }))]}
               />
               <Select label="Level" value={level} onChange={(e) => setLevel(e.target.value)} options={TEAM_LEVELS.map((l) => ({ value: l.value, label: l.label }))} />
+            </div>
+            <div className="space-y-1.5">
+              <Select label="League" value={league} onChange={(e) => setLeague(e.target.value)}>
+                <LeagueOptions ageGroup={ageGroup} level={level} />
+              </Select>
+              <p className="text-xs text-zinc-500">
+                {ageGroup ? `Leagues that fit ${ageGroup} teams come first.` : 'Choose the age group first to see the leagues that fit.'} You can change
+                it later.
+              </p>
             </div>
             <Button variant="primary" className="w-full" isLoading={busy} onClick={() => void createTeam()}>
               Create team

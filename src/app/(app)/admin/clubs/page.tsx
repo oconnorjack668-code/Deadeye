@@ -19,10 +19,10 @@ export const metadata = { title: 'Club suggestions - Deadeye' };
 
 const csvField = (v: string) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
 
-/** A row for docs/agent-os/clubs/directory.csv, in its column order */
+/** A row for docs/agent-os/clubs/directory.csv, in its column order. The id stays empty: scripts/build-clubs.mjs gives it one. */
 function directoryRow(name: string, town: string | null, county: string | null, date: string): string {
   return [
-    name, '', 'club', town || 'to check', county || 'to check', 'Ireland', 'to check', 'to check', 'to check', 'to check', 'to check',
+    '', name, '', 'club', town || 'to check', county || 'to check', 'Ireland', 'to check', 'to check', 'to check', 'to check', 'to check',
     'to check', 'to check', 'player suggestion in the app', 'to check (player suggestion)', date, 'Suggested by players; confirm it exists.',
   ].map(csvField).join(',');
 }

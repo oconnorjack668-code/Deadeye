@@ -1541,6 +1541,8 @@ export interface Database {
           age_group: string | null;
           level: string | null;
           season: string | null;
+          // Added by 00052_team_league.sql
+          league_id: string | null;
         };
         Insert: {
           id?: string;
@@ -1554,6 +1556,7 @@ export interface Database {
           age_group?: string | null;
           level?: string | null;
           season?: string | null;
+          league_id?: string | null;
         };
         Update: {
           name?: string;
@@ -1563,6 +1566,7 @@ export interface Database {
           age_group?: string | null;
           level?: string | null;
           season?: string | null;
+          league_id?: string | null;
         };
         Relationships: [];
       };

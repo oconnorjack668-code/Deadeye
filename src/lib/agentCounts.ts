@@ -4,6 +4,7 @@
 // Counts only: no names, emails, ids or report text ever go in it.
 import type { Funnel } from '@/lib/funnel';
 import { clubById } from '@/lib/clubs';
+import { LEAGUE_NOT_LISTED } from '@/lib/leagues';
 
 /** A club is named in counts only with this many players or more, so no child can be picked out */
 export const CLUB_COUNT_MIN = 5;
@@ -29,6 +30,10 @@ export interface ClubCounts {
   bigClubs: Array<{ name: string; players: number }>;
   /** "My club is not listed" suggestions waiting for the founder */
   suggestionsOpen: number;
+  /** Teams whose coach picked a league from the list (00052) */
+  teamsWithLeague: number;
+  /** Teams whose coach said their league is not in the list */
+  teamsLeagueNotListed: number;
 }
 
 export interface ClubRows {
@@ -38,6 +43,7 @@ export interface ClubRows {
   assignmentsThisWeek: Array<{ team_id: string; created_by: string | null }>;
   playerClubs?: Array<{ user_id: string; club_id: string }>;
   suggestionsOpen?: number;
+  teamLeagues?: Array<{ id: string; league_id: string | null }>;
 }
 
 export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
@@ -52,6 +58,14 @@ export function clubCounts(rows: ClubRows, excluded: Set<string>): ClubCounts {
     assignmentsThisWeek: rows.assignmentsThisWeek.filter((a) => realTeams.has(a.team_id) && !(a.created_by && excluded.has(a.created_by))).length,
     ...homeClubCounts(rows.playerClubs ?? [], excluded),
     suggestionsOpen: rows.suggestionsOpen ?? 0,
+    ...leagueCounts((rows.teamLeagues ?? []).filter((t) => realTeams.has(t.id))),
+  };
+}
+
+function leagueCounts(teams: Array<{ league_id: string | null }>) {
+  return {
+    teamsWithLeague: teams.filter((t) => t.league_id && t.league_id !== LEAGUE_NOT_LISTED).length,
+    teamsLeagueNotListed: teams.filter((t) => t.league_id === LEAGUE_NOT_LISTED).length,
   };
 }
 
@@ -102,6 +116,8 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
         clubs.bigClubs.length ? clubs.bigClubs.map((c) => `${c.name} (${c.players})`).join(', ') : 'none yet'
       }`,
       `- "Club not listed" suggestions waiting: ${clubs.suggestionsOpen}`,
+      `- Teams with a league picked: ${clubs.teamsWithLeague}`,
+      `- Teams whose league is not in the list: ${clubs.teamsLeagueNotListed}`,
       ''
     );
   }

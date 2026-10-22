@@ -17,10 +17,17 @@ open in Excel or Google Sheets.
   each area board's underage leagues, and schools competitions.
 - `pipeline.md`: the clubs Deadeye is talking to, by stage.
 
-The app's club picker (`src/data/clubs.json`) is built from
-`directory.csv` with `node scripts/build-clubs.mjs`; run it after the
-directory changes. `also_known_as` holds other names players search by
-(for example the Wexford Blazers for Wexford BC), separated by `;`.
+The app reads both files through `node scripts/build-clubs.mjs`: the home
+club picker (`src/data/clubs.json`, from `directory.csv`) and the league a
+coach picks for a team (`src/data/leagues.json`, from `leagues.csv`). Run it
+after either file changes, and commit the CSV and the JSON together.
+`also_known_as` holds other names players search by (for example the Wexford
+Blazers for Wexford BC), separated by `;`.
+
+**The `id` column is fixed.** The app stores it (a player's home club, a
+team's league), so never change or reuse an id, even when a row's name or
+county changes. Leave `id` empty on a new row: the script gives it one and
+writes it into the CSV.
 
 ## Age groups
 
@@ -37,14 +44,16 @@ Every row has its `source` and a `status`: `verified` (seen on the source,
 on `last_checked`) or `to check`. Nothing is guessed: a value the source
 does not give stays `to check`.
 
-## Where this goes next
+## In the app
 
-1. The directory becomes the list a player picks their home club from
-   (private by default; club-growth sees counts of 5 or more only).
-2. `leagues.csv` becomes the list a coach picks from when making a team
-   (for example U18 boys → the area board U18 league, the National Cup U18).
-
-Both are app features built later, from these files.
+1. Players pick their home club from the directory in Settings (00051).
+   It is private unless they show it on their card; club-growth sees counts
+   of 5 or more only.
+2. Coaches pick their team's league from `leagues.csv` at coach setup and
+   in Team details (00052). Leagues for the team's age group come first,
+   then its county's area board, then schools competitions for a school
+   team, then every other competition. "My league isn't listed" is counted
+   in the Monday file, so a rise means the list has a gap to fill.
 
 ## Sources
 

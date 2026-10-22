@@ -22,7 +22,7 @@ const funnel = (joined: number, setup: number, first: number): Funnel => ({
 
 vi.mock('@/lib/funnel-server', () => ({
   loadFunnel: async (days: number) => ({ funnel: days === 0 ? funnel(24, 18, 2) : funnel(17, 12, 0), excluded: 2, eventsSince: null }),
-  loadClubCounts: async () => ({ coaches: 2, teams: 1, playersOnTeams: 9, assignmentsThisWeek: 3, playersWithClub: 7, bigClubs: [{ name: 'Wexford BC', players: 6 }], suggestionsOpen: 1 }),
+  loadClubCounts: async () => ({ coaches: 2, teams: 1, playersOnTeams: 9, assignmentsThisWeek: 3, playersWithClub: 7, bigClubs: [{ name: 'Wexford BC', players: 6 }], suggestionsOpen: 1, teamsWithLeague: 1, teamsLeagueNotListed: 0 }),
 }));
 vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: () => ({
@@ -96,7 +96,7 @@ describe('clubCounts', () => {
       },
       excluded
     );
-    expect(counts).toEqual({ coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0 });
+    expect(counts).toEqual({ coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0, teamsWithLeague: 0, teamsLeagueNotListed: 0 });
   });
 
   it('names a home club only with 5 or more players, leaving out owner and test accounts', () => {
@@ -121,10 +121,35 @@ describe('clubCounts', () => {
     expect(counts.suggestionsOpen).toBe(2);
   });
 
+  it('counts teams with a league and teams whose league is not listed, leaving out test teams', () => {
+    const counts = clubCounts(
+      {
+        coachProfiles: [],
+        teams: [
+          { id: 'a', created_by: 'coach-1' },
+          { id: 'b', created_by: 'coach-2' },
+          { id: 'c', created_by: 'coach-3' },
+          { id: 'd', created_by: 'tester' },
+        ],
+        members: [],
+        assignmentsThisWeek: [],
+        teamLeagues: [
+          { id: 'a', league_id: 'super-league-men' },
+          { id: 'b', league_id: 'other' },
+          { id: 'c', league_id: null },
+          { id: 'd', league_id: 'cork-area-board-leagues' },
+        ],
+      },
+      new Set(['tester'])
+    );
+    expect(counts.teamsWithLeague).toBe(1);
+    expect(counts.teamsLeagueNotListed).toBe(1);
+  });
+
   it('adds a Clubs section to the file only when there are club counts', () => {
     const base = [funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 }] as const;
     expect(countsFile('2026-10-26', ...base)).not.toContain('## Clubs');
-    expect(countsFile('2026-10-26', ...base, { coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0 })).toContain(
+    expect(countsFile('2026-10-26', ...base, { coaches: 1, teams: 1, playersOnTeams: 2, assignmentsThisWeek: 1, playersWithClub: 0, bigClubs: [], suggestionsOpen: 0, teamsWithLeague: 0, teamsLeagueNotListed: 0 })).toContain(
       '- Players on a team: 2'
     );
   });
