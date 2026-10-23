@@ -27,5 +27,5 @@ Agent: Claude Code · Commits: see `git log -- src/lib/video/sampleClip.ts` · S
 - Repro: a local `next dev` plus Playwright (Pixel 7) pressing play 12 times left the clip unattached once; after the fix 0 of 30. Playwright's Chromium cannot play H.264, so the play-through check served a VP9 WebM copy of the clip through `page.route` (10 of 10 playing within 1.3s).
 - The camera was tested on a temporary page under the public `/parents/` path (removed, never committed), with Chromium's fake camera and getUserMedia delayed up to 40ms: 10 of 20 black before, 0 of 35 after. Delete `.next/dev` after removing such a page or `next build` fails on its stale types.
 - `next dev` stops once to print the security notice; run it again.
-- This container cannot reach deadeye.ie (network policy); the user can add it under Allowed domains.
+- The live site is deadeyeapp.vercel.app (deadeye.ie is not bought yet). This container cannot reach it (network policy); the user can add it under Allowed domains.
 - The bench prints through `console.log`, which vitest hides here. Set `DEADEYE_BENCH_OUT` to a file and read that.
