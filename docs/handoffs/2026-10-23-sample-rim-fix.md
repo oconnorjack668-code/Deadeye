@@ -1,12 +1,13 @@
-# Sample clip, camera start and Next.js security fixes (2026-10-23)
+# Sample clip, camera start, Next.js security and dashboard spacing fixes (2026-10-23)
 
-Agent: Claude Code · Commits: see `git log -- src/lib/video/sampleClip.ts` · Status: rim fix and sample start fix merged (oconnorjack668-code/Deadeye#36, #37); camera fix and Next.js 16.4.2 pushed to `agent-os`
+Agent: Claude Code · Commits: see `git log -- src/lib/video/sampleClip.ts` · Status: rim fix and sample start fix merged (oconnorjack668-code/Deadeye#36, #37); camera fix and Next.js 16.4.2 merged (#38); club card spacing pushed to `agent-os`
 
 ## Outcome
 - On the tracker sample clip (landing demo and /welcome/sample), the rim marker ran past the ring onto the bracket. Its far end now sits on the ring's far edge. The user spotted it.
 - The sample sometimes sat on a black screen saying "Starting…" until a reload (the user hit it twice). The clip was attached on the next animation frame; after the landing page's download await, that frame could come before the video had rendered, so the clip was never attached. It is now attached in an effect once the video exists.
 - The live camera had the same race after `await getUserMedia`: a black picture. Camera, file and sample now all go through one `attachRef` effect.
 - Next.js 16.4.0 to 16.4.2: fixes two critical remote code execution advisories (image optimiser with SVG, `use cache` typed arrays) and a Server Actions denial of service. vite and vitest bumped by `npm audit fix`.
+- Dashboard: "Pick your club" sat flush against the workload box below it; both of its states now carry `mb-4` like the cards around it. The user spotted it.
 
 ## Decisions
 - Exposure before the upgrade: Server Actions are used (4 files), so the denial of service applied; `next/image` is used but SVG optimisation is not enabled, and `use cache` is not used.
