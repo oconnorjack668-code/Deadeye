@@ -9,11 +9,16 @@ export const SAMPLE_POSTER = '/samples/tracker-sample-poster.jpg';
 /**
  * The first 34 seconds of bench clip 16606 (README, clip bench), re-encoded to
  * 1280 wide H.264 so every phone can play it - the original is HEVC. The rim is
- * the bench's own taps. Run through the bench the way the app runs it
- * (DEADEYE_BENCH_APP=1) on 2026-10-21, this file was called 6 of 6 right:
- * makes at 4.1, 13.9, 20.3 and 25.2s, misses at 8.5 and 31.1s.
+ * the bench's near tap and the ring's far edge: the bench's far tap
+ * (0.5865, 0.1991) sat on the bracket, and the marker showed it. The far edge
+ * is 0.79 of the way between those taps, the same point the promo's rim line
+ * was moved to (docs/handoffs/2026-10-21-promo-rim-line-fix.md). Labels:
+ * makes at 4.1, 13.9, 20.3 and 25.2s, misses at 8.5 and 31.1s. Through the
+ * bench the way the app runs it (DEADEYE_BENCH_APP=1) on 2026-10-23, this file
+ * was called 5 of 5 right, with the 20.3s make never called - the same as with
+ * the old taps, and the makes now cross nearer the ring's centre.
  */
-export const SAMPLE_RIM = rimFromEdges({ x: 0.5253, y: 0.2194 }, { x: 0.5865, y: 0.1991 });
+export const SAMPLE_RIM = rimFromEdges({ x: 0.5253, y: 0.2194 }, { x: 0.5736, y: 0.2034 });
 export const SAMPLE_TRUTH = { makes: 4, attempts: 6 };
 
 let download: Promise<string> | null = null;
