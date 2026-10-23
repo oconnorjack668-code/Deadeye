@@ -42,13 +42,13 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Deadeye - the basketball app that watches your shot',
   description:
-    'Point your phone at the hoop and Deadeye counts every make and miss. Form check, training programs, an AI coach and basketball IQ, free to start.',
+    'Point your phone at the hoop and Deadeye counts your makes and misses. Form check, training programs, an AI coach and basketball IQ, free to start.',
 };
 
 const TRACKER_POINTS = [
   'No sensors, no wearables, no special ball. Just your phone on a tripod or a bag.',
   'Live from the camera, or from a video you filmed earlier.',
-  'Can call every make and miss out loud, so you never walk back to check the phone.',
+  'Can call each make and miss out loud, so you never walk back to check the phone.',
   'Every shot can be corrected before it is saved, so your numbers stay honest.',
 ];
 
@@ -109,11 +109,11 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
     },
     {
       q: 'Do I have to hold my phone while I shoot?',
-      a: 'No. Prop it on a tripod, a bag or a bench, 3 to 6 metres from the hoop and off to one side, with the whole ring in shot. Tap the two sides of the rim once, then just shoot: Deadeye counts every make and miss.',
+      a: 'No. Prop it on a tripod, a bag or a bench, 3 to 6 metres from the hoop and off to one side, with the whole ring in shot. Tap the two sides of the rim once, then just shoot: Deadeye counts your makes and misses.',
     },
     {
       q: 'How accurate is the shot tracker?',
-      a: 'It calls every shot as a make or a miss, and you can fix any call before you save, so your numbers stay honest. Good light and the whole ring and net in shot help most. You can watch it count a real session further up this page.',
+      a: 'It calls each shot it sees as a make or a miss, and you can fix any call before you save, so your numbers stay honest. Good light and the whole ring and net in shot help most. You can watch it count a real session further up this page.',
     },
     {
       q: 'Do my videos get uploaded?',
@@ -173,7 +173,7 @@ export default async function Home() {
               The basketball app that watches your shot
             </h1>
             <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-400 sm:text-lg">
-              Point your phone at the hoop and Deadeye counts every make and miss for you. Then it checks your form,
+              Point your phone at the hoop and Deadeye counts your makes and misses for you. Then it checks your form,
               plans your training and tells you what to work on next.
             </p>
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">

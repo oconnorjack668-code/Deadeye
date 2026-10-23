@@ -16,7 +16,8 @@ export const SAMPLE_POSTER = '/samples/tracker-sample-poster.jpg';
  * makes at 4.1, 13.9, 20.3 and 25.2s, misses at 8.5 and 31.1s. Through the
  * bench the way the app runs it (DEADEYE_BENCH_APP=1) on 2026-10-23, this file
  * was called 5 of 5 right, with the 20.3s make never called - the same as with
- * the old taps, and the makes now cross nearer the ring's centre.
+ * the old taps, and the makes now cross nearer the ring's centre. That miss is
+ * the headless bench only: in the app the founder sees all six called.
  */
 export const SAMPLE_RIM = rimFromEdges({ x: 0.5253, y: 0.2194 }, { x: 0.5736, y: 0.2034 });
 export const SAMPLE_TRUTH = { makes: 4, attempts: 6 };
