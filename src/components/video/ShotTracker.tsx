@@ -193,12 +193,10 @@ export function ShotTracker({
       streamRef.current = stream;
       setSource('camera');
       startCalibrating();
-      requestAnimationFrame(() => {
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          videoRef.current.play().catch(() => undefined);
-        }
-      });
+      attachRef.current = (video) => {
+        video.srcObject = stream;
+        video.play().catch(() => undefined);
+      };
     } catch (err) {
       const name = err instanceof DOMException ? err.name : null;
       if (name === 'NotAllowedError') {
@@ -218,14 +216,33 @@ export function ShotTracker({
     setVideoFile(file);
     setSource('file');
     startCalibrating();
-    requestAnimationFrame(() => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = null;
-        videoRef.current.src = URL.createObjectURL(file);
-        videoRef.current.currentTime = 0.1;
-      }
-    });
+    attachRef.current = (video) => {
+      video.srcObject = null;
+      video.src = URL.createObjectURL(file);
+      video.currentTime = 0.1;
+    };
   }
+
+  /**
+   * What the camera, a file or the sample is waiting to put in the video. The
+   * video element only renders once the step has moved on from 'source', so
+   * this is attached by the effect below, after that render.
+   *
+   * It used to be attached on the next animation frame. After an await - the
+   * camera's getUserMedia, the landing page's sample download - that frame
+   * could come before React had rendered the video, nothing was attached, and
+   * the player sat on a black screen until they reloaded. Locally on 23 Oct
+   * 2026: the sample 1 run in 12, the camera 10 in 20 when it took a moment
+   * to start, as it does on a phone.
+   */
+  const attachRef = useRef<((video: HTMLVideoElement) => void) | null>(null);
+  useEffect(() => {
+    const video = videoRef.current;
+    const attach = attachRef.current;
+    if (!video || !attach) return;
+    attachRef.current = null;
+    attach(video);
+  }, [step]);
 
   // Tap the ring's left and right edges, then fine-tune both in a magnified
   // view before tracking starts. Tracking used to start on the second tap, with
@@ -645,13 +662,8 @@ export function ShotTracker({
   /**
    * Plays the built-in sample with its rim already set. The video element only
    * exists once the step has moved on from 'source' (and is a fresh one after
-   * review), so the clip is attached by the effect below once it has rendered,
+   * review), so the clip is attached through attachRef once it has rendered,
    * and sampleReady starts tracking when it has loaded.
-   *
-   * It used to be attached on the next animation frame, as openFile does. After
-   * the landing page's await that frame could come before React had rendered
-   * the video, the clip was never attached, and the player sat on "Starting…"
-   * until they reloaded - 1 run in 12 locally on 23 Oct 2026.
    */
   async function startSample() {
     if (!sample) return;
@@ -676,19 +688,11 @@ export function ShotTracker({
     setStep('calibrate');
     sampleNotifiedRef.current = false;
     samplePendingRef.current = true;
-    sampleSrcRef.current = src;
+    attachRef.current = (video) => {
+      video.srcObject = null;
+      video.src = src;
+    };
   }
-
-  /** The clip startSample is waiting to attach, until the video has rendered. */
-  const sampleSrcRef = useRef<string | null>(null);
-  useEffect(() => {
-    const video = videoRef.current;
-    const src = sampleSrcRef.current;
-    if (!video || !src) return;
-    sampleSrcRef.current = null;
-    video.srcObject = null;
-    video.src = src;
-  }, [step]);
 
   /**
    * The video's onLoadedData: tracking starts once the sample can play.
