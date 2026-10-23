@@ -8,6 +8,7 @@ Agent: Claude Code · Commits: see `git log -- src/lib/video/sampleClip.ts` · S
 - The live camera had the same race after `await getUserMedia`: a black picture. Camera, file and sample now all go through one `attachRef` effect.
 - Next.js 16.4.0 to 16.4.2: fixes two critical remote code execution advisories (image optimiser with SVG, `use cache` typed arrays) and a Server Actions denial of service. vite and vitest bumped by `npm audit fix`.
 - Dashboard: "Pick your club" sat flush against the workload box below it; both of its states now carry `mb-4` like the cards around it. The user spotted it.
+- Marketing agent drafted the first promo's captions (led by the founder's "Aim is earned") and a first-week plan in `docs/agent-os/marketing/2026-10-23-first-promo.md`, all pointing to deadeyeapp.vercel.app. Landing page: "counts every make and miss" became "counts your makes and misses" (meta, hero, FAQ), founder approved; the demo's own "watch it count every make and miss" stays, true of that clip.
 
 ## Decisions
 - Exposure before the upgrade: Server Actions are used (4 files), so the denial of service applied; `next/image` is used but SVG optimisation is not enabled, and `use cache` is not used.

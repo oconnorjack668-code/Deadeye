@@ -24,7 +24,7 @@ the last 7 days have logged a session.
 - [ ] **Decide: AI label.** The voice is synthetic (Kokoro TTS). If TikTok or Instagram asks whether
       the post has AI-generated content, say yes. It costs little and keeps it honest.
 
-**Flag for the builder (not marketing's files):** the landing page's meta description says
+**Flag for the builder (not marketing's files) - done 2026-10-23, founder approved:** the landing page's meta description says
 Deadeye "counts every make and miss", and its FAQ says "It calls every shot as a make or a miss".
 "Every" is a promise about any player's own footage, where light, angle and rim taps vary (the
 README's clip bench: 92% right across eleven ways of tapping the rim). The sample clip itself
