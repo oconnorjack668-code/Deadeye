@@ -37,6 +37,8 @@ instead.
 - Agent OS: activation work (the weekly funnel loop, its backlog, its agents
   and their permissions) runs from `docs/agent-os/README.md`. Read it before
   taking a backlog item.
+- UI work: read `docs/design.md` (colours, spacing, components, what to
+  avoid) before adding or changing a screen.
 - Never read, print, commit, or modify `.env.local`. Use `.env.example` for
   configuration requirements.
 - Before handing work over, run the smallest relevant verification, report the
