@@ -71,7 +71,7 @@ export function DashboardClubCard() {
 
   if (saved) {
     return (
-      <div className="flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+      <div className="mb-4 flex items-start gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4">
         <Check className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-400" />
         <div className="min-w-0 flex-1 text-sm">
           <p className="font-semibold text-white">{saved.name} is your club</p>
@@ -91,7 +91,7 @@ export function DashboardClubCard() {
   }
 
   return (
-    <section className="space-y-3 rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-600/15 via-zinc-900 to-zinc-900 p-4">
+    <section className="mb-4 space-y-3 rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-600/15 via-zinc-900 to-zinc-900 p-4">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-orange-500/20">
           <Shield className="h-5 w-5 text-orange-300" />
