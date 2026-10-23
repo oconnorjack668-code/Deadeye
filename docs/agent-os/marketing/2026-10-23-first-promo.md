@@ -26,8 +26,10 @@ the last 7 days have logged a session.
 
 **Flag for the builder (not marketing's files):** the landing page's meta description says
 Deadeye "counts every make and miss", and its FAQ says "It calls every shot as a make or a miss".
-On the sample clip it missed one make, so these lines say more than we can back up. Viewers from
-these posts land there. Suggested: "counts your makes and misses" and "It calls each shot it sees
+"Every" is a promise about any player's own footage, where light, angle and rim taps vary (the
+README's clip bench: 92% right across eleven ways of tapping the rim). The sample clip itself
+calls 6 of 6 in the app; an earlier note here said it missed a make, which came from a headless
+test run and was wrong. Viewers from these posts land there. Suggested: "counts your makes and misses" and "It calls each shot it sees
 as a make or a miss, and you can fix any call before you save."
 
 ## What the video shows (24.5s, checked frame by frame)
@@ -122,7 +124,7 @@ App screens come from the tester account.
 | Mon 26 | TikTok 16:30, IG Reel 17:30 | Real session, raw: 10 shots with the live tracker, then the results screen | "10 shots. Phone on a bag. Let's see what it calls." | **New:** screen recording of a live tracker run (tester account) | 20-30s |
 | Tue 27 | TikTok 19:00, IG Reel 19:30 | Founder "I built this": what Deadeye does, why, what's next. Faceless: hands, ball, screen, text on screen or your voice | "I'm building a basketball app in Ireland. Here's week one." | **New:** hands and screen b-roll, tester account | 30-40s |
 | Wed 28 | TikTok 16:30, IG Reel 17:30, IG Story | Shot challenge: 5 spots, 5 shots each, log the total, comment your score out of 25 | "5 spots. 5 shots. What's your number?" | **New:** one adult or the founder from behind, 5 spots, then logging by hand | 25-35s |
-| Fri 30 | TikTok 17:00, IG Reel 18:00 | "It missed one": the sample clip misses a make, you add it back before saving | "Our tracker missed this one." | **New:** screen recording of the sample clip's review screen (tester account) | 15-20s |
+| Fri 30 | TikTok 17:00, IG Reel 18:00 | "Fix any call": a real session's review screen, flipping a call before saving | "Think it got one wrong? Tap it." | **New:** screen recording of a real session's review screen (tester account) | 15-20s |
 | Sun 1 | IG Story | Challenge round-up: score counts from comments only (e.g. "most of you scored 10 to 15"), no names | "Your 5-spot scores are in." | None (text on a still) | 10s |
 
 ### Captions for the week
@@ -142,7 +144,7 @@ Deadeye, comment your score out of 25. Beat it next week. Link in bio." IG adds:
 The only score that matters is your next one." Ask for scores in comments, never videos of
 players. Log by hand (Hoops, New session, enter totals): it is the fastest first session.
 
-**Fri 30, it missed one.** TikTok: "Our tracker missed this make. Here's how you add it back
+**Fri 30, fix any call.** TikTok: "Think it got one wrong? Tap it. Every call can be fixed
 before you save. Try the demo at deadeyeapp.vercel.app, link in bio." IG adds: "Good light and the whole ring
 in shot help it most." This post makes the "it calls" claims believable; post it even if numbers
 are low.

@@ -21,7 +21,7 @@ Agent: Claude Code · Commits: see `git log -- src/lib/video/sampleClip.ts` · S
 
 ## Open
 - 5 high `npm audit` findings remain, all `braces` via `fast-glob` inside `eslint-config-next`: lint tooling only, never shipped. npm's fix downgrades to Next 14, so left until Next updates it.
-- On this machine the bench did not match the 6 of 6 noted on 21 Oct for the 1280 re-encode (both tap sets miss the 20.3s make). That predates this change.
+- On this machine the bench did not match the 6 of 6 noted on 21 Oct for the 1280 re-encode (both tap sets miss the 20.3s make). That predates this change, and is the bench only: in the app the founder sees the sample call all six. The marketing drafts briefly claimed the sample misses a make; corrected.
 
 ## Gotchas
 - Repro: a local `next dev` plus Playwright (Pixel 7) pressing play 12 times left the clip unattached once; after the fix 0 of 30. Playwright's Chromium cannot play H.264, so the play-through check served a VP9 WebM copy of the clip through `page.route` (10 of 10 playing within 1.3s).
