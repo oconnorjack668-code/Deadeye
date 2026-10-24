@@ -1,6 +1,8 @@
 // src/app/(app)/admin/posts/page.tsx
-// Owner only: write and remove founder posts (00050), and see how many players
-// follow. Never who: follower_count returns a number and nothing else.
+// Owner only: write and remove founder posts (00050), for followers or for every
+// player (00054), and see how many players follow. Never who: follower_count
+// returns a number and nothing else. Reads every column, so the page still loads
+// before 00054 has been run.
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { checkIsOwner, requireUser } from '@/lib/auth';
@@ -21,7 +23,7 @@ export default async function FounderPostsPage() {
   const supabase = await createClient();
   const [owners, posts, followers] = await Promise.all([
     ownersAmong([user.id]),
-    supabase.from('founder_posts').select('id, kind, body, created_at').eq('author_id', user.id).order('created_at', { ascending: false }).limit(30),
+    supabase.from('founder_posts').select('*').eq('author_id', user.id).order('created_at', { ascending: false }).limit(30),
     supabase.rpc('follower_count'),
   ]);
 

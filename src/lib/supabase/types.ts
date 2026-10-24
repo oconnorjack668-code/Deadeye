@@ -358,8 +358,8 @@ export interface Database {
       };
       // Founder posts (00050): written only by the server, read by every signed-in player
       founder_posts: {
-        Row: { id: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at: string };
-        Insert: { id?: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at?: string };
+        Row: { id: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at: string; everyone: boolean };
+        Insert: { id?: string; author_id: string; kind: 'challenge' | 'tip' | 'update'; body: string; created_at?: string; everyone?: boolean };
         Update: Record<string, never>;
         Relationships: [];
       };

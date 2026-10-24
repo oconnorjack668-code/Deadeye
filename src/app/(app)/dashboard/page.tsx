@@ -25,7 +25,8 @@ import { InstallNudge } from '@/components/InstallNudge';
 import { StarterSteps } from '@/components/StarterSteps';
 import { FounderPostCard } from '@/components/FounderPostCard';
 import { DashboardClubCard } from '@/components/clubs/DashboardClubCard';
-import type { FounderPost } from '@/lib/founderPosts';
+import { FounderNotice } from '@/components/FounderNotice';
+import { founderNoticeCutoff, type FounderPost } from '@/lib/founderPosts';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
 import { appModeFor } from '@/lib/coachSide';
@@ -123,15 +124,29 @@ export default async function DashboardPage() {
     supabase.from('player_clubs').select('club_id').eq('user_id', user.id).maybeSingle(),
   ]);
   const followed = (follows.data ?? []).map((f) => f.followed_id);
-  const { data: latestPost } = followed.length
-    ? await supabase
-        .from('founder_posts')
-        .select('id, author_id, kind, body, created_at')
-        .in('author_id', followed)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle()
-    : { data: null };
+  const [{ data: followedPost }, { data: notice }] = await Promise.all([
+    followed.length
+      ? supabase
+          .from('founder_posts')
+          .select('id, author_id, kind, body, created_at')
+          .in('author_id', followed)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    // A post the founder sent to every player (00054), for a while after it goes
+    // out. An error before 00054 has been run, which leaves no notice.
+    supabase
+      .from('founder_posts')
+      .select('id, author_id, kind, body, created_at')
+      .eq('everyone', true)
+      .gte('created_at', founderNoticeCutoff())
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  // The same post is not shown twice to a player who also follows the founder
+  const latestPost = followedPost && followedPost.id !== notice?.id ? followedPost : null;
   // Shown until the bonus for finishing them is paid; it is in the XP once paid
   const showStarterSteps = achievements.xpParts.bonus === 0;
   // Nothing logged yet, hoops or gym, and no program on the go
@@ -265,6 +280,10 @@ export default async function DashboardPage() {
             heads-up in the last week of a founding member's free months. Under
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
+
+        {/* A post the founder sent to every player, for a couple of weeks, and
+            one they can dismiss */}
+        {notice && <FounderNotice post={notice as FounderPost} founderId={notice.author_id} />}
 
         {/* Only for a player who follows the founder, once there is a post */}
         {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}

@@ -1,13 +1,15 @@
 // src/app/(app)/admin/posts/PostComposer.tsx
-// The founder writes a post through /api/founder/posts and can remove one.
-// Followers include players aged 13 and up, so the guidance sits by the box.
+// The founder writes a post through /api/founder/posts and can remove one. A
+// post goes to the players who follow, or to every player as a dashboard
+// notice (00054). Both include players aged 13 and up, so the guidance sits by
+// the box.
 'use client';
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { FounderPostItem } from '@/components/FounderPostList';
-import { FOUNDER_POST_KINDS, FOUNDER_POST_MAX, checkFounderPost, type FounderPost, type FounderPostKind } from '@/lib/founderPosts';
+import { FOUNDER_NOTICE_DAYS, FOUNDER_POST_KINDS, FOUNDER_POST_MAX, checkFounderPost, type FounderPost, type FounderPostKind } from '@/lib/founderPosts';
 
 const choice = (on: boolean) =>
   `rounded-xl border px-3 py-2 text-sm font-semibold ${on ? 'border-orange-500 bg-orange-500/10 text-white' : 'border-zinc-700 text-zinc-400 hover:bg-zinc-800'}`;
@@ -16,15 +18,17 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
   const [posts, setPosts] = useState(initialPosts);
   const [kind, setKind] = useState<FounderPostKind>('challenge');
   const [body, setBody] = useState('');
+  const [everyone, setEveryone] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function post() {
-    const checked = checkFounderPost({ kind, body });
+    const checked = checkFounderPost({ kind, body, everyone });
     if ('error' in checked) {
       setError(checked.error);
       return;
     }
+    if (everyone && !window.confirm('This goes on the dashboard of every player, including players under 18. Post it?')) return;
     setBusy(true);
     setError(null);
     try {
@@ -40,6 +44,7 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
       }
       setPosts([data.post, ...posts]);
       setBody('');
+      setEveryone(false);
     } catch {
       setError('Network error. Check your connection and try again.');
     } finally {
@@ -48,7 +53,7 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
   }
 
   async function remove(id: string) {
-    if (!window.confirm('Remove this post? Followers will stop seeing it.')) return;
+    if (!window.confirm('Remove this post? Players will stop seeing it.')) return;
     setError(null);
     const res = await fetch(`/api/founder/posts?id=${encodeURIComponent(id)}`, { method: 'DELETE' }).catch(() => null);
     if (!res?.ok) {
@@ -90,6 +95,18 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
           placeholder="This week: 50 free throws a day. Log them and see who is top on Sunday."
           className="w-full rounded-xl border border-zinc-700/80 bg-zinc-900/90 px-3.5 py-2 text-sm text-zinc-100 focus:border-orange-500 focus:outline-none"
         />
+        <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-zinc-800 bg-zinc-950/40 p-3 text-sm">
+          <input
+            type="checkbox"
+            checked={everyone}
+            onChange={(e) => setEveryone(e.target.checked)}
+            className="mt-0.5 h-4 w-4 flex-shrink-0 accent-orange-500"
+          />
+          <span className="text-zinc-300">
+            <span className="font-semibold text-white">Show to every player</span> as a notice at the top of their
+            dashboard for {FOUNDER_NOTICE_DAYS} days, not only the players who follow you. They can dismiss it.
+          </span>
+        </label>
         <div className="flex items-start justify-between gap-3 text-xs text-zinc-500">
           <p>
             Players from 13 up read this. Keep it encouraging, with no pressure or deadlines that guilt anyone, and
@@ -100,14 +117,14 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
           </span>
         </div>
         <Button className="w-full" onClick={post} disabled={busy || !body.trim()} isLoading={busy}>
-          Post to followers
+          {everyone ? 'Post to every player' : 'Post to followers'}
         </Button>
       </div>
 
       {posts.length > 0 && (
         <ul className="space-y-2">
           {posts.map((p) => (
-            <FounderPostItem key={p.id} post={p}>
+            <FounderPostItem key={p.id} post={p} showAudience>
               <button type="button" onClick={() => remove(p.id)} className="mt-2 text-xs font-semibold text-zinc-500 underline hover:text-zinc-300">
                 Remove
               </button>
