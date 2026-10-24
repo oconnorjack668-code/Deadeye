@@ -95,6 +95,18 @@ function ballOptions(delegate: 'GPU' | 'CPU') {
   };
 }
 
+/**
+ * Throws away the shared pose landmarker so the next getPoseLandmarker() builds
+ * a fresh one. A graph that has failed once (a timestamp error, a lost GPU
+ * context) stays failed, so every later call on it fails too; callers drop it
+ * when detectForVideo throws, and a retry then has something to work with.
+ */
+export function resetPoseLandmarker(): void {
+  const old = posePromise;
+  posePromise = null;
+  old?.then((p) => p.close()).catch(() => undefined);
+}
+
 export function getPoseLandmarker(): Promise<PoseLandmarker> {
   return (posePromise ??= (async () => {
     const vision = await fileset();

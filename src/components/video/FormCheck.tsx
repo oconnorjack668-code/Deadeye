@@ -6,7 +6,8 @@ import { PoseLandmarker } from '@mediapipe/tasks-vision';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { getPoseLandmarker } from '@/lib/video/mediapipe';
+import { getPoseLandmarker, resetPoseLandmarker } from '@/lib/video/mediapipe';
+import { nextPoseTimestamp } from '@/lib/video/poseClock';
 import { seekTo } from '@/lib/video/seek';
 import { analyzeShot, angleAt, LM, type PoseFrame, type ShotMechanics } from '@/lib/video/mechanics';
 import type { Database } from '@/lib/supabase/types';
@@ -115,17 +116,23 @@ export function FormCheck({ initialFile, shotTimeMs, heightCm, hand, onResult }:
     const start = Math.max(0, anchor - 2.5);
     const end = Math.min(video.duration || anchor + 0.5, anchor + 0.5);
     const collected: PoseFrame[] = [];
-    let ts = 0;
-    for (let t = start; t <= end; t += 1 / FPS) {
-      // Stop sampling rather than hang if the clip will not seek. Whatever was
-      // collected up to here still goes through analyzeShot below, which has
-      // its own minimum and will say so if there is too little.
-      if (!(await seekTo(video, t))) break;
-      ts += 1000 / FPS;
-      const result = pose.detectForVideo(video, Math.round(performance.now() + ts));
-      const lm = result.landmarks?.[0];
-      if (lm) collected.push({ t: Math.round(t * 1000), landmarks: lm.map((q) => ({ x: q.x, y: q.y, visibility: q.visibility })) });
-      setProgress((t - start) / Math.max(end - start, 0.01));
+    try {
+      for (let t = start; t <= end; t += 1 / FPS) {
+        // Stop sampling rather than hang if the clip will not seek. Whatever was
+        // collected up to here still goes through analyzeShot below, which has
+        // its own minimum and will say so if there is too little.
+        if (!(await seekTo(video, t))) break;
+        const result = pose.detectForVideo(video, nextPoseTimestamp(1000 / FPS));
+        const lm = result.landmarks?.[0];
+        if (lm) collected.push({ t: Math.round(t * 1000), landmarks: lm.map((q) => ({ x: q.x, y: q.y, visibility: q.visibility })) });
+        setProgress((t - start) / Math.max(end - start, 0.01));
+      }
+    } catch {
+      // A failed graph stays failed, so drop it: the next try builds a new one
+      resetPoseLandmarker();
+      setBusy(false);
+      setError('The body tracker stopped partway through. Try again.');
+      return;
     }
     setBusy(false);
 
