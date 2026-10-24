@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
 - 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
 - 2026-10-23 · sample-rim-fix · Sample rim and start, camera black screen, Next.js patch, club card gap · open: 2 → [handoff](2026-10-23-sample-rim-fix.md)
 - 2026-10-22 · pricing-and-claude · Club pricing sheet and founding offer; AI on Claude; club picker · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)

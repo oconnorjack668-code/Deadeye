@@ -1,7 +1,8 @@
 // src/app/api/founder/posts/route.ts
 // The founder writes and removes posts for the players who follow them
-// (00050). Only the account with the owner role, the one players can follow,
-// may post; players read posts straight from the table and cannot write.
+// (00050), or for every player as a dashboard notice (00054). Only the account
+// with the owner role, the one players can follow, may post; players read
+// posts straight from the table and cannot write.
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { ownersAmong } from '@/lib/owners-server';
@@ -28,10 +29,13 @@ export async function POST(request: Request) {
   const post = checkFounderPost((await request.json().catch(() => null)) ?? {});
   if ('error' in post) return Response.json({ error: post.error }, { status: 400 });
 
+  // The everyone column exists from 00054; a post to followers never touches it,
+  // so followers can still be posted to before that has been run
+  const everyone = post.everyone === true;
   const { data, error } = await createAdminClient()
     .from('founder_posts')
-    .insert({ author_id: me.id, kind: post.kind, body: post.body })
-    .select('id, kind, body, created_at')
+    .insert({ author_id: me.id, kind: post.kind, body: post.body, ...(everyone ? { everyone: true } : {}) })
+    .select(everyone ? 'id, kind, body, created_at, everyone' : 'id, kind, body, created_at')
     .single();
   if (error) return Response.json({ error: 'The post could not be saved. Try again.' }, { status: 500 });
   return Response.json({ post: data });
