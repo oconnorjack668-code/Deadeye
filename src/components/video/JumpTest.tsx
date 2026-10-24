@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
-import { getPoseLandmarker } from '@/lib/video/mediapipe';
+import { getPoseLandmarker, resetPoseLandmarker } from '@/lib/video/mediapipe';
+import { nextPoseTimestamp } from '@/lib/video/poseClock';
 import { detectJump, flightSeconds, jumpHeightCm, plausibleFlight, type FootSample } from '@/lib/video/jump';
 import type { MeasurementSystem } from '@/lib/units';
 import { isPersonalBest, lengthUnit } from '@/lib/performanceTests';
@@ -81,19 +82,25 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
     const end = Math.min(video.duration || start + 3, start + 2.5 * slow);
     const dt = Math.max(1 / 120, (end - start) / 240);
     const samples: FootSample[] = [];
-    let ts = 0;
-    for (let t = start; t <= end; t += dt) {
-      // Stop sampling rather than hang if the clip will not seek; whatever was
-      // collected still goes through the jump analysis, which has its own
-      // minimum and reports plainly when there is too little.
-      if (!(await seekTo(video, t))) break;
-      ts += 20;
-      const lm = pose.detectForVideo(video, Math.round(performance.now() + ts)).landmarks?.[0];
-      if (lm) {
-        const avg = (idx: number[]) => idx.reduce((n, i) => n + lm[i].y, 0) / idx.length;
-        samples.push({ t, footY: avg(FEET), hipY: avg(HIPS) });
+    try {
+      for (let t = start; t <= end; t += dt) {
+        // Stop sampling rather than hang if the clip will not seek; whatever was
+        // collected still goes through the jump analysis, which has its own
+        // minimum and reports plainly when there is too little.
+        if (!(await seekTo(video, t))) break;
+        const lm = pose.detectForVideo(video, nextPoseTimestamp(20)).landmarks?.[0];
+        if (lm) {
+          const avg = (idx: number[]) => idx.reduce((n, i) => n + lm[i].y, 0) / idx.length;
+          samples.push({ t, footY: avg(FEET), hipY: avg(HIPS) });
+        }
+        setProgress((t - start) / Math.max(end - start, 0.01));
       }
-      setProgress((t - start) / Math.max(end - start, 0.01));
+    } catch {
+      // A failed graph stays failed, so drop it: the next try builds a new one
+      resetPoseLandmarker();
+      setBusy(false);
+      setMessage({ tone: 'error', text: 'The body tracker stopped partway through. Try again.' });
+      return;
     }
     setBusy(false);
     const jump = detectJump(samples);
