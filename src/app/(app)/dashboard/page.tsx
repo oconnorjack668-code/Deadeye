@@ -172,6 +172,10 @@ export default async function DashboardPage() {
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
+        {/* A post the founder sent to every player, a banner above everything
+            for a couple of weeks, and one they can dismiss */}
+        {notice && <FounderNotice post={notice as FounderPost} founderId={notice.author_id} />}
+
         {/* Header. Deliberately compact: on a phone the old version spent the
             whole first screenful on a decorative icon, the player's own name at
             text-3xl and a slogan, pushing today's session below the fold. */}
@@ -280,10 +284,6 @@ export default async function DashboardPage() {
             heads-up in the last week of a founding member's free months. Under
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
-
-        {/* A post the founder sent to every player, for a couple of weeks, and
-            one they can dismiss */}
-        {notice && <FounderNotice post={notice as FounderPost} founderId={notice.author_id} />}
 
         {/* Only for a player who follows the founder, once there is a post */}
         {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}

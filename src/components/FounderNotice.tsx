@@ -1,5 +1,7 @@
 // src/components/FounderNotice.tsx
-// A founder post sent to every player (00054), at the top of the dashboard.
+// A founder post sent to every player (00054), as a banner at the very top of
+// the dashboard. Amber, the app's "worth a look" colour: red means an error or a
+// miss, and a note from the founder should not read as something broken.
 // Dismissing it hides it on this device only, since there is nothing to save;
 // a newer notice shows again. It stops showing after FOUNDER_NOTICE_DAYS.
 'use client';
@@ -7,8 +9,7 @@
 import React, { useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { Megaphone, X } from 'lucide-react';
-import { FounderPostItem } from '@/components/FounderPostList';
-import type { FounderPost } from '@/lib/founderPosts';
+import { postKindLabel, type FounderPost } from '@/lib/founderPosts';
 
 const DISMISSED_KEY = 'deadeye:founder-notice-dismissed';
 const listeners = new Set<() => void>();
@@ -42,28 +43,27 @@ export function FounderNotice({ post, founderId }: { post: FounderPost; founderI
   if (dismissed === post.id) return null;
 
   return (
-    <section role="status" className="mb-4 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
-          <Megaphone className="h-4 w-4 text-red-400" /> From the founder
-        </h2>
-        <div className="flex items-center gap-3">
-          <Link href={`/players/${founderId}`} className="text-xs font-semibold text-orange-300 underline">
+    <section className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+      <div className="flex items-start gap-3">
+        <Megaphone className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-400" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-bold uppercase tracking-wider text-amber-300">
+            From the founder · {postKindLabel(post.kind)}
+          </p>
+          <p className="mt-1 whitespace-pre-line break-words text-sm text-amber-50">{post.body}</p>
+          <Link href={`/players/${founderId}`} className="mt-2 inline-block text-xs font-semibold text-amber-300 underline">
             All posts
           </Link>
-          <button
-            type="button"
-            aria-label="Dismiss this notice"
-            onClick={() => dismissOnThisDevice(post.id)}
-            className="text-zinc-500 hover:text-zinc-300"
-          >
-            <X className="h-4 w-4" />
-          </button>
         </div>
+        <button
+          type="button"
+          aria-label="Dismiss this notice"
+          onClick={() => dismissOnThisDevice(post.id)}
+          className="-m-3.5 p-3.5 text-amber-300/70 hover:text-amber-100"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
-      <ul>
-        <FounderPostItem post={post} />
-      </ul>
     </section>
   );
 }

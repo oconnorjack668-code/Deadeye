@@ -72,6 +72,19 @@ describe('a post to every player', () => {
     expect(checkFounderPost({ kind: 'update', body: 'Hi', everyone: 'true' })).toEqual({ kind: 'update', body: 'Hi' });
   });
 
+  it('refuses a link, handle or phone number in a post to everyone, but not in a follower post', () => {
+    for (const body of ['See https://example.com', 'Visit www.deadeye.ie', 'Try deadeyeapp.vercel.app', 'DM me @hoops', 'Call 087 123 4567', 'Text 0871234567']) {
+      expect(checkFounderPost({ kind: 'update', body, everyone: true }), body).toHaveProperty('error');
+    }
+    expect(checkFounderPost({ kind: 'update', body: 'Visit www.deadeye.ie' })).not.toHaveProperty('error');
+  });
+
+  it('allows ordinary numbers and punctuation in a post to everyone', () => {
+    for (const body of ['50 free throws a day, 3 to 6 metres out.', 'Week 1: 10 shots, then 25.', 'Deadeye is early, so bugs happen. Sorry!']) {
+      expect(checkFounderPost({ kind: 'update', body, everyone: true }), body).not.toHaveProperty('error');
+    }
+  });
+
   it('keeps showing for the notice window and no longer', () => {
     const now = new Date('2026-11-14T12:00:00Z');
     expect(FOUNDER_NOTICE_DAYS).toBe(14);

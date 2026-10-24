@@ -28,7 +28,7 @@ export function PostComposer({ initialPosts, followers }: { initialPosts: Founde
       setError(checked.error);
       return;
     }
-    if (everyone && !window.confirm('This goes on the dashboard of every player, including players under 18. Post it?')) return;
+    if (everyone && !window.confirm('This goes on the dashboard of every player, including players under 18. No links, names or contact details, and nothing that pressures anyone. Post it?')) return;
     setBusy(true);
     setError(null);
     try {

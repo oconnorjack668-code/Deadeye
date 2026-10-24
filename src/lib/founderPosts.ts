@@ -13,6 +13,13 @@ export const FOUNDER_POST_KINDS: Array<{ id: FounderPostKind; label: string }> =
 
 export const FOUNDER_POST_MAX = 500;
 
+/**
+ * A link, a handle or a phone number. A post to every player reaches players
+ * under 18, so it may not open a way to contact anyone: the composer says so,
+ * and this enforces it for a post to everyone, API calls included.
+ */
+const LINK_OR_CONTACT = /https?:\/\/|www\.|\b[\w-]+\.(?:com|ie|app|net|org|co|io)\b|@\w|\d[\d\s().-]{6,}\d/i;
+
 /** How long a post sent to everyone keeps showing as a notice on the dashboard (00054) */
 export const FOUNDER_NOTICE_DAYS = 14;
 
@@ -45,6 +52,9 @@ export function checkFounderPost(input: {
   const body = typeof input.body === 'string' ? input.body.trim() : '';
   if (!body) return { error: 'Write something first.' };
   if (body.length > FOUNDER_POST_MAX) return { error: `Keep it to ${FOUNDER_POST_MAX} characters.` };
+  if (input.everyone === true && LINK_OR_CONTACT.test(body)) {
+    return { error: 'No links, handles or phone numbers in a post to every player.' };
+  }
   // Only ever present when true, so a post to followers is saved exactly as before 00054
   return input.everyone === true ? { kind, body, everyone: true } : { kind, body };
 }
