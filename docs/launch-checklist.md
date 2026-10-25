@@ -61,6 +61,11 @@ that data again.
 
 ## Before launch
 
+Not sure which migrations have been run? Paste `docs/check-migrations.sql` into the Supabase SQL
+editor: it only reads, and lists anything missing with the migration it came from. Rebuild it with
+`node scripts/build-migration-check.mjs` whenever a migration is added (a test fails if you forget).
+
+
 - [x] `LEGAL_NAME` and `LEGAL_ADDRESS` set (18 October 2026). Add the town, county and Eircode to the address.
 - [ ] Set `SUPPORT_EMAIL` to an address at `deadeye.ie` once the domain is bought.
 - [ ] Set up email (step 4 above). Until then, parents approve straight from the
