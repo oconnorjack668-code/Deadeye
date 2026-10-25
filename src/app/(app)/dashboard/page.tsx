@@ -174,7 +174,7 @@ export default async function DashboardPage() {
       <div className="p-4 md:p-8 max-w-7xl mx-auto">
         {/* A post the founder sent to every player, a banner above everything
             for a couple of weeks, and one they can dismiss */}
-        {notice && <FounderNotice post={notice as FounderPost} founderId={notice.author_id} />}
+        {notice && <FounderNotice post={notice as FounderPost} />}
 
         {/* Header. Deliberately compact: on a phone the old version spent the
             whole first screenful on a decorative icon, the player's own name at
