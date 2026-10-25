@@ -42,6 +42,8 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
     steps: [
       { name: 'signup_from_demo', label: 'Signed up from the landing page demo' },
       { name: 'welcome_seen', label: 'Saw the welcome screen' },
+      { name: 'welcome_court', label: 'Said they are at a court' },
+      { name: 'welcome_later', label: 'Said not right now' },
       { name: 'sample_played', label: 'Played the sample clip' },
       { name: 'sample_finished', label: 'Watched the sample to the end' },
     ],
@@ -53,6 +55,14 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
       { name: 'tracker_setup', label: 'Picked camera or video, set the rim' },
       { name: 'tracker_started', label: 'Started tracking' },
       { name: 'tracker_finished', label: 'Reached the results' },
+    ],
+  },
+  {
+    // After the tracker group: tracker_saved is added to that group by position below
+    title: 'Logging shots',
+    steps: [
+      { name: 'log_opened', label: 'Opened the shot logger' },
+      { name: 'log_finish_opened', label: 'Pressed Finish with shots logged' },
     ],
   },
 ];

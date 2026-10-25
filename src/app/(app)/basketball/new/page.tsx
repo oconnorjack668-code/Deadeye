@@ -24,6 +24,7 @@ import {
 import { SavedOfflineCard } from '@/components/SavedOfflineCard';
 import { FirstLogGuide, logGuideStep } from '@/components/basketball/FirstLogGuide';
 import { LOG_GUIDE_HIDDEN_KEY, readFlag, writeFlag } from '@/lib/starter';
+import { track } from '@/lib/events';
 import { ArrowLeft, Plus, Timer, Undo2, X, Flame } from 'lucide-react';
 
 interface TrackedShot {
@@ -261,6 +262,11 @@ export default function NewBasketballSessionPage() {
     preloadRecordings(loadSound());
   }, []);
 
+  // Opened the logger, in either mode: the step between the welcome screen and a saved session
+  useEffect(() => {
+    track('log_opened');
+  }, []);
+
   // First-time tips, only for a player with no session saved yet. Asked of the
   // database rather than remembered on the phone, so a player who logged on
   // another device is not walked through it again. Offline, no tips.
@@ -492,6 +498,7 @@ export default function NewBasketballSessionPage() {
       return;
     }
     setError(null);
+    track('log_finish_opened');
     const elapsed = Math.round((Date.now() - draft.startedAt) / 60000);
     setDurationMinutes(Math.min(360, Math.max(5, elapsed)));
     setFinishOpen(true);

@@ -33,6 +33,12 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
     trackIfFromDemo();
   }, []);
 
+  /** The answer to "Are you at a court right now?", recorded so a stall here shows in the funnel */
+  function choose(next: 'court' | 'later') {
+    track(next === 'court' ? 'welcome_court' : 'welcome_later');
+    setAnswer(next);
+  }
+
   if (answer === 'court') {
     return (
       <div className="space-y-5">
@@ -97,6 +103,16 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
           </p>
         </div>
 
+        {/* Most players sign up away from a court, and some have already trained
+            today: the one thing they can do right now is log it. */}
+        <Link href="/basketball/new" className="flex items-center gap-2 py-1 text-sm font-semibold text-orange-300 hover:text-orange-200">
+          <PenLine className="h-4 w-4 flex-shrink-0" />
+          <span>
+            Trained today already? Log it by hand
+            <span className="block text-xs font-normal text-zinc-500">Two taps a spot: where you shot from, then how many went in.</span>
+          </span>
+        </Link>
+
         <RemindersCard showWeekly={false} />
 
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
@@ -141,7 +157,7 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
       <div className="grid gap-3 text-left sm:grid-cols-2">
         <button
           type="button"
-          onClick={() => setAnswer('court')}
+          onClick={() => choose('court')}
           className="flex items-center gap-3 rounded-2xl border border-orange-600/50 bg-orange-600/10 p-4 text-left hover:bg-orange-600/20"
         >
           <MapPin className="h-7 w-7 flex-shrink-0 text-orange-400" />
@@ -152,7 +168,7 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
         </button>
         <button
           type="button"
-          onClick={() => setAnswer('later')}
+          onClick={() => choose('later')}
           className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 text-left hover:bg-zinc-900"
         >
           <Sofa className="h-7 w-7 flex-shrink-0 text-zinc-300" />
