@@ -156,7 +156,7 @@ docker push username/hoopiq:1.0.0
 **2. Create Testing Scenarios**
 
 #### Scenario A: New User Onboarding (30 min)
-1. Visit deadeye.ie
+1. Visit deadeyeapp.vercel.app
 2. Sign up with email
 3. Verify email
 4. Complete onboarding (bio → level → goals)

@@ -17,7 +17,7 @@ Follows [app-review-fixes](2026-10-21-app-review-fixes.md). The plan lives in a 
 - Coaches free; income from Team Pass (~€149/team/season, players get Pro) and Club plan (~€499, 6 teams) (Claude recommended, user agreed).
 - Founding club: Wexford Blazers BC, ~€99/team/season, kept for every season while it stays; its teams incl. the user's U18s trial first (user). See memory `coach-pricing-founding-club`.
 - Profile friend requests never between an adult and an under-18, not even teammates: a coach is a teammate (Claude, per BI coaches-of-minors policy). Codes still work.
-- deadeye.ie: bought in the mam's name, she does the residency proof; never tick "already hold a .ie" (user).
+- deadeye.ie: bought in the mam's name, she does the residency proof; never tick "already hold a .ie" (user). **Note 2026-10-25:** this is whose name it goes in; the domain is not bought yet and the live address is deadeyeapp.vercel.app (user).
 - Funnel uses our own table, no third-party analytics: many players are under 18 (Claude).
 
 ## Where things are
