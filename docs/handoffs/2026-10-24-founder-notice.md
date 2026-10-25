@@ -29,3 +29,7 @@ Agent: Claude Code · Commits: see `git log -- supabase/migrations/00054_founder
 - The safety-reviewer agent diffs against `origin/HEAD`, which is unset in the cloud checkout; `git remote set-head origin main` fixes it locally.
 - `pkill -f "next dev"` run from the shell can kill the shell itself (exit 144); remove temp pages first.
 - Tested the notice on a temporary page under `/parents/` (public path, since the dashboard needs a login): shows, dismisses, stays dismissed after reload, returns for a newer post, works with storage blocked. Page removed.
+
+## Follow-up (2026-10-25)
+- The founder found the amber banner bulky. It is now a slim strip: small icon, "From the founder ·" running into the message, cut to two lines with Read more / Show less, lighter tint, no kind label or All posts row. The long apology measures 82px collapsed, about 40% of the old banner.
+- "Mark fixed" in App errors did nothing for crashes whose message has line breaks (the MediaPipe ones): a browser sends a line break in a form field as \r\n, so the message posted back no longer matched the stored one. Proven in Chromium. The button now sends the row id and the server reads the exact message (`admin/errors/page.tsx`, `markResolved`).

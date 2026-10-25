@@ -54,12 +54,23 @@ function when(iso: string): string {
   });
 }
 
+/**
+ * Marks every open crash with the same message as the one given fixed.
+ *
+ * Takes the id of one row and reads its message here, rather than taking the
+ * message from the form: a browser sends each line break in a form field as
+ * \r\n, so a message with line breaks in it (MediaPipe's, for one) came back
+ * different from the one stored, matched nothing, and the button did nothing.
+ */
 async function markResolved(formData: FormData) {
   'use server';
   if (!(await checkIsOwner())) return;
-  const message = String(formData.get('message') || '');
-  if (!message) return;
-  await createAdminClient().from('app_errors').update({ resolved: true }).eq('message', message).eq('resolved', false);
+  const id = String(formData.get('id') || '');
+  if (!id) return;
+  const admin = createAdminClient();
+  const { data: row } = await admin.from('app_errors').select('message').eq('id', id).maybeSingle();
+  if (!row) return;
+  await admin.from('app_errors').update({ resolved: true }).eq('message', row.message).eq('resolved', false);
   revalidatePath('/admin/errors');
 }
 
@@ -212,7 +223,7 @@ export default async function AdminErrorsPage() {
             )}
             {latest.digest && <p className="mt-2 text-xs text-zinc-500">Digest: {latest.digest}</p>}
             <form action={markResolved} className="mt-3">
-              <input type="hidden" name="message" value={latest.message} />
+              <input type="hidden" name="id" value={latest.id} />
               <button type="submit" className="rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-700">
                 Mark fixed
               </button>
