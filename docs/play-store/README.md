@@ -112,6 +112,7 @@ For players aged 13+ (players under 16 need a parent or guardian to approve thei
 | App activity → Other actions (friends list) | Yes | Optional | App functionality, social features |
 | Personal info → Name and Email address of a parent or guardian (players under 16 only) | Yes | Optional (under-16s only) | Account management (parent approval) |
 | App info & performance → Crash logs | Yes | Required | Analytics (fixing bugs) |
+| App activity → Other actions (steps reached in the app, such as seeing the welcome screen or opening the shot tracker, once a day each, kept 90 days) | Yes | Required | Analytics (finding where new players get stuck) |
 | Financial info → Purchase history | Yes | Optional (Pro only) | App functionality |
 | Personal info → Other info (country, county/region, time zone you choose) | Yes | Optional | App functionality (regional leaderboards, reminders) |
 

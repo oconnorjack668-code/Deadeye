@@ -75,9 +75,12 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
   and "Back to my dashboard". Nothing else changes: both go to the existing logger, which already opens a
   first-time player in Enter totals (E1). Tests: `__tests__/welcome-activation.test.tsx` (the link on the later
   branch only, the button once the sample is watched); 4 of its tests fail on main.
-- Safety: pending (safety-reviewer run started 2026-10-25; verdict to be added before merge)
+- Safety: PASS (2026-10-25), after one BLOCK that was fixed. Files: `welcome/WelcomeClient.tsx`, `welcome/sample/SampleClient.tsx`.
+  Parent gate: both links go to pages under `(app)/layout.tsx`, which sends ask-age and needs-parent players
+  away before rendering, so no gate is bypassed. New personal data: none. Messages: the two link labels are
+  neutral, no urgency or guilt. AI provider, public surfaces: not touched.
 - Release check (2026-10-25): `npx tsc --noEmit` pass. `npx eslint .` clean, no warnings. `npm test` pass,
-  869 passed, 1 skipped. New migrations: none. New `.env.example` variables: none.
+  870 passed, 1 skipped. New migrations: none. New `.env.example` variables: none.
 - Founder checklist:
   1. Migrations to run in the Supabase SQL editor: none.
   2. Env vars to set in Vercel: none.
@@ -104,7 +107,14 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
   weekly counts file the Monday job writes (it reads the groups as they come). Same table and rules as every
   other step: one row per player, step and day. Tests: `welcome-activation.test.tsx`, `funnel.test.ts`,
   `hoops-logging.test.tsx`; the new ones fail on main.
-- Safety: pending (as E2)
+- Safety: BLOCK, then PASS (2026-10-25). Files: `events.ts`, `funnel.ts`, `docs/funnel-counts.sql`,
+  `basketball/new/page.tsx`, `welcome/WelcomeClient.tsx`. The reviewer blocked on two points, both fixed in this
+  branch: the privacy policy (`src/app/privacy/page.tsx`) now names the welcome answer and the shot logger steps,
+  and `app_events` is now in the data export (`api/account/export/route.ts`, with a test; it was missing for the
+  older steps too). New personal data otherwise: none beyond a step name tied to the player id, one row a day,
+  deleted with the account and after 90 days. The new counts are counts only: `/admin/funnel` is owner-only, the
+  weekly file prints set sizes. Note: the funnel has no small-number suppression, so a count of 1 in the 7-day
+  column is close to a statement about one player; the repo holding `docs/agent-os/data/` must stay private.
 - Release check (2026-10-25): as E2 (same branch, same run).
 - Founder checklist:
   1. Migrations to run in the Supabase SQL editor: none.

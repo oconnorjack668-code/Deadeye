@@ -18,11 +18,15 @@ Agent: Claude Code · Commits: see `git log 204d097^..515442b` · Status: PR ope
 - Icon tiles: left alone. The tile in `PageHeader` is deliberate section identity (its own comment: each tab owns a colour), and the 30 one-offs are separate small design calls. `docs/design.md` now says so; new screens should not add them. The founder can say if they want the one-offs flattened.
 - The old handoff line "deadeye.ie: bought in the mam's name" is annotated, not rewritten.
 
+- Safety review (2026-10-25): BLOCK on E3 first, for two real gaps, both fixed: the privacy policy listed the recorded steps as a closed list that did not include the new ones, and `app_events` was missing from the data export (an older gap too). Re-checked as PASS. Also added an "App activity" row to the Play data safety table in `docs/play-store/README.md`.
+- Left for the founder to know: no small-number suppression on the funnel (a count of 1 in the 7-day column nearly describes one player); keep the repo that holds `docs/agent-os/data/` private.
+
 ## Where things are
 - `src/app/(app)/welcome/WelcomeClient.tsx`, `welcome/sample/SampleClient.tsx`: E2 links, `choose()` for the E3 answers.
 - `src/app/(app)/basketball/new/page.tsx`: `log_opened` on mount, `log_finish_opened` when Finish opens.
 - `src/lib/events.ts`, `src/lib/funnel.ts`, `docs/funnel-counts.sql`: the event names and where they are counted.
 - `scripts/build-migration-check.mjs`, `docs/check-migrations.sql`, `__tests__/migration-check.test.ts`.
+- `src/app/privacy/page.tsx`, `src/app/api/account/export/route.ts` (+ `__tests__/account-export.test.ts`): the privacy wording and export that E3 needed.
 - `__tests__/welcome-activation.test.tsx`, `study-quiz-page.test.tsx`; new cases in `funnel.test.ts` and `hoops-logging.test.tsx`.
 
 ## Open

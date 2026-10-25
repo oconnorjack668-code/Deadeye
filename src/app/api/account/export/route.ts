@@ -53,6 +53,8 @@ const USER_TABLES = [
   'player_levels',
   // Crash reports sent from this account
   'app_errors',
+  // The steps reached in the app, one row a day each (00045)
+  'app_events',
   // The home club and any "club not listed" suggestions (00051)
   'player_clubs',
   'club_suggestions',

@@ -107,9 +107,10 @@ export default function PrivacyPage() {
               them straight away.
             </li>
             <li>
-              A few steps you reach in the app, at most once a day each: seeing the welcome screen, playing the sample
-              clip, and opening, starting and finishing the shot tracker. Kept for 90 days, with your account id, only to
-              see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
+              A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
+              gave there (at a court, or not right now), playing the sample clip, opening the shot logger and pressing
+              Finish in it, and opening, starting and finishing the shot tracker. Kept for 90 days, with your account id,
+              only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
               anyone. Deleting your account deletes them straight away.
             </li>
           </ul>
