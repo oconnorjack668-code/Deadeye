@@ -49,47 +49,53 @@ export default function QuizPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Bumped by Retake Quiz to fetch the questions again
+  const [reload, setReload] = useState(0);
+
   useEffect(() => {
-    loadQuiz();
-  }, [topicId]);
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        // A topic's quiz is the combined quiz_questions of its lessons; ?item=<id> quizzes one lesson
+        const itemId = new URLSearchParams(window.location.search).get('item');
+        let query = supabase
+          .from('study_items')
+          .select('id, quiz_questions')
+          .eq('topic_id', topicId)
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+        if (itemId) query = query.eq('id', itemId);
+        const { data: items, error: fetchError } = await query;
+        if (cancelled) return;
 
-  async function loadQuiz() {
-    try {
-      const supabase = createClient();
-      // A topic's quiz is the combined quiz_questions of its lessons; ?item=<id> quizzes one lesson
-      const itemId = new URLSearchParams(window.location.search).get('item');
-      let query = supabase
-        .from('study_items')
-        .select('id, quiz_questions')
-        .eq('topic_id', topicId)
-        .eq('is_active', true)
-        .order('display_order', { ascending: true });
-      if (itemId) query = query.eq('id', itemId);
-      const { data: items, error: fetchError } = await query;
+        if (fetchError || !items) {
+          setError('Quiz not found');
+          return;
+        }
 
-      if (fetchError || !items) {
-        setError('Quiz not found');
-        return;
+        const loaded: Question[] = items.flatMap((item) =>
+          (Array.isArray(item.quiz_questions) ? (item.quiz_questions as unknown as QuizQuestionJson[]) : []).map((q, idx) => ({
+            id: `${item.id}-${idx}`,
+            itemId: item.id,
+            text: q.question,
+            options: q.options || [],
+            correctAnswer: q.correct_index,
+            explanation: q.explanation,
+          }))
+        );
+
+        setQuestions(loaded);
+      } catch {
+        if (!cancelled) setError('Failed to load quiz');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      const loaded: Question[] = items.flatMap((item) =>
-        (Array.isArray(item.quiz_questions) ? (item.quiz_questions as unknown as QuizQuestionJson[]) : []).map((q, idx) => ({
-          id: `${item.id}-${idx}`,
-          itemId: item.id,
-          text: q.question,
-          options: q.options || [],
-          correctAnswer: q.correct_index,
-          explanation: q.explanation,
-        }))
-      );
-
-      setQuestions(loaded);
-    } catch {
-      setError('Failed to load quiz');
-    } finally {
-      setLoading(false);
-    }
-  }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [topicId, reload]);
 
   function handleSelectAnswer(index: number) {
     // First answer counts; the result and explanation are shown right away
@@ -271,7 +277,7 @@ export default function QuizPage() {
                   setShowResults(false);
                   setCurrentQuestion(0);
                   setSelectedAnswers({});
-                  loadQuiz();
+                  setReload((n) => n + 1);
                 }}
               >
                 Retake Quiz

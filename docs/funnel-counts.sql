@@ -35,7 +35,7 @@ UNION ALL SELECT 4, 'logged 2nd', count(*) FILTER (WHERE n >= 2) FROM sessions
 UNION ALL SELECT 5, 'logged 3rd', count(*) FILTER (WHERE n >= 3) FROM sessions
 UNION ALL SELECT 6, 'saved a tracked session', count(*) FILTER (WHERE tracked) FROM sessions
 UNION ALL SELECT 10 + array_position(
-    ARRAY['signup_from_demo', 'welcome_seen','sample_played', 'sample_finished', 'tracker_opened', 'tracker_setup', 'tracker_started', 'tracker_finished', 'tracker_saved'],
+    ARRAY['signup_from_demo', 'welcome_seen', 'welcome_court', 'welcome_later', 'sample_played', 'sample_finished', 'tracker_opened', 'tracker_setup', 'tracker_started', 'tracker_finished', 'tracker_saved', 'log_opened', 'log_finish_opened'],
     name
   ), name, players FROM steps
 ORDER BY step_order;

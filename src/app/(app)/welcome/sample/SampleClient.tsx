@@ -54,6 +54,9 @@ export function SampleClient() {
             <Link href="/video" className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-500">
               Open the tracker
             </Link>
+            <Link href="/basketball/new" className="rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-900">
+              Log shots by hand
+            </Link>
             <Link href="/dashboard" className="rounded-xl border border-zinc-700 px-4 py-2 text-sm font-semibold text-zinc-200 hover:bg-zinc-900">
               Back to my dashboard
             </Link>

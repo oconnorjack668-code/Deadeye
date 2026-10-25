@@ -4,6 +4,12 @@ Everything needed to publish **Deadeye AI Basketball Trainer** on Google Play as
 (the website wrapped as an Android app with PWABuilder). Updates to the website appear in the app
 automatically — you only rebuild the app for icon/name/package changes.
 
+> **Which web address?** Today the live site is **https://deadeyeapp.vercel.app**. `deadeye.ie` is not
+> bought yet (`docs/launch-checklist.md`). The listing fields below use the live address, so a reviewer
+> who opens them lands on a working page; change them in Play Console once the domain moves. Sections 3
+> and 4 (building the app) wait for the move: the Android app is tied to one web address, so build it
+> on the final one.
+
 Files in this folder:
 - `feature-graphic-1024x500.png` — the Play Store feature graphic (required)
 - App icon for the store: `public/icon-store-1024.png` (Play wants 512×512 — PWABuilder/Play resize it, or use `public/icon-play-512.png`)
@@ -59,8 +65,8 @@ For players aged 13+ (players under 16 need a parent or guardian to approve thei
 ```
 
 **Category:** Sports  **Tags:** Basketball, Fitness, Training
-**Contact email:** your support email  **Website:** `https://deadeye.ie`
-**Privacy policy URL:** `https://deadeye.ie/privacy`
+**Contact email:** your support email  **Website:** `https://deadeyeapp.vercel.app`
+**Privacy policy URL:** `https://deadeyeapp.vercel.app/privacy`
 
 **Screenshots** (phone, 2–8 images, portrait): take them on your phone from the live app. Suggested order:
 1. Dashboard (with the Today card and rank)
@@ -78,7 +84,7 @@ For players aged 13+ (players under 16 need a parent or guardian to approve thei
 
 | Question | Answer |
 |---|---|
-| Privacy policy | `https://deadeye.ie/privacy` |
+| Privacy policy | `https://deadeyeapp.vercel.app/privacy` |
 | Ads | **No**, the app has no ads |
 | App access | "All or some functionality is restricted" → give a **test login** (create a spare account, e.g. reviewer@…, with some sessions logged) |
 | Target audience | **13–15, 16–17, 18+** (do **not** tick under 13). Under-16s cannot use the app until a parent approves the account from a link the player sends them |
@@ -87,7 +93,7 @@ For players aged 13+ (players under 16 need a parent or guardian to approve thei
 | Health apps | Tick **"Fitness"** only; not a medical device |
 | Financial features | None |
 | Government app | No |
-| Account deletion | Yes → URL `https://deadeye.ie/account-deletion` |
+| Account deletion | Yes → URL `https://deadeyeapp.vercel.app/account-deletion` |
 
 ### Data safety form
 
@@ -106,6 +112,7 @@ For players aged 13+ (players under 16 need a parent or guardian to approve thei
 | App activity → Other actions (friends list) | Yes | Optional | App functionality, social features |
 | Personal info → Name and Email address of a parent or guardian (players under 16 only) | Yes | Optional (under-16s only) | Account management (parent approval) |
 | App info & performance → Crash logs | Yes | Required | Analytics (fixing bugs) |
+| App activity → Other actions (steps reached in the app, such as seeing the welcome screen or opening the shot tracker, once a day each, kept 90 days) | Yes | Required | Analytics (finding where new players get stuck) |
 | Financial info → Purchase history | Yes | Optional (Pro only) | App functionality |
 | Personal info → Other info (country, county/region, time zone you choose) | Yes | Optional | App functionality (regional leaderboards, reminders) |
 
@@ -149,7 +156,8 @@ After you upload to Play (next step), go to **Play Console → Test and release 
 
 ## Checklist before you submit
 - [ ] Migrations run in Supabase (including `00036_parent_approval.sql`)
-- [ ] `deadeye.ie` live, `deadeyebasketball.com` redirecting to it (see `docs/launch-checklist.md`)
+- [ ] `deadeye.ie` bought and live, `deadeyebasketball.com` redirecting to it (see `docs/launch-checklist.md`)
+- [ ] The three URLs in the store listing and App content (website, privacy policy, account deletion) open, and are changed to `deadeye.ie` once it is live
 - [ ] `LEGAL_NAME`, `LEGAL_ADDRESS`, `RESEND_API_KEY` and `EMAIL_FROM` set in Vercel
 - [ ] `SUPPORT_EMAIL` set in Vercel (shows on Privacy, Terms and Account deletion pages)
 - [ ] `/privacy`, `/terms`, `/account-deletion` open without logging in

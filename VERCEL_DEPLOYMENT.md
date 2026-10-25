@@ -120,7 +120,7 @@ Click "Add New" for each variable and fill in the values.
 Once complete, you'll see:
 - ✅ Build successful
 - ✅ Deployment complete
-- 🌐 Production URL: `https://deadeye.ie` (or your custom domain)
+- 🌐 Production URL: `https://deadeyeapp.vercel.app` (and your custom domain, once you have one: `deadeye.ie` is not bought yet)
 
 ---
 
@@ -150,7 +150,7 @@ Once complete, you'll see:
 
 ### 6.1 Visit Your Site
 ```
-https://deadeye.ie
+https://deadeyeapp.vercel.app
 ```
 
 ### 6.2 Test Core Flows
@@ -195,7 +195,7 @@ https://deadeye.ie
 
 ### 7.1 Add Domain
 1. Vercel Dashboard → Project Settings → Domains
-2. Enter your domain (e.g., `deadeye.ie`)
+2. Enter your domain (e.g., `deadeye.ie`, once it is bought; the steps for the move are in `docs/launch-checklist.md`)
 3. Follow DNS configuration instructions
 4. Usually takes 5-30 minutes to propagate
 
@@ -274,7 +274,7 @@ Enable Vercel Analytics in Project Settings → Analytics
 ### 1. Invite Beta Testers
 Share your production URL:
 ```
-https://deadeye.ie
+https://deadeyeapp.vercel.app
 ```
 
 Create test accounts for testers to use.
@@ -359,7 +359,7 @@ npm run start
 
 ## Production URLs
 
-**Live Site**: https://deadeye.ie  
+**Live Site**: https://deadeyeapp.vercel.app (`deadeye.ie` once it is bought)  
 **Vercel Dashboard**: https://vercel.com/dashboard  
 **Supabase Console**: https://app.supabase.com  
 **OpenAI Dashboard**: https://platform.openai.com  

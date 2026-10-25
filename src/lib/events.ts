@@ -8,6 +8,10 @@ export const EVENT_NAMES = [
   /** Tapped sign-up under the landing page demo, then reached the welcome screen */
   'signup_from_demo',
   'welcome_seen',
+  /** Picked "Yes, I'm at a court" on the welcome screen */
+  'welcome_court',
+  /** Picked "Not right now" on the welcome screen */
+  'welcome_later',
   'sample_played',
   'sample_finished',
   'tracker_opened',
@@ -17,6 +21,10 @@ export const EVENT_NAMES = [
   /** Reached the results, whether or not they then saved */
   'tracker_finished',
   'tracker_saved',
+  /** Opened the shot logger, to track every shot or to enter totals */
+  'log_opened',
+  /** Pressed Finish with something logged, so the Finish panel opened */
+  'log_finish_opened',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

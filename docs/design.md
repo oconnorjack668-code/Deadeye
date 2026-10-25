@@ -68,8 +68,11 @@ content, no combined hover transforms. Respect `prefers-reduced-motion`.
 
 Adapted from the community Unslop UI skill, trimmed to what applies here.
 
-- **Icons in coloured rounded squares** as decoration. The app has a few (such as "Pick your
-  club"); don't add more. Put the icon inline, or leave it out if it says nothing.
+- **Icons in coloured rounded squares** as decoration. One is deliberate: the tile in
+  `PageHeader`, whose colour says which tab you are on (hoops orange, gym green, IQ blue, train
+  orange to red), so keep it. About 30 older one-off tiles remain (the streak flame, tips, club
+  cards and so on). Don't add new ones, and when you change a screen that has one, put the icon
+  inline or drop it.
 - **Emoji as UI.** Not in headings, cards or feature lists. Fine in user posts and in marketing
   captions.
 - **Glassmorphism**: blur plus translucent card plus light border over a gradient. `Card` keeps a
@@ -89,5 +92,5 @@ Adapted from the community Unslop UI skill, trimmed to what applies here.
 - [ ] One obvious next action, in orange
 - [ ] Colours match the table above
 - [ ] Every card in a stack has a gap below it
-- [ ] No new icon tiles, emoji, glow, gradient text or nested cards
+- [ ] No new icon tiles (the `PageHeader` one is the exception), emoji, glow, gradient text or nested cards
 - [ ] Works with `prefers-reduced-motion`

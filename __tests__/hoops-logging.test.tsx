@@ -11,6 +11,8 @@ import { render, screen, fireEvent, within, waitFor, act } from '@testing-librar
 // cannot answer for (signed out, or the request failed), as an empty client gives.
 const db = vi.hoisted(() => ({ sessions: null as number | null, asked: 0 }));
 
+const tracked = vi.hoisted(() => [] as string[]);
+vi.mock('@/lib/events', () => ({ track: (name: string) => tracked.push(name) }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }) }));
 vi.mock('@/lib/supabase/client', () => ({
   createClient: () =>
@@ -209,5 +211,33 @@ describe("Hoops session: a new player's first log", () => {
     render(<NewBasketballSessionPage />);
     await answered();
     expect(pressed('Track every shot')).toBe('true');
+  });
+});
+
+
+describe('Hoops session: funnel steps (E3)', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    tracked.length = 0;
+  });
+
+  it('records that the logger was opened, once', async () => {
+    render(<NewBasketballSessionPage />);
+    await openTotals();
+    expect(tracked).toEqual(['log_opened']);
+  });
+
+  it('records Finish only when it opens, which needs something logged', async () => {
+    render(<NewBasketballSessionPage />);
+    await openTotals();
+
+    // Nothing logged yet: Finish refuses, so it is not recorded
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
+    expect(tracked).toEqual(['log_opened']);
+
+    tapCourt(25, 20);
+    fireEvent.click(screen.getByRole('button', { name: '7 of 10 made' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Finish' }));
+    expect(tracked).toEqual(['log_opened', 'log_finish_opened']);
   });
 });
