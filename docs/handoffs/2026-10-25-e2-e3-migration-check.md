@@ -39,3 +39,6 @@ Agent: Claude Code · Commits: see `git log 204d097^..515442b` · Status: PR ope
 - `docs/check-migrations.sql` is generated: edit the script, not the file.
 - The welcome screen page never goes network-idle in a browser (the reminders card keeps polling): wait for a button, not for idle, in Playwright.
 - Playwright cannot play the sample here (no H.264); the E2 end-card link is tested with the tracker stubbed.
+
+## Follow-up (2026-10-26)
+- The club pricing sheet (PDF) on the landing page downloaded the login page: `src/proxy.ts` skipped the login check for images, JSON and video in `public/` but not `.pdf`, so a signed-out visitor was redirected to `/login` and the browser saved that page under the PDF name. `.pdf` is now skipped; `__tests__/proxy-matcher.test.ts` covers every PDF in `public/`.
