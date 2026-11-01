@@ -399,7 +399,10 @@ export function ShotTracker({
         if (!account?.length) return;
         const merged = mergeRims(loadSavedRims(), account);
         setSavedRims(merged);
-        storeSavedRims(merged);
+        // Only this phone's own hoops are written to its storage. One from the
+        // account stays in memory: on a shared tablet it would otherwise be
+        // left behind, name and all, after this player signs out.
+        storeSavedRims(merged.filter((r) => !r.fromAccount));
       });
     }
   }
@@ -432,7 +435,7 @@ export function ShotTracker({
     }
     const next = touchSavedRim(savedRims, entry.id, Date.now());
     setSavedRims(next);
-    storeSavedRims(next);
+    storeSavedRims(next.filter((r) => !r.fromAccount));
     setRim(entry.rim);
     setFirstEdge(null);
     setCalibrating(true);
@@ -444,7 +447,7 @@ export function ShotTracker({
     const now = Date.now();
     const next = withSavedRim(savedRims, rimName, rim, now);
     setSavedRims(next);
-    storeSavedRims(next);
+    storeSavedRims(next.filter((r) => !r.fromAccount));
     setRimSaved(true);
     void saveAccountRim(createClient(), rimName, rim, now);
   }
@@ -453,7 +456,7 @@ export function ShotTracker({
     const entry = savedRims.find((s) => s.id === id);
     const next = withoutSavedRim(savedRims, id);
     setSavedRims(next);
-    storeSavedRims(next);
+    storeSavedRims(next.filter((r) => !r.fromAccount));
     if (entry) void deleteAccountRim(createClient(), entry.name);
   }
 
@@ -497,7 +500,7 @@ export function ShotTracker({
       const now = Date.now();
       const next = withSavedRim(savedRims.filter((s) => s.id !== checked.id), checked.name, measured, now);
       setSavedRims(next);
-      storeSavedRims(next);
+      storeSavedRims(next.filter((r) => !r.fromAccount));
       void saveAccountRim(createClient(), checked.name, measured, now);
     }
     setCheckingSaved(null);
@@ -1150,7 +1153,7 @@ export function ShotTracker({
         shots,
         removed,
         quality,
-        device: deviceClass(navigator.userAgent, navigator.maxTouchPoints ?? 0, navigator.hardwareConcurrency),
+        device: deviceClass(navigator.userAgent, navigator.maxTouchPoints ?? 0),
         mode: drillLabel,
         activeMinutes: Math.round(shootingMs / 60000),
         rechecked,
@@ -1423,7 +1426,7 @@ export function ShotTracker({
               <span>
                 Keep the video for replays
                 <span className="block text-xs text-zinc-500">
-                  Lets you watch any shot again and make a highlight reel. It stays on this phone and is gone when you leave.
+                  Lets you watch any shot again and make a highlight reel. It stays on this phone and is gone when you leave, unless you share a reel.
                 </span>
               </span>
             </label>
@@ -1685,7 +1688,8 @@ export function ShotTracker({
                     Remember this hoop?
                   </label>
                   <p className="mt-1 text-xs text-zinc-500">
-                    Skip the two taps next time you film from this spot. Kept on this phone and with your account.
+                    Skip the two taps next time you film from this spot. Kept on this phone and with your account. Only you
+                    see it, so no addresses needed.
                   </p>
                   <div className="mt-2 flex gap-2">
                     <input
@@ -1693,7 +1697,7 @@ export function ShotTracker({
                       value={rimName}
                       onChange={(e) => setRimName(e.target.value)}
                       maxLength={MAX_RIM_NAME}
-                      placeholder="e.g. Home driveway"
+                      placeholder="e.g. Left hoop"
                       className="flex-1 min-w-0 rounded-xl border border-zinc-700/80 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500 focus:border-orange-500 focus:outline-none"
                     />
                     <Button variant="secondary" size="sm" disabled={!rimName.trim()} onClick={saveCurrentRim}>

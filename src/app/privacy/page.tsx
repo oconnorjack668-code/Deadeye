@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 22, 2026';
+const LAST_UPDATED = 'November 1, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -87,6 +87,15 @@ export default function PrivacyPage() {
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
               itself runs on your phone, so videos you analyse without uploading never leave your device.
             </li>
+            <li>
+              Hoops you save in the shot tracker: the name you give each one and where the ring sits in the picture, so
+              you do not have to mark it again. Only you can see them.
+            </li>
+            <li>
+              For each shot tracker session you save: the tracker&apos;s own call on each shot next to yours, how smoothly
+              it ran, and your phone type (iPhone, Android or other). Used only to measure and improve the tracker, and
+              only ever added up across sessions, never shown per player.
+            </li>
             <li>AI coaching reports generated from your session data.</li>
             <li>Programs, goals, challenges, badges and NBA style match results.</li>
             <li>Game stats you log (box scores, opponent name, score) and teams you create or join.</li>
@@ -135,8 +144,8 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, and keeping the service secure rely on our
-              legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>

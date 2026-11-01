@@ -10,8 +10,8 @@
 // who saw what really happened - and /admin/tracker adds them up.
 //
 // Only numbers are kept: no video, no picture, nothing about where the player
-// was. The device is a coarse class (iOS or Android, phone or not, how many
-// cores), enough to tell a slow phone from a fast one and nothing more.
+// was. The device is only its platform (iPhone, Android or other), which is
+// all /admin/tracker groups by, and the privacy policy names it.
 import type { DetectedShot } from './shotDetector';
 import type { CourtZone } from '@/lib/court';
 
@@ -58,9 +58,6 @@ export interface RunQuality {
 
 export interface DeviceClass {
   os: 'ios' | 'android' | 'other';
-  mobile: boolean;
-  /** navigator.hardwareConcurrency, or null when the browser does not say. */
-  cores: number | null;
 }
 
 /**
@@ -70,15 +67,11 @@ export interface DeviceClass {
  * build, which is more than accuracy numbers need, and players can be 13.
  * iPadOS reports itself as a Mac, so a Mac with a touch screen counts as iOS.
  */
-export function deviceClass(userAgent: string, maxTouchPoints: number, cores: number | undefined): DeviceClass {
+export function deviceClass(userAgent: string, maxTouchPoints: number): DeviceClass {
   const ua = userAgent || '';
   const ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/i.test(ua) && maxTouchPoints > 1);
   const android = /Android/i.test(ua);
-  return {
-    os: ios ? 'ios' : android ? 'android' : 'other',
-    mobile: ios || android || /Mobi/i.test(ua),
-    cores: typeof cores === 'number' && Number.isFinite(cores) && cores > 0 ? Math.round(cores) : null,
-  };
+  return { os: ios ? 'ios' : android ? 'android' : 'other' };
 }
 
 /** One shot as saved in video_analyses.summary. Short keys: a session can hold hundreds. */

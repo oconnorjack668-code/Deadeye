@@ -12,19 +12,16 @@ import {
 
 describe('deviceClass', () => {
   it('reads iPhone, Android and desktop', () => {
-    expect(deviceClass('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)', 5, 6)).toEqual({ os: 'ios', mobile: true, cores: 6 });
-    expect(deviceClass('Mozilla/5.0 (Linux; Android 14; SM-A136B) Mobile', 5, 8)).toEqual({ os: 'android', mobile: true, cores: 8 });
-    expect(deviceClass('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 0, 12)).toEqual({ os: 'other', mobile: false, cores: 12 });
+    expect(deviceClass('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)', 5)).toEqual({ os: 'ios' });
+    expect(deviceClass('Mozilla/5.0 (Linux; Android 14; SM-A136B) Mobile', 5)).toEqual({ os: 'android' });
+    expect(deviceClass('Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 0)).toEqual({ os: 'other' });
   });
 
   it('counts an iPad, which reports itself as a Mac, as iOS', () => {
-    expect(deviceClass('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 5, 8).os).toBe('ios');
-    expect(deviceClass('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0, 8).os).toBe('other');
+    expect(deviceClass('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 5).os).toBe('ios');
+    expect(deviceClass('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)', 0).os).toBe('other');
   });
 
-  it('leaves out a core count the browser does not give', () => {
-    expect(deviceClass('', 0, undefined).cores).toBeNull();
-  });
 });
 
 describe('saved summaries', () => {
@@ -53,7 +50,7 @@ describe('saved summaries', () => {
   });
 
   it('round-trips through JSON', () => {
-    const summary = buildSummary({ source: 'camera', zone: 'all-around', shots, removed: 0, quality: { fps: 20, frames: 10, ballSeenPct: 1 }, device: { os: 'ios', mobile: true, cores: 6 }, activeMinutes: 12 });
+    const summary = buildSummary({ source: 'camera', zone: 'all-around', shots, removed: 0, quality: { fps: 20, frames: 10, ballSeenPct: 1 }, device: { os: 'ios' }, activeMinutes: 12 });
     expect(parseSummary(JSON.parse(JSON.stringify(summary)))).toEqual(summary);
   });
 

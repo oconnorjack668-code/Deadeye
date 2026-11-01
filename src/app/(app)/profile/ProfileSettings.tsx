@@ -56,6 +56,7 @@ export function ProfileSettings({ initialIsPublic, showLeaderboard = true }: { i
       try {
         localStorage.removeItem('hoopiq-offline-queue-v1');
         localStorage.removeItem('hoopiq-exercise-cache-v1');
+        localStorage.removeItem('hoopiq-saved-rims-v1');
       } catch {
         // storage unavailable
       }

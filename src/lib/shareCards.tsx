@@ -92,7 +92,7 @@ function ShotDots({ made, bestRun }: { made: boolean[]; bestRun: number }) {
         ))}
       </div>
       <div style={{ display: 'flex', fontSize: 30, color: '#d4d4d8', marginTop: 18 }}>
-        {`Best run ${bestRun} in a row · counted by the Deadeye tracker`}
+        {bestRun >= 2 ? `Best run ${bestRun} in a row · counted by the Deadeye tracker` : 'Counted by the Deadeye tracker'}
       </div>
     </div>
   );

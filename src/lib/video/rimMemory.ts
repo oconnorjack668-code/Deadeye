@@ -11,7 +11,9 @@
 // magnified view before it is used, never started on straight away.
 import { MAX_RIM_TILT, MAX_RIM_WIDTH, MIN_RIM_WIDTH, type Rim } from './shotDetector';
 
-const KEY = 'hoopiq-saved-rims-v1';
+/** Exported so sign-out and account deletion can clear it from a shared device. */
+export const SAVED_RIMS_KEY = 'hoopiq-saved-rims-v1';
+const KEY = SAVED_RIMS_KEY;
 /** Keeping a handful: past this the list is slower to pick from than to re-tap. */
 export const MAX_SAVED_RIMS = 6;
 export const MAX_RIM_NAME = 40;

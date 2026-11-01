@@ -33,4 +33,11 @@ export async function signOutOfThisPhone(): Promise<void> {
   await createClient().auth.signOut();
   // Pages kept for offline logging belong to this player
   if (typeof caches !== 'undefined') await caches.delete('hoopiq-pages-v1').catch(() => false);
+  // So are the hoops measured with the tracker: their names can say where the
+  // player lives, and the next person on a shared device should not see them
+  try {
+    localStorage.removeItem('hoopiq-saved-rims-v1');
+  } catch {
+    // storage unavailable
+  }
 }
