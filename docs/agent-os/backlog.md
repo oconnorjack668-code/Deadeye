@@ -59,7 +59,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
   Enter totals; an account that has logged before still opens in Track every shot.
 - Result: read after a week live, from `/admin/funnel` "Everyone", against 2 of 18 (11%).
 
-## E2 · "Trained already? Log it" for players away from a court · review (agent-os)
+## E2 · "Trained already? Log it" for players away from a court · shipped 2026-10-25
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (commit 204d097)
 
@@ -89,9 +89,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      today already? Log it by hand" shows under the intro, and opens the logger in Enter totals.
   5. Open Watch the tracker call a session, let it finish: the end card has Open the tracker, Log shots by hand
      and Back to my dashboard.
-- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%).
+- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup.
 
-## E3 · Markers for the welcome answer and the by-hand logger · review (agent-os)
+## E3 · Markers for the welcome answer and the by-hand logger · shipped 2026-10-25
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (commit 204d097)
 
@@ -124,7 +124,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      spot logged. At `/admin/funnel` the new rows show 1 at each step you reached (the page counts players who
      joined in the window, so use a new test account).
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
-- Result: read in the next data file, then after two weeks.
+- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault).
 
 ## E0 · Ask 5 players why they stopped · founder
 
