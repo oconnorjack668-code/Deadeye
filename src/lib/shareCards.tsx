@@ -75,9 +75,30 @@ export interface SessionCardData {
   minutes: number;
   drills: number;
   zones: Array<{ label: string; makes: number; attempts: number }>;
+  /** A session the tracker counted: every shot in order, and the best run of makes. */
+  tracked?: { made: boolean[]; bestRun: number } | null;
 }
 
-export function SessionCard({ date, type, minutes, drills, zones }: SessionCardData) {
+/** Most shots drawn as dots; past this the row would not fit the card. */
+const MAX_DOTS = 60;
+
+function ShotDots({ made, bestRun }: { made: boolean[]; bestRun: number }) {
+  const shown = made.slice(-MAX_DOTS);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 36 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
+        {shown.map((m, i) => (
+          <div key={i} style={{ display: 'flex', width: 26, height: 26, borderRadius: 13, backgroundColor: m ? '#34d399' : '#f87171' }} />
+        ))}
+      </div>
+      <div style={{ display: 'flex', fontSize: 30, color: '#d4d4d8', marginTop: 18 }}>
+        {`Best run ${bestRun} in a row · counted by the Deadeye tracker`}
+      </div>
+    </div>
+  );
+}
+
+export function SessionCard({ date, type, minutes, drills, zones, tracked }: SessionCardData) {
   const makes = zones.reduce((n, z) => n + z.makes, 0);
   const attempts = zones.reduce((n, z) => n + z.attempts, 0);
   const top = [...zones].sort((a, b) => b.attempts - a.attempts).slice(0, 4);
@@ -93,8 +114,9 @@ export function SessionCard({ date, type, minutes, drills, zones }: SessionCardD
             <div style={{ display: 'flex', fontSize: 56, fontWeight: 800, marginBottom: 30 }}>{`${makes}/${attempts}`}</div>
           </div>
           <div style={{ display: 'flex', fontSize: 30, color: '#a1a1aa', marginTop: 4 }}>shots made</div>
+          {tracked && tracked.made.length > 0 ? <ShotDots made={tracked.made} bestRun={tracked.bestRun} /> : null}
           <div style={{ display: 'flex', flexDirection: 'column', marginTop: 36 }}>
-            {top.map((z) => (
+            {top.slice(0, tracked ? 3 : 4).map((z) => (
               <Bar key={z.label} label={z.label} value={pct(z.makes, z.attempts)} sub={`${z.makes}/${z.attempts} · ${pct(z.makes, z.attempts)}%`} />
             ))}
           </div>

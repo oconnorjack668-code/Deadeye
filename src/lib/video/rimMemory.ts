@@ -4,10 +4,11 @@
 // general-purpose COCO model with no hoop class - it cannot find a rim by
 // itself. It does not have to ask twice for the same hoop, though.
 //
-// Kept on the device, not in the database, on purpose: a rim measurement is
-// only valid for one camera position, and where this phone sits is a property
-// of this phone. Syncing someone's driveway rim to their laptop would offer
-// them a measurement that cannot be right. It also needs no migration.
+// Kept on the device first, on purpose: a rim measurement is only valid for one
+// camera position, and where this phone sits is a property of this phone.
+// Since 00055 a copy also goes to the account (rimSync.ts), but one that did
+// not come from this device is marked fromAccount and always checked in the
+// magnified view before it is used, never started on straight away.
 import { MAX_RIM_TILT, MAX_RIM_WIDTH, MIN_RIM_WIDTH, type Rim } from './shotDetector';
 
 const KEY = 'hoopiq-saved-rims-v1';
@@ -21,6 +22,8 @@ export interface SavedRim {
   rim: Rim;
   /** Epoch ms, so the list can lead with what was used most recently. */
   usedAt: number;
+  /** Came from the account, not measured in this browser: check before use (rimSync.ts). */
+  fromAccount?: boolean;
 }
 
 /**

@@ -988,12 +988,19 @@ export function say(text: string, voiceUri: string | null): void {
   }
 }
 
-/** Announces one called shot: the chosen sound, then the chosen words. */
-export function announceShot(settings: SoundSettings, made: boolean, makes: number, attempts: number): void {
+/**
+ * Announces one called shot: the chosen sound, then the chosen words.
+ *
+ * `cue` is a drill instruction ("Move to the left wing.") said after the
+ * score, and said even with the voice off: a spots drill cannot be done
+ * without it. Joined into one line because say() cuts off anything still
+ * speaking, which would lose the score or the cue.
+ */
+export function announceShot(settings: SoundSettings, made: boolean, makes: number, attempts: number, cue?: string | null): void {
   if (settings.muted) return;
   resumeAudio();
   if (made) playMake(settings.make);
   else playMiss(settings.miss);
-  const line = spokenLine(settings.voice, made, makes, attempts);
+  const line = [spokenLine(settings.voice, made, makes, attempts), cue].filter(Boolean).join(' ');
   if (line) say(line, settings.voiceUri);
 }

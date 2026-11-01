@@ -156,6 +156,14 @@ export interface DetectedShot {
    * apart - see BORDERLINE_MARGIN below.
    */
   crossMargin?: number;
+  /**
+   * crossMargin with its side kept: negative when the ball crossed left of the
+   * rim's centre as the camera sees it, positive right. For telling a player
+   * which way they miss. Absent when no crossing was seen.
+   */
+  crossSide?: number;
+  /** The ball was seen coming back up off the ring before the call: it hit the rim. */
+  touchedRim?: boolean;
 }
 
 /**
@@ -346,6 +354,8 @@ interface Pending {
   /** When the ball reached the rim line. */
   t: number;
   margin: number;
+  /** The margin with its side kept, when where it crossed was seen or projected; see DetectedShot.crossSide. */
+  side?: number;
   confident: boolean;
   /** Sightings under the rim inside the net's width, and off to the side. */
   inside: number;
@@ -419,6 +429,12 @@ export class ShotDetector {
   private side(x: number): number {
     const { rim } = this;
     return rim.width > 0 ? Math.abs(x - rim.x) / (rim.width / 2) : Infinity;
+  }
+
+  /** Off the rim's centre in half-rim widths, negative to the left as the camera sees it. */
+  private signedSide(x: number): number {
+    const { rim } = this;
+    return rim.width > 0 ? (x - rim.x) / (rim.width / 2) : 0;
   }
 
   /** Feed one frame. Returns a shot when one is decided on this frame. */
@@ -513,7 +529,7 @@ export class ShotDetector {
         // Reached the ring, vanished, and is now dropping out from under the
         // net: it went through out of sight. Still needs the net to agree.
         if (this.nearAt !== null && below && obs.t - this.nearAt <= this.goneMs()) {
-          this.pending = { t: this.nearAt, margin: this.side(prev.x), confident: false, inside: 1, outside: 0, first: 'inside', order: ['inside'] };
+          this.pending = { t: this.nearAt, margin: this.side(prev.x), side: this.signedSide(prev.x), confident: false, inside: 1, outside: 0, first: 'inside', order: ['inside'] };
           return this.confirm({ t: obs.t, ball: null });
         }
         return null;
@@ -542,10 +558,10 @@ export class ShotDetector {
       const margin = this.side(crossX);
       const at = prev.t + (obs.t - prev.t) * Math.min(1, Math.max(0, fraction));
       const confident = obs.t - prev.t <= MAX_CROSSING_GAP_MS;
-      if (margin > MAKE_MARGIN) return this.decide(obs.t, false, confident, margin, at);
+      if (margin > MAKE_MARGIN) return this.decide(obs.t, false, confident, margin, at, this.signedSide(crossX));
       // Inside the ring on screen. That is necessary for a make, not proof of
       // one: see CONFIRM_MS.
-      this.pending = { t: at, margin, confident, inside: 0, outside: 0, first: null, order: [] };
+      this.pending = { t: at, margin, side: this.signedSide(crossX), confident, inside: 0, outside: 0, first: null, order: [] };
       return this.confirm(obs);
     }
 
@@ -561,7 +577,7 @@ export class ShotDetector {
     // whether it went through
     const crossX = this.hiddenCrossing();
     if (gone >= HIDDEN_MS && crossX !== null && this.netLog.length && this.side(crossX) <= MAKE_MARGIN) {
-      this.pending = { t: this.lastAbove!.t, margin: this.side(crossX), confident: false, inside: 0, outside: 0, first: null, order: [] };
+      this.pending = { t: this.lastAbove!.t, margin: this.side(crossX), side: this.signedSide(crossX), confident: false, inside: 0, outside: 0, first: null, order: [] };
       return this.confirm(obs);
     }
     // Confident when nothing says it went in. A ball that reached the ring and
@@ -650,7 +666,7 @@ export class ShotDetector {
     }
 
     // Seen dropping beside the ring and never under it: it rolled off the side
-    if (p.first === 'outside' && p.outside >= 2) return this.decide(obs.t, false, true, p.margin, p.t);
+    if (p.first === 'outside' && p.outside >= 2) return this.decide(obs.t, false, true, p.margin, p.t, p.side);
 
     const netKnown = this.netLog.some((n) => n.t >= p.t);
     const elapsed = obs.t - p.t;
@@ -660,7 +676,7 @@ export class ShotDetector {
       // under the ring settles it, and so does running out of time without
       // one, since the crossing itself was inside.
       if (p.first === 'inside' || elapsed >= CONFIRM_MS) {
-        return this.decide(obs.t, p.first !== 'outside', p.confident, p.margin, p.t);
+        return this.decide(obs.t, p.first !== 'outside', p.confident, p.margin, p.t, p.side);
       }
       return null;
     }
@@ -671,9 +687,9 @@ export class ShotDetector {
     // the ring first waits for the late window, which is the only thing that
     // tells a rattle-in from a ball that bounced out towards the camera and fell
     // past the front of the net while it was still shaking from the hit
-    if (moving >= NET_FRAMES && p.first === 'inside' && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t);
+    if (moving >= NET_FRAMES && p.first === 'inside' && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
     if (moving >= NET_FRAMES && p.first === 'inside' && elapsed >= LATE_MS) {
-      return this.decide(obs.t, true, late() >= NET_LATE * 2, p.margin, p.t);
+      return this.decide(obs.t, true, late() >= NET_LATE * 2, p.margin, p.t, p.side);
     }
     if (elapsed >= CONFIRM_MS) {
       // A make needs the net dragged and the ball seen under the ring. The net
@@ -682,7 +698,7 @@ export class ShotDetector {
       // clip, as many as a swish - unless it moved a great deal more than a
       // rim hit does. And the ball under the ring is not enough either: one
       // that fell past the front of it is there too, with the net still.
-      if (p.first === 'inside' && moving >= NET_FRAMES && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t);
+      if (p.first === 'inside' && moving >= NET_FRAMES && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
       if (p.first === 'inside' && moving >= NET_FRAMES && elapsed < LATE_MS) return null;
       if (p.first === null && moving >= NET_FRAMES && elapsed < LATE_MS) {
         // The net moved and the ball has not been seen since it reached the
@@ -694,7 +710,7 @@ export class ShotDetector {
         const swing = late();
         // Sure when the net is still swinging hard; a make, but worth a look,
         // when it only just clears the bar
-        if (swing >= NET_LATE) return this.decide(obs.t, true, swing >= NET_LATE * 2, p.margin, p.t);
+        if (swing >= NET_LATE) return this.decide(obs.t, true, swing >= NET_LATE * 2, p.margin, p.t, p.side);
         this.lateNet = swing;
         // The ring was hit and the ball has not been seen since. It may yet
         // drop in - a ball off the ring can go a metre up and still fall
@@ -713,7 +729,7 @@ export class ShotDetector {
       // The net hardly moved: it did not go through, however central it looked.
       // Sure when it barely moved at all. A ball brushing the net on the way
       // past moved it on up to four frames; a make, on six or more.
-      return this.decide(obs.t, false, moving <= NET_FRAMES - 2, p.margin, p.t);
+      return this.decide(obs.t, false, moving <= NET_FRAMES - 2, p.margin, p.t, p.side);
     }
     return null;
   }
@@ -736,7 +752,7 @@ export class ShotDetector {
         p.first === 'inside'
           ? moving >= NET_FRAMES
           : p.first === null && moving >= NET_FRAMES && this.netSum(p.t + CONFIRM_MS, t) >= NET_LATE;
-      return this.decide(t, made, false, p.margin, p.t);
+      return this.decide(t, made, false, p.margin, p.t, p.side);
     }
     // Reached the ring and not called yet: nothing says it went in
     if (this.armedAt !== null && this.nearAt !== null) return this.miss(t, false);
@@ -805,9 +821,17 @@ export class ShotDetector {
    * and differs from now: the call can come some time later, and the shot's
    * time is used to find it in the clip.
    */
-  private decide(t: number, made: boolean, confident: boolean, crossMargin?: number, at?: number): DetectedShot {
+  private decide(t: number, made: boolean, confident: boolean, crossMargin?: number, at?: number, crossSide?: number): DetectedShot {
     const reached = this.pending !== null || this.nearAt !== null || this.touchedAt !== null;
-    const shot: DetectedShot = { t: at ?? t, made, confident, ...(crossMargin === undefined ? {} : { crossMargin }) };
+    const shot: DetectedShot = {
+      t: at ?? t,
+      made,
+      confident,
+      ...(crossMargin === undefined ? {} : { crossMargin }),
+      // Only with a margin: a side without a crossing is a guess
+      ...(crossMargin === undefined || crossSide === undefined ? {} : { crossSide }),
+      ...(this.touchedAt !== null ? { touchedRim: true } : {}),
+    };
     this.shots.push(shot);
     this.armedAt = null;
     this.lastAbove = null;
