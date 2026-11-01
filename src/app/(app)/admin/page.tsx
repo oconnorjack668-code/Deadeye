@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users, Crosshair } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -117,6 +117,15 @@ export default async function AdminPage() {
       badge: null,
       tile: 'bg-sky-600/20',
       iconColor: 'text-sky-400',
+    },
+    {
+      href: '/admin/tracker',
+      icon: Crosshair,
+      title: 'Tracker accuracy',
+      desc: "The tracker's calls on players' own sessions against what they kept",
+      badge: null,
+      tile: 'bg-orange-600/20',
+      iconColor: 'text-orange-400',
     },
     {
       href: '/admin/detector-bench',

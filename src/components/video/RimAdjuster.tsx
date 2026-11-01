@@ -3,7 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Play, RotateCcw, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Play, RotateCcw, AlertTriangle, ZoomIn } from 'lucide-react';
 import {
   zoomRegionFor,
   toZoom,
@@ -29,6 +29,9 @@ export function RimAdjuster({
   onChange,
   onStart,
   onRedo,
+  zoomTo,
+  onZoom,
+  footer,
 }: {
   videoRef: React.RefObject<HTMLVideoElement | null>;
   /** Left end first. */
@@ -36,6 +39,11 @@ export function RimAdjuster({
   onChange: (edges: [Point, Point]) => void;
   onStart: () => void;
   onRedo: () => void;
+  /** Live camera only: the zoom that would make a small ring big enough, or null. */
+  zoomTo?: number | null;
+  onZoom?: () => void;
+  /** Shown above the buttons: the framing check. */
+  footer?: React.ReactNode;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   // Fixed when the view opens: a picture that moved under a dragging finger
@@ -203,12 +211,28 @@ export function RimAdjuster({
       {across !== null && across < SMALL_RIM_PX && (
         <div className="flex gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-200">
           <AlertTriangle className="h-4 w-4 flex-shrink-0 text-amber-400" />
-          <span>
-            The hoop is small in this video, only about {across} pixels across. Some makes and misses may be called wrong,
-            so check them at the end. Next time, film closer so the hoop fills more of the picture.
-          </span>
+          {zoomTo && onZoom ? (
+            <span className="flex-1">
+              The hoop is small in the picture, only about {across} pixels across, so some calls may be wrong. Zooming
+              the camera in fixes that.
+              <button
+                type="button"
+                onClick={onZoom}
+                className="mt-2 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-amber-500 font-semibold text-zinc-950"
+              >
+                <ZoomIn className="h-4 w-4" /> Zoom in to {zoomTo.toFixed(1)}×
+              </button>
+            </span>
+          ) : (
+            <span>
+              The hoop is small in this video, only about {across} pixels across. Some makes and misses may be called wrong,
+              so check them at the end. Next time, film closer so the hoop fills more of the picture.
+            </span>
+          )}
         </div>
       )}
+
+      {footer}
 
       <div className="grid grid-cols-[auto_1fr] gap-2">
         <Button variant="secondary" size="lg" onClick={onRedo} className="gap-2">

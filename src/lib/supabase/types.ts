@@ -328,6 +328,13 @@ export interface Database {
         Update: { club_id?: string; show_on_card?: boolean; updated_at?: string };
         Relationships: [];
       };
+      // Hoops measured with the shot tracker (00055), owner-only; see src/lib/video/rimSync.ts
+      saved_rims: {
+        Row: { id: string; user_id: string; name: string; rim: Json; used_at: string; created_at: string };
+        Insert: { id?: string; user_id: string; name: string; rim: Json; used_at?: string; created_at?: string };
+        Update: { name?: string; rim?: Json; used_at?: string };
+        Relationships: [];
+      };
       // "My club is not listed" (00051): written by api/clubs/suggest, read by the player and the owner
       club_suggestions: {
         Row: { id: string; user_id: string; club_name: string; town: string | null; county: string | null; resolved: boolean; created_at: string };

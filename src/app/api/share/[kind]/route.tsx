@@ -14,6 +14,8 @@ import { ZONE_LABELS } from '@/lib/court';
 import { asMeasurementSystem, displayWeight, weightUnitLabel } from '@/lib/units';
 import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
 import { CARD_HEIGHT, CARD_WIDTH, Frame, GameCard, RankCard, SessionCard, WorkoutCard, titleCase } from '@/lib/shareCards';
+import { parseSummary } from '@/lib/video/trackedShots';
+import { streaks } from '@/lib/video/shotStats';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,12 +45,25 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
   let body: React.ReactNode;
 
   if (kind === 'session') {
-    const { data: session } = await supabase
-      .from('training_sessions')
-      .select('session_date, session_type, duration_minutes, session_drills(shooting_entries(shot_zone, makes, attempts))')
-      .eq('id', id)
-      .eq('user_id', user.id)
-      .maybeSingle();
+    const [{ data: session }, { data: analysis }] = await Promise.all([
+      supabase
+        .from('training_sessions')
+        .select('session_date, session_type, duration_minutes, session_drills(shooting_entries(shot_zone, makes, attempts))')
+        .eq('id', id)
+        .eq('user_id', user.id)
+        .maybeSingle(),
+      supabase
+        .from('video_analyses')
+        .select('summary')
+        .eq('session_id', id)
+        .eq('user_id', user.id)
+        .eq('kind', 'shot_tracking')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+    const tracked = analysis ? parseSummary(analysis.summary) : null;
+    const made = tracked?.shots.map((s) => s.made) ?? [];
     if (!session) return new Response('Not found', { status: 404 });
     // session_drills(shooting_entries(...)) is a two-level embed, which this
     // hand-written schema doesn't model relationship metadata for.
@@ -74,6 +89,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
         minutes={typedSession.duration_minutes}
         drills={(typedSession.session_drills || []).length}
         zones={[...zones.entries()].map(([zone, z]) => ({ label: ZONE_LABELS[zone as keyof typeof ZONE_LABELS] || titleCase(zone), ...z }))}
+        tracked={made.length ? { made, bestRun: streaks(made).best } : null}
       />
     );
   } else if (kind === 'workout') {

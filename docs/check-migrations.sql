@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00054, 54 files, 256 things). Do not edit it by
+-- (00001 to 00055, 55 files, 258 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -276,7 +276,9 @@ WITH expected(migration, kind, obj, col) AS (
     ('00053', 'function', 'end_club_challenge', ''),
     ('00053', 'function', 'club_challenge_for', ''),
     ('00054', 'column', 'founder_posts', 'everyone'),
-    ('00054', 'index', 'idx_founder_posts_everyone_created', '')
+    ('00054', 'index', 'idx_founder_posts_everyone_created', ''),
+    ('00055', 'table', 'saved_rims', ''),
+    ('00055', 'index', 'saved_rims_user_name_idx', '')
 ),
 checked AS (
   SELECT
