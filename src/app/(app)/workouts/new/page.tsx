@@ -670,7 +670,7 @@ export default function NewWorkoutPage() {
           </Link>
           <div className="text-center">
             <h1 className="text-lg font-black text-white">Log Workout</h1>
-            <p className="text-xs text-zinc-500">{doneSets} sets done</p>
+            <p className="text-sm text-zinc-500">{doneSets} sets done</p>
           </div>
           <Button variant="primary" size="sm" onClick={openFinish}>
             Finish
@@ -680,7 +680,7 @@ export default function NewWorkoutPage() {
         {waiting && (
           <div role="status" className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
             <p className="text-sm font-semibold text-amber-200">You have an unfinished workout</p>
-            <p className="mt-1 text-xs text-zinc-400">
+            <p className="mt-1 text-sm text-zinc-400">
               Below is the workout you started earlier, with {doneSets} {doneSets === 1 ? 'set' : 'sets'} done. Carry on with it, or start
               the one you just opened ({waiting.length} {waiting.length === 1 ? 'exercise' : 'exercises'}).
             </p>
@@ -733,7 +733,7 @@ export default function NewWorkoutPage() {
               <div className="flex items-start justify-between mb-2">
                 <div>
                   <h3 className="font-bold text-white">{e.name}</h3>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-sm text-zinc-500">
                     {muscleLabel(e.primaryMuscle)}
                     {e.history.length > 0 && (
                       <>
@@ -752,7 +752,7 @@ export default function NewWorkoutPage() {
                         type="button"
                         onClick={() => setMode(e, m)}
                         aria-pressed={(e.mode ?? 'reps') === m}
-                        className={`rounded-md px-2 py-0.5 text-[11px] font-semibold capitalize ${
+                        className={`rounded-md px-2 py-0.5 text-xs font-semibold capitalize ${
                           (e.mode ?? 'reps') === m ? 'bg-zinc-600 text-white' : 'text-zinc-400 hover:text-zinc-200'
                         }`}
                       >
@@ -771,7 +771,7 @@ export default function NewWorkoutPage() {
                 </button>
               </div>
 
-              <div className="grid grid-cols-[2rem_1fr_4.5rem_4rem_2.75rem] gap-2 px-1 pb-1 text-[11px] font-semibold uppercase text-zinc-500">
+              <div className="grid grid-cols-[2rem_1fr_4.5rem_4rem_2.75rem] gap-2 px-1 pb-1 text-xs font-semibold uppercase text-zinc-500">
                 <span>Set</span>
                 <span>Previous</span>
                 <span className="text-center">{unit}</span>
@@ -804,7 +804,7 @@ export default function NewWorkoutPage() {
                       placeholder={prev?.weight_kg ? String(displayWeight(prev.weight_kg, units)) : '—'}
                       onChange={(ev) => updateSet(e.key, i, { weight: ev.target.value, done: false, isPR: false })}
                       aria-label={`${e.name} set ${i + 1} weight in ${unit}`}
-                      className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-600"
+                      className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-500"
                     />
                     <input
                       inputMode={mode === 'distance' ? 'decimal' : 'numeric'}
@@ -812,7 +812,7 @@ export default function NewWorkoutPage() {
                       placeholder={prevAmount ? String(prevAmount) : '0'}
                       onChange={(ev) => updateSet(e.key, i, { reps: ev.target.value, done: false, isPR: false })}
                       aria-label={`${e.name} set ${i + 1} ${mode === 'time' ? 'seconds' : mode === 'distance' ? 'metres' : 'reps'}`}
-                      className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-600"
+                      className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-500"
                     />
                     <button
                       type="button"

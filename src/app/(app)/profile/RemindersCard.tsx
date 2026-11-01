@@ -200,7 +200,7 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
                 </button>
               ))}
             </div>
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-500">
               Reminders come once a day, {REMINDER_TIME_LABEL}. If your streak would end tonight, you also get one warning
               then, even on a day you did not pick.
             </p>
@@ -252,7 +252,7 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
             </Link>
           </div>
         )}
-        {message && <p className="text-xs text-zinc-300">{message}</p>}
+        {message && <p className="text-sm text-zinc-300">{message}</p>}
       </CardContent>
     </Card>
   );

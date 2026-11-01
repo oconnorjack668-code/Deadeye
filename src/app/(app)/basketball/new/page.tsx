@@ -638,7 +638,7 @@ export default function NewBasketballSessionPage() {
           </Link>
           <div className="text-center">
             <h1 className="text-lg font-black text-white">Hoops Session</h1>
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-500">
               {totalMakes}/{allShots.length} · {pct(totalMakes, allShots.length)}
             </p>
           </div>
@@ -736,7 +736,7 @@ export default function NewBasketballSessionPage() {
         ) : (
           // Sits directly above the logging buttons because those are disabled
           // until a spot is picked - the page-level error Alert is off-screen here.
-          <p className="mt-2 mb-3 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-center text-xs font-semibold text-orange-300">
+          <p className="mt-2 mb-3 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2 text-center text-sm font-semibold text-orange-300">
             Tap the court above to set where you are shooting from
           </p>
         )}
@@ -835,10 +835,10 @@ export default function NewBasketballSessionPage() {
             </div>
 
             {!attemptsValid ? (
-              <p className="text-xs text-zinc-500">Shots per spot is a whole number from 1 to 1000.</p>
+              <p className="text-sm text-zinc-500">Shots per spot is a whole number from 1 to 1000.</p>
             ) : attempts <= TAP_MAKES_MAX ? (
               <div>
-                <p className="mb-1.5 text-xs font-semibold text-zinc-400">How many went in?</p>
+                <p className="mb-1.5 text-sm font-semibold text-zinc-400">How many went in?</p>
                 <div className={`grid gap-1.5 ${attempts <= 10 ? 'grid-cols-6' : 'grid-cols-7'}`}>
                   {Array.from({ length: attempts + 1 }, (_, n) => (
                     <button

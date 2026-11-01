@@ -1,7 +1,7 @@
 // src/components/FounderNotice.tsx
 // A founder post sent to every player (00054), as a slim strip at the very top
-// of the dashboard: one line of label running into the message, cut to two
-// lines with Read more, so it is noticed without pushing Today down. Amber, the
+// of the dashboard: one line of label running into the message, cut to one
+// line with Read more, so it is noticed without pushing Today down. Amber, the
 // app's "worth a look" colour: red means an error or a miss, and a note from the
 // founder should not read as something broken.
 // Dismissing it hides it on this device only, since there is nothing to save;
@@ -13,8 +13,8 @@ import { Megaphone, X } from 'lucide-react';
 import type { FounderPost } from '@/lib/founderPosts';
 
 const DISMISSED_KEY = 'deadeye:founder-notice-dismissed';
-// Past this, the two-line cut will usually hide some of it, so offer Read more
-const LONG_AT = 110;
+// Past this, the one-line cut will usually hide some of it, so offer Read more
+const LONG_AT = 45;
 const listeners = new Set<() => void>();
 
 /** The id of the notice dismissed on this device, or an empty string */
@@ -51,7 +51,7 @@ export function FounderNotice({ post }: { post: FounderPost }) {
     <section className="mb-4 flex items-start gap-2.5 rounded-xl border border-amber-500/20 bg-amber-500/[0.07] px-3 py-2.5">
       <Megaphone className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-400" />
       <div className="min-w-0 flex-1 text-sm leading-snug">
-        <p className={`whitespace-pre-line break-words text-zinc-200 ${open ? '' : 'line-clamp-2'}`}>
+        <p className={`whitespace-pre-line break-words text-zinc-200 ${open ? '' : 'line-clamp-1'}`}>
           <span className="font-semibold text-amber-300">From the founder</span>
           <span className="text-zinc-500"> · </span>
           {post.body}

@@ -38,7 +38,7 @@ function VerifyEmailContent() {
               </div>
             </div>
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-500">
               Did not receive the email? Check your spam folder or verify with SMTP in production.
             </p>
           </CardContent>

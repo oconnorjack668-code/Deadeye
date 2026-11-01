@@ -174,7 +174,7 @@ export function AskClient({
                 className="w-full rounded-xl bg-black"
                 onTimeUpdate={(e) => setMomentMs(e.currentTarget.currentTime * 1000)}
               />
-              <p className="text-xs text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 Pause on the moment you want to ask about. Marked at{' '}
                 <span className="font-semibold text-white tabular-nums">{momentClock(momentMs)}</span>.
               </p>
@@ -196,7 +196,7 @@ export function AskClient({
               maxLength={MAX_PLAYER_READ}
               rows={2}
               placeholder="I thought the help defender was late so the lane was open"
-              className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white placeholder:text-zinc-600"
+              className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white placeholder:text-zinc-500"
             />
           </label>
 
@@ -208,7 +208,7 @@ export function AskClient({
               maxLength={MAX_QUESTION}
               rows={2}
               placeholder="Should I have driven here or kicked it to the corner?"
-              className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white placeholder:text-zinc-600"
+              className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm font-normal normal-case tracking-normal text-white placeholder:text-zinc-500"
             />
           </label>
 
@@ -228,7 +228,7 @@ export function AskClient({
             </select>
           </label>
 
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             {teamId
               ? 'The head coaches of this team can watch this one moment of this one clip, and all of them see the same question, so it is never a private chat. Assistant coaches cannot. Nobody can browse your other videos, and deleting the question takes their access with it.'
               : 'Nobody else sees this. Worth knowing: people are often confident and wrong in equal measure about their own decisions, so an outside answer is worth more than your own.'}
@@ -254,7 +254,7 @@ export function AskClient({
         </Card>
       )}
       {accuracy.rate === null && accuracy.judged > 0 && (
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           {MIN_ANSWERED_FOR_RATE - accuracy.judged} more answers and you will see how often your read matches your
           coach.
         </p>
@@ -267,7 +267,7 @@ export function AskClient({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-white">{q.question}</p>
-                  <p className="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-500">
+                  <p className="mt-0.5 flex items-center gap-1.5 text-sm text-zinc-500">
                     <Clock className="h-3 w-3" /> {momentClock(q.moment_ms)}
                     {q.team_id === null && ' · just you'}
                   </p>
@@ -293,7 +293,7 @@ export function AskClient({
                   {/* Safeguarding: anything a coach writes can be reported to us (Owner tools) */}
                   {q.coach_note && (
                     <ReportProblem
-                      label={<span className="mt-2 inline-block text-[11px] text-zinc-500 underline hover:text-zinc-300">Report this answer</span>}
+                      label={<span className="mt-2 inline-block text-xs text-zinc-500 underline hover:text-zinc-300">Report this answer</span>}
                       question="What is wrong with this answer?"
                       placeholder="Tell us what worries you. Only the Deadeye team reads this, not your coach."
                       context={`Coach post: film answer ${q.id}: ${q.coach_note}`.slice(0, 300)}
@@ -302,7 +302,7 @@ export function AskClient({
                   )}
                 </div>
               ) : (
-                <p className="mt-2 text-xs text-amber-400">
+                <p className="mt-2 text-sm text-amber-400">
                   {q.team_id ? 'Waiting on your coach' : 'Saved for you to come back to'}
                 </p>
               )}

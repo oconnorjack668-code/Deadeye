@@ -188,8 +188,8 @@ export function HighlightReel({ file, makeTimesMs, makes, attempts }: { file: Fi
           </Button>
         </>
       )}
-      {error && <p className="text-xs text-red-300">{error}</p>}
-      {windows.length > 0 && !result && !busy && <p className="text-[11px] text-zinc-500">{windows.length} clips · no sound</p>}
+      {error && <p className="text-sm text-red-300">{error}</p>}
+      {windows.length > 0 && !result && !busy && <p className="text-sm text-zinc-500">{windows.length} clips · no sound</p>}
     </div>
   );
 }

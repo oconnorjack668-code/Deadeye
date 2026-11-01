@@ -141,12 +141,12 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
         {withdrawBy && <WithdrawFromContract deadline={withdrawBy} />}
 
         {!isPaying && (
-          <p className="text-xs text-zinc-400">
+          <p className="text-sm text-zinc-400">
             Under 18? Talk to a parent or guardian before buying Pro. They can pay for it, and they can see exactly what it
             includes on this page.
           </p>
         )}
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           The price shown is the full price you pay. Payments are handled securely by Stripe. Pro renews automatically until
           you cancel; cancel any time from Manage subscription. In the first 14 days you can also withdraw for a full refund.
           See the{' '}

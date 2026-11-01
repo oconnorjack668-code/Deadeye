@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 
 export function FounderBadge({ className = '' }: { className?: string }) {
   return (
-    <Badge variant="brand" className={`flex-shrink-0 gap-1 px-2 py-0 text-[10px] ${className}`}>
+    <Badge variant="brand" className={`flex-shrink-0 gap-1 px-2 py-0 text-xs ${className}`}>
       <BadgeCheck className="h-3 w-3" aria-hidden />
       Founder
     </Badge>

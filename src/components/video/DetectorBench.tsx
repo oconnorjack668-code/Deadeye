@@ -655,7 +655,7 @@ export function DetectorBench() {
                   ? 'Now tap the opposite side, straight across the ring.'
                   : 'Tap the left and right edges of the ring — its widest points across, not the front and back.'}
               </p>
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="mt-1 text-sm text-zinc-400">
                 Playback is paused and the video controls are off, so your taps land on the frame instead of
                 starting the video.
               </p>
@@ -762,13 +762,13 @@ export function DetectorBench() {
           </Button>
 
           {phase === 'loading' && (
-            <p className="text-xs text-zinc-400">
+            <p className="text-sm text-zinc-400">
               Fetching the detector model and runtime (about 10 MB, from two CDNs). Only the first run pays
               for this; after that the browser has them cached.
             </p>
           )}
           {phase === 'measuring' && (
-            <p className="text-xs text-zinc-400">
+            <p className="text-sm text-zinc-400">
               {mode === 'every-frame'
                 ? 'Seeking to every frame in turn, so this takes longer than the clip. It can run in a background tab.'
                 : 'The clip plays at normal speed, so the detector sees frames the way the live tracker does. Keep this page in front of you - a backgrounded tab stops sending frames.'}
@@ -791,7 +791,7 @@ export function DetectorBench() {
             </Alert>
           )}
           {!rim && (
-            <p className="text-xs text-amber-400">
+            <p className="text-sm text-amber-400">
               Set the rim first. Without it this only measures the full frame, which is the case that already
               fails - it cannot tell you whether cropping to the hoop helps.
             </p>
@@ -886,7 +886,7 @@ export function DetectorBench() {
                   ))}
                 </div>
               )}
-              <p className="text-xs text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 If &ldquo;sports ball&rdquo; is absent but other classes are present, the model works and simply cannot
                 resolve the ball. If it is present here but the benchmark above finds nothing, the score threshold or
                 the class filter is wrong.
@@ -948,7 +948,7 @@ export function DetectorBench() {
                     {report.wallClockS.toFixed(0)}s for {report.durationS.toFixed(0)}s of clip
                   </span>
                 </div>
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-sm text-zinc-500">
                   Gaps matter most: an armed shot with the ball unseen for {LOST_BALL_MS} ms is scored a miss, so a high
                   gap count predicts makes being called misses.
                 </p>
@@ -968,7 +968,7 @@ export function DetectorBench() {
                         <span className={s.made ? 'font-semibold text-emerald-400' : 'font-semibold text-red-400'}>
                           {s.made ? 'MAKE' : 'MISS'}
                         </span>
-                        {!s.confident && <span className="text-[10px] uppercase text-amber-500">inferred</span>}
+                        {!s.confident && <span className="text-xs uppercase text-amber-500">inferred</span>}
                       </div>
                     ))}
                   </div>
@@ -996,7 +996,7 @@ export function DetectorBench() {
                   />
                 </div>
                 {truthImpossible && (
-                  <p className="mt-2 text-xs font-semibold text-amber-400">
+                  <p className="mt-2 text-sm font-semibold text-amber-400">
                     That is more makes than attempts, so the comparison is hidden. Attempts goes in the left
                     box, makes in the right.
                   </p>
@@ -1017,7 +1017,7 @@ export function DetectorBench() {
                     <span className="text-right font-semibold text-white">{pct(Math.min(detectedAttempts, ta), ta)}</span>
                   </div>
                 )}
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-sm text-zinc-500">
                   Counts only. Matching each detected shot to the right real one needs the review UI; this is enough to
                   tell whether the detector is worth building on.
                 </p>

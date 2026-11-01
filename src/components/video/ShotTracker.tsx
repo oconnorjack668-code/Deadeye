@@ -1208,7 +1208,7 @@ export function ShotTracker({
               </span>
             </span>
           </button>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             The rim is already set for this clip. At a court you tap its two sides once, then just shoot.
           </p>
         </div>
@@ -1246,7 +1246,7 @@ export function ShotTracker({
               <li>• Not facing bright windows or the sun</li>
               <li>• Upload the original video, not a screen recording or one sent through a messaging app</li>
             </ul>
-            <p className="mt-2 text-xs text-zinc-500">Your video stays on your phone.</p>
+            <p className="mt-2 text-sm text-zinc-500">Your video stays on your phone.</p>
           </div>
         </div>
       )}
@@ -1405,7 +1405,7 @@ export function ShotTracker({
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 A saved rim only fits the spot the camera was in when you measured it. If the phone has moved,
                 tap the rim again.
               </p>
@@ -1446,7 +1446,7 @@ export function ShotTracker({
               <div className="h-full bg-orange-500" style={{ width: `${Math.round(progress * 100)}%` }} />
             </div>
           )}
-          <p className="text-xs text-zinc-500 flex items-center gap-1.5">
+          <p className="text-sm text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />
             {rechecked
               ? 'Checking the recording again at full frame rate. It plays at normal speed.'
@@ -1512,7 +1512,7 @@ export function ShotTracker({
               {/* Judged on how many shots the tracker was unsure of, not on how
                   often the ball was in view: the tracker reports only a ball in
                   flight, under a tenth of the frames of a normal session. */}
-              <p className="mt-1.5 text-xs text-zinc-500">
+              <p className="mt-1.5 text-sm text-zinc-500">
                 {lowFps
                   ? recording
                     ? 'That is a low frame rate, so shots may have been missed between frames. Check it again from the recording below to catch them.'
@@ -1531,14 +1531,14 @@ export function ShotTracker({
           {recording && !rechecked && rim && (
             <div className={`rounded-2xl border p-3 ${lowFps ? 'border-orange-500/50 bg-orange-600/10' : 'border-zinc-800 bg-zinc-900/70'}`}>
               <p className="text-sm font-semibold text-white">Check again from the recording</p>
-              <p className="mt-1 text-xs text-zinc-400">
+              <p className="mt-1 text-sm text-zinc-400">
                 Runs the tracker over the video at its full frame rate. It plays at normal speed, so it takes as long as the session
                 did ({clock(elapsedMs)}). The calls below are replaced by the new ones.
               </p>
               <Button variant={lowFps ? 'primary' : 'secondary'} size="sm" className="mt-2 gap-2" onClick={recheck}>
                 <RotateCcw className="h-4 w-4" /> Check again
               </Button>
-              {recording.capped && <p className="mt-2 text-xs text-zinc-500">The recording stopped early to save space, so only the first part is in it.</p>}
+              {recording.capped && <p className="mt-2 text-sm text-zinc-500">The recording stopped early to save space, so only the first part is in it.</p>}
             </div>
           )}
 
@@ -1687,7 +1687,7 @@ export function ShotTracker({
                   <label htmlFor="rim-name" className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
                     Remember this hoop?
                   </label>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-sm text-zinc-500">
                     Skip the two taps next time you film from this spot. Kept on this phone and with your account. Only you
                     see it, so no addresses needed.
                   </p>
@@ -1732,7 +1732,7 @@ export function ShotTracker({
             />
           ) : (
             makes > 0 && (
-              <p className="flex items-start gap-2 text-xs text-zinc-500">
+              <p className="flex items-start gap-2 text-sm text-zinc-500">
                 <Film className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
                 Keep the video for replays next time, or film with your phone&apos;s camera app and choose &ldquo;Video from your phone&rdquo;, to get a
                 highlight reel of your makes.

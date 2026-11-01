@@ -99,7 +99,7 @@ export function DrillPicker({ value, onChange }: { value: DrillMode; onChange: (
         </div>
       )}
 
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         {value.kind === 'free'
           ? 'Counts every shot it sees until you stop.'
           : value.kind === 'target'

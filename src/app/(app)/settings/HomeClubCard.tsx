@@ -175,7 +175,7 @@ export function HomeClubCard({
                 className={input}
               />
             </div>
-            <p className="text-xs text-zinc-500">Just the club, please: no names, phone numbers or emails.</p>
+            <p className="text-sm text-zinc-500">Just the club, please: no names, phone numbers or emails.</p>
             <div className="flex gap-2">
               <Button className="flex-1" onClick={suggest} disabled={busy || suggestion.clubName.trim().length < 2} isLoading={busy}>
                 Send

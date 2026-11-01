@@ -190,7 +190,7 @@ export default async function Home() {
                 How to get the app
               </a>
             </div>
-            <p className="mt-4 text-xs text-zinc-500">Free to start · For players aged 13 and over · No ads</p>
+            <p className="mt-4 text-sm text-zinc-500">Free to start · For players aged 13 and over · No ads</p>
             <a href="#try-it" className="mt-3 inline-block text-sm font-semibold text-orange-400 hover:text-orange-300">
               Watch it track real shots, right here ↓
             </a>

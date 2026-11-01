@@ -303,7 +303,7 @@ export function EditWorkout({
                     aria-label={`${g.name} set ${r.set.set_number} ${SET_MODE_UNIT[r.mode]}`}
                     className={`${field} pr-9 text-center`}
                   />
-                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-zinc-500">{SET_MODE_UNIT[r.mode]}</span>
+                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-xs text-zinc-500">{SET_MODE_UNIT[r.mode]}</span>
                 </div>
                 <button
                   type="button"

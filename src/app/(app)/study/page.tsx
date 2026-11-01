@@ -246,7 +246,7 @@ export default async function StudyPage() {
                         <span className="text-sm font-bold text-blue-400 flex-shrink-0">{percent}%</span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-400 mt-2">{topic.description}</p>
+                    <p className="text-sm text-zinc-400 mt-2">{topic.description}</p>
                     <div className="mt-4 flex items-center gap-3">
                       <div className="h-1.5 flex-1 rounded-full bg-zinc-800 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400" style={{ width: `${percent}%` }} />

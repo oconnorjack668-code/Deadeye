@@ -40,7 +40,7 @@ export function AgeCheckForm() {
     <form onSubmit={submit} className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5">
       {error && <Alert variant="error">{error}</Alert>}
       <AgeChoice value={age} onChange={setAge} />
-      <p className="text-xs text-zinc-500">Please answer honestly. You can&apos;t change this answer later.</p>
+      <p className="text-sm text-zinc-500">Please answer honestly. You can&apos;t change this answer later.</p>
       <Button type="submit" className="w-full" isLoading={saving}>
         Continue
       </Button>

@@ -34,8 +34,10 @@ export function FoundingCard({
   const price = founderPrice || FOUNDER_PRICE_FALLBACK;
 
   if (state.kind === 'can-claim') {
+    // A plain card: Today, above it, is the one highlighted card on the
+    // dashboard (docs/design.md allows one gradient a screen)
     return (
-      <div className="mb-4 rounded-2xl border border-amber-500/50 bg-gradient-to-br from-amber-500/15 to-transparent p-5">
+      <div className="mb-4 rounded-2xl border border-amber-500/40 bg-zinc-900/70 p-5">
         <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
           <Gift className="h-4 w-4" /> Founding member offer
         </p>

@@ -65,7 +65,7 @@ export function ParentApprovalForm({ token, child, emailStep }: { token: string;
       <Button type="submit" className="w-full" isLoading={saving}>
         {emailStep ? 'Continue' : 'Approve'}
       </Button>
-      {emailStep && <p className="text-xs text-zinc-500">We will email you a link to confirm.</p>}
+      {emailStep && <p className="text-sm text-zinc-500">We will email you a link to confirm.</p>}
     </form>
   );
 }

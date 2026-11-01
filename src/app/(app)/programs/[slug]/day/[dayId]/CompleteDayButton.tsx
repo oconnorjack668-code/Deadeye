@@ -65,7 +65,7 @@ export function CompleteDayButton({
         <CheckCircle2 className={`h-4 w-4 ${done ? 'text-emerald-400' : ''}`} />
         {done ? 'Completed (tap to undo)' : 'Mark session complete'}
       </Button>
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
     </div>
   );
 }

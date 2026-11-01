@@ -14,8 +14,8 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
   return (
     <div className="rounded-xl bg-zinc-950/60 border border-zinc-800 p-3 text-center">
       <div className="text-2xl font-black text-white">{value}</div>
-      <div className="text-[11px] font-semibold uppercase text-zinc-500">{label}</div>
-      {sub && <div className="text-[10px] text-zinc-600">{sub}</div>}
+      <div className="text-xs font-semibold uppercase text-zinc-500">{label}</div>
+      {sub && <div className="text-xs text-zinc-500">{sub}</div>}
     </div>
   );
 }
@@ -92,7 +92,7 @@ export default async function GamesPage() {
                 <Stat label="BPG" value={`${s.bpg}`} />
                 <Stat label="TOPG" value={`${s.topg}`} />
               </div>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 Effective FG% {fmtPct(s.efgPct)} · True shooting {fmtPct(s.tsPct)}
                 {s.mpg != null ? ` · ${s.mpg} min per game` : ''}
               </p>
@@ -104,7 +104,7 @@ export default async function GamesPage() {
                 <div className="flex items-end gap-1.5 h-32">
                   {last10.map((g) => (
                     <Link key={g.id} href={`/games/${g.id}`} className="flex-1 flex flex-col items-center justify-end h-full group">
-                      <span className="text-[10px] text-zinc-400 mb-0.5">{g.points}</span>
+                      <span className="text-xs text-zinc-400 mb-0.5">{g.points}</span>
                       <div
                         className={`w-full rounded-t-md ${g.result === 'win' ? 'bg-emerald-500' : g.result === 'loss' ? 'bg-red-500/80' : 'bg-orange-500'} group-hover:opacity-80`}
                         style={{ height: `${Math.max(4, (g.points / maxPts) * 100)}%` }}

@@ -68,10 +68,10 @@ export async function AfterSession({
                       {z.before !== null && <span className="text-xs text-zinc-500">{z.before}% →</span>}
                       <span className="font-bold text-white">{z.now}%</span>
                       {change === null ? (
-                        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-semibold text-zinc-400">new spot</span>
+                        <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs font-semibold text-zinc-400">new spot</span>
                       ) : change !== 0 ? (
                         <span
-                          className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          className={`inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold ${
                             change > 0 ? 'bg-emerald-500/15 text-emerald-300' : 'bg-red-500/15 text-red-300'
                           }`}
                         >
@@ -93,7 +93,7 @@ export async function AfterSession({
               );
             })}
           </ul>
-          <p className="mt-3 text-[11px] text-zinc-500">
+          <p className="mt-3 text-sm text-zinc-500">
             Bar: this session. White line: your earlier sessions. {progress.overall.now}% overall today
             {progress.overall.before !== null ? `, ${progress.overall.before}% before` : ''}.
           </p>

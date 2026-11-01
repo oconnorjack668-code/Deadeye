@@ -17,7 +17,7 @@ export function ProBadge({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        'inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-amber-300 ring-1 ring-amber-500/30',
+        'inline-flex flex-shrink-0 items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-amber-300 ring-1 ring-amber-500/30',
         className
       )}
     >
@@ -29,7 +29,7 @@ export function ProBadge({ className }: { className?: string }) {
 /** One line under something Free shows part of, saying what the rest is. */
 export function ProNote({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <p className={cn('flex items-start gap-2 text-xs text-zinc-400', className)}>
+    <p className={cn('flex items-start gap-2 text-sm text-zinc-400', className)}>
       <Crown className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-amber-400" />
       <span>
         {children}{' '}

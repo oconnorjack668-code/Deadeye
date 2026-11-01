@@ -159,12 +159,12 @@ export default async function AdminPage() {
                   <span className="flex items-center gap-2">
                     <span className="font-semibold text-white">{t.title}</span>
                     {t.badge && (
-                      <span className="rounded-full bg-orange-600 px-2 py-0.5 text-[11px] font-bold text-white">{t.badge}</span>
+                      <span className="rounded-full bg-orange-600 px-2 py-0.5 text-xs font-bold text-white">{t.badge}</span>
                     )}
                   </span>
                   <span className="block text-xs text-zinc-500">{t.desc}</span>
                 </span>
-                <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
               </Link>
             );
           })}

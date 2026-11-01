@@ -118,7 +118,7 @@ export default async function CoachPage() {
 
         {teams.length === 0 ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center space-y-3">
-            <Shield className="h-10 w-10 text-zinc-600 mx-auto" />
+            <Shield className="h-10 w-10 text-zinc-500 mx-auto" />
             <p className="font-semibold text-white">You&apos;re not coaching a team yet</p>
             <p className="text-sm text-zinc-400">
               {isAdult ? 'Create your team, or join one another coach made.' : 'Ask your head coach for the team code and join it.'}
@@ -135,7 +135,7 @@ export default async function CoachPage() {
                   <Link href={`/teams/${team.id}`} className="text-xl font-black text-white hover:underline">
                     {team.name}
                   </Link>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-sm text-zinc-500">
                     {[team.club_name, team.age_group, team.role === 'assistant' ? ROLE_LABELS.assistant : null].filter(Boolean).join(' · ') ||
                       `${s.players} players`}
                   </p>
@@ -147,19 +147,19 @@ export default async function CoachPage() {
                   <div className="text-2xl font-black text-white">
                     {s.activeThisWeek}/{s.players}
                   </div>
-                  <div className="text-[11px] text-zinc-500">trained this week</div>
+                  <div className="text-xs text-zinc-500">trained this week</div>
                 </div>
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <div className="text-2xl font-black text-white">{s.minutes}</div>
-                  <div className="text-[11px] text-zinc-500">team minutes (7d)</div>
+                  <div className="text-xs text-zinc-500">team minutes (7d)</div>
                 </div>
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <div className="text-2xl font-black text-orange-400">{s.shootingPct != null ? `${s.shootingPct}%` : '–'}</div>
-                  <div className="text-[11px] text-zinc-500">{s.attempts ? `${s.makes}/${s.attempts} shots` : 'team shooting'}</div>
+                  <div className="text-xs text-zinc-500">{s.attempts ? `${s.makes}/${s.attempts} shots` : 'team shooting'}</div>
                 </div>
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <div className="text-2xl font-black text-white">{s.avgPpg ?? '–'}</div>
-                  <div className="text-[11px] text-zinc-500">avg PPG</div>
+                  <div className="text-xs text-zinc-500">avg PPG</div>
                 </div>
               </div>
 
@@ -230,7 +230,7 @@ export default async function CoachPage() {
                   a coach reading it as "not trusted" would be the one way this
                   feature could do harm. */}
               {s.verifiedSessions > 0 && (
-                <p className="flex items-center gap-1.5 text-xs text-cyan-300/90">
+                <p className="flex items-center gap-1.5 text-sm text-cyan-300/90">
                   <Video className="h-3.5 w-3.5 flex-shrink-0" />
                   {s.verifiedSessions} of this week&apos;s hoops sessions {s.verifiedSessions === 1 ? 'was' : 'were'} counted
                   from video
@@ -249,14 +249,14 @@ export default async function CoachPage() {
                 </Link>
               </div>
 
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 {s.sharing}/{s.players} share training details with you
               </p>
             </section>
           ))
         )}
 
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           Players choose whether to share their training details with coaches (Settings → Privacy, or on the team page). You always see
           their weekly totals and game averages, never their notes or videos.
         </p>

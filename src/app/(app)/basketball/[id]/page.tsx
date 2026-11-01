@@ -14,6 +14,7 @@ import { DeleteSessionButton } from './DeleteSessionButton';
 import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
 import { AfterSession } from '@/components/basketball/AfterSession';
 import { XP_VALUES } from '@/lib/achievements';
+import { CountUp } from '@/components/CountUp';
 import { ShootingBreakdown } from '@/components/basketball/ShootingBreakdown';
 import { parseSummary } from '@/lib/video/trackedShots';
 
@@ -107,7 +108,7 @@ export default async function BasketballSessionPage({
             watched these shots; the player then confirmed each call by hand,
             which is the part that makes the number worth anything. */}
         {session.verified_by_video && (
-          <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-xs font-semibold text-cyan-300">
+          <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg border border-cyan-500/40 bg-cyan-500/10 px-2.5 py-1 text-sm font-semibold text-cyan-300">
             <Video className="h-3.5 w-3.5" /> Counted from video
           </p>
         )}
@@ -134,7 +135,10 @@ export default async function BasketballSessionPage({
             <CardContent className="p-5 flex items-center justify-between">
               <div>
                 <div className="text-xs font-semibold uppercase text-zinc-400">Shooting</div>
-                <div className="text-3xl font-black text-orange-400">{pct(makes, attempts)}</div>
+                {/* Counts up once, straight after saving: the result arriving */}
+                <div className="text-3xl font-black text-orange-400">
+                  <CountUp value={Math.round((makes / attempts) * 100)} suffix="%" animate={saved === '1'} />
+                </div>
               </div>
               <div className="text-right text-sm text-zinc-300">
                 {makes} makes

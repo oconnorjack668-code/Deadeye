@@ -20,7 +20,7 @@ export function FounderPostItem({
 }) {
   return (
     <li className="rounded-xl border border-zinc-800 bg-zinc-950/40 p-3">
-      <div className="mb-1 flex items-center justify-between gap-2 text-[11px] font-bold uppercase tracking-wider">
+      <div className="mb-1 flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-wider">
         <span className="text-orange-300">
           {postKindLabel(post.kind)}
           {showAudience && post.everyone && <span className="ml-2 text-zinc-400">· Every player</span>}

@@ -58,7 +58,7 @@ function Row({ label, total }: { label: string; total: AccuracyTotals }) {
         </span>
       </div>
       {total.runs === 0 ? (
-        <p className="mt-1 text-xs text-zinc-500">No sessions saved with the tracker&apos;s calls yet.</p>
+        <p className="mt-1 text-sm text-zinc-500">No sessions saved with the tracker&apos;s calls yet.</p>
       ) : (
         <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-3">
           <div>
@@ -90,7 +90,7 @@ function Row({ label, total }: { label: string; total: AccuracyTotals }) {
         </dl>
       )}
       {total.unsure > 0 && (
-        <p className="mt-2 text-xs text-zinc-500">
+        <p className="mt-2 text-sm text-zinc-500">
           Unsure calls the tracker guessed right: {pct(total.unsureRight, total.unsure)}. Runs under 12 fps: {total.slowRuns}.
         </p>
       )}
@@ -137,7 +137,7 @@ export default async function TrackerAccuracyPage({ searchParams }: { searchPara
             {groups.map((g) => (
               <Row key={g.label} label={g.label} total={totalAccuracy(result.filter(g.filter))} />
             ))}
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-500">
               Counted from sessions saved since the tracker began keeping its own calls. A player who saves without checking
               the list makes the tracker look better than it is, so read &ldquo;called right&rdquo; as an upper bound.
               {result.length >= MAX_RUNS ? ` Only the latest ${MAX_RUNS} sessions are counted.` : ''}

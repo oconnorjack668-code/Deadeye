@@ -240,7 +240,7 @@ export default function CoachSetupPage() {
                   </button>
                 ))}
               </div>
-              {knownMinor && <p className="text-xs text-zinc-500">Your account says you are under 18.</p>}
+              {knownMinor && <p className="text-sm text-zinc-500">Your account says you are under 18.</p>}
               {isAdult === false && (
                 <p className="text-sm text-zinc-300">
                   Coaches under 18 help as an assistant coach, on a team with an adult head coach. You can post assignments and share the team
@@ -295,7 +295,7 @@ export default function CoachSetupPage() {
               <Select label="League" value={league} onChange={(e) => setLeague(e.target.value)}>
                 <LeagueOptions ageGroup={ageGroup} level={level} />
               </Select>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 {ageGroup ? `Leagues that fit ${ageGroup} teams come first.` : 'Choose the age group first to see the leagues that fit.'} You can change
                 it later.
               </p>
@@ -351,7 +351,7 @@ export default function CoachSetupPage() {
         )}
 
         {step !== 'share' && !editing && (
-          <p className="text-center text-xs text-zinc-500">
+          <p className="text-center text-sm text-zinc-500">
             Only playing? <Link href="/onboarding" className="underline">Set up as a player</Link>
           </p>
         )}

@@ -62,7 +62,7 @@ export default async function TeamsPage() {
                       <div className="font-bold text-white">{m.teams!.name}</div>
                       <div className="text-xs text-zinc-500">{ROLE_LABELS[m.role] ?? 'Player'}</div>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-zinc-600" />
+                    <ChevronRight className="h-5 w-5 text-zinc-500" />
                   </Link>
                 ))}
               </section>

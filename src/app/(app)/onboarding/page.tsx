@@ -335,7 +335,7 @@ export default function OnboardingPage() {
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
         <div className="flex flex-col items-center gap-3">
           <div className="h-10 w-10 border-4 border-orange-500 border-t-transparent rounded-full animate-spin" />
-          <p className="text-xs text-zinc-400 font-medium">Setting up your player record...</p>
+          <p className="text-sm text-zinc-400 font-medium">Setting up your player record...</p>
         </div>
       </div>
     );
@@ -378,7 +378,7 @@ export default function OnboardingPage() {
                     <span className="block font-bold text-white">{c.title}</span>
                     <span className="block text-sm text-zinc-400">{c.text}</span>
                   </span>
-                  <ArrowRight className="ml-auto h-5 w-5 text-zinc-600" />
+                  <ArrowRight className="ml-auto h-5 w-5 text-zinc-500" />
                 </button>
               );
             })}
@@ -399,7 +399,7 @@ export default function OnboardingPage() {
               <h2 className="text-sm font-black uppercase tracking-wider text-white">
                 {isEditing ? 'Edit Player Info' : 'Deadeye Setup'}
               </h2>
-              <p className="text-[11px] text-zinc-400">Step {step} of 3</p>
+              <p className="text-sm text-zinc-400">Step {step} of 3</p>
             </div>
           </div>
           {/* Step Progress Bar */}
@@ -627,7 +627,7 @@ export default function OnboardingPage() {
                           active
                             ? 'border-orange-500 bg-orange-500/20 text-orange-300 font-semibold'
                             : atCap
-                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-600 cursor-not-allowed'
+                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-500 cursor-not-allowed'
                               : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
                         }`}
                       >
@@ -657,7 +657,7 @@ export default function OnboardingPage() {
                           active
                             ? 'border-amber-500 bg-amber-500/20 text-amber-300 font-semibold'
                             : atCap
-                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-600 cursor-not-allowed'
+                              ? 'border-zinc-800/60 bg-zinc-900/50 text-zinc-500 cursor-not-allowed'
                               : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700'
                         }`}
                       >

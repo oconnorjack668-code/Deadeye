@@ -131,7 +131,7 @@ export default async function DemoVideosPage({ searchParams }: { searchParams: P
             <p className="mb-2 text-sm text-zinc-300">
               {withVideo} of {items.length} {show} have a video.
             </p>
-            <p className="mb-4 text-xs text-zinc-500">
+            <p className="mb-4 text-sm text-zinc-500">
               Tap Find to search YouTube, copy the link of a good video, paste it here and save. Pick short, clear videos
               from channels that allow embedding. Clear the box and save to remove one.
             </p>
@@ -169,7 +169,7 @@ export default async function DemoVideosPage({ searchParams }: { searchParams: P
                       defaultValue={item.video ? `https://youtu.be/${item.video}` : ''}
                       placeholder="Paste a YouTube link"
                       aria-label={`YouTube link for ${item.name}`}
-                      className="min-w-0 flex-1 rounded-lg border border-zinc-700/80 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-600"
+                      className="min-w-0 flex-1 rounded-lg border border-zinc-700/80 bg-zinc-950 px-3 py-2 text-sm text-white placeholder:text-zinc-500"
                     />
                     <button type="submit" className="rounded-lg bg-orange-600 px-3 py-2 text-xs font-semibold text-white hover:bg-orange-500">
                       Save

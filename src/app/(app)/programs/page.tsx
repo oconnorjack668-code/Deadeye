@@ -102,7 +102,7 @@ export default async function ProgramsPage({ searchParams }: { searchParams: Pro
                 </div>
                 <p className="text-sm text-zinc-400 mt-1 line-clamp-2">{p.description}</p>
               </div>
-              <ChevronRight className="h-4 w-4 text-zinc-600 flex-shrink-0" />
+              <ChevronRight className="h-4 w-4 text-zinc-500 flex-shrink-0" />
             </Link>
           ))}
           {programs.length === 0 && <p className="text-sm text-zinc-500">No programs yet.</p>}

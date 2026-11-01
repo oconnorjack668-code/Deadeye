@@ -2,6 +2,9 @@
 import React from 'react';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
+import { getActiveProgram } from '@/lib/programs';
+import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck, Flame } from 'lucide-react';
 
@@ -12,8 +15,7 @@ interface Item {
   icon: typeof CalendarCheck;
   title: string;
   desc: string;
-  /** Tailwind classes for the icon tile - keeps each group visually distinct */
-  tile: string;
+  /** The icon's colour, which says which group a row is in */
   iconColor: string;
   badge?: string;
 }
@@ -21,9 +23,13 @@ interface Item {
 /**
  * Sixteen equally-weighted cards in one flat grid made this page a wall. The
  * features are grouped by what the player is actually trying to do, so the page
- * can be scanned by intent rather than read end to end.
+ * can be scanned by intent rather than read end to end. Even grouped, sixteen
+ * cards of equal weight still left nothing to start with, so the page now leads
+ * with one thing - the next session of the player's program, or a quick
+ * workout - and the groups below are plain rows, icons inline rather than in
+ * coloured tiles (docs/design.md, "Avoid").
  *
- * Every tile takes its group's colour, so the colour says which group a card
+ * Every icon takes its group's colour, so the colour says which group a row
  * is in before its title is read. Each colour was chosen for what the group is
  * for. Plan is the brand orange: action, and the first thing on the page. Learn
  * is blue, calm and focused, for reading. Compete is gold, the colour of
@@ -31,11 +37,11 @@ interface Item {
  * in the shot tracker. The one exception is Deadeye Pro, which stays gold
  * wherever it appears, so that premium always looks the same.
  */
-const PLAN = { tile: 'bg-orange-600/20', iconColor: 'text-orange-400' };
-const LEARN = { tile: 'bg-blue-600/20', iconColor: 'text-blue-400' };
-const COMPETE = { tile: 'bg-amber-600/20', iconColor: 'text-amber-400' };
-const COACHING = { tile: 'bg-violet-600/20', iconColor: 'text-violet-400' };
-const PREMIUM = { tile: 'bg-amber-600/20', iconColor: 'text-amber-300' };
+const PLAN = { iconColor: 'text-orange-400' };
+const LEARN = { iconColor: 'text-blue-400' };
+const COMPETE = { iconColor: 'text-amber-400' };
+const COACHING = { iconColor: 'text-violet-400' };
+const PREMIUM = { iconColor: 'text-amber-300' };
 
 const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
   {
@@ -82,8 +88,9 @@ const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
 ];
 
 export default async function TrainPage() {
-  await requireUser();
-  const profile = await getCurrentProfile();
+  const user = await requireUser();
+  const [profile, activeProgram] = await Promise.all([getCurrentProfile(), getActiveProgram(await createClient(), user.id)]);
+  const next = activeProgram?.next ?? null;
   // A player who switched AI coaching off should not be offered it again from
   // the hub. Everything else on this page is unaffected - the toggle turns off
   // the commentary, not the app.
@@ -94,35 +101,65 @@ export default async function TrainPage() {
       <div className="p-4 md:p-8 max-w-3xl mx-auto">
         <PageHeader tone="train" icon={CalendarCheck} title="Train" subtitle="Plan, learn and improve" />
 
+        {/* The one thing to do here: the program's next session, or, with no
+            program on the go, a workout built for the time the player has */}
+        <section className="mb-6 rounded-2xl border border-orange-600/40 bg-gradient-to-br from-orange-600/15 to-transparent p-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-orange-300">Next for you</p>
+          {next && activeProgram ? (
+            <>
+              <p className="mt-1 text-xl font-black text-white">{next.title}</p>
+              <p className="text-sm text-zinc-300">
+                {activeProgram.program.name} · Week {next.week}, session {next.day} · {next.estimated_minutes} min
+              </p>
+              <Link href={`/programs/${activeProgram.program.slug}/day/${next.id}`} className="mt-3 inline-block">
+                <Button variant="primary" size="sm">Start the session</Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mt-1 text-xl font-black text-white">A workout for the time you have</p>
+              <p className="text-sm text-zinc-300">Pick how long and what to work on, and it builds the session.</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Link href="/train/generate">
+                  <Button variant="primary" size="sm">Build a workout</Button>
+                </Link>
+                <Link href="/programs">
+                  <Button variant="outline" size="sm">Follow a program</Button>
+                </Link>
+              </div>
+            </>
+          )}
+        </section>
+
         {GROUPS.map((group) => {
           const items = aiOff ? group.items.filter((s) => !s.href.startsWith('/ai-coach')) : group.items;
           return (
           <section key={group.label} className="mb-6">
             <h2 className={`mb-2 text-xs font-bold uppercase tracking-wider ${group.labelColor}`}>{group.label}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* One card per group, its features as rows: a list reads as
+                "pick one of these", a grid of cards as "all of these matter" */}
+            <div className="divide-y divide-zinc-800 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/70">
               {items.map((s) => {
                 const Icon = s.icon;
                 return (
                   <Link
                     key={s.href}
                     href={s.href}
-                    className="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3.5 hover:bg-zinc-900 hover:border-zinc-700 transition-colors"
+                    className="flex min-h-14 items-center gap-3 px-4 py-3 transition-colors duration-150 hover:bg-zinc-800/50"
                   >
-                    <span className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${s.tile}`}>
-                      <Icon className={`h-5 w-5 ${s.iconColor}`} />
-                    </span>
+                    <Icon className={`h-5 w-5 flex-shrink-0 ${s.iconColor}`} />
                     <span className="min-w-0 flex-1">
                       <span className="flex items-center gap-2">
                         <span className="font-semibold text-white">{s.title}</span>
                         {s.badge && (
-                          <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+                          <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-bold text-amber-300">
                             {s.badge}
                           </span>
                         )}
                       </span>
-                      <span className="block text-xs text-zinc-500">{s.desc}</span>
+                      <span className="block text-sm text-zinc-400">{s.desc}</span>
                     </span>
-                    <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+                    <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
                   </Link>
                 );
               })}

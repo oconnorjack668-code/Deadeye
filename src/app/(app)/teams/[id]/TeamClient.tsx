@@ -424,7 +424,7 @@ export function TeamClient({
                     <button
                       type="button"
                       aria-label={`Delete ${a.title}`}
-                      className="text-zinc-600 hover:text-red-400"
+                      className="text-zinc-500 hover:text-red-400"
                       onClick={() => window.confirm('Delete this assignment?') && void run(`d-${a.id}`, () => db().from('team_assignments').delete().eq('id', a.id))}
                     >
                       <Trash2 className="h-4 w-4" />
@@ -433,7 +433,7 @@ export function TeamClient({
                 </div>
               </div>
               {isStaff && done.length > 0 && (
-                <p className="mt-2 text-[11px] text-emerald-400/80">
+                <p className="mt-2 text-sm text-emerald-400/80">
                   ✓ {done.map((uid) => roster.find((r) => r.user_id === uid)?.display_name || 'Former member').join(', ')}
                 </p>
               )}
@@ -441,7 +441,7 @@ export function TeamClient({
               {!isStaff && (
                 <ReportProblem
                   label={
-                    <span className="mt-2 inline-flex items-center gap-1 text-[11px] text-zinc-500 hover:text-zinc-300">
+                    <span className="mt-2 inline-flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-300">
                       <Flag className="h-3 w-3" /> Report this post
                     </span>
                   }
@@ -468,7 +468,7 @@ export function TeamClient({
         </div>
         <div className="overflow-x-auto rounded-2xl border border-zinc-800">
           <table className="w-full text-sm">
-            <thead className="bg-zinc-900 text-[11px] uppercase text-zinc-500">
+            <thead className="bg-zinc-900 text-xs uppercase text-zinc-500">
               <tr>
                 <th className="px-3 py-2 text-left">Player</th>
                 <th className="px-2 py-2 text-right" title="Sessions + workouts in the last 7 days">7d</th>
@@ -493,14 +493,14 @@ export function TeamClient({
                       ) : (
                         r.display_name
                       )}
-                      {r.role !== 'player' && <span className="ml-1.5 text-[10px] font-bold uppercase text-cyan-400">{ROLE_LABELS[r.role]}</span>}
+                      {r.role !== 'player' && <span className="ml-1.5 text-xs font-bold uppercase text-cyan-400">{ROLE_LABELS[r.role]}</span>}
                       {isCoach && r.role === 'player' && !r.share_details && (
-                        <span title="Not sharing training details" className="ml-1.5 text-[10px] text-zinc-500">
+                        <span title="Not sharing training details" className="ml-1.5 text-xs text-zinc-500">
                           🔒
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-zinc-500 flex items-center gap-1">
+                    <div className="text-xs text-zinc-500 flex items-center gap-1">
                       {r.player_position || '—'}
                       {r.streak > 0 && (
                         <span className="text-orange-400 flex items-center">
@@ -561,7 +561,7 @@ export function TeamClient({
             </tbody>
           </table>
         </div>
-        <p className="text-[11px] text-zinc-500">
+        <p className="text-sm text-zinc-500">
           Training numbers are the last 7 days; game averages cover the last 12 months of games each player logged in Deadeye.
         </p>
       </section>

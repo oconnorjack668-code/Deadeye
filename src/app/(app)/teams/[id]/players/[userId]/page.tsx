@@ -45,7 +45,7 @@ export default async function CoachPlayerPage({ params }: { params: Promise<{ id
           <ArrowLeft className="h-4 w-4" /> {team?.name || 'Team'}
         </Link>
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-8 text-center">
-          <Lock className="h-8 w-8 text-zinc-600 mx-auto mb-2" />
+          <Lock className="h-8 w-8 text-zinc-500 mx-auto mb-2" />
           <p className="font-semibold text-white">Not shared</p>
           <p className="text-sm text-zinc-400">This player hasn&apos;t chosen to share their training details with this team&apos;s coaches.</p>
         </div>
@@ -83,7 +83,7 @@ export default async function CoachPlayerPage({ params }: { params: Promise<{ id
           ].map((s) => (
             <div key={s.l} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
               <div className="text-xl font-black text-white">{s.v}</div>
-              <div className="text-[11px] text-zinc-500">{s.l}</div>
+              <div className="text-xs text-zinc-500">{s.l}</div>
             </div>
           ))}
         </div>
@@ -116,7 +116,7 @@ export default async function CoachPlayerPage({ params }: { params: Promise<{ id
             <h2 className="mb-2 flex items-center gap-2 font-bold text-white">
               <Trophy className="h-4 w-4 text-amber-400" /> Games
             </h2>
-            <p className="mb-2 text-xs text-zinc-400">
+            <p className="mb-2 text-sm text-zinc-400">
               {g.ppg} pts · {g.rpg} reb · {g.apg} ast · FG {g.fgPct ?? '–'}% · 3P {g.threePct ?? '–'}% · FT {g.ftPct ?? '–'}% · TO {g.topg}
             </p>
             <ul className="divide-y divide-zinc-800 text-sm">
@@ -188,7 +188,7 @@ export default async function CoachPlayerPage({ params }: { params: Promise<{ id
             <ul className="space-y-1 text-sm">
               {d.assignments.map((a, i) => (
                 <li key={`${a.title}-${i}`} className="flex items-center gap-2">
-                  {a.done ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Circle className="h-4 w-4 text-zinc-600" />}
+                  {a.done ? <CheckCircle2 className="h-4 w-4 text-emerald-400" /> : <Circle className="h-4 w-4 text-zinc-500" />}
                   <span className={a.done ? 'text-zinc-400' : 'text-zinc-200'}>{a.title}</span>
                   {a.due_date && <span className="text-xs text-zinc-500">due {short(a.due_date)}</span>}
                 </li>

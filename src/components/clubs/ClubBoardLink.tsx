@@ -15,7 +15,7 @@ export function ClubBoardLink({ club }: { club: { id: string; name: string } }) 
         {clubInitials(club.name)}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[11px] font-bold uppercase tracking-[0.16em] text-orange-300">Club board</span>
+        <span className="block text-xs font-bold uppercase tracking-[0.16em] text-orange-300">Club board</span>
         <span className="block truncate font-bold text-white">{club.name}</span>
       </span>
       <ChevronRight className="h-5 w-5 flex-shrink-0 text-orange-300 transition group-hover:translate-x-0.5" />

@@ -91,7 +91,7 @@ export function EnrollButton({
       <Button variant="primary" size="lg" className="w-full gap-2" isLoading={busy} onClick={enroll}>
         <Play className="h-4 w-4" /> Start this program
       </Button>
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
     </div>
   );
 }

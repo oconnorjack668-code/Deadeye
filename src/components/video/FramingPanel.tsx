@@ -19,7 +19,7 @@ export function FramingPanel({
   shownElsewhere?: FramingCheckId[];
 }) {
   if (!all) {
-    return <p className="text-xs text-zinc-500">Checking the picture…</p>;
+    return <p className="text-sm text-zinc-500">Checking the picture…</p>;
   }
   const checks = all.filter((c) => !shownElsewhere.includes(c.id));
   const good = framingVerdict(checks) === 'good';

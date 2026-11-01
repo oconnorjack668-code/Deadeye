@@ -123,7 +123,7 @@ export function DailyQuestion({
             {correct ? 'Correct.' : 'Not this time.'}
           </p>
           {question.explanation && <p className="text-zinc-300">{question.explanation}</p>}
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             From {question.lessonTitle} · a new question tomorrow · {daysLeft} before any repeat
           </p>
         </div>

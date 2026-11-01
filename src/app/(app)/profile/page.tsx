@@ -70,7 +70,7 @@ function Stat({ icon: Icon, tone, value, label, href }: { icon: React.ElementTyp
     <Link href={href} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 hover:border-zinc-700">
       <Icon className={`h-4 w-4 ${tone}`} />
       <div className="mt-1 text-xl font-black text-white tabular-nums">{value}</div>
-      <div className="text-[11px] text-zinc-400">{label}</div>
+      <div className="text-xs text-zinc-400">{label}</div>
     </Link>
   );
 }
@@ -215,10 +215,10 @@ export default async function ProfilePage() {
             <span className="block text-xs text-zinc-500">Avatar, privacy, email, notifications, sounds, units, your data</span>
           </span>
         </span>
-        <ChevronRight className="h-4 w-4 text-zinc-600" />
+        <ChevronRight className="h-4 w-4 text-zinc-500" />
       </Link>
 
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-sm text-zinc-500">
         <Link href="/privacy" className="underline hover:text-zinc-300">Privacy policy</Link>
         {' · '}
         <Link href="/terms" className="underline hover:text-zinc-300">Terms of use</Link>

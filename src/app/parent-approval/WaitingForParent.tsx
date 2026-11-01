@@ -81,7 +81,7 @@ export function WaitingForParent({ token, emailedTo }: { token: string; emailedT
 
       <div className="space-y-3 rounded-xl border border-zinc-800 bg-zinc-900/90 p-5">
         <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Link for your parent</p>
-        <p className="break-all rounded-md bg-zinc-950 px-3 py-2 font-mono text-xs text-zinc-200 select-all">{link || '…'}</p>
+        <p className="break-all rounded-md bg-zinc-950 px-3 py-2 font-mono text-sm text-zinc-200 select-all">{link || '…'}</p>
         <div className="grid grid-cols-2 gap-2">
           {canShare ? (
             <Button onClick={share} disabled={!link}>
