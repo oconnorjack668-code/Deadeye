@@ -1,6 +1,6 @@
 # Shot tracker upgrades: accuracy data, worker, camera watch, HUD, drills, replays (2026-11-01)
 
-Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: none yet · Status: built and checked, not committed (the user asked to build, not to commit)
+Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: 6b3e996, 007967d, 4f104e6, e49918c · Status: shipped, merged as #50 (8c9fbb3) on 1 Nov 2026
 
 ## Outcome
 - Each tracked session saves the tracker's own call next to the player's correction, plus fps, worker, camera moves and a coarse device class. `/admin/tracker` adds them up.
@@ -28,8 +28,8 @@ Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: non
 - Browser (Playwright, Pixel 7, local): the sample calls 4 of 6 in dev and production, with the worker loaded. Upload → taps → framing → track → replay all worked. The fake camera with a knock showed Camera moved, then Fix rim, resume, recording, re-check. Spots drill tagged its zones; full screen kept the overlay aligned.
 
 ## Open
-- Run `00055_saved_rims.sql` in Supabase (launch checklist). Until then hoops stay phone-only, quietly.
-- Before merging: safety-reviewer (device class in summaries, hoop names stored, on-phone recording) and release-checker.
+- ~~Run 00055~~: the user confirmed it was run before the merge. Tick it in `docs/launch-checklist.md`.
+- ~~Safety review~~: BLOCK, then PASS. It found the privacy policy did not name the new data and that account hoops stayed on shared devices; both were fixed in 4f104e6, along with less device data (platform only) and copy notes. release-checker was not run; tsc, lint, tests, build and the bench were.
 - Not tested: a real phone (zoom, focus lock, MediaRecorder memory on iOS, orientation lock), signed-in saving, and the session page breakdown (this sandbox cannot reach Supabase). Needs the user.
 - Owner tools got a new tile in the existing tile style. `docs/design.md` says to drop tiles when a screen changes; left for a separate tidy.
 

@@ -107,7 +107,7 @@ editor: it only reads, and lists anything missing with the migration it came fro
       choice of who sees them, and a parent approving any under-16 photo), and
       stores levels so friends can see them on player cards. It also creates
       the private `avatars` storage bucket. Safe to run more than once.
-- [ ] Run `supabase/migrations/00055_saved_rims.sql` in the Supabase SQL editor.
+- [x] Run `supabase/migrations/00055_saved_rims.sql` in the Supabase SQL editor.
       It keeps the hoops a player saves in the shot tracker with their account
       as well as on the phone. Until it is run the tracker keeps them on the
       phone only, as before. Safe to run more than once.
