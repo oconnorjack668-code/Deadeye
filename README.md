@@ -160,10 +160,25 @@ check. With the taps on the ring's edges it gets 31 of 31.
 The first clip stays at 10 of 10. `DEADEYE_BENCH_START` and `_END`, in
 seconds, run one stretch of a clip, for trying variations on a single shot.
 
-The one still wrong whatever the taps is a ball that hit the rim, bounced
-back towards the camera and fell past the front of the net while the net was
-still shaking from the hit. On screen that looks exactly like a make. The
-other errors come with taps a long way off the ring.
+The errors that remain come with taps off the ring's edges. A ball off the
+rim towards the camera, falling past the front of the net, was once wrong
+whatever the taps; with the taps on the edges it is now called right. Its
+apparent size was checked as a cue (1 Nov 2026) and does not help: on the
+84.9s miss the ball falls past the net at the same size it arrived at.
+
+In three-frame mode the bench runs the app's own pipeline,
+`src/lib/video/trackerPipeline.ts`, the code the phone's worker runs, so it
+cannot drift from the app. It also reports the camera watcher
+(`src/lib/video/cameraShift.ts`): `camera moved` should say `never` on a
+tripod clip, and did on all 13 runs of both clips. `DEADEYE_BENCH_KNOCK`,
+as `seconds,dx,dy` in crop pixels, shifts the picture from that moment, as
+a knocked tripod does, to check the watcher notices: knocks of 5, 7 and 14
+pixels were each reported within 1.2 to 4.6 seconds.
+
+Every session saved from the tracker now keeps the tracker's own calls next
+to the player's corrections, so real-world accuracy, by camera or upload and
+by phone type, is at `/admin/tracker`. Read it as an upper bound: a player
+who saves without checking agrees with every call.
 
 ## Three deliberate design decisions
 
