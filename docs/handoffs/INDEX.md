@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
 - 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
 - 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
 - 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
