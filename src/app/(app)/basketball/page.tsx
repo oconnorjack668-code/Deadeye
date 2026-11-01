@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import Link from 'next/link';
 import { Plus, Target, ListChecks, ClipboardList, Video, Lightbulb, ChevronRight } from 'lucide-react';
 import { formatShootingPercentage } from '@/lib/stats';
@@ -56,8 +57,15 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
+      <div className={HUB_CONTAINER}>
         <PageHeader tone="hoops" icon={Target} title="Hoops" subtitle="Drills, shooting and game minutes" />
+
+        {/* Logging and the history in the main column; the numbers and
+            shortcuts beside them on a laptop, between them on a phone */}
+        <HubGrid
+          sideLabel="Your shooting and shortcuts"
+          top={
+            <>
 
         {/* The shot logger lands here after saving (?saved=1) */}
         {saved === '1' && totalSessions === 1 && <FirstSessionCelebration xp={XP_VALUES.session} />}
@@ -89,6 +97,10 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
           <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
         </Link>
 
+            </>
+          }
+          side={
+            <>
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Link href="/games">
             <Card className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900 transition-colors h-full">
@@ -152,6 +164,10 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
           </div>
         )}
 
+            </>
+          }
+          rest={
+            <>
         {/* Session History */}
         {sessions && sessions.length > 0 ? (
           <>
@@ -201,6 +217,9 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
             </CardContent>
           </Card>
         )}
+            </>
+          }
+        />
       </div>
     </div>
   );

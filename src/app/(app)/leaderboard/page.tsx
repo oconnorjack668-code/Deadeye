@@ -103,7 +103,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-4xl mx-auto space-y-5">
+      <div className="p-4 md:p-8 max-w-4xl lg:max-w-6xl mx-auto space-y-5">
         <header className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-red-700 to-red-500 flex items-center justify-center shadow-lg shadow-red-950/60">
             <Trophy className="h-6 w-6 text-white" />
@@ -114,6 +114,10 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
           </div>
         </header>
 
+        {/* The board in the main column, this week's challenges beside it on a
+            laptop; one under the other on a phone */}
+        <div className="space-y-5 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8 lg:space-y-0">
+        <div className="min-w-0 space-y-5">
         {notReady ? (
           <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-4 text-sm text-amber-200">
             The new leaderboard isn&apos;t switched on yet. Run migration <code>00024_settings_region_coach.sql</code> in Supabase.
@@ -338,13 +342,14 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             </details>
           </>
         )}
+        </div>
 
         {challenges && challenges.length > 0 && (
-          <section>
+          <section aria-label="Active challenges" className="min-w-0">
             <h2 className="mb-3 flex items-center gap-2 text-lg font-bold text-white">
               <Target className="h-5 w-5 text-red-400" /> Active challenges
             </h2>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-1">
               {(challenges as Array<{ id: string; title: string; description: string; points: number }>).map((c) => {
                 const complete = done.has(c.id);
                 return (
@@ -376,6 +381,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             </Link>
           </section>
         )}
+        </div>
       </div>
     </div>
   );

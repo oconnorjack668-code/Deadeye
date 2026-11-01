@@ -3,6 +3,7 @@
 // streak, badges, shooting and best jump - then their player info, and a look
 // at the card other players see.
 import React from 'react';
+import { HubGrid } from '@/components/layout/HubGrid';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
 import { planLabel } from '@/lib/entitlements';
@@ -108,7 +109,13 @@ export default async function ProfilePage() {
   const focusAreas = [...new Set<string>((profile?.focus_areas || []).map(focusAreaLabel))];
 
   return (
-    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl mx-auto space-y-5">
+    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl lg:max-w-5xl mx-auto">
+      {/* The player card and their numbers in the main column, the details
+          beside them on a laptop; one column, in this order, on a phone */}
+      <HubGrid
+        sideLabel="Player info"
+        top={
+          <div className="space-y-5">
       {/* Who they are as a player */}
       <section className={`rounded-2xl border p-5 ${theme.card}`}>
         <div className="flex items-center gap-4">
@@ -165,7 +172,10 @@ export default async function ProfilePage() {
           href="/workouts/tests"
         />
       </div>
-
+          </div>
+        }
+        side={
+          <div className="mt-5 lg:mt-0">
       <Card className="border-zinc-800 bg-zinc-900/70">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
@@ -203,7 +213,10 @@ export default async function ProfilePage() {
           )}
         </CardContent>
       </Card>
-
+          </div>
+        }
+        rest={
+          <div className="mt-5 space-y-5">
       <Link
         href="/settings"
         className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900"
@@ -223,6 +236,9 @@ export default async function ProfilePage() {
         {' · '}
         <Link href="/terms" className="underline hover:text-zinc-300">Terms of use</Link>
       </p>
+          </div>
+        }
+      />
     </div>
   );
 }
