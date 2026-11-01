@@ -1,5 +1,6 @@
 // src/lib/signOut.ts
 // Signing out of this phone. Browser only: called from a tap.
+import { SAVED_RIMS_KEY } from '@/lib/video/rimMemory';
 
 /**
  * Stops this phone's training reminders: they belong to the player who is
@@ -36,7 +37,7 @@ export async function signOutOfThisPhone(): Promise<void> {
   // So are the hoops measured with the tracker: their names can say where the
   // player lives, and the next person on a shared device should not see them
   try {
-    localStorage.removeItem('hoopiq-saved-rims-v1');
+    localStorage.removeItem(SAVED_RIMS_KEY);
   } catch {
     // storage unavailable
   }
