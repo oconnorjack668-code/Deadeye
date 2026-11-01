@@ -17,7 +17,7 @@ export default function TermsPage() {
       <main className="mx-auto max-w-2xl space-y-6 text-sm leading-6 text-zinc-300">
         <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">← Deadeye</Link>
         <h1 className="text-3xl font-black text-white">Terms of Use</h1>
-        <p className="text-xs text-zinc-500">Last updated: {LAST_UPDATED}</p>
+        <p className="text-sm text-zinc-500">Last updated: {LAST_UPDATED}</p>
         <p>
           These terms cover your use of Deadeye Basketball Training (&ldquo;Deadeye&rdquo;), the app and website. By
           creating an account you agree to them. If you do not agree, please do not use Deadeye.
@@ -154,7 +154,7 @@ export default function TermsPage() {
           </section>
         )}
 
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           See also our <Link href="/privacy" className="underline">Privacy Policy</Link>.
         </p>
       </main>

@@ -49,8 +49,8 @@ export function AgeChoice({
           </label>
         ))}
       </div>
-      <p className="mt-2 text-xs text-zinc-500">Deadeye is for players aged 13 and over.</p>
-      {error && <p className="mt-1 text-xs text-red-400">{error}</p>}
+      <p className="mt-2 text-sm text-zinc-500">Deadeye is for players aged 13 and over.</p>
+      {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
     </fieldset>
   );
 }

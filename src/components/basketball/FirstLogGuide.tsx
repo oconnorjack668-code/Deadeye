@@ -27,7 +27,7 @@ export function FirstLogGuide({ step, mode, onHide }: { step: LogGuideStep; mode
     <div className="mb-3 flex items-start gap-3 rounded-xl border border-orange-500/40 bg-orange-500/10 px-3 py-2.5" aria-live="polite">
       <Lightbulb className="mt-0.5 h-4 w-4 flex-shrink-0 text-orange-300" />
       <div className="min-w-0 flex-1">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-orange-300">Step {step} of 3</p>
+        <p className="text-sm font-bold uppercase tracking-wider text-orange-300">Step {step} of 3</p>
         <p className="text-sm font-semibold text-white">{tip(step, mode)}</p>
       </div>
       <button type="button" onClick={onHide} aria-label="Hide these tips" className="flex-shrink-0 p-1 text-orange-300/60 hover:text-orange-200">

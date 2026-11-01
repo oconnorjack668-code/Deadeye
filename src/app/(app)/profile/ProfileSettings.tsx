@@ -113,7 +113,7 @@ export function ProfileSettings({ initialIsPublic, showLeaderboard = true }: { i
           >
             Download my data
           </a>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-500">
             See the <a href="/privacy" className="underline">Privacy Policy</a> and{' '}
             <a href="/terms" className="underline">Terms of Use</a>.
           </p>

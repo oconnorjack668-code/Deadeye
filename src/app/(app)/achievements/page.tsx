@@ -132,7 +132,7 @@ export default async function AchievementsPage() {
             </div>
             <div className="text-right">
               <div className="text-xl font-black text-orange-300">+{a.streak.nextDayBonus}</div>
-              <div className="text-[11px] text-zinc-400">bonus XP next training day</div>
+              <div className="text-xs text-zinc-400">bonus XP next training day</div>
             </div>
           </div>
 
@@ -156,7 +156,7 @@ export default async function AchievementsPage() {
                   }`}
                 >
                   <div className="text-sm font-black tabular-nums">{m.days}</div>
-                  <div className="text-[10px] font-semibold">+{m.xp >= 1000 ? `${m.xp / 1000}k` : m.xp}</div>
+                  <div className="text-xs font-semibold">+{m.xp >= 1000 ? `${m.xp / 1000}k` : m.xp}</div>
                 </div>
               );
             })}
@@ -167,7 +167,7 @@ export default async function AchievementsPage() {
               {Array.from({ length: a.freeze.max }, (_, i) => (
                 <span
                   key={i}
-                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${i < a.freeze.held ? 'bg-sky-500/25 text-sky-200' : 'bg-zinc-900 text-zinc-600'}`}
+                  className={`flex h-9 w-9 items-center justify-center rounded-xl ${i < a.freeze.held ? 'bg-sky-500/25 text-sky-200' : 'bg-zinc-900 text-zinc-500'}`}
                 >
                   <Snowflake className="h-5 w-5" />
                 </span>
@@ -185,7 +185,7 @@ export default async function AchievementsPage() {
             </div>
           </div>
           {a.freeze.saved.length > 0 && (
-            <p className="mt-2 text-xs font-semibold text-sky-300">
+            <p className="mt-2 text-sm font-semibold text-sky-300">
               A freeze saved this streak on{' '}
               {a.freeze.saved
                 .map((d) => new Date(`${d}T00:00:00Z`).toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' }))
@@ -194,7 +194,7 @@ export default async function AchievementsPage() {
             </p>
           )}
 
-          <p className="mt-3 text-xs text-zinc-400">
+          <p className="mt-3 text-sm text-zinc-400">
             Every training day in a streak is worth more than the last, and each milestone pays out every time you reach it. A
             rest day does not break your streak. Every {FREEZE_EVERY} training days in a streak earns a freeze, and if you miss
             more than your rest day, a freeze covers the extra day by itself.
@@ -218,7 +218,7 @@ export default async function AchievementsPage() {
                   className={`flex items-center justify-between rounded-xl border px-3 py-2 ${here ? tTheme.card : 'border-zinc-800 bg-zinc-900/50'}`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${reached ? tTheme.chip : 'bg-zinc-800 text-zinc-600'}`}>
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-lg ${reached ? tTheme.chip : 'bg-zinc-800 text-zinc-500'}`}>
                       {reached ? <Check className="h-4 w-4" /> : <Lock className="h-3.5 w-3.5" />}
                     </span>
                     <span className={`font-semibold ${reached ? 'text-white' : 'text-zinc-500'}`}>{t.name}</span>
@@ -229,13 +229,13 @@ export default async function AchievementsPage() {
               );
             })}
           </div>
-          <p className="mt-2 text-xs text-zinc-500">Each tier gives your level card a new colour.</p>
+          <p className="mt-2 text-sm text-zinc-500">Each tier gives your level card a new colour.</p>
         </section>
 
         {/* Weekly challenges */}
         <section>
           <h2 className="text-lg font-bold text-white mb-1">This week&apos;s challenges</h2>
-          <p className="text-xs text-zinc-500 mb-3">Reset every Monday. Points count toward your XP and the leaderboard.</p>
+          <p className="text-sm text-zinc-500 mb-3">Reset every Monday. Points count toward your XP and the leaderboard.</p>
           <div className="space-y-2">
             {a.challenges.map((c) => (
               <div key={c.id} className={`rounded-2xl border p-4 ${c.done ? 'border-emerald-600/40 bg-emerald-600/10' : 'border-zinc-800 bg-zinc-900/70'}`}>
@@ -249,7 +249,7 @@ export default async function AchievementsPage() {
                 <div className="mt-2 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
                   <div className={`h-full ${c.done ? 'bg-emerald-500' : 'bg-amber-400'}`} style={{ width: `${Math.round((c.current / c.target) * 100)}%` }} />
                 </div>
-                <div className="mt-1 text-[11px] text-zinc-500">
+                <div className="mt-1 text-xs text-zinc-500">
                   {c.current}/{c.target}
                 </div>
               </div>
@@ -279,18 +279,18 @@ export default async function AchievementsPage() {
                               b.earned ? TIER_STYLES[b.tier] : 'from-zinc-800 to-zinc-800'
                             } flex items-center justify-center`}
                           >
-                            <Icon className={`h-6 w-6 ${b.earned ? 'text-white' : 'text-zinc-600'}`} />
+                            <Icon className={`h-6 w-6 ${b.earned ? 'text-white' : 'text-zinc-500'}`} />
                           </div>
                           <div className={`mt-2 text-sm font-semibold ${b.earned ? 'text-white' : 'text-zinc-400'}`}>{b.title}</div>
-                          <div className="text-[11px] text-zinc-500">{b.description}</div>
+                          <div className="text-xs text-zinc-500">{b.description}</div>
                           {b.earned ? (
-                            <div className="mt-1 text-[11px] font-semibold text-emerald-400">+{BADGE_XP[b.tier].toLocaleString()} XP</div>
+                            <div className="mt-1 text-xs font-semibold text-emerald-400">+{BADGE_XP[b.tier].toLocaleString()} XP</div>
                           ) : (
                             <>
                               <div className="mt-2 h-1 rounded-full bg-zinc-800 overflow-hidden">
                                 <div className="h-full bg-zinc-500" style={{ width: `${Math.round((b.current / b.target) * 100)}%` }} />
                               </div>
-                              <div className="mt-1 text-[11px] text-zinc-500 tabular-nums">
+                              <div className="mt-1 text-xs text-zinc-500 tabular-nums">
                                 {b.current.toLocaleString()}/{b.target.toLocaleString()} · +{BADGE_XP[b.tier].toLocaleString()} XP
                               </div>
                             </>

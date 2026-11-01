@@ -66,7 +66,7 @@ export function VideoAIFeedback({ shooting, mechanics }: { shooting: ShootingSum
           <p className="text-sm text-zinc-300">What should the AI look at? Only these numbers are sent, never your video.</p>
           <div className="space-y-1.5">
             {options.map((o) => (
-              <label key={o.id} className={`flex items-center gap-2 text-sm ${o.enabled ? 'text-zinc-200' : 'text-zinc-600'}`}>
+              <label key={o.id} className={`flex items-center gap-2 text-sm ${o.enabled ? 'text-zinc-200' : 'text-zinc-500'}`}>
                 <input type="radio" name="video-ai-data" disabled={!o.enabled} checked={choice === o.id} onChange={() => setChoice(o.id)} className="accent-red-500" />
                 {o.label}
               </label>
@@ -75,10 +75,10 @@ export function VideoAIFeedback({ shooting, mechanics }: { shooting: ShootingSum
           <Button variant="primary" isLoading={busy} onClick={run}>
             Get AI feedback
           </Button>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             On Free this uses one of your {FREE_MONTHLY_AI_REPORTS} AI reports for the month. Unlimited with Pro.
           </p>
-          {error && <p className="text-xs text-red-400">{error}</p>}
+          {error && <p className="text-sm text-red-400">{error}</p>}
         </>
       ) : (
         <div className="space-y-3 text-sm text-zinc-200">
@@ -97,7 +97,7 @@ export function VideoAIFeedback({ shooting, mechanics }: { shooting: ShootingSum
               ))}
             </ul>
           )}
-          <p className="text-xs text-zinc-500">Saved to your AI Coach reports.</p>
+          <p className="text-sm text-zinc-500">Saved to your AI Coach reports.</p>
         </div>
       )}
     </div>

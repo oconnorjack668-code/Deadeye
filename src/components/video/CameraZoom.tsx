@@ -29,7 +29,7 @@ export function CameraZoom({ range, value, onChange }: { range: ZoomRange; value
         onChange={(e) => onChange(Number(e.target.value))}
         className="mt-2 h-11 w-full accent-orange-500"
       />
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         Zoom until the ring is big in the picture, with room above it for the ball coming down.
       </p>
     </div>

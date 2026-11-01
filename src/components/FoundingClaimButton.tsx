@@ -35,7 +35,7 @@ export function FoundingClaimButton() {
       >
         <Gift className="h-4 w-4" /> {busy ? 'Claiming…' : `Claim ${FOUNDING_MONTHS} months of Pro free`}
       </button>
-      {error && <p className="text-xs text-red-300">{error}</p>}
+      {error && <p className="text-sm text-red-300">{error}</p>}
     </div>
   );
 }

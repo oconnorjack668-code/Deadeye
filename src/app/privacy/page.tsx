@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <main className="mx-auto max-w-2xl space-y-6 text-sm leading-6 text-zinc-300">
         <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">← Deadeye</Link>
         <h1 className="text-3xl font-black text-white">Privacy Policy</h1>
-        <p className="text-xs text-zinc-500">Last updated: {LAST_UPDATED}</p>
+        <p className="text-sm text-zinc-500">Last updated: {LAST_UPDATED}</p>
         <p>This policy covers Deadeye Basketball Training (&ldquo;Deadeye&rdquo;), the app and website.</p>
 
         <section className="space-y-2">

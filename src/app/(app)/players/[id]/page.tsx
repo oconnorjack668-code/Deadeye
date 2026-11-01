@@ -106,7 +106,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
 
         {!card ? (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-8 text-center">
-            <Lock className="h-8 w-8 text-zinc-600 mx-auto mb-2" />
+            <Lock className="h-8 w-8 text-zinc-500 mx-auto mb-2" />
             <p className="font-semibold text-white">This profile is private</p>
             <p className="text-sm text-zinc-400">Only friends and teammates can see it.</p>
           </div>
@@ -142,7 +142,7 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
                 {[card.position, card.height_cm ? formatHeight(card.height_cm, units) : null].filter(Boolean).join(' · ')}
               </p>
               {(card.region || card.country) && (
-                <p className="mt-1 text-xs text-zinc-500 flex items-center justify-center gap-1">
+                <p className="mt-1 text-sm text-zinc-500 flex items-center justify-center gap-1">
                   <MapPin className="h-3 w-3" /> {[card.region, countryName(card.country)].filter(Boolean).join(', ')}
                 </p>
               )}
@@ -179,17 +179,17 @@ export default async function PlayerPage({ params }: { params: Promise<{ id: str
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
                 <Trophy className="h-5 w-5 text-amber-400 mx-auto" />
                 <div className="text-xl font-black text-white">{card.season_points ?? 0}</div>
-                <div className="text-[11px] text-zinc-500">season pts</div>
+                <div className="text-xs text-zinc-500">season pts</div>
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
                 <Award className="h-5 w-5 text-amber-300 mx-auto" />
                 <div className="text-xl font-black text-white">{card.badges}</div>
-                <div className="text-[11px] text-zinc-500">badges</div>
+                <div className="text-xs text-zinc-500">badges</div>
               </div>
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
                 <Flame className="h-5 w-5 text-orange-400 mx-auto" />
                 <div className="text-xl font-black text-white">{card.streak ?? '–'}</div>
-                <div className="text-[11px] text-zinc-500">day streak</div>
+                <div className="text-xs text-zinc-500">day streak</div>
               </div>
             </div>
 

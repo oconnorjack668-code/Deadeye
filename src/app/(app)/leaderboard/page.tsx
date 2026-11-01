@@ -34,7 +34,7 @@ function href(scope: Scope, age: string, team?: string | null) {
 }
 
 const TRAIN_BUTTON =
-  'inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-red-600 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-red-950/50 hover:bg-red-500';
+  'inline-flex min-h-11 flex-shrink-0 items-center gap-1.5 rounded-full bg-orange-600 px-4 py-2 text-sm font-bold text-white transition-[filter] duration-150 hover:brightness-110';
 
 export default async function LeaderboardPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   await requireUser();
@@ -123,7 +123,6 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             {/* Where you stand, and what it takes to move up */}
             {meRow && !needsLocation && (
               <section className="relative overflow-hidden rounded-3xl border border-red-500/30 bg-gradient-to-br from-red-950/70 via-zinc-900 to-zinc-950 p-5">
-                <div aria-hidden className="pointer-events-none absolute -right-12 -top-12 h-44 w-44 rounded-full bg-red-600/20 blur-3xl" />
                 <div className="relative flex items-center gap-4">
                   <Avatar
                     name={profile?.display_name || meRow.player_name}
@@ -133,7 +132,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                     size={60}
                   />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[11px] font-bold uppercase tracking-widest text-red-300/80">You · {activeLabel}</p>
+                    <p className="truncate text-sm font-bold uppercase tracking-widest text-red-300/80">You · {activeLabel}</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-black leading-tight tabular-nums text-white">{ranked ? `#${meRow.rank}` : '–'}</span>
                       {ranked && meRow.total > 1 && <span className="text-sm text-zinc-400">of {meRow.total}</span>}
@@ -141,7 +140,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <div className="text-3xl font-black leading-none tabular-nums text-white">{meRow.points}</div>
-                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">pts</div>
+                    <div className="mt-1 text-xs font-semibold uppercase tracking-widest text-zinc-400">pts</div>
                   </div>
                 </div>
 
@@ -189,7 +188,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                 </div>
 
                 {!profile?.is_public && (
-                  <p className="relative mt-3 text-xs text-zinc-400">
+                  <p className="relative mt-3 text-sm text-zinc-400">
                     Only friends and teammates can see you.{' '}
                     <Link href="/settings" className="underline text-cyan-400">
                       Show me on the public board
@@ -211,7 +210,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                       href={href(t.scope, age, t.team)}
                       aria-current={active ? 'page' : undefined}
                       className={`min-w-[5.5rem] flex-shrink-0 rounded-2xl border px-3.5 py-2 transition-colors ${
-                        active ? 'border-red-500/70 bg-red-500/15 text-white' : 'border-zinc-800 bg-zinc-900/70 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
+                        active ? 'border-orange-500/70 bg-orange-500/15 text-white' : 'border-zinc-800 bg-zinc-900/70 text-zinc-400 hover:border-zinc-700 hover:text-zinc-200'
                       }`}
                     >
                       <div className="max-w-[9rem] truncate text-xs font-semibold">
@@ -252,7 +251,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
               </div>
             ) : listed.length === 0 ? (
               <div className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900/40 p-8 text-center">
-                <Trophy className="mx-auto mb-3 h-10 w-10 text-zinc-600" />
+                <Trophy className="mx-auto mb-3 h-10 w-10 text-zinc-500" />
                 {scope === 'friends' ? (
                   <>
                     <p className="font-bold text-white">No friends on this board yet</p>
@@ -319,20 +318,20 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <Dumbbell className="h-4 w-4 text-emerald-400" />
                   <div className="mt-1.5 font-bold text-white">+10 training</div>
-                  <p className="mt-0.5 text-xs text-zinc-400">Each day you log a hoops session or workout (once a day, on your own calendar)</p>
+                  <p className="mt-0.5 text-sm text-zinc-400">Each day you log a hoops session or workout (once a day, on your own calendar)</p>
                 </div>
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <BookOpen className="h-4 w-4 text-amber-400" />
                   <div className="mt-1.5 font-bold text-white">+10 quiz</div>
-                  <p className="mt-0.5 text-xs text-zinc-400">Each IQ Study topic quiz passed at 80%+</p>
+                  <p className="mt-0.5 text-sm text-zinc-400">Each IQ Study topic quiz passed at 80%+</p>
                 </div>
                 <div className="rounded-xl bg-zinc-950/60 p-3">
                   <Target className="h-4 w-4 text-red-400" />
                   <div className="mt-1.5 font-bold text-white">Bonus</div>
-                  <p className="mt-0.5 text-xs text-zinc-400">Extra points for weekly challenges</p>
+                  <p className="mt-0.5 text-sm text-zinc-400">Extra points for weekly challenges</p>
                 </div>
               </div>
-              <p className="mt-3 text-xs text-zinc-500">
+              <p className="mt-3 text-sm text-zinc-500">
                 Everyone, country and county boards show players who turned on &ldquo;Show me on the public leaderboard&rdquo;. Friends and
                 team boards show your friends and teammates. Age groups use your age bracket, which is never shown to anyone.
               </p>
@@ -365,8 +364,8 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                           <Star className="h-3 w-3" /> +{c.points}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs text-zinc-400">{c.description}</p>
-                      {complete && <p className="mt-2 text-xs font-semibold text-emerald-400">Done</p>}
+                      <p className="mt-1 text-sm text-zinc-400">{c.description}</p>
+                      {complete && <p className="mt-2 text-sm font-semibold text-emerald-400">Done</p>}
                     </div>
                   </div>
                 );

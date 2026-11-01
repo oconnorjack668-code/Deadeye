@@ -37,7 +37,7 @@ function Stepper({ label, value, onChange, step, min, max, format }: {
 }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{label}</span>
+      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{label}</span>
       <div className="flex items-center gap-1.5">
         <button type="button" aria-label={`Less ${label.toLowerCase()}`} onClick={() => onChange(Math.max(min, value - step))} className="rounded-lg bg-zinc-800 p-1.5 text-zinc-300">
           <Minus className="h-3.5 w-3.5" />

@@ -66,18 +66,18 @@ export function ShootingBreakdown({ shots, className = '' }: { shots: SavedShot[
       </dl>
 
       {split && split.second.attempts > 0 && pct(split.first.makes, split.first.attempts) - pct(split.second.makes, split.second.attempts) >= 15 && (
-        <p className="mt-3 text-xs text-zinc-400">
+        <p className="mt-3 text-sm text-zinc-400">
           Your second half dropped off. Tired legs show up as short misses: worth a rest between rounds, or ending on a make.
         </p>
       )}
       {tendency && (
-        <p className="mt-2 text-xs text-zinc-400">
+        <p className="mt-2 text-sm text-zinc-400">
           Most wide misses went {tendency}, as the camera saw them. Filmed from behind you, that is your {tendency} too; from in front, it is
           the other way.
         </p>
       )}
       {hasCalls && kinds.rim > 0 && (
-        <p className="mt-2 text-xs text-zinc-500">A clean make went through without the ball being seen bouncing off the ring first.</p>
+        <p className="mt-2 text-sm text-zinc-500">A clean make went through without the ball being seen bouncing off the ring first.</p>
       )}
     </div>
   );

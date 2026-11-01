@@ -201,7 +201,7 @@ export default async function AICoachPage() {
                 <CardContent className="p-4 flex items-center justify-between gap-4">
                   <div>
                     <h3 className="font-semibold text-white capitalize">{session.session_type.replace(/-/g, ' ')}</h3>
-                    <p className="text-xs text-zinc-400">
+                    <p className="text-sm text-zinc-400">
                       {new Date(`${session.session_date}T00:00:00`).toLocaleDateString('en-US', {
                         weekday: 'short',
                         month: 'short',
@@ -247,7 +247,7 @@ export default async function AICoachPage() {
                       {report.report_type === 'weekly_summary' && (
                         <Badge variant="success" className="text-xs">Weekly report</Badge>
                       )}
-                      <p className="text-xs text-zinc-400">
+                      <p className="text-sm text-zinc-400">
                         {new Date(report.created_at).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',

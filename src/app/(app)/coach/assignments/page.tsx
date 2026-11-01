@@ -61,7 +61,7 @@ export default async function CoachAssignmentsPage({ searchParams }: { searchPar
             <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-800" aria-hidden>
               <div className="h-full rounded-full bg-cyan-500" style={{ width: `${a.of ? Math.round((a.done / a.of) * 100) : 0}%` }} />
             </div>
-            <p className="mt-1 text-xs text-zinc-500">
+            <p className="mt-1 text-sm text-zinc-500">
               {[
                 teams.length > 1 ? a.team : null,
                 a.due_date

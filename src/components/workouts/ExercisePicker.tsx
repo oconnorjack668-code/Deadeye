@@ -120,7 +120,7 @@ export function ExercisePicker({
               aria-label={favoriteIds.has(e.id) ? `Remove ${e.name} from favorites` : `Add ${e.name} to favorites`}
               className="h-10 w-10 flex items-center justify-center"
             >
-              <Star className={`h-4 w-4 ${favoriteIds.has(e.id) ? 'fill-amber-400 text-amber-400' : 'text-zinc-600'}`} />
+              <Star className={`h-4 w-4 ${favoriteIds.has(e.id) ? 'fill-amber-400 text-amber-400' : 'text-zinc-500'}`} />
             </button>
           </li>
         ))}

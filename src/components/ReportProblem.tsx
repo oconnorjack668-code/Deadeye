@@ -107,11 +107,11 @@ export function ReportProblem({
         />
       </label>
       {/* Many players are under 18: ask for the problem, not for them */}
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         We see the page you are on and your type of device. Please leave out your name, address and phone number.
       </p>
       {error && (
-        <p role="alert" className="text-xs font-semibold text-red-400">
+        <p role="alert" className="text-sm font-semibold text-red-400">
           {error}
         </p>
       )}

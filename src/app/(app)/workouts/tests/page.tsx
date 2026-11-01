@@ -136,7 +136,7 @@ export default async function PerformanceTestsPage() {
                   <div className="flex items-start justify-between mb-3">
                     <div className="space-y-1">
                       <h3 className="font-bold text-white">{testType.label}</h3>
-                      <p className="text-xs text-zinc-400">Measured in {unitFor(testType.id)}</p>
+                      <p className="text-sm text-zinc-400">Measured in {unitFor(testType.id)}</p>
                     </div>
                     <span className="text-2xl">{testType.icon}</span>
                   </div>
@@ -163,7 +163,7 @@ export default async function PerformanceTestsPage() {
                     </div>
                   ) : (
                     <div className="pt-3 border-t border-zinc-800">
-                      <p className="text-xs text-zinc-500 italic">No tests logged yet</p>
+                      <p className="text-sm text-zinc-500 italic">No tests logged yet</p>
                       <Link href="/workouts/tests/new" className="mt-2 block">
                         <Button variant="outline" size="sm" className="w-full">
                           Log First Test
@@ -212,7 +212,7 @@ export default async function PerformanceTestsPage() {
                             </Badge>
                           )}
                         </div>
-                        <p className="text-xs text-zinc-400">
+                        <p className="text-sm text-zinc-400">
                           {new Date(`${test.test_date}T00:00:00`).toLocaleDateString('en-US', {
                             month: 'short',
                             day: 'numeric',
@@ -225,7 +225,7 @@ export default async function PerformanceTestsPage() {
                           {shown.value} {shown.unit}
                         </span>
                         {test.notes && (
-                          <p className="text-xs text-zinc-500 mt-0.5">{test.notes}</p>
+                          <p className="text-sm text-zinc-500 mt-0.5">{test.notes}</p>
                         )}
                       </div>
                       <TestActions test={test} />

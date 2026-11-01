@@ -72,7 +72,7 @@ function StatCard({
         <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">{label}</div>
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
           <span className={`text-2xl sm:text-3xl font-black leading-none ${valueClass}`}>{value}</span>
-          <Badge variant={badgeVariant} className="flex-shrink-0 text-[10px] sm:text-xs">
+          <Badge variant={badgeVariant} className="flex-shrink-0 text-xs sm:text-xs">
             {badge}
           </Badge>
         </div>

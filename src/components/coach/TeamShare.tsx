@@ -55,10 +55,10 @@ export function TeamShare({ teamName, code, coachName }: { teamName: string; cod
         {qr && (
           // A data URL drawn in the browser; next/image adds nothing here
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={qr} alt={`QR code to join ${teamName}`} width={200} height={200} className="mx-auto rounded-xl bg-white p-2" />
+          <img src={qr} alt={`QR code to join ${teamName}`} width={200} height={200} className="mx-auto rounded-xl bg-[#fff] p-2" />
         )}
-        <p className="text-xs text-zinc-500">Players scan this at training, or type the code in Teams.</p>
-        {link && <p className="break-all text-xs text-zinc-400">{link}</p>}
+        <p className="text-sm text-zinc-500">Players scan this at training, or type the code in Teams.</p>
+        {link && <p className="break-all text-sm text-zinc-400">{link}</p>}
       </div>
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -88,7 +88,7 @@ export function TeamShare({ teamName, code, coachName }: { teamName: string; cod
           {copied === 'parents' ? 'Message copied' : 'Copy a message for parents'}
         </button>
       </div>
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         The parents&apos; message says what you can see (weekly totals, and details only if a player shares them) and that you post to the
         whole team, never privately.
       </p>

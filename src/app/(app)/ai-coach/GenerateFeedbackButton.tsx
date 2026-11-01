@@ -40,7 +40,7 @@ export function GenerateFeedbackButton({ sessionId, disabled }: { sessionId: str
             them. This says what it is actually doing. */}
         {loading ? 'Reading your session…' : 'Get AI feedback'}
       </Button>
-      {error && <p className="text-xs text-red-400 max-w-[16rem]">{error}</p>}
+      {error && <p className="text-sm text-red-400 max-w-[16rem]">{error}</p>}
     </div>
   );
 }

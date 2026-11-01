@@ -46,7 +46,7 @@ export function InstallNudge() {
       <Link href="/install" className="min-w-0 flex-1 truncate hover:text-zinc-200">
         Add Deadeye to your home screen for full screen and reminders <span className="text-orange-400">· How</span>
       </Link>
-      <button type="button" onClick={dismiss} aria-label="Hide this" className="flex-shrink-0 p-1 text-zinc-600 hover:text-zinc-300">
+      <button type="button" onClick={dismiss} aria-label="Hide this" className="flex-shrink-0 p-1 text-zinc-500 hover:text-zinc-300">
         <X className="h-4 w-4" />
       </button>
     </div>

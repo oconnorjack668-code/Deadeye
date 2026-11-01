@@ -53,7 +53,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         </Link>
         <h1 className="text-3xl font-black tracking-tight text-white">{guide.title}</h1>
         <p className="text-sm text-zinc-400 mt-2">{guide.summary}</p>
-        <p className="text-xs text-zinc-500 mt-1 flex items-center gap-1">
+        <p className="text-sm text-zinc-500 mt-1 flex items-center gap-1">
           <Clock className="h-3 w-3" /> {guide.reading_minutes} min read
         </p>
         <div className="mt-6 space-y-6 text-sm leading-6 text-zinc-300">

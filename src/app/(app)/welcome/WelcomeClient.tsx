@@ -84,7 +84,7 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
           >
             <PenLine className="h-4 w-4" /> Log shots by hand instead
           </Link>
-          <p className="text-center text-xs text-zinc-500">
+          <p className="text-center text-sm text-zinc-500">
             By hand is two taps a spot: where you shot from, then how many went in.
           </p>
         </div>

@@ -172,7 +172,7 @@ export function StyleMatchClient({
       {editing ? (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
           <h2 className="font-bold text-white">What describes your game? (up to 5)</h2>
-          <p className="text-xs text-zinc-500 mt-1 mb-3">
+          <p className="text-sm text-zinc-500 mt-1 mb-3">
             Height: {formatHeight(heightCm, units)} ·{' '}
             {shotProfile
               ? `shot locations from ${totalShots} logged shots included`
@@ -216,7 +216,7 @@ export function StyleMatchClient({
                   </div>
                   <div className="text-right">
                     <div className="text-2xl font-black text-cyan-400">{m.score}%</div>
-                    <div className="text-[11px] text-zinc-500">
+                    <div className="text-xs text-zinc-500">
                       {m.height_diff_cm === 0
                         ? 'same height'
                         : `${Math.abs(m.height_diff_cm)} cm ${m.height_diff_cm > 0 ? 'taller than him' : 'shorter than him'}`}

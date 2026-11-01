@@ -95,7 +95,7 @@ export default async function WorkoutsPage() {
             <span className="block text-sm font-semibold text-white">Fuel</span>
             <span className="block text-xs text-zinc-500">Eating, water and sleep around your training</span>
           </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
         </Link>
 
         {/* Routines */}
@@ -144,12 +144,12 @@ export default async function WorkoutsPage() {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-white capitalize">{w.workout_type.replace(/_/g, ' ')}</h3>
-                      <p className="text-xs text-zinc-400 mt-1">
+                      <p className="text-sm text-zinc-400 mt-1">
                         {new Date(`${w.workout_date}T00:00:00`).toLocaleDateString()} · {w.duration_minutes} min · RPE {w.rpe}/10
                         {w.workout_sets?.[0]?.count ? ` · ${w.workout_sets[0].count} sets` : ''}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-zinc-600" />
+                    <ChevronRight className="h-4 w-4 text-zinc-500" />
                   </CardContent>
                 </Card>
               </Link>

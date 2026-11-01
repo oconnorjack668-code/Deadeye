@@ -218,11 +218,11 @@ export function FormCheck({ initialFile, shotTimeMs, heightCm, hand, onResult }:
                   <div key={title} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
                     <div className="text-xs text-zinc-500">{title}</div>
                     <div className="text-xl font-black text-white">{value}</div>
-                    <div className="text-[11px] text-zinc-500">{hint}</div>
+                    <div className="text-xs text-zinc-500">{hint}</div>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 Measurements come from a phone camera, so treat them as estimates. Comparing your own shots over time (same angle and
                 distance) is more useful than any single number.
               </p>

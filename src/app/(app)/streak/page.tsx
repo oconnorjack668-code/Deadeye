@@ -28,7 +28,7 @@ const DAY_STYLE: Record<CalendarDay['status'], string> = {
   trained: 'bg-orange-500 text-white font-bold',
   rest: 'bg-zinc-800 text-zinc-300',
   frozen: 'bg-sky-500/25 text-sky-100',
-  missed: 'text-zinc-600',
+  missed: 'text-zinc-500',
   open: 'text-white ring-2 ring-inset ring-orange-400',
   future: 'text-zinc-700',
 };
@@ -97,22 +97,22 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
       <div className="p-4 md:p-8 max-w-2xl mx-auto space-y-6">
         {/* The streak */}
         <section className="rounded-3xl border border-orange-500/40 bg-gradient-to-b from-orange-500/20 via-orange-500/5 to-transparent p-6 text-center">
-          <Flame className={`mx-auto h-16 w-16 ${current > 0 ? 'text-orange-400' : 'text-zinc-600'}`} />
+          <Flame className={`mx-auto h-16 w-16 ${current > 0 ? 'text-orange-400' : 'text-zinc-500'}`} />
           <div className="mt-2 text-6xl font-black tabular-nums text-white">{current}</div>
           <div className="text-sm font-semibold text-zinc-300">day streak</div>
           <p className={`mt-3 text-sm font-semibold ${status.tone}`}>{status.text}</p>
           <div className="mt-4 grid grid-cols-3 gap-2 text-left">
             <div className="rounded-xl bg-zinc-950/50 p-3">
               <div className="text-lg font-black text-white tabular-nums">{longest}</div>
-              <div className="text-[11px] text-zinc-400">longest</div>
+              <div className="text-xs text-zinc-400">longest</div>
             </div>
             <div className="rounded-xl bg-zinc-950/50 p-3">
               <div className="text-lg font-black text-orange-300 tabular-nums">+{streakDayBonus(current + 1)}</div>
-              <div className="text-[11px] text-zinc-400">XP next day</div>
+              <div className="text-xs text-zinc-400">XP next day</div>
             </div>
             <div className="rounded-xl bg-zinc-950/50 p-3">
               <div className="text-lg font-black text-sky-300 tabular-nums">{state.freezes}</div>
-              <div className="text-[11px] text-zinc-400">freezes</div>
+              <div className="text-xs text-zinc-400">freezes</div>
             </div>
           </div>
         </section>
@@ -129,7 +129,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
             </Link>
             <div className="text-center">
               <h2 className="font-bold text-white">{monthLabel}</h2>
-              <p className="text-xs text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 {trainedInMonth} training day{trainedInMonth === 1 ? '' : 's'}
                 {frozenInMonth > 0 && ` · ${frozenInMonth} frozen`}
               </p>
@@ -146,7 +146,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
               <span className="h-9 w-9" />
             )}
           </div>
-          <div className="grid grid-cols-7 gap-1 text-center text-[11px] font-semibold text-zinc-500">
+          <div className="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-zinc-500">
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
               <div key={i}>{d}</div>
             ))}
@@ -168,7 +168,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
               </div>
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-zinc-400">
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-400">
             <span className="flex items-center gap-1.5">
               <span className="h-3 w-3 rounded bg-orange-500" /> Trained
             </span>
@@ -188,7 +188,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
               {Array.from({ length: MAX_FREEZES }, (_, i) => (
                 <span
                   key={i}
-                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${i < state.freezes ? 'bg-sky-500/25 text-sky-200' : 'bg-zinc-900 text-zinc-600'}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${i < state.freezes ? 'bg-sky-500/25 text-sky-200' : 'bg-zinc-900 text-zinc-500'}`}
                 >
                   <Snowflake className="h-5 w-5" />
                 </span>
@@ -196,7 +196,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
             </div>
             <div className="min-w-0">
               <h2 className="font-bold text-white">Streak freezes</h2>
-              <p className="text-xs text-zinc-300">
+              <p className="text-sm text-zinc-300">
                 {state.nextFreezeIn === null
                   ? 'You hold the most you can.'
                   : `Next one in ${state.nextFreezeIn} training day${state.nextFreezeIn === 1 ? '' : 's'}.`}
@@ -207,11 +207,11 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
             <div className="h-full rounded-full bg-sky-400" style={{ width: `${Math.round(freezeProgress * 100)}%` }} />
           </div>
           {state.frozen.length > 0 && current > 0 && (
-            <p className="mt-3 text-xs font-semibold text-sky-200">
+            <p className="mt-3 text-sm font-semibold text-sky-200">
               A freeze saved this streak on {state.frozen.map(formatDay).join(' and ')}.
             </p>
           )}
-          <p className="mt-3 text-xs text-zinc-400">
+          <p className="mt-3 text-sm text-zinc-400">
             Every {FREEZE_EVERY} training days in a streak earns a freeze, and you can hold {MAX_FREEZES}. Miss more than your rest day and
             a freeze covers the extra day by itself. Nothing to switch on.
           </p>
@@ -237,7 +237,7 @@ export default async function StreakPage({ searchParams }: { searchParams: Promi
                 >
                   <span
                     className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl ${
-                      reached ? 'bg-orange-500 text-white' : next ? 'bg-zinc-800 text-orange-300' : 'bg-zinc-900 text-zinc-600'
+                      reached ? 'bg-orange-500 text-white' : next ? 'bg-zinc-800 text-orange-300' : 'bg-zinc-900 text-zinc-500'
                     }`}
                   >
                     {reached ? <Check className="h-5 w-5" /> : next ? <Flame className="h-5 w-5" /> : <Lock className="h-4 w-4" />}

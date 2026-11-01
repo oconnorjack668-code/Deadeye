@@ -122,7 +122,7 @@ export function FriendsClient({ myId, myCode, rows, feed }: { myId: string; myCo
             <UserPlus className="h-4 w-4 mr-1.5" /> Add
           </Button>
         </form>
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           Friends see your display name, training totals and badges. Your notes, videos and details stay private.
         </p>
       </div>
@@ -206,7 +206,7 @@ export function FriendsClient({ myId, myCode, rows, feed }: { myId: string; myCo
                     <button
                       type="button"
                       aria-label={`Remove ${r.display_name}`}
-                      className="text-zinc-600 hover:text-red-400"
+                      className="text-zinc-500 hover:text-red-400"
                       onClick={() => {
                         if (window.confirm(`Remove ${r.display_name} from your friends?`)) {
                           void call(`r-${r.friendship_id}`, () => createClient().rpc('remove_friendship', { p_friendship_id: r.friendship_id! }));
@@ -221,7 +221,7 @@ export function FriendsClient({ myId, myCode, rows, feed }: { myId: string; myCo
             })}
           </ol>
         )}
-        <p className="text-[11px] text-zinc-500">Points: 20 per session or workout, 1 per 5 minutes, 1 per shot made.</p>
+        <p className="text-sm text-zinc-500">Points: 20 per session or workout, 1 per 5 minutes, 1 per shot made.</p>
       </section>
 
       {/* Feed */}
@@ -238,9 +238,9 @@ export function FriendsClient({ myId, myCode, rows, feed }: { myId: string; myCo
                     <p className="text-sm text-zinc-200">
                       <span className="font-semibold text-white">{f.user_id === myId ? 'You' : f.display_name}</span> · {f.title}
                     </p>
-                    {f.detail && <p className="text-xs text-zinc-400">{f.detail}</p>}
+                    {f.detail && <p className="text-sm text-zinc-400">{f.detail}</p>}
                   </div>
-                  <span className="text-[11px] text-zinc-500 whitespace-nowrap">{timeAgo(f.created_at)}</span>
+                  <span className="text-xs text-zinc-500 whitespace-nowrap">{timeAgo(f.created_at)}</span>
                 </li>
               );
             })}

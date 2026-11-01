@@ -43,7 +43,7 @@ export function WithdrawFromContract({ deadline }: { deadline: string }) {
     <div className="space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
       <div>
         <div className="text-sm font-semibold text-white">Changed your mind?</div>
-        <p className="text-xs text-zinc-400">
+        <p className="text-sm text-zinc-400">
           You can withdraw from your Pro contract until {deadline} and get a full refund. Pro ends straight away.
         </p>
       </div>

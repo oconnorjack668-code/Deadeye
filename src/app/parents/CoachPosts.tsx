@@ -68,7 +68,7 @@ export async function CoachPosts({ childId, child }: { childId: string; child: s
             <li key={a.id} className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3">
               <p className="font-semibold text-white">{a.title}</p>
               {a.details && <p className="mt-0.5 whitespace-pre-wrap text-sm text-zinc-300">{a.details}</p>}
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500">
                 {coach(a.created_by)} to {teamName[a.team_id]} · {date(a.created_at)}
               </p>
             </li>
@@ -78,7 +78,7 @@ export async function CoachPosts({ childId, child }: { childId: string; child: s
               <p className="text-sm text-zinc-400">{child} asked about a clip: {q.question}</p>
               <p className="mt-1 font-semibold text-white">{VERDICTS.find((v) => v.id === q.verdict)?.label ?? 'Answered'}</p>
               {q.coach_note && <p className="mt-0.5 text-sm text-zinc-300">{q.coach_note}</p>}
-              <p className="mt-1 text-xs text-zinc-500">
+              <p className="mt-1 text-sm text-zinc-500">
                 {coach(q.answered_by)} · {date(q.answered_at!)}
               </p>
             </li>
@@ -89,7 +89,7 @@ export async function CoachPosts({ childId, child }: { childId: string; child: s
         </ul>
       )}
       {contactEmail && (
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           Worried about something a coach posted? Email{' '}
           <a href={`mailto:${contactEmail}`} className="underline">
             {contactEmail}

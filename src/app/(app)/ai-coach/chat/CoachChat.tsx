@@ -215,7 +215,7 @@ export function CoachChat({ initial, remaining: initialRemaining }: { initial: C
             <Send className="h-4 w-4" />
           </button>
         </form>
-        <div className="max-w-3xl mx-auto px-4 pb-2 flex justify-between text-[11px] text-zinc-500">
+        <div className="max-w-3xl mx-auto px-4 pb-2 flex justify-between text-xs text-zinc-500">
           <span>
             {remaining === null ? 'Unlimited with Pro' : `${remaining} of ${FREE_CHAT_PER_DAY} free questions left today`} · Not medical advice
           </span>
