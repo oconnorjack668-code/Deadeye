@@ -1,6 +1,6 @@
 # Shot tracker upgrades: accuracy data, worker, camera watch, HUD, drills, replays (2026-11-01)
 
-Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: 6b3e996, 007967d, 4f104e6, e49918c · Status: shipped, merged as #50 (8c9fbb3) on 1 Nov 2026
+Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: 6b3e996, 007967d, 4f104e6, e49918c · Status: shipped, merged as #50 (8c9fbb3) on 1 Nov 2026; handoff fixes #51 (38ce969); checked live
 
 ## Outcome
 - Each tracked session saves the tracker's own call next to the player's correction, plus fps, worker, camera moves and a coarse device class. `/admin/tracker` adds them up.
@@ -27,14 +27,20 @@ Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-upgrades` · Commits: 6b3
 - Bench before and after: 10/10, 31/31, tap grid 313/341, 7 phantom calls. Identical.
 - Browser (Playwright, Pixel 7, local): the sample calls 4 of 6 in dev and production, with the worker loaded. Upload → taps → framing → track → replay all worked. The fake camera with a knock showed Camera moved, then Fix rim, resume, recording, re-check. Spots drill tagged its zones; full screen kept the overlay aligned.
 
+## Live check (1 Nov 2026, after #51 deployed)
+- GitHub shows both production deploys succeeded (8c9fbb3 at 20:01, 38ce969 at 20:30 UTC). Vercel: no runtime errors in the 2 hours after.
+- deadeyeapp.vercel.app: home, /privacy (new hoop and tracker wording, dated November 1, 2026) and the sample clip return 200. The landing sample, played at phone size, called "Spot on, 4 of 6" with the worker loaded from the live build.
+- Not checked live (needs sign-in): saving a session, the session page breakdown, hoop sync.
+
 ## Open
 - ~~Run 00055~~: the user confirmed it was run before the merge. Tick it in `docs/launch-checklist.md`.
 - ~~Safety review~~: BLOCK, then PASS. It found the privacy policy did not name the new data and that account hoops stayed on shared devices; both were fixed in 4f104e6, along with less device data (platform only) and copy notes. release-checker was not run; tsc, lint, tests, build and the bench were.
-- Not tested: a real phone (zoom, focus lock, MediaRecorder memory on iOS, orientation lock), signed-in saving, and the session page breakdown (this sandbox cannot reach Supabase). Needs the user.
+- Not tested: a real phone (zoom, focus lock, MediaRecorder memory on iOS, orientation lock), signed-in saving, the session page breakdown and hoop sync (this sandbox cannot reach Supabase, live or local). Needs the user.
 - Owner tools got a new tile in the existing tile style. `docs/design.md` says to drop tiles when a screen changes; left for a separate tidy.
 
 ## Gotchas
 - The React Compiler bailed out of all of ShotTracker over one `setFraming(null)` in an effect cleanup. It showed as impure-call errors in unrelated functions. Fixed by moving the check to `useFramingCheck.ts`. Bisect by stubbing or cutting, not by reading the errors.
 - `scripts/build-migration-check.mjs` does nothing on Windows (its run-directly check compares mismatched paths). Import `buildCheck` and call it instead.
 - Bash heredocs here drop backslashes; write scripts containing `\` with the file tool.
+- Merging follows the agent-os rules: the founder names the PR ("merge 51"), checks green, `gh pr merge --match-head-commit <sha>` so nothing pushed after the yes slips in. Docs changes to main also go through a PR.
 - Supabase is unreachable from this sandbox, so signed-in checks fail ("Failed to fetch"). A temporary page under `/parents/` was used and then deleted, along with `.next/dev`.
