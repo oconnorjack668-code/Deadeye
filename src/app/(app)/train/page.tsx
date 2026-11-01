@@ -98,7 +98,7 @@ export default async function TrainPage() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
+      <div className="p-4 md:p-8 max-w-3xl lg:max-w-5xl mx-auto">
         <PageHeader tone="train" icon={CalendarCheck} title="Train" subtitle="Plan, learn and improve" />
 
         {/* The one thing to do here: the program's next session, or, with no
@@ -131,6 +131,8 @@ export default async function TrainPage() {
           )}
         </section>
 
+        {/* Two groups side by side on a laptop, one under another on a phone */}
+        <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-x-6">
         {GROUPS.map((group) => {
           const items = aiOff ? group.items.filter((s) => !s.href.startsWith('/ai-coach')) : group.items;
           return (
@@ -167,6 +169,7 @@ export default async function TrainPage() {
           </section>
           );
         })}
+        </div>
       </div>
     </div>
   );
