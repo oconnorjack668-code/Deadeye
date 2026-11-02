@@ -61,6 +61,28 @@ lint error. If you add a table or column in a migration, add it there too,
 including its `Relationships: []` entry — and if you add an enum-like `CHECK`
 constraint, widen the matching TypeScript union, which has drifted before.
 
+## Preview deployments
+
+Every pull request gets a Vercel preview. Since 2 Nov 2026 previews can be
+signed in to, which is how a change is checked before it goes live:
+
+- **Private.** Deployment Protection is on (Standard), so a preview link asks
+  for a Vercel login first. The production address stays public.
+- **Live data.** Previews have `NEXT_PUBLIC_SUPABASE_URL` and
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, so they read and write the **live
+  database**. Sign in only as the tester account, and do not save anything you
+  would not want in production.
+- **No service key.** `SUPABASE_SERVICE_ROLE_KEY` (and any copy of it) is
+  Production-only, so unreviewed code never holds a key that bypasses row level
+  security. Features that use it fail on previews by design: data export,
+  account deletion, AI coach chat, the founding claim, photo upload and the
+  parent links. Player screens are unaffected.
+- **Built in.** `NEXT_PUBLIC_*` values are fixed when a preview is built; after
+  changing one in Vercel, a new build is needed.
+
+When migrations need testing on their own, the next step is a separate
+Supabase project for previews.
+
 ## Layout
 
 ```
