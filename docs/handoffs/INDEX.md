@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
 - 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
 - 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
 - 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
@@ -31,4 +32,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-21 · promo-rim-line-fix · First rim line now ends on the ring; promo and phone page updated · open: none → [handoff](2026-10-21-promo-rim-line-fix.md)
 - 2026-10-20 · leaderboard-redesign · Leaderboard redesign with podium, avatars and a chase nudge, shipped · open: 1 → [handoff](2026-10-20-leaderboard-redesign.md)
 - 2026-10-20 · promo-video-and-coach-format · Promo v2 shipped (first promo + voice); coach replies formatted · open: 1 → [handoff](2026-10-20-promo-video-and-coach-format.md)
-- 2026-10-20 · tracker-streaks-gym-avatars · Tracker fixes, levels, streak freezes, programmes, gym/drill tools, avatars, Codex access · open: 5 → [handoff](2026-10-20-tracker-streaks-gym-avatars.md)
