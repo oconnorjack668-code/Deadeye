@@ -494,6 +494,8 @@ export interface EndCardStats {
   makes: number;
   attempts: number;
   bestRun: number;
+  /** The session beat the player's best % (personalBest.ts). */
+  personalBest?: boolean;
 }
 
 /** The last seconds of a saved video: the session's numbers on the app's own background. `p` 0..1 fades it in. */
@@ -506,6 +508,19 @@ export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats,
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   const cy = h / 2;
+  if (stats.personalBest) {
+    ctx.font = `900 ${16 * u}px ${family}`;
+    const label = 'NEW PERSONAL BEST';
+    const tw = ctx.measureText(label).width + 28 * u;
+    ctx.fillStyle = '#10b981';
+    ctx.beginPath();
+    ctx.roundRect(w / 2 - tw / 2, cy - 104 * u, tw, 30 * u, 15 * u);
+    ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(label, w / 2, cy - 88.5 * u);
+    ctx.textBaseline = 'alphabetic';
+  }
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 ${64 * u}px ${family}`;
   ctx.fillText(`${stats.makes}/${stats.attempts}`, w / 2, cy - 4 * u);

@@ -43,6 +43,7 @@ import {
 } from '@/lib/video/overlayTimeline';
 import { drawBall, drawRim } from '@/lib/video/overlayArt';
 import { TrackerVideoExport } from './TrackerVideoExport';
+import { loadShootingBest, MIN_PB_ATTEMPTS, personalBest, type ShootingTally } from '@/lib/video/personalBest';
 import { useFramingCheck } from './useFramingCheck';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
@@ -60,7 +61,7 @@ import { ShotReplay } from './ShotReplay';
 import { ShootingBreakdown } from '@/components/basketball/ShootingBreakdown';
 import { track } from '@/lib/events';
 import { deleteAccountRim, loadAccountRims, mergeRims, saveAccountRim } from '@/lib/video/rimSync';
-import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film } from 'lucide-react';
+import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film, Trophy } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
 type Source = 'camera' | 'file';
@@ -237,6 +238,8 @@ export function ShotTracker({
   // with it drawn in (overlayTimeline.ts); snapshotted when the run ends
   const overlayLogRef = useRef<OverlayLog | null>(null);
   const [timeline, setTimeline] = useState<OverlayTimeline | null>(null);
+  /** The player's best saved session % to beat; undefined until known (personalBest.ts). */
+  const [shootingBest, setShootingBest] = useState<ShootingTally | null | undefined>(undefined);
   /** The latest call, for the rim line taking its colour for a moment. */
   const lastCallRef = useRef<{ t: number; made: boolean } | null>(null);
 
@@ -660,6 +663,9 @@ export function ShotTracker({
       overlayLogRef.current = createOverlayLog();
       lastCallRef.current = null;
       setTimeline(null);
+      // The best to beat, fetched now while the phone is still likely online
+      // and before this session is saved into it (personalBest.ts)
+      if (!sample) void loadShootingBest(createClient()).then(setShootingBest);
     } else {
       const held = performance.now() - fixStartedRef.current;
       pausedMsRef.current += held;
@@ -1200,6 +1206,7 @@ export function ShotTracker({
   const replayIndex = replayShot ? shots.indexOf(replayShot) : -1;
   const anyWithoutZone = shots.some((s) => !s.zone);
   const lowFps = quality !== null && quality.fps < 12;
+  const best = sample ? ({ kind: 'none' } as const) : personalBest({ makes, attempts: shots.length }, shootingBest);
 
   return (
     <div className="space-y-4">
@@ -1505,6 +1512,24 @@ export function ShotTracker({
             )}
           </div>
 
+          {/* Against the player's saved sessions, on the numbers as corrected
+              here: they are what gets saved */}
+          {best.kind !== 'none' && (
+            <div className="flex items-start gap-3 rounded-2xl border border-emerald-600/40 bg-emerald-600/10 p-4">
+              <Trophy className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-400" aria-hidden="true" />
+              <div>
+                <p className="font-bold text-white">
+                  {best.kind === 'new' ? `New personal best: ${best.pct}%` : `Personal best set: ${best.pct}%`}
+                </p>
+                <p className="mt-1 text-sm text-zinc-300">
+                  {best.kind === 'new'
+                    ? `Your best before was ${best.previous.pct}% (${best.previous.makes}/${best.previous.attempts}). Save the session to keep it.`
+                    : `Your first session of ${MIN_PB_ATTEMPTS} shots or more, so this is the % to beat. Save the session to keep it.`}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* The sample's answer is known, so say how close the call was rather
               than asking the player to check shots they never saw taken. */}
           {sample && (
@@ -1748,7 +1773,7 @@ export function ShotTracker({
           )}
 
           {replayFile && timeline && timeline.calls.length > 0 && (
-            <TrackerVideoExport file={replayFile} timeline={timeline} offsetMs={replayOffset} />
+            <TrackerVideoExport file={replayFile} timeline={timeline} offsetMs={replayOffset} best={shootingBest} />
           )}
 
           {replayFile ? (
