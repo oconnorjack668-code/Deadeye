@@ -1,8 +1,10 @@
 // src/app/api/cron/reminders/route.ts
 // Scheduled job, once a day at 16:00 UTC (vercel.json): sends training
 // reminders to players whose reminder is due today and who haven't trained yet. Protected by CRON_SECRET
-// (Vercel Cron sends it as "Authorization: Bearer <CRON_SECRET>").
+// (Vercel Cron sends it as "Authorization: Bearer <CRON_SECRET>"). Each run is saved to
+// cron_runs (src/lib/cronRuns.ts) and shown at /admin/cron-runs.
 import { createAdminClient } from '@/lib/supabase/admin';
+import { CRON_RUN_KEEP_DAYS, withCronLog } from '@/lib/cronRuns';
 import { pushConfigured, sendPush } from '@/lib/push';
 import { reminderDue, reminderPush, reminderWindowOpen, type ReminderPrefs } from '@/lib/reminders';
 import { streakState } from '@/lib/achievements';
@@ -35,7 +37,7 @@ async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClie
 
 export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
+async function run(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -54,6 +56,16 @@ export async function GET(request: Request) {
         () => undefined
       );
   }
+
+  // Housekeeping: the scheduled job run log (00056) is kept for a year
+  await admin
+    .from('cron_runs')
+    .delete()
+    .lt('started_at', new Date(Date.now() - CRON_RUN_KEEP_DAYS * 86_400_000).toISOString())
+    .then(
+      () => undefined,
+      () => undefined
+    );
 
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
   // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)
@@ -120,6 +132,8 @@ export async function GET(request: Request) {
 
   return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, foundingReminders });
 }
+
+export const GET = withCronLog('reminders', run);
 
 /**
  * The player's streak tonight, from their training days, with the same rest

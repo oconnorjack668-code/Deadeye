@@ -15,6 +15,7 @@
 // recreates is expected again, so the files are read in order.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const DIR = 'supabase/migrations';
 const OUT = 'docs/check-migrations.sql';
@@ -164,4 +165,7 @@ function main() {
   console.log(`${OUT}: ${objects.length} things from ${files.length} migrations; unchecked: ${unchecked.join(', ') || 'none'}`);
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) main();
+// fileURLToPath, not new URL().pathname: the pathname keeps a space as %20 and,
+// on Windows, a leading slash before the drive letter, so a checkout in a
+// folder like "Vivobook S16" never matched and the script did nothing, silently.
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

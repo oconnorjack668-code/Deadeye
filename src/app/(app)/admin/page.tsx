@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users, Crosshair } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users, Crosshair, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -31,6 +31,24 @@ async function pendingBoardLinks(): Promise<number | null> {
   }
 }
 
+/**
+ * Scheduled job runs that failed in the last 8 days (00056), or null before
+ * the migration. A week and a day, so the Sunday weekly report is still
+ * counted on the Monday after next.
+ */
+async function recentFailedRuns(): Promise<number | null> {
+  try {
+    const { count, error } = await createAdminClient()
+      .from('cron_runs')
+      .select('id', { count: 'exact', head: true })
+      .eq('outcome', 'failed')
+      .gte('started_at', new Date(Date.now() - 8 * 86_400_000).toISOString());
+    return error ? null : count ?? 0;
+  } catch {
+    return null;
+  }
+}
+
 async function unread(table: 'player_reports' | 'app_errors'): Promise<{ count: number } | { problem: string }> {
   try {
     const { count, error } = await createAdminClient()
@@ -47,7 +65,12 @@ async function unread(table: 'player_reports' | 'app_errors'): Promise<{ count: 
 export default async function AdminPage() {
   if (!(await checkIsOwner())) notFound();
 
-  const [reports, crashes, boardRequests] = await Promise.all([unread('player_reports'), unread('app_errors'), pendingBoardLinks()]);
+  const [reports, crashes, boardRequests, failedRuns] = await Promise.all([
+    unread('player_reports'),
+    unread('app_errors'),
+    pendingBoardLinks(),
+    recentFailedRuns(),
+  ]);
 
   // Player reports have their own tile, first. They sat at the top of the
   // errors page, under a tile called "App errors", and could not be found.
@@ -72,6 +95,18 @@ export default async function AdminPage() {
       badge: 'count' in crashes && crashes.count > 0 ? `${crashes.count} open` : null,
       tile: 'bg-red-600/20',
       iconColor: 'text-red-400',
+    },
+    {
+      href: '/admin/cron-runs',
+      icon: Clock,
+      title: 'Scheduled jobs',
+      desc:
+        failedRuns === null
+          ? 'Run 00056_cron_runs.sql in the Supabase SQL editor to turn these on'
+          : 'Every run of the reminders, weekly report and agent counts, and what each did',
+      badge: failedRuns ? `${failedRuns} failed` : null,
+      tile: 'bg-sky-600/20',
+      iconColor: 'text-sky-400',
     },
     {
       href: '/admin/funnel',
