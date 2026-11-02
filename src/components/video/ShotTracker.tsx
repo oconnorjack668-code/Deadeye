@@ -29,6 +29,9 @@ import { createHealthMonitor, type HealthMonitor, type HealthReading } from '@/l
 import { startLiveRecorder, resolveDuration, type LiveRecorder, type LiveRecording } from '@/lib/video/liveRecorder';
 import { describeMode, drillCue, drillProgress, zoneForShot, FREE, type DrillMode } from '@/lib/video/drillModes';
 import { activeMs, IDLE_MS, streaks, zoneTotals } from '@/lib/video/shotStats';
+import { createOverlayLog, heatLevel, mediaAtClock, rimTone, TRAIL_MS, TRAIL_POINTS, type OverlayLog, type OverlayTimeline } from '@/lib/video/overlayTimeline';
+import { drawBall, drawRim } from '@/lib/video/overlayArt';
+import { TrackerVideoExport } from './TrackerVideoExport';
 import { useFramingCheck } from './useFramingCheck';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
@@ -87,9 +90,6 @@ function edgesOfRim(rim: Rim): [Point, Point] {
     { x: right, y: rimYAt(rim, right) },
   ];
 }
-
-/** How long the ball's trail stays on screen, ms. */
-const TRAIL_MS = 600;
 
 /** After a drill is done, how long the last call stays up before review. */
 const DRILL_END_MS = 1500;
@@ -219,6 +219,12 @@ export function ShotTracker({
   const [rechecked, setRechecked] = useState(false);
   /** The shot being watched again, by id. */
   const [replayId, setReplayId] = useState<number | null>(null);
+  // What the overlay showed, logged through the run so the video can be saved
+  // with it drawn in (overlayTimeline.ts); snapshotted when the run ends
+  const overlayLogRef = useRef<OverlayLog | null>(null);
+  const [timeline, setTimeline] = useState<OverlayTimeline | null>(null);
+  /** The latest call, for the rim line taking its colour for a moment. */
+  const lastCallRef = useRef<{ t: number; made: boolean } | null>(null);
 
   // Release the camera, screen lock, worker and any pending timer when leaving
   useEffect(
@@ -591,39 +597,15 @@ export function ShotTracker({
 
     // The first edge marker is a DOM overlay, not canvas: draw() runs from the
     // tracking loop and would read a stale firstEdge from its closure.
-    if (activeRim) {
-      // Drawn as the span between the two taps, following the rim's tilt, so
-      // what is drawn is the line the crossing test actually uses.
-      const ends = edgesOfRim(activeRim).map((p) => [p.x * canvas.width, p.y * canvas.height]);
-      ctx.strokeStyle = '#f97316';
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(ends[0][0], ends[0][1]);
-      ctx.lineTo(ends[1][0], ends[1][1]);
-      ctx.stroke();
-      ctx.fillStyle = '#f97316';
-      for (const [ex, ey] of ends) {
-        ctx.beginPath();
-        ctx.arc(ex, ey, 4, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+    // Drawn as the span between the two taps, following the rim's tilt, so
+    // what is drawn is the line the crossing test actually uses. The same
+    // drawing goes into a saved video (overlayArt.ts).
+    if (activeRim) drawRim(ctx, canvas.width, canvas.height, activeRim, 1, rimTone(lastCallRef.current, t));
 
     const trail = trailRef.current;
     if (ball) trail.push({ x: ball.x + ball.w / 2, y: ball.y + ball.h / 2, t });
-    while (trail.length && (trail[0].t < t - TRAIL_MS || trail.length > 12)) trail.shift();
-    trail.forEach((p, i) => {
-      const age = (i + 1) / trail.length;
-      ctx.fillStyle = `rgba(52, 211, 153, ${0.15 + 0.5 * age})`;
-      ctx.beginPath();
-      ctx.arc(p.x * canvas.width, p.y * canvas.height, 2 + 3 * age, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    if (ball) {
-      ctx.strokeStyle = '#22c55e';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(ball.x * canvas.width, ball.y * canvas.height, ball.w * canvas.width, ball.h * canvas.height);
-    }
+    while (trail.length && (trail[0].t < t - TRAIL_MS || trail.length > TRAIL_POINTS)) trail.shift();
+    drawBall(ctx, canvas.width, canvas.height, trail, ball ?? null, 1, heatLevel(streaks(madeRef.current).current));
   }
 
   /**
@@ -659,9 +641,17 @@ export function ShotTracker({
       pausedMsRef.current = 0;
       inWorkerRef.current = null;
       healthRef.current = createHealthMonitor();
+      overlayLogRef.current = createOverlayLog();
+      lastCallRef.current = null;
+      setTimeline(null);
     } else {
-      pausedMsRef.current += performance.now() - fixStartedRef.current;
+      const held = performance.now() - fixStartedRef.current;
+      pausedMsRef.current += held;
+      // The camera kept recording while the clock held for the re-aim. A
+      // file's clock is its own time, which the pause stopped too.
+      if (source === 'camera') overlayLogRef.current?.gap(clockBaseRef.current, held);
     }
+    overlayLogRef.current?.rim(resume ? clockBaseRef.current : 0, calibratedRim);
     trailRef.current = [];
     healthRef.current.setMoved(false);
     setMoved(null);
@@ -730,12 +720,14 @@ export function ShotTracker({
       setShots((cur) => [...cur, fromDetected(shot, id, spot)]);
       healthRef.current.shot(shot.confident);
       activityRef.current.push(shot.t);
+      overlayLogRef.current?.call(shot);
+      lastCallRef.current = { t: shot.t, made: shot.made };
       navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
       // Counted from the run's own list rather than from `shots` state, which
       // has not re-rendered yet
       const attempts = madeRef.current.length;
       const makes = madeRef.current.filter(Boolean).length;
-      setFlash({ id, made: shot.made, confident: shot.confident, makes, attempts });
+      setFlash({ id, made: shot.made, confident: shot.confident, makes, attempts, streak: streaks(madeRef.current).current });
       // A phone on a tripod is metres away and the player is usually facing
       // the hoop, so sound is the part of the confirmation that reaches them
       announceShot(sound, shot.made, makes, attempts, drillCue(modeRef.current, madeRef.current));
@@ -768,6 +760,7 @@ export function ShotTracker({
         healthRef.current.setMoved(true);
         setMoved(r.moved);
       }
+      overlayLogRef.current?.frame(r.t, r.ball);
       if (r.shot) onShot(r.shot);
       draw(calibratedRim, r.ball, r.t);
 
@@ -855,6 +848,7 @@ export function ShotTracker({
     if (!last) return;
     const spot = zoneForShot(modeRef.current, madeRef.current.length);
     madeRef.current.push(last.made);
+    overlayLogRef.current?.call(last);
     const id = nextIdRef.current++;
     setShots((cur) => [...cur, fromDetected(last, id, spot)]);
   }
@@ -896,6 +890,8 @@ export function ShotTracker({
       });
     }
     setShootingMs(activeMs(activityRef.current, elapsedRef.current));
+    const log = overlayLogRef.current;
+    if (log) setTimeline(log.snapshot({ activity: activityRef.current, mode: modeRef.current, endT: elapsedRef.current }));
     // The recording first, while the camera is still running
     const recorder = recorderRef.current;
     recorderRef.current = null;
@@ -1173,6 +1169,11 @@ export function ShotTracker({
   // What a shot can be watched again from: the clip, or the live recording
   const replayFile = source === 'file' ? videoFile : recording?.file ?? null;
   const replayOffset = source === 'file' ? 0 : recording?.offsetMs ?? 0;
+  // A shot's time on the tracking clock as its time in the video. The clock
+  // holds while the rim is fixed and a live recording does not, so after a
+  // fix every later shot sits that much further into the recording.
+  const clockGaps = timeline?.gaps ?? [];
+  const inVideo = (t: number) => mediaAtClock(clockGaps, t) - replayOffset;
   const replayShot = replayId === null ? null : shots.find((s) => s.id === replayId) ?? null;
   const replayIndex = replayShot ? shots.indexOf(replayShot) : -1;
   const anyWithoutZone = shots.some((s) => !s.zone);
@@ -1639,7 +1640,7 @@ export function ShotTracker({
           {replayShot && replayFile && (
             <ShotReplay
               file={replayFile}
-              atMs={replayShot.t - replayOffset}
+              atMs={inVideo(replayShot.t)}
               title={`Shot ${replayIndex + 1} at ${clock(replayShot.t)}`}
               made={replayShot.confident ? replayShot.made : null}
               onSet={(made) => {
@@ -1723,10 +1724,14 @@ export function ShotTracker({
             </label>
           )}
 
+          {replayFile && timeline && timeline.calls.length > 0 && (
+            <TrackerVideoExport file={replayFile} timeline={timeline} offsetMs={replayOffset} />
+          )}
+
           {replayFile ? (
             <HighlightReel
               file={replayFile}
-              makeTimesMs={shots.filter((s) => s.made).map((s) => s.t - replayOffset)}
+              makeTimesMs={shots.filter((s) => s.made).map((s) => inVideo(s.t))}
               makes={makes}
               attempts={shots.length}
             />
