@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
 - 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
 - 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
 - 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
@@ -31,4 +32,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-21 · app-review-fixes · Tester walkthrough of 40 pages; name filter, layout and copy fixes, shipped · open: 1 → [handoff](2026-10-21-app-review-fixes.md)
 - 2026-10-21 · first-run-tutorial · Welcome screen, sample tracker clip, starting steps +150 XP, promo on site · open: 1 → [handoff](2026-10-21-first-run-tutorial.md)
 - 2026-10-21 · promo-rim-line-fix · First rim line now ends on the ring; promo and phone page updated · open: none → [handoff](2026-10-21-promo-rim-line-fix.md)
-- 2026-10-20 · leaderboard-redesign · Leaderboard redesign with podium, avatars and a chase nudge, shipped · open: 1 → [handoff](2026-10-20-leaderboard-redesign.md)

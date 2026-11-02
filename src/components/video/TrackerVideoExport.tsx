@@ -8,6 +8,7 @@ import { resolveDuration } from '@/lib/video/liveRecorder';
 import { clockAtMedia, heatLevel, mediaAtClock, overlayAt, replayPicks, type OverlayTimeline } from '@/lib/video/overlayTimeline';
 import { drawBackdrop, drawBall, drawEndCard, drawHud, drawRim, hudUnit, verticalLayout, VERTICAL, type Rect } from '@/lib/video/overlayArt';
 import { streaks } from '@/lib/video/shotStats';
+import { personalBest, type ShootingTally } from '@/lib/video/personalBest';
 import { localDateString } from '@/lib/dates';
 import { Clapperboard, Download, Share2, Square } from 'lucide-react';
 
@@ -88,7 +89,18 @@ export function planLengthMs(plan: readonly ExportSegment[]): number {
  * happened: corrections made in review are not in it, because they were not
  * on the screen.
  */
-export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: File; timeline: OverlayTimeline; offsetMs?: number }) {
+export function TrackerVideoExport({
+  file,
+  timeline,
+  offsetMs = 0,
+  best,
+}: {
+  file: File;
+  timeline: OverlayTimeline;
+  offsetMs?: number;
+  /** The player's best saved session before this one (personalBest.ts); undefined when not known. */
+  best?: ShootingTally | null;
+}) {
   const calls = timeline.calls;
   const [from, setFrom] = useState(-1);
   const [to, setTo] = useState(-1);
@@ -244,7 +256,11 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
       if (stopState() !== 'cancel') {
         // The numbers as they stood on screen where the session part stopped
         const made = calls.filter((c) => c.t <= clockAtMedia(timeline.gaps, mainEndMs + offsetMs).clockMs).map((c) => c.made);
-        const stats = { makes: made.filter(Boolean).length, attempts: made.length, bestRun: streaks(made).best };
+        const tally = { makes: made.filter(Boolean).length, attempts: made.length };
+        // Only a whole session, made to the end, can claim a best: a part of
+        // one is not a session's %
+        const whole = from < 0 && to < 0 && stopState() === 'none';
+        const stats = { ...tally, bestRun: streaks(made).best, personalBest: whole && personalBest(tally, best).kind === 'new' };
         await new Promise<void>((resolve) => {
           const began = performance.now();
           const tick = () => {
