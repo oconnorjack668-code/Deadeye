@@ -112,6 +112,9 @@ makes in a row the makes count on the tracker overlay burns (`StreakFlame`), a p
 It lives only on the overlay over the video, which is the tracker's own broadcast-style
 space and is also what a saved tracker video shows (`src/lib/video/overlayArt.ts` draws both).
 Don't spread it to cards or the dashboard. The flame holds still for reduced motion.
+The same overlay shows a **milestone banner** for 2.5s (`.deadeye-banner`): round numbers of
+makes (10, 25, 50, 100...) and shots (50, 100, 200...), and a perfect 5/5 start
+(`milestoneFor` in `overlayTimeline.ts`). Keep that list short; it is not for every shot.
 
 ## Avoid (the AI-slop list)
 

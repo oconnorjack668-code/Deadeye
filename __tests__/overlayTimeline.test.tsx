@@ -7,14 +7,17 @@ import {
   createOverlayLog,
   heatLevel,
   mediaAtClock,
+  milestoneFor,
   overlayAt,
+  replayPicks,
   rimTone,
+  BANNER_MS,
   FLASH_MS,
   MAX_FRAMES,
   type OverlayTimeline,
 } from '@/lib/video/overlayTimeline';
-import { flashCurve, heatLabel, hudUnit } from '@/lib/video/overlayArt';
-import { exportRange } from '@/components/video/TrackerVideoExport';
+import { bannerCurve, flashCurve, heatLabel, hudUnit, verticalLayout } from '@/lib/video/overlayArt';
+import { exportPlan, exportRange, planLengthMs } from '@/components/video/TrackerVideoExport';
 import { TrackerHud } from '@/components/video/TrackerHud';
 import { FREE } from '@/lib/video/drillModes';
 
@@ -176,6 +179,97 @@ describe('the saved video', () => {
   });
 });
 
+describe('milestones', () => {
+  const run = (makes: number, misses: number) => [...Array(misses).fill(false), ...Array(makes).fill(true)];
+
+  it('marks round numbers of makes on the make that reaches them', () => {
+    expect(milestoneFor(run(10, 4))).toBe('10 makes');
+    expect(milestoneFor(run(9, 4))).toBeNull();
+    // A miss after the tenth make does not repeat it
+    expect(milestoneFor([...run(10, 4), false])).toBeNull();
+  });
+
+  it('marks a perfect start and round numbers of shots', () => {
+    expect(milestoneFor(run(5, 0))).toBe('Perfect start · 5/5');
+    expect(milestoneFor([true, true, true, true, false])).toBeNull();
+    expect(milestoneFor([...Array(49).fill(true).map((_, i) => i % 3 === 0), false])).toBe('50 shots up');
+    expect(milestoneFor([])).toBeNull();
+  });
+
+  it('puts the latest banner on the overlay for its time', () => {
+    const tl = timeline([1, 2, 3, 4, 5].map((s) => [s * 1000, true] as [number, boolean]));
+    expect(overlayAt(tl, 4900).banner).toBeNull();
+    expect(overlayAt(tl, 5000).banner).toEqual({ label: 'Perfect start · 5/5', age: 0 });
+    expect(overlayAt(tl, 5000 + BANNER_MS).banner).not.toBeNull();
+    expect(overlayAt(tl, 5001 + BANNER_MS).banner).toBeNull();
+    expect(bannerCurve(0).opacity).toBe(0);
+    expect(bannerCurve(1000)).toEqual({ opacity: 1, scale: 1 });
+    expect(bannerCurve(BANNER_MS).opacity).toBe(0);
+  });
+});
+
+describe('slow-mo replays', () => {
+  // make, make, miss, make, make, make, miss, make
+  const tl = timeline([
+    [1000, true],
+    [2000, true],
+    [3000, false],
+    [4000, true],
+    [5000, true],
+    [6000, true],
+    [7000, false],
+    [8000, true],
+  ]);
+
+  it('picks the makes deepest into a streak, in the order they happened', () => {
+    // Streaks at each make: 1, 2, -, 1, 2, 3, -, 1
+    expect(replayPicks(tl, 0, 10_000)).toEqual([2000, 5000, 6000]);
+    expect(replayPicks(tl, 0, 10_000, 1)).toEqual([6000]);
+    // Only inside the range saved; the streak still counts makes from before it
+    expect(replayPicks(tl, 5500, 10_000)).toEqual([6000, 8000]);
+  });
+
+  it('plays them at half speed after the session part', () => {
+    const plan = exportPlan(tl, -1, -1, 12_000, 0, true);
+    expect(plan[0]).toEqual({ startMs: 0, endMs: 12_000, rate: 1, replay: false });
+    expect(plan.slice(1)).toEqual([
+      { startMs: 200, endMs: 2700, rate: 0.5, replay: true },
+      { startMs: 3200, endMs: 5700, rate: 0.5, replay: true },
+      { startMs: 4200, endMs: 6700, rate: 0.5, replay: true },
+    ]);
+    // 12s, three 2.5s replays at half speed, the end card
+    expect(planLengthMs(plan)).toBe(12_000 + 3 * 5000 + 2500);
+    expect(exportPlan(tl, -1, -1, 12_000, 0, false)).toHaveLength(1);
+  });
+});
+
+describe('vertical video', () => {
+  it('shows sideways footage whole across the width, over a blurred copy, inside the safe area', () => {
+    const { picture, area, backdrop } = verticalLayout(1920, 1080);
+    expect(backdrop).toBe(true);
+    expect(picture.w).toBe(1080);
+    expect(picture.h).toBeCloseTo(607.5);
+    expect(picture.y).toBeGreaterThanOrEqual(area.y);
+    expect(picture.y + picture.h).toBeLessThanOrEqual(area.y + area.h);
+    // Clear of the platforms' tabs at the top and caption at the bottom
+    expect(area.y).toBe(192);
+    expect(area.y + area.h).toBeLessThan(1920 * 0.8);
+  });
+
+  it('fills the frame with upright footage', () => {
+    const { picture, backdrop } = verticalLayout(1080, 1920);
+    expect(backdrop).toBe(false);
+    expect(picture).toEqual({ x: 0, y: 0, w: 1080, h: 1920 });
+    // A little wider than 9:16 still fills it, trimmed at the sides
+    const wider = verticalLayout(900, 1500);
+    expect(wider.backdrop).toBe(false);
+    expect(wider.picture.h).toBe(1920);
+    expect(wider.picture.x).toBeLessThan(0);
+    // 2:3 is too wide to fill without losing a lot: it goes over the backdrop
+    expect(verticalLayout(720, 1080).backdrop).toBe(true);
+  });
+});
+
 describe('TrackerHud on a streak', () => {
   const base = {
     makes: 3,
@@ -195,6 +289,11 @@ describe('TrackerHud on a streak', () => {
     render(<TrackerHud {...base} streak={{ current: 3, best: 3, coldRun: 0 }} flash={{ id: 3, made: true, confident: true, makes: 3, attempts: 3, streak: 3 }} />);
     expect(screen.getByText('Heating up · 3')).toBeTruthy();
     expect(screen.getByText(/3 in a row/)).toBeTruthy();
+  });
+
+  it('shows a milestone banner', () => {
+    render(<TrackerHud {...base} streak={{ current: 0, best: 3, coldRun: 1 }} flash={null} banner={{ id: 9, label: '10 makes' }} />);
+    expect(screen.getByText('10 makes')).toBeTruthy();
   });
 
   it('stays plain below three', () => {

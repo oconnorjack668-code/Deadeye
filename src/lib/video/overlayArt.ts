@@ -11,7 +11,7 @@
 // times it was drawn: a saved video is drawn frame by frame at the video's
 // pace and has to come out the same however fast the phone is.
 import { rimYAt, type Rim } from './shotDetector';
-import { FLASH_MS, heatLevel, type Box, type OverlayState, type RimTone } from './overlayTimeline';
+import { BANNER_MS, FLASH_MS, heatLevel, type Box, type OverlayState, type RimTone } from './overlayTimeline';
 import { pct } from './shotStats';
 
 type Ctx = CanvasRenderingContext2D;
@@ -202,19 +202,41 @@ function pill(ctx: Ctx, x: number, y: number, h: number, text: string, bg: strin
  * bottom left, a make or miss across the middle. The buttons and the amber
  * warnings are left out - they are for the player at the time, not for anyone
  * watching afterwards. `t` drives the flame; `family` is the page's font.
+ *
+ * `area` is where the HUD goes on the canvas (the whole of it unless a
+ * vertical video sets it, verticalLayout). A `replay` frame shows only that it
+ * is a replay, the call and the mark: the score as it stood back then would
+ * read as the score going backwards.
  */
-export function drawHud(ctx: Ctx, w: number, h: number, s: OverlayState, t: number, family: string) {
+export function drawHud(
+  ctx: Ctx,
+  canvasW: number,
+  canvasH: number,
+  s: OverlayState,
+  t: number,
+  family: string,
+  { area, replay = false }: { area?: Rect; replay?: boolean } = {}
+) {
+  const a = area ?? { x: 0, y: 0, w: canvasW, h: canvasH };
+  const w = a.w;
+  const h = a.h;
   const u = hudUnit(w, h);
   const font = (px: number, weight: number) => `${weight} ${px * u}px ${family}`;
   const heat = heatLevel(s.streak);
   ctx.save();
+  ctx.translate(a.x, a.y);
 
-  // Scrim so the readout stays legible against a bright gym or sky
-  const scrim = ctx.createLinearGradient(0, 0, 0, 128 * u);
+  if (replay) {
+    ctx.font = font(14, 900);
+    pill(ctx, 12 * u, 12 * u, 28 * u, 'SLOW-MO REPLAY', ORANGE, '#ffffff', u, 'left', true);
+  } else {
+  // Scrim so the readout stays legible against a bright gym or sky. From the
+  // top of the frame, not of the HUD, so a vertical video gets no hard edge.
+  const scrim = ctx.createLinearGradient(0, -a.y, 0, 128 * u);
   scrim.addColorStop(0, 'rgba(0,0,0,0.8)');
   scrim.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = scrim;
-  ctx.fillRect(0, 0, w, 128 * u);
+  ctx.fillRect(-a.x, -a.y, canvasW, a.y + 128 * u);
 
   // Score: makes, /attempts, %
   const left = 12 * u;
@@ -301,8 +323,99 @@ export function drawHud(ctx: Ctx, w: number, h: number, s: OverlayState, t: numb
     ctx.fill();
   });
 
+  if (s.banner) drawBanner(ctx, s.banner.label, s.banner.age, u, family);
+  }
+
   drawMark(ctx, w, h, u, family);
   if (s.flash) drawFlash(ctx, w, h, s.flash, u, family);
+  ctx.restore();
+}
+
+/** Opacity and scale of a milestone banner `age` ms in: pops in, holds, fades (the .deadeye-banner keyframes). */
+export function bannerCurve(age: number): { opacity: number; scale: number } {
+  if (age < 0 || age > BANNER_MS) return { opacity: 0, scale: 1 };
+  if (age < 180) return { opacity: age / 180, scale: 0.9 + (0.13 * age) / 180 };
+  if (age < 300) return { opacity: 1, scale: 1.03 - (0.03 * (age - 180)) / 120 };
+  if (age > BANNER_MS - 400) return { opacity: (BANNER_MS - age) / 400, scale: 1 };
+  return { opacity: 1, scale: 1 };
+}
+
+/** A milestone, under the score where the live HUD shows it. */
+function drawBanner(ctx: Ctx, label: string, age: number, u: number, family: string) {
+  const { opacity, scale } = bannerCurve(age);
+  if (opacity <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = opacity;
+  const x = 12 * u;
+  const y = 84 * u;
+  const hgt = 30 * u;
+  ctx.translate(x, y + hgt / 2);
+  ctx.scale(scale, scale);
+  ctx.translate(-x, -(y + hgt / 2));
+  ctx.font = `900 ${15 * u}px ${family}`;
+  pill(ctx, x, y, hgt, label.toUpperCase(), '#ffffff', '#09090b', u, 'left', true);
+  // The dot in brand orange rather than the text colour
+  ctx.fillStyle = ORANGE;
+  ctx.beginPath();
+  ctx.arc(x + 14 * u, y + hgt / 2, 4 * u, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+export interface Rect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+/** A vertical video's size: 1080 x 1920, what TikTok, Reels and Shorts show full screen. */
+export const VERTICAL = { w: 1080, h: 1920 } as const;
+
+/**
+ * Where the picture and the HUD go in a 9:16 frame. Sideways footage is shown
+ * whole, across the width, over a blurred copy of itself: a crop tall enough
+ * to fill 9:16 keeps about a quarter of a sideways picture and would cut the
+ * shooter out. Upright footage fills the frame. The HUD stays out of the top
+ * tenth and the bottom fifth or so, where TikTok and Reels put their tabs and
+ * caption.
+ */
+export function verticalLayout(srcW: number, srcH: number, W: number = VERTICAL.w, H: number = VERTICAL.h): { picture: Rect; area: Rect; backdrop: boolean } {
+  const area = { x: 0, y: Math.round(H * 0.1), w: W, h: Math.round(H * 0.68) };
+  const srcAspect = srcW / srcH;
+  if (srcAspect <= (W / H) * 1.15) {
+    const scale = Math.max(W / srcW, H / srcH);
+    const w = srcW * scale;
+    const h = srcH * scale;
+    return { picture: { x: (W - w) / 2, y: (H - h) / 2, w, h }, area, backdrop: false };
+  }
+  const h = W / srcAspect;
+  return { picture: { x: 0, y: area.y + (area.h - h) / 2, w: W, h }, area, backdrop: true };
+}
+
+/**
+ * The blurred copy of the picture behind a sideways video in a vertical frame.
+ * Blurred by drawing it tiny and stretching it back up, which every browser
+ * does quickly; the canvas filter property is missing from older Safari.
+ */
+export function drawBackdrop(ctx: Ctx, source: CanvasImageSource, srcW: number, srcH: number, W: number, H: number, scratch: HTMLCanvasElement) {
+  const sw = 27;
+  const sh = 48;
+  if (scratch.width !== sw) scratch.width = sw;
+  if (scratch.height !== sh) scratch.height = sh;
+  const sctx = scratch.getContext('2d');
+  if (!sctx) return;
+  // Cover: the middle of the picture, cut to the frame's shape
+  const scale = Math.max(sw / srcW, sh / srcH);
+  const cw = sw / scale;
+  const ch = sh / scale;
+  sctx.drawImage(source, (srcW - cw) / 2, (srcH - ch) / 2, cw, ch, 0, 0, sw, sh);
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(scratch, 0, 0, W, H);
+  ctx.fillStyle = 'rgba(9,9,11,0.55)';
+  ctx.fillRect(0, 0, W, H);
   ctx.restore();
 }
 
@@ -339,8 +452,12 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   if (opacity <= 0) return;
   ctx.save();
   ctx.globalAlpha = opacity;
+  // The wash covers the whole frame, also when the HUD has only part of it
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.fillStyle = f.made ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)';
-  ctx.fillRect(0, 0, w, h);
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.restore();
   ctx.translate(w / 2, h / 2);
   ctx.scale(scale, scale);
   ctx.textAlign = 'center';
