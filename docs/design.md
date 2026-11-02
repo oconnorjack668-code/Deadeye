@@ -106,6 +106,13 @@ Short and for a reason: a shot call (`.deadeye-flash`), a level-up (`.deadeye-po
 feedback (`active:scale-[0.98]`). 150-300ms for interface transitions. No entrance animations on
 content, no combined hover transforms. Respect `prefers-reduced-motion`.
 
+One exception, chosen by the founder on 2 Nov 2026: the shot tracker's **streak flame**. At 3
+makes in a row the makes count on the tracker overlay burns (`StreakFlame`), a pill reads
+"Heating up · 3" (orange) and from 5 "On fire · 5" (red), and the shot call adds "3 in a row".
+It lives only on the overlay over the video, which is the tracker's own broadcast-style
+space and is also what a saved tracker video shows (`src/lib/video/overlayArt.ts` draws both).
+Don't spread it to cards or the dashboard. The flame holds still for reduced motion.
+
 ## Avoid (the AI-slop list)
 
 Adapted from the community Unslop UI skill, trimmed to what applies here.

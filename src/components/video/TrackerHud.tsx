@@ -2,10 +2,13 @@
 'use client';
 
 import React from 'react';
-import { Crosshair, Maximize2, Minimize2, Pause } from 'lucide-react';
+import { Crosshair, Flame, Maximize2, Minimize2, Pause } from 'lucide-react';
 import { ISSUE_TEXT, type HealthReading } from '@/lib/video/liveHealth';
 import type { DrillProgress } from '@/lib/video/drillModes';
 import type { Streaks } from '@/lib/video/shotStats';
+import { heatLevel } from '@/lib/video/overlayTimeline';
+import { heatLabel } from '@/lib/video/overlayArt';
+import { StreakFlame } from './StreakFlame';
 
 export interface ShotFlash {
   id: number;
@@ -13,6 +16,8 @@ export interface ShotFlash {
   confident: boolean;
   makes: number;
   attempts: number;
+  /** Makes in a row after this call. */
+  streak: number;
 }
 
 function clock(ms: number): string {
@@ -61,6 +66,8 @@ export function TrackerHud({
 }) {
   const pct = attempts ? Math.round((makes / attempts) * 100) : 0;
   const issues = health.issues;
+  const heat = heatLevel(streak.current);
+  const hotLabel = heatLabel(streak.current);
 
   return (
     <>
@@ -71,7 +78,12 @@ export function TrackerHud({
       <div className="pointer-events-none absolute left-3 top-2 text-white" aria-live="polite" aria-atomic="true">
         <div className="flex items-end gap-2">
           <span className="text-5xl sm:text-6xl font-black leading-none tabular-nums drop-shadow-lg">
-            {makes}
+            {/* On a hot streak the makes count burns: the flame stands on the
+                number's baseline and the digits sit over it */}
+            <span className="relative inline-block">
+              <StreakFlame heat={heat} className="absolute -bottom-2 left-1/2 h-[170%] w-[170%] min-w-16 -translate-x-1/2" />
+              <span className="relative">{makes}</span>
+            </span>
             <span className="text-3xl sm:text-4xl text-zinc-300">/{attempts}</span>
           </span>
           <span className="mb-1 text-2xl sm:text-3xl font-black leading-none text-orange-400 tabular-nums drop-shadow-lg">{pct}%</span>
@@ -79,8 +91,12 @@ export function TrackerHud({
         <div className="mt-1 flex items-center gap-2 text-sm font-semibold tabular-nums text-zinc-300 drop-shadow">
           {paused && <Pause className="h-3.5 w-3.5" aria-label="Paused" />}
           {clock(clockMs)}
-          {streak.current >= 3 && (
-            <span className="rounded-full bg-emerald-500/90 px-2 py-0.5 text-xs font-bold text-white">{streak.current} in a row</span>
+          {hotLabel && (
+            <span
+              className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold uppercase text-white ${heat > 1 ? 'bg-red-600' : 'bg-orange-600'}`}
+            >
+              <Flame className="h-3.5 w-3.5" aria-hidden="true" /> {hotLabel}
+            </span>
           )}
         </div>
       </div>
@@ -161,6 +177,11 @@ export function TrackerHud({
           <span className="mt-1 text-2xl font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
             {flash.makes}/{flash.attempts}
           </span>
+          {flash.made && flash.streak >= 3 && (
+            <span className="mt-1 flex items-center gap-1 text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+              <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+            </span>
+          )}
           {!flash.confident && (
             <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
           )}
