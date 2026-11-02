@@ -13,6 +13,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { loadClubCounts, loadFunnel } from '@/lib/funnel-server';
 import { countsFile, countsPath, isIrishRunHour, type ReportCounts } from '@/lib/agentCounts';
 import { saveToGitHub } from '@/lib/githubFile';
+import { withCronLog } from '@/lib/cronRuns';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -29,7 +30,7 @@ async function reportCounts(): Promise<ReportCounts> {
   return { reportsNew, reportsOpen, crashesOpen };
 }
 
-export async function GET(request: Request) {
+async function run(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return Response.json({ error: 'Not allowed.' }, { status: 401 });
@@ -51,3 +52,6 @@ export async function GET(request: Request) {
   if (!saved.ok) return Response.json({ error: saved.error }, { status: 502 });
   return Response.json({ saved: path });
 }
+
+// Each run, the skipped 07:30 UTC one included, is saved to cron_runs (/admin/cron-runs)
+export const GET = withCronLog('agent-counts', run);

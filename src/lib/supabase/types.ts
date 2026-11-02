@@ -1693,6 +1693,28 @@ export interface Database {
         Update: { resolved?: boolean };
         Relationships: [];
       };
+      cron_runs: {
+        Row: {
+          id: string;
+          job: string;
+          started_at: string;
+          duration_ms: number;
+          status: number;
+          outcome: 'ok' | 'skipped' | 'failed';
+          summary: Json;
+        };
+        Insert: {
+          id?: string;
+          job: string;
+          started_at?: string;
+          duration_ms: number;
+          status: number;
+          outcome: 'ok' | 'skipped' | 'failed';
+          summary?: Json;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       app_events: {
         Row: {
           id: string;
