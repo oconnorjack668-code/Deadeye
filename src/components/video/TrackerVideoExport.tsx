@@ -5,8 +5,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { pickRecordingType } from '@/lib/video/highlights';
 import { resolveDuration } from '@/lib/video/liveRecorder';
-import { clockAtMedia, heatLevel, mediaAtClock, overlayAt, type OverlayTimeline } from '@/lib/video/overlayTimeline';
-import { drawBall, drawEndCard, drawHud, drawRim, hudUnit } from '@/lib/video/overlayArt';
+import { clockAtMedia, heatLevel, mediaAtClock, overlayAt, replayPicks, type OverlayTimeline } from '@/lib/video/overlayTimeline';
+import { drawBackdrop, drawBall, drawEndCard, drawHud, drawRim, hudUnit, verticalLayout, VERTICAL, type Rect } from '@/lib/video/overlayArt';
 import { streaks } from '@/lib/video/shotStats';
 import { localDateString } from '@/lib/dates';
 import { Clapperboard, Download, Share2, Square } from 'lucide-react';
@@ -15,12 +15,26 @@ import { Clapperboard, Download, Share2, Square } from 'lucide-react';
 const LEAD_MS = 3000;
 const TAIL_MS = 2500;
 const END_CARD_MS = 2500;
+/** A slow-motion replay: this much before the make and after it, at this speed. */
+const REPLAY_BEFORE_MS = 1800;
+const REPLAY_AFTER_MS = 700;
+const REPLAY_RATE = 0.5;
 /** Sharp enough for an ad cut at 1080p. */
 const EXPORT_BITS_PER_SECOND = 8_000_000;
 /** The saved file is held in memory until it is shared, so it stops here (about 10 minutes). */
 const MAX_EXPORT_BYTES = 600 * 1024 * 1024;
 /** Longest side of the saved video. */
 const MAX_SIDE = 1920;
+
+export type ExportShape = 'original' | 'vertical';
+
+/** A stretch of the recording to play into the saved video, at a speed. */
+export interface ExportSegment {
+  startMs: number;
+  endMs: number;
+  rate: number;
+  replay: boolean;
+}
 
 function clock(ms: number): string {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -36,20 +50,50 @@ export function exportRange(tl: OverlayTimeline, from: number, to: number, durat
 }
 
 /**
+ * What the saved video plays, in order: the chosen range at normal speed,
+ * then with `slowmo` up to three of its best makes again at half speed
+ * (replayPicks), before the end card.
+ */
+export function exportPlan(tl: OverlayTimeline, from: number, to: number, durationMs: number, offsetMs: number, slowmo: boolean): ExportSegment[] {
+  const range = exportRange(tl, from, to, durationMs, offsetMs);
+  const plan: ExportSegment[] = [{ ...range, rate: 1, replay: false }];
+  if (!slowmo) return plan;
+  const fromClock = clockAtMedia(tl.gaps, range.startMs + offsetMs).clockMs;
+  const toClock = clockAtMedia(tl.gaps, range.endMs + offsetMs).clockMs;
+  for (const t of replayPicks(tl, fromClock, toClock)) {
+    const at = mediaAtClock(tl.gaps, t) - offsetMs;
+    const startMs = Math.max(0, at - REPLAY_BEFORE_MS);
+    const endMs = Math.min(durationMs, at + REPLAY_AFTER_MS);
+    if (endMs > startMs) plan.push({ startMs, endMs, rate: REPLAY_RATE, replay: true });
+  }
+  return plan;
+}
+
+/** How long a plan takes to play, and so how long the saved video is, ms. */
+export function planLengthMs(plan: readonly ExportSegment[]): number {
+  return plan.reduce((n, s) => n + (s.endMs - s.startMs) / s.rate, 0) + END_CARD_MS;
+}
+
+/**
  * Saves the session's video with the tracker's overlay drawn into it - the
- * rim line, the ball and its trail, the score, the streak flame, each make and
- * miss - as it looked live, for sharing or for footage of the app at work.
+ * rim line, the ball and its trail, the score, the streak flame, milestones,
+ * each make and miss - as it looked live, for sharing or for footage of the
+ * app at work. In the footage's own shape or 9:16 for TikTok and Reels, with
+ * the best makes again in slow motion if chosen.
  *
- * The recording is played through a canvas at normal speed, each frame drawn
- * with the overlay as it stood at that moment (overlayTimeline.ts), and the
- * canvas recorded. Nothing is uploaded. The calls shown are the tracker's own,
- * as they happened: corrections made in review are not in it, because they
- * were not on the screen.
+ * The recording is played through a canvas, each frame drawn with the overlay
+ * as it stood at that moment (overlayTimeline.ts), and the canvas recorded.
+ * Slow motion is the recording played at half speed into the same canvas.
+ * Nothing is uploaded. The calls shown are the tracker's own, as they
+ * happened: corrections made in review are not in it, because they were not
+ * on the screen.
  */
 export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: File; timeline: OverlayTimeline; offsetMs?: number }) {
   const calls = timeline.calls;
   const [from, setFrom] = useState(-1);
   const [to, setTo] = useState(-1);
+  const [shape, setShape] = useState<ExportShape>('vertical');
+  const [slowmo, setSlowmo] = useState(true);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<{ url: string; blob: Blob; name: string; capped: boolean } | null>(null);
@@ -68,8 +112,9 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
 
   // Length of what will be saved, from the tracking clock's own end until the file is opened
   const roughEnd = mediaAtClock(timeline.gaps, timeline.endT) - offsetMs;
-  const rough = exportRange(timeline, from, to, roughEnd, offsetMs);
-  const seconds = Math.round((rough.endMs - rough.startMs + END_CARD_MS) / 1000);
+  const roughPlan = exportPlan(timeline, from, to, roughEnd, offsetMs, slowmo);
+  const seconds = Math.round(planLengthMs(roughPlan) / 1000);
+  const replays = roughPlan.filter((s) => s.replay).length;
 
   async function build() {
     const type = typeof MediaRecorder !== 'undefined' ? pickRecordingType((t) => MediaRecorder.isTypeSupported(t)) : null;
@@ -95,13 +140,33 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
       });
       await resolveDuration(video);
       const durationMs = Number.isFinite(video.duration) ? video.duration * 1000 : roughEnd;
-      const { startMs, endMs } = exportRange(timeline, from, to, durationMs, offsetMs);
+      const plan = exportPlan(timeline, from, to, durationMs, offsetMs, slowmo);
+      const total = planLengthMs(plan);
 
-      const scale = Math.min(1, MAX_SIDE / Math.max(video.videoWidth, video.videoHeight));
-      const w = (canvas.width = Math.round((video.videoWidth * scale) / 2) * 2);
-      const h = (canvas.height = Math.round((video.videoHeight * scale) / 2) * 2);
+      // Where the picture and the HUD go on the canvas
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      let W: number;
+      let H: number;
+      let picture: Rect;
+      let area: Rect;
+      let backdrop = false;
+      if (shape === 'vertical') {
+        W = VERTICAL.w;
+        H = VERTICAL.h;
+        ({ picture, area, backdrop } = verticalLayout(vw, vh, W, H));
+      } else {
+        const scale = Math.min(1, MAX_SIDE / Math.max(vw, vh));
+        W = Math.round((vw * scale) / 2) * 2;
+        H = Math.round((vh * scale) / 2) * 2;
+        picture = { x: 0, y: 0, w: W, h: H };
+        area = picture;
+      }
+      canvas.width = W;
+      canvas.height = H;
       const ctx = canvas.getContext('2d')!;
-      const u = hudUnit(w, h);
+      const pu = hudUnit(picture.w, picture.h);
+      const scratch = document.createElement('canvas');
       const family = getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif';
 
       const stream = canvas.captureStream(30);
@@ -120,57 +185,72 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
       };
       const stopped = new Promise<void>((resolve) => (recorder.onstop = () => resolve()));
 
-      await new Promise<void>((resolve) => {
-        video.onseeked = () => resolve();
-        video.currentTime = startMs / 1000;
-      });
-
       /** One frame of the session, with the overlay as it stood at that moment. */
-      const paint = (mediaMs: number) => {
-        ctx.drawImage(video, 0, 0, w, h);
+      const paint = (mediaMs: number, replay: boolean) => {
+        if (backdrop) drawBackdrop(ctx, video, vw, vh, W, H, scratch);
+        ctx.drawImage(video, picture.x, picture.y, picture.w, picture.h);
         const { clockMs, held } = clockAtMedia(timeline.gaps, mediaMs + offsetMs);
         const s = overlayAt(timeline, clockMs, held);
-        const heat = heatLevel(s.streak);
-        if (s.rim) drawRim(ctx, w, h, s.rim, u, s.tone);
-        drawBall(ctx, w, h, s.trail, s.ball, u, heat);
-        drawHud(ctx, w, h, s, mediaMs, family);
+        ctx.save();
+        ctx.translate(picture.x, picture.y);
+        if (s.rim) drawRim(ctx, picture.w, picture.h, s.rim, pu, s.tone);
+        drawBall(ctx, picture.w, picture.h, s.trail, s.ball, pu, heatLevel(s.streak));
+        ctx.restore();
+        drawHud(ctx, W, H, s, mediaMs, family, { area, replay });
       };
 
-      paint(startMs);
-      recorder.start(1000);
-      await video.play();
-      // Paced by animation frames, not requestVideoFrameCallback: this video
-      // is never on the page, and a video that is not shown presents no frames
-      // to call back on. A frame is drawn whenever the video has moved on.
-      await new Promise<void>((resolve) => {
-        let lastMs = -1;
-        const step = () => {
-          const mediaMs = video.currentTime * 1000;
-          if (stopState() !== 'none' || video.ended || mediaMs >= endMs) {
-            video.pause();
-            resolve();
-            return;
-          }
-          if (mediaMs !== lastMs) {
-            lastMs = mediaMs;
-            paint(mediaMs);
-            setProgress((mediaMs - startMs) / Math.max(1, endMs - startMs));
-          }
-          requestAnimationFrame(step);
-        };
-        step();
-      });
+      const seek = (ms: number) =>
+        new Promise<void>((resolve) => {
+          video.onseeked = () => resolve();
+          video.currentTime = ms / 1000;
+        });
+
+      let done = 0;
+      let mainEndMs = plan[0].startMs;
+      for (const [i, seg] of plan.entries()) {
+        if (stopState() !== 'none') break;
+        if (i > 0) recorder.pause();
+        await seek(seg.startMs);
+        paint(seg.startMs, seg.replay);
+        if (i === 0) recorder.start(1000);
+        else recorder.resume();
+        video.playbackRate = seg.rate;
+        await video.play();
+        // Paced by animation frames, not requestVideoFrameCallback: this video
+        // is never on the page, and a video that is not shown presents no
+        // frames to call back on. A frame is drawn whenever the video moved on.
+        await new Promise<void>((resolve) => {
+          let lastMs = -1;
+          const step = () => {
+            const mediaMs = video.currentTime * 1000;
+            if (stopState() !== 'none' || video.ended || mediaMs >= seg.endMs) {
+              video.pause();
+              resolve();
+              return;
+            }
+            if (mediaMs !== lastMs) {
+              lastMs = mediaMs;
+              paint(mediaMs, seg.replay);
+              setProgress((done + (mediaMs - seg.startMs) / seg.rate) / total);
+            }
+            requestAnimationFrame(step);
+          };
+          step();
+        });
+        if (!seg.replay) mainEndMs = Math.min(video.currentTime * 1000, seg.endMs);
+        done += (seg.endMs - seg.startMs) / seg.rate;
+      }
 
       if (stopState() !== 'cancel') {
-        // The numbers as they stood on screen where the video stopped
-        const endedAt = Math.min(video.currentTime * 1000, endMs);
-        const made = calls.filter((c) => c.t <= clockAtMedia(timeline.gaps, endedAt + offsetMs).clockMs).map((c) => c.made);
+        // The numbers as they stood on screen where the session part stopped
+        const made = calls.filter((c) => c.t <= clockAtMedia(timeline.gaps, mainEndMs + offsetMs).clockMs).map((c) => c.made);
         const stats = { makes: made.filter(Boolean).length, attempts: made.length, bestRun: streaks(made).best };
         await new Promise<void>((resolve) => {
           const began = performance.now();
           const tick = () => {
             const p = (performance.now() - began) / END_CARD_MS;
-            drawEndCard(ctx, w, h, stats, Math.min(1, p), family);
+            drawEndCard(ctx, W, H, stats, Math.min(1, p), family);
+            setProgress((done + Math.min(1, p) * END_CARD_MS) / total);
             if (p < 1 && stopState() !== 'cancel') requestAnimationFrame(tick);
             else resolve();
           };
@@ -183,7 +263,8 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
       stream.getTracks().forEach((t) => t.stop());
       if (stopState() === 'cancel') return;
       const blob = new Blob(chunks, { type: type.mimeType.split(';')[0] });
-      setResult({ url: URL.createObjectURL(blob), blob, name: `deadeye-tracker-${localDateString()}.${type.extension}`, capped });
+      const suffix = shape === 'vertical' ? '-vertical' : '';
+      setResult({ url: URL.createObjectURL(blob), blob, name: `deadeye-tracker-${localDateString()}${suffix}.${type.extension}`, capped });
     } catch {
       setError('Could not make the video from this recording.');
     } finally {
@@ -215,6 +296,19 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
   }
 
   const shotLabel = (i: number) => `Shot ${i + 1} · ${calls[i].made ? 'make' : 'miss'} · ${clock(mediaAtClock(timeline.gaps, calls[i].t) - offsetMs)}`;
+  const selectClass = 'mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm font-normal normal-case tracking-normal text-zinc-200';
+  const shapeButton = (value: ExportShape, label: string) => (
+    <button
+      type="button"
+      aria-pressed={shape === value}
+      onClick={() => setShape(value)}
+      className={`h-11 flex-1 rounded-xl border text-sm font-semibold ${
+        shape === value ? 'border-orange-500 bg-orange-600/15 text-white' : 'border-zinc-800 bg-zinc-950/60 text-zinc-300'
+      }`}
+    >
+      {label}
+    </button>
+  );
 
   return (
     <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-3">
@@ -223,7 +317,12 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
       </div>
       {result ? (
         <>
-          <video src={result.url} controls playsInline className="w-full rounded-xl bg-black" />
+          <video
+            src={result.url}
+            controls
+            playsInline
+            className={`rounded-xl bg-black ${shape === 'vertical' ? 'mx-auto max-h-[70vh] w-auto' : 'w-full'}`}
+          />
           {result.capped && <p className="text-sm text-zinc-400">It stopped early to save space on your phone. Pick a shorter part for the rest.</p>}
           <div className="flex gap-2">
             <Button variant="primary" className="flex-1 gap-2" onClick={() => void share()}>
@@ -234,7 +333,7 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
             </a>
           </div>
           <button type="button" onClick={() => setResult(null)} className="w-full text-center text-sm text-zinc-400 underline">
-            Make another part
+            Make another
           </button>
         </>
       ) : (
@@ -243,47 +342,60 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
             Your session with everything the tracker showed: the rim line, the ball, the score, the streak flame and each make and miss.
             Made on your phone; nothing is uploaded.
           </p>
-          {calls.length > 0 && !busy && (
-            <div className="grid grid-cols-2 gap-2">
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                From
-                <select
-                  value={from}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    setFrom(v);
-                    if (to >= 0 && v > to) setTo(v);
-                  }}
-                  className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm font-normal normal-case tracking-normal text-zinc-200"
-                >
-                  <option value={-1}>The start</option>
-                  {calls.map((_, i) => (
-                    <option key={i} value={i}>
-                      {shotLabel(i)}
-                    </option>
-                  ))}
-                </select>
+          {!busy && (
+            <>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  From
+                  <select
+                    value={from}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      setFrom(v);
+                      if (to >= 0 && v > to) setTo(v);
+                    }}
+                    className={selectClass}
+                  >
+                    <option value={-1}>The start</option>
+                    {calls.map((_, i) => (
+                      <option key={i} value={i}>
+                        {shotLabel(i)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                  To
+                  <select
+                    value={to}
+                    onChange={(e) => {
+                      const v = Number(e.target.value);
+                      setTo(v);
+                      if (v >= 0 && from > v) setFrom(v);
+                    }}
+                    className={selectClass}
+                  >
+                    <option value={-1}>The end</option>
+                    {calls.map((_, i) => (
+                      <option key={i} value={i}>
+                        {shotLabel(i)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Shape</p>
+                <div className="mt-1 flex gap-2">
+                  {shapeButton('vertical', 'Vertical 9:16')}
+                  {shapeButton('original', 'As filmed')}
+                </div>
+              </div>
+              <label className="flex min-h-11 items-center gap-3 text-sm text-zinc-200">
+                <input type="checkbox" checked={slowmo} onChange={(e) => setSlowmo(e.target.checked)} className="h-5 w-5 accent-orange-600" />
+                Slow-mo replays of the best makes
               </label>
-              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-                To
-                <select
-                  value={to}
-                  onChange={(e) => {
-                    const v = Number(e.target.value);
-                    setTo(v);
-                    if (v >= 0 && from > v) setFrom(v);
-                  }}
-                  className="mt-1 w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-2 py-2 text-sm font-normal normal-case tracking-normal text-zinc-200"
-                >
-                  <option value={-1}>The end</option>
-                  {calls.map((_, i) => (
-                    <option key={i} value={i}>
-                      {shotLabel(i)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
+            </>
           )}
           {busy && (
             <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
@@ -300,7 +412,8 @@ export function TrackerVideoExport({ file, timeline, offsetMs = 0 }: { file: Fil
             </Button>
           )}
           <p className="text-sm text-zinc-500">
-            About {clock(seconds * 1000)} long, no sound. It plays through at normal speed, so keep this screen open while it is made.
+            About {clock(seconds * 1000)} long{slowmo && replays ? `, with ${replays} slow-mo ${replays === 1 ? 'replay' : 'replays'}` : ''}, no sound. It plays
+            through as it is made, so keep this screen open.
           </p>
         </>
       )}

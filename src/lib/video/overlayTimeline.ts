@@ -171,6 +171,44 @@ export function heatLevel(streak: number): 0 | 1 | 2 | 3 {
   return 3;
 }
 
+/** How long a milestone banner stays up, ms. */
+export const BANNER_MS = 2500;
+const MAKE_MILESTONES = [10, 25, 50, 100, 150, 200, 300];
+const SHOT_MILESTONES = [50, 100, 200, 300, 500];
+
+/**
+ * A milestone reached by the latest call, or null. Kept to a few on purpose
+ * (docs/design.md): round numbers of makes and shots, and a perfect start.
+ */
+export function milestoneFor(made: readonly boolean[]): string | null {
+  const n = made.length;
+  if (!n) return null;
+  const makes = made.filter(Boolean).length;
+  if (made[n - 1] && MAKE_MILESTONES.includes(makes)) return `${makes} makes`;
+  if (n === 5 && makes === 5) return 'Perfect start · 5/5';
+  if (SHOT_MILESTONES.includes(n)) return `${n} shots up`;
+  return null;
+}
+
+/**
+ * The makes worth a slow-motion replay between two moments on the clock: the
+ * ones made deepest into a streak, latest first on a tie, shown in the order
+ * they happened.
+ */
+export function replayPicks(tl: OverlayTimeline, fromClock: number, toClock: number, max = 3): number[] {
+  const made: boolean[] = [];
+  const picks: Array<{ t: number; streak: number }> = [];
+  for (const c of tl.calls) {
+    made.push(c.made);
+    if (c.made && c.t >= fromClock && c.t <= toClock) picks.push({ t: c.t, streak: streaks(made).current });
+  }
+  return picks
+    .sort((a, b) => b.streak - a.streak || b.t - a.t)
+    .slice(0, max)
+    .map((p) => p.t)
+    .sort((a, b) => a - b);
+}
+
 export interface OverlayFlash {
   made: boolean;
   confident: boolean;
@@ -198,6 +236,8 @@ export interface OverlayState {
   paused: boolean;
   ballInView: boolean;
   flash: OverlayFlash | null;
+  /** A milestone just reached, and how long ago. */
+  banner: { label: string; age: number } | null;
   drill: DrillProgress | null;
 }
 
@@ -245,6 +285,15 @@ export function overlayAt(tl: OverlayTimeline, clockMs: number, held = false): O
     }
   }
 
+  let banner: OverlayState['banner'] = null;
+  for (let i = n - 1; i >= 0 && clockMs - tl.calls[i].t <= BANNER_MS; i--) {
+    const label = milestoneFor(madeSoFar.slice(0, i + 1));
+    if (label) {
+      banner = { label, age: clockMs - tl.calls[i].t };
+      break;
+    }
+  }
+
   const activity = tl.activity.filter((t) => t <= clockMs);
   const lastActivity = activity.length ? activity[activity.length - 1] : 0;
   return {
@@ -260,6 +309,7 @@ export function overlayAt(tl: OverlayTimeline, clockMs: number, held = false): O
     paused: clockMs - lastActivity > IDLE_MS,
     ballInView,
     flash,
+    banner,
     drill: drillProgress(tl.mode, madeSoFar, clockMs),
   };
 }

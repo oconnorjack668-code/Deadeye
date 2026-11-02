@@ -123,6 +123,51 @@ body {
   }
 }
 
+/* A milestone on the tracker ("10 makes"): pops in, holds long enough to read
+   from the arc, fades. Drawn the same way in a saved video (overlayArt's
+   bannerCurve), so keep the two in step. */
+@keyframes deadeye-banner {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  7% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  12% {
+    transform: scale(1);
+  }
+  84% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.deadeye-banner {
+  transform-origin: left center;
+  animation: deadeye-banner 2.5s ease-out forwards;
+}
+
+@keyframes deadeye-banner-still {
+  0%,
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deadeye-banner {
+    animation: deadeye-banner-still 2.5s step-end forwards;
+  }
+}
+
 /* Room at the end of every page on a phone, so the last thing on it can scroll
    clear of the floating quick-log button (QuickLog), which sits above the
    bottom nav. Pages scroll inside their own flex-1 overflow-auto container,

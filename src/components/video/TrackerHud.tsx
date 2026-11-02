@@ -46,6 +46,7 @@ export function TrackerHud({
   onToggleTheatre,
   onFixRim,
   canFixRim,
+  banner = null,
 }: {
   makes: number;
   attempts: number;
@@ -63,6 +64,8 @@ export function TrackerHud({
   /** Offered when the camera has moved (canFixRim). */
   onFixRim: () => void;
   canFixRim: boolean;
+  /** A milestone just reached (overlayTimeline's milestoneFor), keyed so each one animates afresh. */
+  banner?: { id: number; label: string } | null;
 }) {
   const pct = attempts ? Math.round((makes / attempts) * 100) : 0;
   const issues = health.issues;
@@ -99,6 +102,16 @@ export function TrackerHud({
             </span>
           )}
         </div>
+        {/* White in both themes: it sits on footage, not on the page */}
+        {banner && (
+          <div
+            key={banner.id}
+            className="deadeye-banner mt-2 flex w-fit items-center gap-2 rounded-full bg-[#fff] px-3 py-1 text-sm font-black uppercase text-[#09090b] shadow-lg"
+          >
+            <span className="h-2 w-2 rounded-full bg-orange-500" aria-hidden="true" />
+            {banner.label}
+          </div>
+        )}
       </div>
 
       {/* Is it working? Calm unless something is wrong, and then it says what */}

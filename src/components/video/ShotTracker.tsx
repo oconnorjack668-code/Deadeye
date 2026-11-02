@@ -29,7 +29,18 @@ import { createHealthMonitor, type HealthMonitor, type HealthReading } from '@/l
 import { startLiveRecorder, resolveDuration, type LiveRecorder, type LiveRecording } from '@/lib/video/liveRecorder';
 import { describeMode, drillCue, drillProgress, zoneForShot, FREE, type DrillMode } from '@/lib/video/drillModes';
 import { activeMs, IDLE_MS, streaks, zoneTotals } from '@/lib/video/shotStats';
-import { createOverlayLog, heatLevel, mediaAtClock, rimTone, TRAIL_MS, TRAIL_POINTS, type OverlayLog, type OverlayTimeline } from '@/lib/video/overlayTimeline';
+import {
+  BANNER_MS,
+  createOverlayLog,
+  heatLevel,
+  mediaAtClock,
+  milestoneFor,
+  rimTone,
+  TRAIL_MS,
+  TRAIL_POINTS,
+  type OverlayLog,
+  type OverlayTimeline,
+} from '@/lib/video/overlayTimeline';
 import { drawBall, drawRim } from '@/lib/video/overlayArt';
 import { TrackerVideoExport } from './TrackerVideoExport';
 import { useFramingCheck } from './useFramingCheck';
@@ -170,6 +181,9 @@ export function ShotTracker({
   const inWorkerRef = useRef<boolean | null>(null);
   const [quality, setQuality] = useState<RunQuality | null>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** A milestone just reached ("10 makes"), shown under the score for BANNER_MS. */
+  const [banner, setBanner] = useState<{ id: number; label: string } | null>(null);
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** The run's workload, so finish() can say how many frames went unscored. */
   const workloadRef = useRef<ReturnType<typeof createWorkload> | null>(null);
   /** Smallest hoop picture the device dropped to during the run. */
@@ -236,6 +250,7 @@ export function ShotTracker({
       streamRef.current?.getTracks().forEach((t) => t.stop());
       lockRef.current?.release().catch(() => undefined);
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
       if (doneTimerRef.current) clearTimeout(doneTimerRef.current);
     },
     []
@@ -624,6 +639,7 @@ export function ShotTracker({
     if (!resume) {
       setShots([]);
       setFlash(null);
+      setBanner(null);
       setRemoved(0);
       setQuality(null);
       setShootingMs(0);
@@ -733,6 +749,12 @@ export function ShotTracker({
       announceShot(sound, shot.made, makes, attempts, drillCue(modeRef.current, madeRef.current));
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       flashTimerRef.current = setTimeout(() => setFlash(null), 1400);
+      const milestone = milestoneFor(madeRef.current);
+      if (milestone) {
+        setBanner({ id, label: milestone });
+        if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+        bannerTimerRef.current = setTimeout(() => setBanner(null), BANNER_MS);
+      }
       if (drillProgress(modeRef.current, madeRef.current, 0)?.done && modeRef.current.kind !== 'timed') endDrill();
     };
 
@@ -1309,6 +1331,7 @@ export function ShotTracker({
                 onToggleTheatre={toggleTheatre}
                 onFixRim={fixRim}
                 canFixRim={moved !== null}
+                banner={banner}
               />
             )}
           </div>
