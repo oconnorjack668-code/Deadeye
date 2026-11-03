@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 1, 2026';
+const LAST_UPDATED = 'November 3, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -85,7 +85,8 @@ export default function PrivacyPage() {
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
-              itself runs on your phone, so videos you analyse without uploading never leave your device.
+              itself runs on your phone, so videos you analyse without uploading never leave your device. So does the
+              shot tracker&apos;s &ldquo;Find the hoop for me&rdquo;: the picture it looks at is not uploaded.
             </li>
             <li>
               Hoops you save in the shot tracker: the name you give each one and where the ring sits in the picture, so
@@ -243,6 +244,16 @@ export default function PrivacyPage() {
           <p>
             Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the
             EU; our providers use the EU&apos;s standard contractual clauses to protect it.
+          </p>
+        </section>
+
+        <section id="credits" className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Credits</h2>
+          <p>
+            The shot tracker&apos;s hoop finder is an RF-DETR model by Roboflow (Apache 2.0), trained by Deadeye on these
+            public datasets from Roboflow Universe: &ldquo;ballllls&rdquo; (CC BY 4.0), &ldquo;X-Basket&rdquo; (CC BY
+            4.0), &ldquo;Basketball Shot Tracking&rdquo; (CC BY 4.0) and &ldquo;basketball-computer-vision&rdquo;
+            (public domain). Thank you to their authors.
           </p>
         </section>
 

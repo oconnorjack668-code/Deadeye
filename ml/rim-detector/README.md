@@ -30,8 +30,31 @@ What it does:
 The evaluation frames come from `scripts/bench-suite.json`'s clips; rebuild them with ffmpeg if the clips
 change.
 
-## Next
+## Trained (3 Nov 2026), and in the app
 
-With the result in hand: the app runs the model once when the camera is pointed at the hoop, proposes the
-rim, and the player confirms with one tap (the adjuster stays as the fallback). Automatic "Fix rim" after a
-knocked tripod comes from the same model.
+RF-DETR Nano, 40 epochs at most with early stopping, on 2,179 training pictures. On the 305 held-back ones:
+rim found 85% (88% of its rim finds right), backboard 96%, ball 76%. The int8 copy reproduces the full
+model's finds as well as the full one does, at 36 MB against 115.
+
+In the app it is **Find the hoop for me** in the tracker's rim step (`src/lib/video/rimFinder.ts`,
+`rimModel.ts` and its worker). The model downloads on first press (`public/models/rim-detector-int8.onnx`),
+stays in the Cache API (`deadeye-models-v1`, kept by the service worker), and runs on the phone. It looks
+at the whole picture, then again at a square five rim widths across around what it found, over three
+moments of a live camera, and opens the adjuster on the ends for the player to check.
+
+Measured with `__tests__/rimFinderBench.test.ts` on the 24 frames, against the ring's ends, in rim widths
+(median, worst):
+
+| | near clip | far clip |
+| --- | --- | --- |
+| one look | 0.142, 0.158 (it boxed the bracket too) | 0.111, 0.445 |
+| close look, 5 rim widths | **0.027, 0.042** | **0.018, 0.048** |
+
+The near clip's bench taps had the far end on the bracket; `eval-frames/frames.json` now has the ring's
+edge (0.5736, 0.2034, as `sampleClip.ts`). A box has no tilt, so the ends start level; on the full near clip
+the shot bench called 9 of 10 right on the found ends and 9 of 10 on the true ring ends (a different shot
+wrong each time), so level ends lose nothing there. A browser run of the 34s sample on the found ends,
+unadjusted, called 3 of 6 (the 13.9s make); tapped, 4 of 6.
+
+Next: automatic "Fix rim" when the camera moves, from the same model; more Deadeye frames in training from
+the test library.

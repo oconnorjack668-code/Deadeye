@@ -45,6 +45,8 @@ import { drawBall, drawRim } from '@/lib/video/overlayArt';
 import { TrackerVideoExport } from './TrackerVideoExport';
 import { loadShootingBest, MIN_PB_ATTEMPTS, personalBest, type ShootingTally } from '@/lib/video/personalBest';
 import { benchClip } from '@/lib/video/benchLabels';
+import { findRimSteady } from '@/lib/video/rimFinder';
+import { captureFrame, loadRimModel, rimModelCached, sampler, RIM_MODEL_BYTES, type RimModel } from '@/lib/video/rimModel';
 import { useFramingCheck } from './useFramingCheck';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
@@ -62,7 +64,7 @@ import { ShotReplay } from './ShotReplay';
 import { ShootingBreakdown } from '@/components/basketball/ShootingBreakdown';
 import { track } from '@/lib/events';
 import { deleteAccountRim, loadAccountRims, mergeRims, saveAccountRim } from '@/lib/video/rimSync';
-import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film, Trophy, FlaskConical } from 'lucide-react';
+import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film, Trophy, FlaskConical, ScanSearch } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
 type Source = 'camera' | 'file';
@@ -255,6 +257,7 @@ export function ShotTracker({
       stopRef.current = true;
       runRef.current++;
       engineRef.current?.dispose();
+      rimModelRef.current?.dispose();
       recorderRef.current?.discard();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       lockRef.current?.release().catch(() => undefined);
@@ -389,6 +392,21 @@ export function ShotTracker({
   const [calibrating, setCalibrating] = useState(false);
   const [firstEdge, setFirstEdge] = useState<{ x: number; y: number } | null>(null);
   const [edges, setEdges] = useState<[Point, Point] | null>(null);
+  // "Find the hoop for me" (rimFinder.ts): where it has got to, whether the
+  // ends in the adjuster came from it, and whether the model is on the phone
+  const [finder, setFinder] = useState<{ state: 'idle' | 'loading' | 'looking' | 'none' | 'failed'; progress?: number }>({ state: 'idle' });
+  const [autoFound, setAutoFound] = useState(false);
+  const [modelCached, setModelCached] = useState<boolean | null>(null);
+  const rimModelRef = useRef<RimModel | null>(null);
+  // Whether the hoop finder is already on this phone, for saying what pressing it downloads
+  useEffect(() => {
+    if (step !== 'calibrate' || modelCached !== null) return;
+    let live = true;
+    void rimModelCached().then((cached) => live && setModelCached(cached));
+    return () => {
+      live = false;
+    };
+  }, [step, modelCached]);
 
   // Hoops measured before, so a returning player taps nothing. Read when the
   // calibrate step opens rather than on mount: localStorage does not exist while
@@ -507,6 +525,7 @@ export function ShotTracker({
     setError(null);
     setEdges(leftFirst(firstEdge, point));
     setFirstEdge(null);
+    setAutoFound(false);
   }
 
   /** Starts tracking on the ends as adjusted in the magnified view. */
@@ -548,6 +567,46 @@ export function ShotTracker({
     setEdges(null);
     setFirstEdge(null);
     setError(null);
+    setAutoFound(false);
+  }
+
+  /**
+   * Finds the hoop with the trained model (rimFinder.ts) and opens the
+   * adjuster on what it found, for the player to check. The model downloads
+   * on first use and is kept on the phone. A live camera is looked at over
+   * about a second, three moments, and the middle answer taken, so a ball on
+   * the ring in one of them does not move it.
+   */
+  async function findHoop() {
+    const video = videoRef.current;
+    if (!video?.videoWidth || finder.state === 'loading' || finder.state === 'looking') return;
+    setError(null);
+    setFinder({ state: 'loading', progress: 0 });
+    try {
+      const model = rimModelRef.current ?? (await loadRimModel((progress) => setFinder({ state: 'loading', progress })));
+      rimModelRef.current = model;
+      setModelCached(true);
+      setFinder({ state: 'looking' });
+      const stills: HTMLCanvasElement[] = [];
+      const moments = source === 'camera' ? 3 : 1;
+      for (let i = 0; i < moments; i++) {
+        if (i) await new Promise((r) => setTimeout(r, 350));
+        const still = captureFrame(video);
+        if (still) stills.push(still);
+      }
+      const found = await findRimSteady(video.videoWidth, video.videoHeight, stills.map(sampler), model.run);
+      if (!found) {
+        setFinder({ state: 'none' });
+        return;
+      }
+      setFirstEdge(null);
+      setEdges(leftFirst(found.left, found.right));
+      setAdjusterKey((k) => k + 1);
+      setAutoFound(true);
+      setFinder({ state: 'idle' });
+    } catch {
+      setFinder({ state: 'failed' });
+    }
   }
 
   /** The zoom slider. Taps made before it no longer sit on the ring, so they go. */
@@ -1401,6 +1460,12 @@ export function ShotTracker({
               ring&apos;s edges. If the camera is somewhere else this time, tap again.
             </p>
           )}
+          {autoFound && !fixing && (
+            <p className="rounded-xl border border-emerald-600/40 bg-emerald-600/10 p-3 text-sm text-emerald-100">
+              Hoop found. Check both circles sit on the ends of the metal ring, and move them if not - a ring seen from the side
+              needs its far end raised or lowered. Then start.
+            </p>
+          )}
           {fixing && (
             <p className="rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-100">
               The camera moved, so the ring has moved in the picture. Check both circles sit on its edges again. Your{' '}
@@ -1436,6 +1501,41 @@ export function ShotTracker({
             <button type="button" onClick={() => setFirstEdge(null)} className="text-xs text-zinc-500 underline">
               Start the rim again
             </button>
+          )}
+
+          {/* Or let the trained model find it (rimFinder.ts): it proposes, the
+              adjuster that opens next is where the player checks it */}
+          {!firstEdge && !calibrating && (
+            <div className="space-y-1.5">
+              <Button
+                variant="secondary"
+                className="w-full gap-2"
+                onClick={findHoop}
+                isLoading={finder.state === 'loading' || finder.state === 'looking'}
+              >
+                <ScanSearch className="h-4 w-4" />
+                {finder.state === 'loading'
+                  ? `Getting the hoop finder… ${Math.round((finder.progress ?? 0) * 100)}%`
+                  : finder.state === 'looking'
+                    ? 'Looking for the hoop…'
+                    : 'Find the hoop for me'}
+              </Button>
+              {finder.state === 'none' && (
+                <p className="text-sm text-amber-300">No hoop found. Get the whole ring in the picture, or tap its two sides.</p>
+              )}
+              {finder.state === 'failed' && (
+                <p className="text-sm text-amber-300">The hoop finder could not start on this phone. Tap the ring&apos;s two sides instead.</p>
+              )}
+              {modelCached === false && finder.state === 'idle' && (
+                <p className="text-xs text-zinc-500">
+                  First time only: downloads {Math.round(RIM_MODEL_BYTES / 1e6)} MB, then it is kept on this phone. The picture never
+                  leaves it.{' '}
+                  <a href="/privacy#credits" className="underline">
+                    Credits
+                  </a>
+                </p>
+              )}
+            </div>
           )}
 
           {source === 'camera' && cameraZoom && !calibrating && (

@@ -2,6 +2,7 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-10-21 · first-run-tutorial · Welcome screen, sample tracker clip, starting steps +150 XP, promo on site · open: 1 → [handoff](2026-10-21-first-run-tutorial.md)
 - 2026-10-21 · promo-rim-line-fix · First rim line now ends on the ring; promo and phone page updated · open: none → [handoff](2026-10-21-promo-rim-line-fix.md)
 - 2026-10-20 · leaderboard-redesign · Leaderboard redesign with podium, avatars and a chase nudge, shipped · open: 1 → [handoff](2026-10-20-leaderboard-redesign.md)
 - 2026-10-20 · tracker-streaks-gym-avatars · Tracker fixes, levels, streak freezes, programmes, gym/drill tools, avatars, Codex access · open: 5 → [handoff](2026-10-20-tracker-streaks-gym-avatars.md)
