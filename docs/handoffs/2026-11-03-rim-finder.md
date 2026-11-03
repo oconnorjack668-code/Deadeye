@@ -29,7 +29,14 @@ Agent: Claude Code (Opus 5.5) · Branch: `feat/rim-finder` · Status: PR opened,
 - Dataset source links for 2 datasets still to confirm (`ml/rim-detector/ATTRIBUTION.md`).
 - Next: automatic Fix rim from the same model; retrain with test-library frames.
 
+## Follow-ups the same day (#64, and the PR after it)
+- The founder found it spinning for ever on a phone. On the live site, with the tester in Chrome: the Turbopack-bundled worker was created but never ran. There was no message and no error; the same build worked locally, also with the service worker in control. Button's `isLoading` also hid every stage behind "Loading...".
+- #64: stages on the button, time limits (start 15s, stalled download 45s, ready 120s, look 60s), failures shown and reported with stage and time, two looks on one still.
+- Then: the worker is a plain file, `public/workers/rim-model.js` (outside `/_next/static/`, skipped by the proxy). The runtime is dynamically imported from jsdelivr. Run as a blob worker on the live site before merging: alive 10ms, 36 MB in 1.5s, ready 3.7s, one look 2.5s.
+- The tracker's own bundled worker does run on the live site (frames came back in Chrome), so tracking was not affected.
+
 ## Gotchas
+- Test signed-in features on the live site in Chrome with the tester session, and build locally with Turbopack (`next build`), not `--webpack`: the webpack build hid this.
 - onnxruntime-node rejects jsdom's typed arrays: the bench file is `@vitest-environment node`.
 - PowerShell's Set-Content writes a BOM that JSON.parse rejects.
 - Signed-out test pages log 405s from `/api/events` redirecting to /login; harmless.
