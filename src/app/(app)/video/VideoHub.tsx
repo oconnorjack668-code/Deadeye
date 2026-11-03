@@ -34,6 +34,7 @@ export function VideoHub({
   hand,
   units,
   initialTab = 'shots',
+  ownerTools = false,
 }: {
   heightCm: number | null;
   position: string | null;
@@ -41,6 +42,8 @@ export function VideoHub({
   units: MeasurementSystem;
   /** From ?tab=, so search can open Form check or the jump test directly */
   initialTab?: Tab;
+  /** The owner's tools in the shot tracker (its test library button). */
+  ownerTools?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>(initialTab);
   const [formFile, setFormFile] = useState<File | null>(null);
@@ -71,6 +74,7 @@ export function VideoHub({
       {/* Tabs stay mounted so switching doesn't lose a session in progress */}
       <div className={tab === 'shots' ? '' : 'hidden'}>
         <ShotTracker
+          ownerTools={ownerTools}
           onSummary={setShooting}
           onCheckForm={(file, shotMs) => {
             setFormFile(file);
