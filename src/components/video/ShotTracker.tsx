@@ -46,7 +46,27 @@ import { TrackerVideoExport } from './TrackerVideoExport';
 import { loadShootingBest, MIN_PB_ATTEMPTS, personalBest, type ShootingTally } from '@/lib/video/personalBest';
 import { benchClip } from '@/lib/video/benchLabels';
 import { findRimSteady } from '@/lib/video/rimFinder';
-import { captureFrame, loadRimModel, rimModelCached, sampler, RIM_MODEL_BYTES, type RimModel } from '@/lib/video/rimModel';
+import { captureFrame, loadRimModel, rimModelCached, sampler, RimFinderError, RIM_MODEL_BYTES, type RimModel } from '@/lib/video/rimModel';
+import { reportError } from '@/lib/reportError';
+
+/** Where "Find the hoop for me" has got to. */
+type FinderState =
+  | { state: 'idle' | 'starting' | 'preparing' | 'looking' | 'none' }
+  | { state: 'downloading'; progress: number }
+  | { state: 'failed'; reason: RimFinderError['stage'] };
+
+function finderBusy(state: FinderState['state']): boolean {
+  return state === 'starting' || state === 'downloading' || state === 'preparing' || state === 'looking';
+}
+
+/** The button's words for each stage: which one it is in is what a player waiting needs to see. */
+function finderLabel(f: FinderState): string {
+  if (f.state === 'starting') return 'Starting the hoop finder…';
+  if (f.state === 'downloading') return `Downloading the hoop finder… ${Math.round(f.progress * 100)}%`;
+  if (f.state === 'preparing') return 'Getting it ready…';
+  if (f.state === 'looking') return 'Looking for the hoop…';
+  return 'Find the hoop for me';
+}
 import { useFramingCheck } from './useFramingCheck';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
@@ -394,7 +414,7 @@ export function ShotTracker({
   const [edges, setEdges] = useState<[Point, Point] | null>(null);
   // "Find the hoop for me" (rimFinder.ts): where it has got to, whether the
   // ends in the adjuster came from it, and whether the model is on the phone
-  const [finder, setFinder] = useState<{ state: 'idle' | 'loading' | 'looking' | 'none' | 'failed'; progress?: number }>({ state: 'idle' });
+  const [finder, setFinder] = useState<FinderState>({ state: 'idle' });
   const [autoFound, setAutoFound] = useState(false);
   const [modelCached, setModelCached] = useState<boolean | null>(null);
   const rimModelRef = useRef<RimModel | null>(null);
@@ -573,28 +593,30 @@ export function ShotTracker({
   /**
    * Finds the hoop with the trained model (rimFinder.ts) and opens the
    * adjuster on what it found, for the player to check. The model downloads
-   * on first use and is kept on the phone. A live camera is looked at over
-   * about a second, three moments, and the middle answer taken, so a ball on
-   * the ring in one of them does not move it.
+   * on first use and is kept on the phone. One still of the picture, two
+   * looks (whole, then close): on the bench one close look was 0.027 and
+   * 0.018 rim widths out, and every extra look is seconds on a phone.
+   * A failure or a stage over its time limit is shown, and reported with the
+   * stage and how long it took, since phones are where it is slow.
    */
   async function findHoop() {
     const video = videoRef.current;
-    if (!video?.videoWidth || finder.state === 'loading' || finder.state === 'looking') return;
+    if (!video?.videoWidth || finderBusy(finder.state)) return;
     setError(null);
-    setFinder({ state: 'loading', progress: 0 });
+    const began = performance.now();
+    setFinder({ state: 'starting' });
     try {
-      const model = rimModelRef.current ?? (await loadRimModel((progress) => setFinder({ state: 'loading', progress })));
+      const model =
+        rimModelRef.current ??
+        (await loadRimModel((s) =>
+          setFinder(s.stage === 'downloading' ? { state: 'downloading', progress: s.fraction } : { state: s.stage })
+        ));
       rimModelRef.current = model;
       setModelCached(true);
       setFinder({ state: 'looking' });
-      const stills: HTMLCanvasElement[] = [];
-      const moments = source === 'camera' ? 3 : 1;
-      for (let i = 0; i < moments; i++) {
-        if (i) await new Promise((r) => setTimeout(r, 350));
-        const still = captureFrame(video);
-        if (still) stills.push(still);
-      }
-      const found = await findRimSteady(video.videoWidth, video.videoHeight, stills.map(sampler), model.run);
+      const still = captureFrame(video);
+      if (!still) throw new RimFinderError('look', 'no picture to look at');
+      const found = await findRimSteady(video.videoWidth, video.videoHeight, [sampler(still)], model.run);
       if (!found) {
         setFinder({ state: 'none' });
         return;
@@ -604,8 +626,14 @@ export function ShotTracker({
       setAdjusterKey((k) => k + 1);
       setAutoFound(true);
       setFinder({ state: 'idle' });
-    } catch {
-      setFinder({ state: 'failed' });
+    } catch (err) {
+      const stage = err instanceof RimFinderError ? err.stage : 'look';
+      setFinder({ state: 'failed', reason: stage });
+      // A model that broke is not used again; the next press starts afresh
+      rimModelRef.current?.dispose();
+      rimModelRef.current = null;
+      const seconds = Math.round((performance.now() - began) / 1000);
+      reportError('client', new Error(`Hoop finder failed at ${stage}: ${err instanceof Error ? err.message : String(err)} (${seconds}s, ${source})`));
     }
   }
 
@@ -1507,24 +1535,25 @@ export function ShotTracker({
               adjuster that opens next is where the player checks it */}
           {!firstEdge && !calibrating && (
             <div className="space-y-1.5">
-              <Button
-                variant="secondary"
-                className="w-full gap-2"
-                onClick={findHoop}
-                isLoading={finder.state === 'loading' || finder.state === 'looking'}
-              >
-                <ScanSearch className="h-4 w-4" />
-                {finder.state === 'loading'
-                  ? `Getting the hoop finder… ${Math.round((finder.progress ?? 0) * 100)}%`
-                  : finder.state === 'looking'
-                    ? 'Looking for the hoop…'
-                    : 'Find the hoop for me'}
+              {/* Not Button's isLoading: it swaps the label for "Loading...",
+                  and which stage it is in is the useful part */}
+              <Button variant="secondary" className="w-full gap-2" onClick={findHoop} disabled={finderBusy(finder.state)}>
+                {finderBusy(finder.state) ? (
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+                ) : (
+                  <ScanSearch className="h-4 w-4" />
+                )}
+                {finderLabel(finder)}
               </Button>
               {finder.state === 'none' && (
                 <p className="text-sm text-amber-300">No hoop found. Get the whole ring in the picture, or tap its two sides.</p>
               )}
               {finder.state === 'failed' && (
-                <p className="text-sm text-amber-300">The hoop finder could not start on this phone. Tap the ring&apos;s two sides instead.</p>
+                <p className="text-sm text-amber-300">
+                  {finder.reason === 'download'
+                    ? 'The hoop finder could not download. Check the connection and try again, or tap the ring’s two sides.'
+                    : 'The hoop finder could not run on this phone. Tap the ring’s two sides instead.'}
+                </p>
               )}
               {modelCached === false && finder.state === 'idle' && (
                 <p className="text-xs text-zinc-500">
