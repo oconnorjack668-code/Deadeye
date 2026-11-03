@@ -1,6 +1,7 @@
 // src/lib/video/rimModel.ts
-// The rim detector in the browser: loads it in a worker (rimModel.worker.ts)
-// and hands rimFinder.ts a RunModel, plus the pictures to run it on.
+// The rim detector in the browser: loads it in a worker (public/workers/
+// rim-model.js) and hands rimFinder.ts a RunModel, plus the pictures to run
+// it on.
 //
 // Every stage has a time limit and says where it is. The first live version
 // had neither: when the worker never started on the production build, the
@@ -14,6 +15,8 @@ export const RIM_MODEL_BYTES = 35_657_994;
 export const MODEL_CACHE = 'deadeye-models-v1';
 /** Must match onnxruntime-web in package.json: the runtime is fetched for this version. */
 export const RUNTIME_VERSION = '1.30.0';
+/** The worker; the query changes when the file does, so no cache keeps an old one. */
+export const RIM_WORKER_URL = '/workers/rim-model.js?v=2';
 
 /** Longest waits, ms: for the worker to start, for the download to move, for the model to be ready, for one look. */
 export const LIMITS = { start: 15_000, stalled: 45_000, prepare: 120_000, look: 60_000 };
@@ -65,7 +68,8 @@ export function loadRimModel(onStage: (s: RimStage) => void): Promise<RimModel> 
     onStage({ stage: 'starting' });
     let worker: Worker;
     try {
-      worker = new Worker(new URL('./rimModel.worker.ts', import.meta.url), { type: 'module' });
+      // A plain file, not a bundled worker: see the note at its top
+      worker = new Worker(RIM_WORKER_URL);
     } catch (err) {
       reject(new RimFinderError('start', err instanceof Error ? err.message : 'worker could not be made'));
       return;

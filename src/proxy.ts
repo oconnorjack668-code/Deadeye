@@ -17,9 +17,10 @@ export const config = {
      *   is a PDF, and without .pdf here a signed-out visitor downloaded the login page.
      *   .onnx is the hoop finder's model (36 MB): a session check on it does nothing useful
      * - PWA files (sw.js, offline.html) and .well-known (app store domain verification)
+     * - workers/ (plain worker scripts, e.g. the hoop finder's)
      * - api/webhooks (Stripe webhook endpoint handles own signature auth)
      * - api/cron (scheduled jobs; protected by CRON_SECRET)
      */
-    '/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|\\.well-known/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|mp3|mp4|pdf|onnx)$|api/webhooks|api/cron).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw\\.js|offline\\.html|\\.well-known/|workers/|.*\\.(?:svg|png|jpg|jpeg|gif|webp|json|mp3|mp4|pdf|onnx)$|api/webhooks|api/cron).*)',
   ],
 };
