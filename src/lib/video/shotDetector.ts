@@ -344,6 +344,42 @@ const APPROACH_GAP_MS = 150;
 /** Longest gap between the sightings either side of the rim line that can place a crossing. */
 const MAX_CROSSING_GAP_MS = 250;
 
+/**
+ * The frame rate the times and frame counts above were measured at.
+ *
+ * Some of them are really "a frame or two": APPROACH_GAP_MS is four and a
+ * half frames at 30 a second, and less than two at 10, where one frame without
+ * the ball leaves a 200ms gap and the shot never starts. A phone that can only
+ * score 10 frames a second called 5 of 31 shots on the 2:39 clip that way,
+ * having found the ball on more of its frames than at 30. So the gaps that
+ * stand for missing frames stretch, and the counts of frames shrink, with how
+ * far apart frames are really arriving (see `pace`). Times that are about the
+ * ball's flight - LOST_BALL_MS, CONFIRM_MS, GONE_MS - stay as they are.
+ */
+const TUNED_FRAME_MS = 1000 / 30;
+/** Most the gaps stretch: frames 3.5 times further apart than tuned, under 10 a second. */
+const MAX_PACE = 3.5;
+/** Recent frame gaps the pace is the median of. */
+const PACE_FRAMES = 15;
+
+/**
+ * From this pace on (under 20 frames a second), one sighting of the ball just
+ * above the ring, followed by the net moving, starts a shot.
+ *
+ * A shot starts on two sightings above the rim. At 10 frames a second a ball
+ * dropping in from the top of the picture can be above the ring on one frame
+ * only, and then it is in the net: on the bench's 10 fps clips every make was
+ * never counted at all, while every miss, seen bouncing, was. The net moving
+ * says something went through; the sighting says it was a ball at the ring.
+ * The call is made by the usual confirm step and is always marked unsure.
+ */
+const SLOW_PACE = 1.5;
+// Tried and left out (3 Nov 2026): widening "near the ring" for the lone
+// sighting by a frame's travel at 10 rim widths a second. On the first clip at
+// 10 fps a make's only sighting was 0.84 rim widths up, just outside NEAR; the
+// wider reach started those shots but confirm called them misses, so the
+// suite traded missed shots for wrong calls one for one.
+
 interface Sighting {
   t: number;
   x: number;
@@ -405,6 +441,13 @@ export class ShotDetector {
   /** Lowest the ball has come at the ring on this shot, in rim widths below it. */
   private deepest: number | null = null;
   private netLog: Array<{ t: number; net: number }> = [];
+  /** On a slow phone, a lone sighting just above the ring with no shot started: see SLOW_PACE. */
+  private lone: Sighting | null = null;
+  /** The shot being judged was started from `lone`. */
+  private loneShot = false;
+  /** Recent gaps between frames, ms, and how many tuned frames each is: see TUNED_FRAME_MS. */
+  private frameGaps: number[] = [];
+  private pace = 1;
   private readonly aspect: number;
   readonly shots: DetectedShot[] = [];
 
@@ -417,6 +460,34 @@ export class ShotDetector {
 
   setRim(rim: Rim) {
     this.rim = rim;
+  }
+
+  /**
+   * How far apart frames are arriving, from the median of the recent gaps: 1
+   * at the tuned 30 a second, 3 at 10. A gap over half a second is a pause,
+   * not the frame rate, and is left out.
+   */
+  private notePace(t: number) {
+    if (this.lastT > 0) {
+      const gap = t - this.lastT;
+      if (gap > 5 && gap < 500) {
+        this.frameGaps.push(gap);
+        if (this.frameGaps.length > PACE_FRAMES) this.frameGaps.shift();
+        const sorted = [...this.frameGaps].sort((a, b) => a - b);
+        const median = sorted[sorted.length >> 1];
+        this.pace = Math.min(MAX_PACE, Math.max(1, median / TUNED_FRAME_MS));
+      }
+    }
+  }
+
+  /** A gap that stands for missing frames, stretched to the frame rate: see TUNED_FRAME_MS. */
+  private gapMs(tuned: number): number {
+    return tuned * this.pace;
+  }
+
+  /** A count of frames, shrunk to the frame rate, never below `least`. */
+  private frames(tuned: number, least: number): number {
+    return Math.max(least, Math.round(tuned / this.pace));
   }
 
   /** Below the rim line at the ball's own x, in rim widths. Negative is above. */
@@ -439,6 +510,7 @@ export class ShotDetector {
 
   /** Feed one frame. Returns a shot when one is decided on this frame. */
   push(input: BallObservation): DetectedShot | null {
+    this.notePace(input.t);
     this.lastT = input.t;
     const obs = this.sameBall(input);
     if (obs.net !== undefined) {
@@ -456,14 +528,29 @@ export class ShotDetector {
       if (obs.net < NET_MOVING) {
         this.stillFrames++;
         this.swingFrames = 0;
-      } else if (this.stillFrames >= NET_SETTLED && ++this.swingFrames >= NET_SWUNG) {
-        this.pending = { t: obs.t - (NET_SWUNG - 1) * 33, margin: 0, confident: false, inside: 0, outside: 0, first: null, order: [] };
+      } else if (this.stillFrames >= this.frames(NET_SETTLED, 2) && ++this.swingFrames >= this.frames(NET_SWUNG, 1)) {
+        this.pending = { t: obs.t - (this.frames(NET_SWUNG, 1) - 1) * TUNED_FRAME_MS * this.pace, margin: 0, confident: false, inside: 0, outside: 0, first: null, order: [] };
         this.stillFrames = 0;
         this.swingFrames = 0;
       }
     }
 
     if (this.pending) return this.confirm(obs);
+
+    // A slow phone's lone sighting at the ring, then the net moving: see SLOW_PACE
+    if (this.lone && this.armedAt === null) {
+      const lone = this.lone;
+      if (obs.t - lone.t > CONFIRM_MS) {
+        this.lone = null;
+      } else if (this.netLog.filter((n) => n.t > lone.t && n.net >= NET_MOVING).length >= this.frames(NET_FRAMES, 2)) {
+        this.lone = null;
+        this.loneShot = true;
+        this.armedAt = lone.t;
+        this.nearAt = lone.t;
+        this.pending = { t: lone.t, margin: this.side(lone.x), confident: false, inside: 0, outside: 0, first: null, order: [] };
+        return this.confirm(obs);
+      }
+    }
 
     // Checked first, on every frame. Lower down it was only reached on a frame
     // where the ball was seen beside the rim, so anything that kept appearing
@@ -498,9 +585,11 @@ export class ShotDetector {
         // after it swallowed the real shot that followed.
         const first = this.approach;
         this.approach = { t: obs.t, x, y };
-        if (!first || obs.t - first.t > APPROACH_GAP_MS || depth <= this.depth(first.x, first.y)) return null;
+        if (this.pace >= SLOW_PACE && side <= TOUCH_SIDE && depth >= -NEAR) this.lone = { t: obs.t, x, y };
+        if (!first || obs.t - first.t > this.gapMs(APPROACH_GAP_MS) || depth <= this.depth(first.x, first.y)) return null;
         if (Math.hypot(x - first.x, (y - first.y) * this.aspect) / this.rim.width > (MAX_BALL_RIMS_PER_SEC * (obs.t - first.t)) / 1000) return null;
         this.armedAt = first.t;
+        this.lone = null;
       }
       if (side <= TOUCH_SIDE && depth >= -NEAR) this.nearAt = obs.t;
       // Came down to the ring and is now going back up: it hit the rim. Only
@@ -520,7 +609,7 @@ export class ShotDetector {
 
     if (depth >= 0 && this.lastAbove) {
       const prev = this.lastAbove;
-      if (obs.t - prev.t > MAX_CROSSING_GAP_MS) {
+      if (obs.t - prev.t > this.gapMs(MAX_CROSSING_GAP_MS)) {
         // Too long since it was above to say where it crossed. Falling beside
         // the ring after reaching it says it missed; anything else is not
         // evidence either way.
@@ -557,7 +646,7 @@ export class ShotDetector {
       const crossX = prev.x + (x - prev.x) * Math.min(1, Math.max(0, fraction));
       const margin = this.side(crossX);
       const at = prev.t + (obs.t - prev.t) * Math.min(1, Math.max(0, fraction));
-      const confident = obs.t - prev.t <= MAX_CROSSING_GAP_MS;
+      const confident = obs.t - prev.t <= this.gapMs(MAX_CROSSING_GAP_MS);
       if (margin > MAKE_MARGIN) return this.decide(obs.t, false, confident, margin, at, this.signedSide(crossX));
       // Inside the ring on screen. That is necessary for a make, not proof of
       // one: see CONFIRM_MS.
@@ -576,7 +665,7 @@ export class ShotDetector {
     // Disappeared at the ring with the net being watched: the net will say
     // whether it went through
     const crossX = this.hiddenCrossing();
-    if (gone >= HIDDEN_MS && crossX !== null && this.netLog.length && this.side(crossX) <= MAKE_MARGIN) {
+    if (gone >= this.gapMs(HIDDEN_MS) && crossX !== null && this.netLog.length && this.side(crossX) <= MAKE_MARGIN) {
       this.pending = { t: this.lastAbove!.t, margin: this.side(crossX), side: this.signedSide(crossX), confident: false, inside: 0, outside: 0, first: null, order: [] };
       return this.confirm(obs);
     }
@@ -611,7 +700,7 @@ export class ShotDetector {
     const sink = (depth - this.depth(before.x, before.y)) / (last.t - before.t);
     if (sink <= 0) return null;
     const ms = -depth / sink;
-    if (ms > HIDDEN_REACH_MS) return null;
+    if (ms > this.gapMs(HIDDEN_REACH_MS)) return null;
     return last.x + ((last.x - before.x) / (last.t - before.t)) * ms;
   }
 
@@ -687,8 +776,8 @@ export class ShotDetector {
     // the ring first waits for the late window, which is the only thing that
     // tells a rattle-in from a ball that bounced out towards the camera and fell
     // past the front of the net while it was still shaking from the hit
-    if (moving >= NET_FRAMES && p.first === 'inside' && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
-    if (moving >= NET_FRAMES && p.first === 'inside' && elapsed >= LATE_MS) {
+    if (moving >= this.frames(NET_FRAMES, 2) && p.first === 'inside' && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
+    if (moving >= this.frames(NET_FRAMES, 2) && p.first === 'inside' && elapsed >= LATE_MS) {
       return this.decide(obs.t, true, late() >= NET_LATE * 2, p.margin, p.t, p.side);
     }
     if (elapsed >= CONFIRM_MS) {
@@ -698,15 +787,15 @@ export class ShotDetector {
       // clip, as many as a swish - unless it moved a great deal more than a
       // rim hit does. And the ball under the ring is not enough either: one
       // that fell past the front of it is there too, with the net still.
-      if (p.first === 'inside' && moving >= NET_FRAMES && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
-      if (p.first === 'inside' && moving >= NET_FRAMES && elapsed < LATE_MS) return null;
-      if (p.first === null && moving >= NET_FRAMES && elapsed < LATE_MS) {
+      if (p.first === 'inside' && moving >= this.frames(NET_FRAMES, 2) && this.touchedAt === null) return this.decide(obs.t, true, true, p.margin, p.t, p.side);
+      if (p.first === 'inside' && moving >= this.frames(NET_FRAMES, 2) && elapsed < LATE_MS) return null;
+      if (p.first === null && moving >= this.frames(NET_FRAMES, 2) && elapsed < LATE_MS) {
         // The net moved and the ball has not been seen since it reached the
         // ring: it went in out of sight, or hit the ring and bounced away
         // unseen. The next half second tells them apart - see NET_LATE.
         return null;
       }
-      if (p.first === null && moving >= NET_FRAMES) {
+      if (p.first === null && moving >= this.frames(NET_FRAMES, 2)) {
         const swing = late();
         // Sure when the net is still swinging hard; a make, but worth a look,
         // when it only just clears the bar
@@ -729,7 +818,7 @@ export class ShotDetector {
       // The net hardly moved: it did not go through, however central it looked.
       // Sure when it barely moved at all. A ball brushing the net on the way
       // past moved it on up to four frames; a make, on six or more.
-      return this.decide(obs.t, false, moving <= NET_FRAMES - 2, p.margin, p.t, p.side);
+      return this.decide(obs.t, false, moving <= this.frames(NET_FRAMES - 2, 1), p.margin, p.t, p.side);
     }
     return null;
   }
@@ -750,8 +839,8 @@ export class ShotDetector {
       const moving = this.netLog.filter((n) => n.t >= p.t && n.t <= p.t + CONFIRM_MS && n.net >= NET_MOVING).length;
       const made =
         p.first === 'inside'
-          ? moving >= NET_FRAMES
-          : p.first === null && moving >= NET_FRAMES && this.netSum(p.t + CONFIRM_MS, t) >= NET_LATE;
+          ? moving >= this.frames(NET_FRAMES, 2)
+          : p.first === null && moving >= this.frames(NET_FRAMES, 2) && this.netSum(p.t + CONFIRM_MS, t) >= NET_LATE;
       return this.decide(t, made, false, p.margin, p.t, p.side);
     }
     // Reached the ring and not called yet: nothing says it went in
@@ -774,7 +863,7 @@ export class ShotDetector {
   private sameBall(obs: BallObservation): BallObservation {
     if (!obs.ball || obs.id === undefined || obs.id === null) return obs;
     const watching = this.armedAt !== null || this.pending !== null;
-    if (watching && this.ballId !== null && obs.id !== this.ballId && obs.t - this.ballIdSeen < SWITCH_MS) {
+    if (watching && this.ballId !== null && obs.id !== this.ballId && obs.t - this.ballIdSeen < this.gapMs(SWITCH_MS)) {
       return { ...obs, ball: null };
     }
     this.ballId = obs.id;
@@ -784,7 +873,7 @@ export class ShotDetector {
 
   /** Total net movement between two times. */
   private netSum(from: number, to: number): number {
-    return this.netLog.filter((n) => n.t > from && n.t <= to).reduce((sum, n) => sum + n.net, 0);
+    return this.netLog.filter((n) => n.t > from && n.t <= to).reduce((sum, n) => sum + n.net, 0) * this.pace;
   }
 
   /**
@@ -794,7 +883,7 @@ export class ShotDetector {
    */
   private netStill(from: number, to: number): boolean {
     if (!this.netLog.some((n) => n.t >= from)) return false;
-    return this.netLog.filter((n) => n.t >= from && n.t <= to && n.net >= NET_MOVING).length <= NET_FRAMES - 2;
+    return this.netLog.filter((n) => n.t >= from && n.t <= to && n.net >= NET_MOVING).length <= this.frames(NET_FRAMES - 2, 1);
   }
 
   /** How long the ball may go unseen after reaching the ring before it has gone. */
@@ -823,13 +912,18 @@ export class ShotDetector {
    */
   private decide(t: number, made: boolean, confident: boolean, crossMargin?: number, at?: number, crossSide?: number): DetectedShot {
     const reached = this.pending !== null || this.nearAt !== null || this.touchedAt !== null;
+    // Started from a lone sighting (SLOW_PACE): no crossing was seen, so the
+    // call is never sure and has no margin, whatever the net did
+    const lone = this.loneShot;
+    this.loneShot = false;
+    this.lone = null;
     const shot: DetectedShot = {
       t: at ?? t,
       made,
-      confident,
-      ...(crossMargin === undefined ? {} : { crossMargin }),
+      confident: confident && !lone,
+      ...(crossMargin === undefined || lone ? {} : { crossMargin }),
       // Only with a margin: a side without a crossing is a guess
-      ...(crossMargin === undefined || crossSide === undefined ? {} : { crossSide }),
+      ...(crossMargin === undefined || crossSide === undefined || lone ? {} : { crossSide }),
       ...(this.touchedAt !== null ? { touchedRim: true } : {}),
     };
     this.shots.push(shot);
