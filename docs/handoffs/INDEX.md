@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-03 · rim-finder · Find the hoop for me: trained detector, close second look, in the tracker · open: 3 → [handoff](2026-11-03-rim-finder.md)
 - 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 4 → [handoff](2026-11-03-tracker-accuracy-bench.md)
 - 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
 - 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
@@ -31,4 +32,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-21 · coach-side-c1-c2 · Coach setup, coach home, mode switch, safeguarding; live, tester-checked · open: 5 → [handoff](2026-10-21-coach-side-c1-c2.md)
 - 2026-10-21 · funnel-demo-progress-coach-plan · Player funnel, landing demo, progress cards, add friend, FAQ; coach plan · open: 8 → [handoff](2026-10-21-funnel-demo-progress-coach-plan.md)
 - 2026-10-21 · app-review-fixes · Tester walkthrough of 40 pages; name filter, layout and copy fixes, shipped · open: 1 → [handoff](2026-10-21-app-review-fixes.md)
-- 2026-10-21 · first-run-tutorial · Welcome screen, sample tracker clip, starting steps +150 XP, promo on site · open: 1 → [handoff](2026-10-21-first-run-tutorial.md)
