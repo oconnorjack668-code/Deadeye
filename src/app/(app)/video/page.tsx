@@ -1,6 +1,6 @@
 // src/app/(app)/video/page.tsx
 import React from 'react';
-import { requireUser, getCurrentProfile, getHasPro } from '@/lib/auth';
+import { requireUser, getCurrentProfile, getHasPro, checkIsOwner } from '@/lib/auth';
 import { ProLock } from '@/components/ProGate';
 import { VideoHub, type Tab } from './VideoHub';
 import { FormTrends } from './FormTrends';
@@ -21,7 +21,7 @@ export default async function VideoPage({ searchParams }: { searchParams: Promis
   // ?tab= opens one tab directly, for app search
   const asked = (await searchParams).tab;
   const initialTab = TABS.find((t) => t === asked) ?? 'shots';
-  const [profile, isPro] = await Promise.all([getCurrentProfile(), getHasPro()]);
+  const [profile, isPro, isOwner] = await Promise.all([getCurrentProfile(), getHasPro(), checkIsOwner()]);
 
   // Form checks have been saved here since the feature shipped; this is the
   // first thing to read them back. Bounded, because a trend is about the recent
@@ -59,6 +59,7 @@ export default async function VideoPage({ searchParams }: { searchParams: Promis
           hand={profile?.dominant_hand === 'left' ? 'left' : 'right'}
           units={asMeasurementSystem(profile?.measurement_system)}
           initialTab={initialTab}
+          ownerTools={isOwner}
         />
         {/* Each form check is free; how your form changes across them is Pro.
             Only mentioned once there are enough checks for a trend to exist,

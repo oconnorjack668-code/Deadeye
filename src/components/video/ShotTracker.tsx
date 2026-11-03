@@ -44,6 +44,7 @@ import {
 import { drawBall, drawRim } from '@/lib/video/overlayArt';
 import { TrackerVideoExport } from './TrackerVideoExport';
 import { loadShootingBest, MIN_PB_ATTEMPTS, personalBest, type ShootingTally } from '@/lib/video/personalBest';
+import { benchClip } from '@/lib/video/benchLabels';
 import { useFramingCheck } from './useFramingCheck';
 import { localDateString } from '@/lib/dates';
 import { ZONE_LABELS, ZONE_SPOTS, type CourtZone } from '@/lib/court';
@@ -61,7 +62,7 @@ import { ShotReplay } from './ShotReplay';
 import { ShootingBreakdown } from '@/components/basketball/ShootingBreakdown';
 import { track } from '@/lib/events';
 import { deleteAccountRim, loadAccountRims, mergeRims, saveAccountRim } from '@/lib/video/rimSync';
-import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film, Trophy } from 'lucide-react';
+import { Camera, FileVideo, Crosshair, Square, Trash2, Plus, Activity, Play, RotateCcw, Film, Trophy, FlaskConical } from 'lucide-react';
 
 type Step = 'source' | 'calibrate' | 'tracking' | 'review';
 type Source = 'camera' | 'file';
@@ -112,10 +113,13 @@ export function ShotTracker({
   onCheckForm,
   onSummary,
   sample,
+  ownerTools = false,
 }: {
   onCheckForm?: (file: File, shotTimeMs: number) => void;
   onSummary?: (summary: ShootingSummary | null) => void;
   sample?: TrackerSample;
+  /** The owner's tools: save a checked session as a test clip for the bench (benchLabels.ts). */
+  ownerTools?: boolean;
 }) {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -238,6 +242,8 @@ export function ShotTracker({
   // with it drawn in (overlayTimeline.ts); snapshotted when the run ends
   const overlayLogRef = useRef<OverlayLog | null>(null);
   const [timeline, setTimeline] = useState<OverlayTimeline | null>(null);
+  /** After "Save for the test library": how many hand-added shots had no time to save. */
+  const [benchSaved, setBenchSaved] = useState<number | null>(null);
   /** The player's best saved session % to beat; undefined until known (personalBest.ts). */
   const [shootingBest, setShootingBest] = useState<ShootingTally | null | undefined>(undefined);
   /** The latest call, for the rim line taking its colour for a moment. */
@@ -663,6 +669,7 @@ export function ShotTracker({
       overlayLogRef.current = createOverlayLog();
       lastCallRef.current = null;
       setTimeline(null);
+      setBenchSaved(null);
       // The best to beat, fetched now while the phone is still likely online
       // and before this session is saved into it (personalBest.ts)
       if (!sample) void loadShootingBest(createClient()).then(setShootingBest);
@@ -1092,6 +1099,38 @@ export function ShotTracker({
 
   function setShotZone(id: number, value: string) {
     setShots((cur) => cur.map((x) => (x.id === id ? { ...x, zone: value ? (value as ShotZoneChoice) : undefined } : x)));
+  }
+
+  /**
+   * Owner only: saves this session's video and its checked shot list to the
+   * phone as a labelled clip for the tracker's test bench (benchLabels.ts,
+   * scripts/bench-suite.mjs). Two downloads: the video, and a .json of the
+   * labels with the same name.
+   */
+  function saveForBench() {
+    if (!replayFile || !rim) return;
+    const now = new Date();
+    const id = `owner-${localDateString()}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    const extension = replayFile.type.includes('webm') ? 'webm' : 'mp4';
+    const clip = benchClip({
+      shots,
+      rim,
+      toVideoMs: inVideo,
+      id,
+      extension,
+      note: `${source === 'camera' ? 'live camera' : 'video from phone'}, ${shots.length} shots, ${quality ? `${quality.fps.toFixed(0)} fps scored` : 'fps unknown'}`,
+    });
+    const save = (blob: Blob, name: string) => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    };
+    save(replayFile, clip.file);
+    save(new Blob([JSON.stringify(clip, null, 2)], { type: 'application/json' }), `${id}.json`);
+    setBenchSaved(clip.untimed);
   }
 
   function addShot(made: boolean) {
@@ -1792,6 +1831,34 @@ export function ShotTracker({
               </p>
             )
           )}
+          {/* Owner only: this session, checked, becomes a test clip for the
+              tracker's bench (scripts/bench-suite.mjs) */}
+          {ownerTools && replayFile && rim && shots.length > 0 && (
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3">
+              <p className="flex items-center gap-2 text-sm font-semibold text-white">
+                <FlaskConical className="h-4 w-4 text-cyan-400" aria-hidden="true" /> Test library (owner)
+              </p>
+              {benchSaved === null ? (
+                <>
+                  <p className="mt-1 text-sm text-zinc-400">
+                    Fix every call first: the list as it stands becomes the right answers. Saves the video and a labels file to this phone; copy
+                    both into the bench folder on the laptop.
+                  </p>
+                  <Button variant="secondary" size="sm" className="mt-2" onClick={saveForBench}>
+                    Save for the test library
+                  </Button>
+                </>
+              ) : (
+                <p className="mt-1 text-sm text-emerald-300">
+                  Saved.{' '}
+                  {benchSaved > 0
+                    ? `${benchSaved} shot${benchSaved === 1 ? '' : 's'} added by hand had no time in the video and were left out.`
+                    : 'Every shot had its time.'}
+                </p>
+              )}
+            </div>
+          )}
+
           <Button variant="primary" size="lg" className="w-full" isLoading={saving} onClick={saveSession}>
             Save as a Hoops session
           </Button>

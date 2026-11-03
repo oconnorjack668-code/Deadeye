@@ -197,6 +197,51 @@ as `seconds,dx,dy` in crop pixels, shifts the picture from that moment, as
 a knocked tripod does, to check the watcher notices: knocks of 5, 7 and 14
 pixels were each reported within 1.2 to 4.6 seconds.
 
+### The bench suite
+
+`scripts/bench-suite.mjs` runs the bench, the way the app runs, over every
+labelled clip and seven harder versions of each, and prints one table: half
+the pixels (a far or small rim), dim and grainy, washed out by bright windows,
+15 and 10 frames a second (slow phones), a wobbly mount, and small, dim and
+slow at once. The harder versions keep their labels, since the shots happen at
+the same moments; they stand in for conditions, not for new courts. Labels
+are in `scripts/bench-suite.json`; the clip files stay outside the repo.
+
+```bash
+DEADEYE_BENCH_DIR=~/Documents/deadeye-bench node scripts/bench-suite.mjs --label=mychange
+# one clip, some versions:  node scripts/bench-suite.mjs clip2 --variant=base,fps10
+```
+
+Versions are made with ffmpeg into `variants/` once and reused; reports and
+`summary.txt` go to `out/<label>/`. Compare a change's summary with
+`out/baseline/`.
+
+First runs (3 Nov 2026), 328 labelled attempts across both clips and all
+versions. Before: 221 right (67.4%), 60 never counted, 5 phantoms; as filmed
+both clips were already perfect. The failures were slow phones (10 fps: 4 of
+31 on clip 2, makes never counted at all), washed-out pictures (4 of 10 on
+clip 1) and a wobbly mount. Three changes, each measured:
+
+- Gaps and frame counts in `ShotDetector` follow the frame rate actually
+  arriving (`TUNED_FRAME_MS`): 226.
+- The motion threshold follows the picture's contrast (`adaptedThreshold` in
+  `motionBall.ts`): washed out went to 10/10 and 29/31.
+- On a slow phone a lone sighting just above the ring, then the net moving,
+  starts a shot, always marked unsure (`SLOW_PACE`): clip 2 at 10 fps went to
+  13/31.
+
+After: 254 right (77.4%), 37 never counted, 2 phantoms, with both clips as
+filmed unchanged at 10/10 and 31/31. Still weak: 10 fps on clip 1 (4 of 10,
+its makes enter from the top of the picture), the wobbly mount (17 of 31 on
+clip 2) and a small rim far away (23 of 31). The rim detector
+(`ml/rim-detector/`) is the next step for setup; these need real clips.
+
+New real clips come from the app: the owner sees **Save for the test library**
+under a checked session in the tracker's review, which saves the video and a
+`.json` of labels (the calls as corrected; shots added by hand have no time
+and are left out). Copy both into `DEADEYE_BENCH_DIR` and the suite picks them
+up. Players' videos never leave their phones; this is the owner's footage.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player
