@@ -1,6 +1,6 @@
 # Tracker accuracy: bench suite, slow phones, washed-out light; rim detector notebook (2026-11-03)
 
-Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-bench-variants` · Status: PR opened, merged on the founder's word ("merge once it's all checked")
+Agent: Claude Code (Opus 5.5) · Commits: 64f55b3, ef9eba2, d92af92 (#61), 7e3c0b4 (#62) · Status: merged on the founder's word ("merge once it's all checked")
 
 ## Outcome
 - `scripts/bench-suite.mjs` runs the clip bench, the app's way, over both labelled clips and 7 harder versions of each (far, dim, washed out, 15/10 fps, wobbly, all at once): 328 labelled attempts in one table.
@@ -29,7 +29,7 @@ Agent: Claude Code (Opus 5.5) · Branch: `feat/tracker-bench-variants` · Status
 - tsc, ESLint on changed files, 977 tests, `next build --webpack`; suite runs baseline, pace, contrast-lone, arrival (dropped), final spot check identical to contrast-lone.
 
 ## Open
-- Founder: run the notebook on Colab (steps in its first cell), bring back `deadeye-rim-detector-result.zip`; then Claude wires rim-finding into the app.
+- ~~Founder: run the notebook on Colab~~: done 3 Nov. The first run stopped at step 4 ("RF-DETR training dependencies are missing": `rfdetr[onnx]` has no pytorch_lightning). #62 (7e3c0b4) installs `rfdetr[train,loggers,onnx]==1.11.2`. Rim-finding shipped: [rim-finder handoff](2026-11-03-rim-finder.md).
 - Founder: send the 2 dataset links for ATTRIBUTION before the model ships.
 - Still weak: clip 1 at 10 fps (4/10), wobbly mount, far small rim. Needs real clips from the test-library button.
 - Not checked on a phone: the button's two downloads on iPhone Safari.
