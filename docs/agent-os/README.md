@@ -45,6 +45,16 @@ that fails to load is reported, never hidden: the agent opens its reply with a
 `Skills MISSING` line, and `/agent-os` puts it first in the report to the
 founder with the fix. The agent's own rules always win.
 
+## Learning
+
+Each agent keeps a knowledge file in `knowledge/` (founder's ask,
+2026-11-07): the founder's corrections written as rules, a checklist it runs
+on its own work before the founder sees it, and research findings with their
+sources. It reads the file before every task, adds a lesson whenever the
+founder corrects it, and researches its field again when the file is more
+than 30 days old. `knowledge/README.md` has the rules and which sources
+count.
+
 ## Marketing
 
 **marketing** (`.claude/agents/marketing.md`) runs on its own with

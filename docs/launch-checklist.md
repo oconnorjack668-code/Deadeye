@@ -3,6 +3,9 @@
 Written 16 October 2026. Nothing here has been bought or switched on yet; the
 code is ready for each step.
 
+**Step by step, with deadlines:** `docs/founder-setup-guide.md` (domain,
+email, Stripe Pro by 8 January 2027, club billing by 1 February 2027).
+
 ## Domains
 
 | Domain | Use | Status when checked (16 Oct 2026) |
