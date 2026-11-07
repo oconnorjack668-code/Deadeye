@@ -283,7 +283,7 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
                     }`}
                   >
                     {t.label}
-                    {counts.get(t.id) ? <span className="absolute right-1.5 top-1 text-[10px] text-white/80">{counts.get(t.id)}</span> : null}
+                    {counts.get(t.id) ? <span className="absolute right-1.5 top-1 text-xs text-white/80">{counts.get(t.id)}</span> : null}
                   </button>
                 ))}
               </div>
@@ -318,13 +318,13 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
                       >
                         <span className="w-11 flex-shrink-0 tabular-nums text-xs text-zinc-500">{clock(e.t)}</span>
                         <span className="text-zinc-300">{label}</span>
-                        {!tagCountsToBoxScore(e.type) && <span className="text-[10px] uppercase text-zinc-600">style only</span>}
+                        {!tagCountsToBoxScore(e.type) && <span className="text-xs uppercase text-zinc-500">style only</span>}
                       </button>
                       <button
                         type="button"
                         onClick={() => removeEvent(i)}
                         aria-label={`Remove ${label} at ${clock(e.t)}`}
-                        className="flex-shrink-0 text-zinc-600 hover:text-red-400"
+                        className="flex-shrink-0 text-zinc-500 hover:text-red-400"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -387,7 +387,7 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
               <Button variant="primary" size="lg" className="w-full gap-2" isLoading={savingGame} onClick={() => void saveAsGame()}>
                 <ClipboardList className="h-4 w-4" /> Save as a game
               </Button>
-              <p className="text-xs text-zinc-500">
+              <p className="text-sm text-zinc-500">
                 Saves to your game stats and season averages. Every number comes from a play you tagged.
               </p>
             </div>

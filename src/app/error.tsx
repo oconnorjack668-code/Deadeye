@@ -24,7 +24,7 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
             ? 'The page stopped loading part-way, usually from a weak signal. Check your connection and try again.'
             : 'That one rimmed out. The problem has been reported automatically. Try again, or head back to your dashboard.'}
         </p>
-        {error.digest && <p className="mt-2 text-[11px] text-zinc-600">Error code: {error.digest}</p>}
+        {error.digest && <p className="mt-2 text-sm text-zinc-500">Error code: {error.digest}</p>}
         <div className="mt-5 flex flex-col gap-2">
           <button
             type="button"

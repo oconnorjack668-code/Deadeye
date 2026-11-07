@@ -1,6 +1,7 @@
 // src/app/(app)/profile/ProfileSettings.tsx
 'use client';
 
+import { SAVED_RIMS_KEY } from '@/lib/video/rimMemory';
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -56,6 +57,7 @@ export function ProfileSettings({ initialIsPublic, showLeaderboard = true }: { i
       try {
         localStorage.removeItem('hoopiq-offline-queue-v1');
         localStorage.removeItem('hoopiq-exercise-cache-v1');
+        localStorage.removeItem(SAVED_RIMS_KEY);
       } catch {
         // storage unavailable
       }
@@ -111,7 +113,7 @@ export function ProfileSettings({ initialIsPublic, showLeaderboard = true }: { i
           >
             Download my data
           </a>
-          <p className="mt-2 text-xs text-zinc-500">
+          <p className="mt-2 text-sm text-zinc-500">
             See the <a href="/privacy" className="underline">Privacy Policy</a> and{' '}
             <a href="/terms" className="underline">Terms of Use</a>.
           </p>

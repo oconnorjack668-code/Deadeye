@@ -73,7 +73,7 @@ export function ClubBoard({
               {clubInitials(club.name)}
             </span>
             <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-orange-300">Club board</p>
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-orange-300">Club board</p>
               <h1 className="truncate text-2xl font-black tracking-tight text-white md:text-4xl">{club.name}</h1>
               {club.place && (
                 <p className="mt-0.5 flex items-center gap-1 text-sm text-zinc-400">
@@ -101,7 +101,7 @@ export function ClubBoard({
           </div>
         </div>
 
-        <p className="flex items-start gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 text-xs leading-relaxed text-zinc-400">
+        <p className="flex items-start gap-2 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 text-sm leading-relaxed text-zinc-400">
           <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />
           <span>
             Only the players and coaches of {club.name}&apos;s teams can see this board, and Deadeye checks with the club before a team
@@ -118,7 +118,7 @@ function Stat({ label, value, small = false }: { label: string; value: string; s
   return (
     <div className="min-w-0 rounded-2xl border border-white/5 bg-zinc-950/50 px-3 py-2.5 backdrop-blur-sm">
       <dd className={`truncate font-black tabular-nums text-white ${small ? 'text-sm leading-6' : 'text-xl'}`}>{value}</dd>
-      <dt className="text-[11px] leading-tight text-zinc-400">{label}</dt>
+      <dt className="text-xs leading-tight text-zinc-400">{label}</dt>
     </div>
   );
 }
@@ -169,7 +169,7 @@ function ChallengeCard({ challenge, coachTeams, today }: { challenge: ClubChalle
           <div>
             <h2 className="font-bold text-white">Club challenge</h2>
             {challenge && (
-              <p className="text-xs text-zinc-400">
+              <p className="text-sm text-zinc-400">
                 {shortDate(challenge.starts_on)} to {shortDate(challenge.ends_on)}
               </p>
             )}
@@ -177,7 +177,7 @@ function ChallengeCard({ challenge, coachTeams, today }: { challenge: ClubChalle
         </div>
         {challenge && (
           <span
-            className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${
+            className={`rounded-full px-2.5 py-1 text-xs font-bold ${
               done ? 'bg-emerald-500/20 text-emerald-300' : left > 0 ? 'bg-zinc-800 text-zinc-200' : 'bg-zinc-800 text-zinc-500'
             }`}
           >
@@ -212,7 +212,7 @@ function ChallengeCard({ challenge, coachTeams, today }: { challenge: ClubChalle
               className="h-full rounded-full bg-gradient-to-r from-orange-500 via-amber-400 to-yellow-300 shadow-[0_0_14px_rgba(251,191,36,0.45)] transition-[width] duration-700"
             />
           </div>
-          <p className="mt-2.5 text-xs text-zinc-400">
+          <p className="mt-2.5 text-sm text-zinc-400">
             {done
               ? `The club hit ${num(challenge.target)} ${metricLabel(challenge.metric, challenge.target)}. Brilliant work, everyone.`
               : `${num(challenge.target - challenge.progress)} to go. Every ${challenge.metric === 'shots' ? 'shot' : 'session'} logged by a player on the club's teams counts.`}
@@ -220,15 +220,15 @@ function ChallengeCard({ challenge, coachTeams, today }: { challenge: ClubChalle
         </div>
       ) : (
         <div className="mt-4 rounded-2xl border border-dashed border-zinc-700 p-4 text-center">
-          <Target className="mx-auto h-7 w-7 text-zinc-600" />
+          <Target className="mx-auto h-7 w-7 text-zinc-500" />
           <p className="mt-1.5 text-sm font-semibold text-zinc-200">No club challenge right now</p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             {isCoach ? 'Set one for the whole club: sessions or shots, for up to 3 months.' : 'Your coaches can set one for the whole club.'}
           </p>
         </div>
       )}
 
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
 
       {isCoach && !editing && (
         <div className="mt-4 flex items-center gap-3">
@@ -329,7 +329,7 @@ function ChallengeEditor({ coachTeams, onDone }: { coachTeams: CoachTeam[]; onDo
       {coachTeams.length > 1 && (
         <TeamPicker teams={coachTeams} value={teamId} onChange={setTeamId} label="Set it as coach of" />
       )}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
       <div className="flex gap-2">
         <Button size="sm" variant="primary" className="flex-1" isLoading={busy} onClick={() => void start()}>
           Start challenge
@@ -338,7 +338,7 @@ function ChallengeEditor({ coachTeams, onDone }: { coachTeams: CoachTeam[]; onDo
           Cancel
         </Button>
       </div>
-      <p className="text-[11px] text-zinc-500">A new challenge replaces the current one. Everyone sees one club total, never a player.</p>
+      <p className="text-sm text-zinc-500">A new challenge replaces the current one. Everyone sees one club total, never a player.</p>
     </div>
   );
 }
@@ -375,7 +375,7 @@ function TeamRace({ race }: { race: ReturnType<typeof teamRace> }) {
         </span>
         <div>
           <h2 className="font-bold text-white">This week</h2>
-          <p className="text-xs text-zinc-400">Sessions logged in the last 7 days, by team</p>
+          <p className="text-sm text-zinc-400">Sessions logged in the last 7 days, by team</p>
         </div>
       </div>
       {race.length === 0 ? (
@@ -399,7 +399,7 @@ function TeamRace({ race }: { race: ReturnType<typeof teamRace> }) {
                     <div className="flex items-baseline justify-between gap-2">
                       <span className="min-w-0 truncate text-sm font-semibold text-white">
                         {t.name}
-                        {t.mine && <span className="ml-1.5 text-[11px] font-bold text-orange-300">Your team</span>}
+                        {t.mine && <span className="ml-1.5 text-xs font-bold text-orange-300">Your team</span>}
                       </span>
                       {t.sessions_7d !== null && <span className="text-sm font-black tabular-nums text-white">{num(t.sessions_7d)}</span>}
                     </div>
@@ -413,12 +413,12 @@ function TeamRace({ race }: { race: ReturnType<typeof teamRace> }) {
                             }`}
                           />
                         </div>
-                        <p className="mt-1 truncate text-[11px] text-zinc-500">
+                        <p className="mt-1 truncate text-sm text-zinc-500">
                           {[`${t.active_7d} of ${t.players} trained`, `${num(t.shots_7d ?? 0)} shots`, details].filter(Boolean).join(' · ')}
                         </p>
                       </>
                     ) : (
-                      <p className="mt-0.5 truncate text-[11px] text-zinc-500">
+                      <p className="mt-0.5 truncate text-sm text-zinc-500">
                         {[details, 'Totals show from 3 players'].filter(Boolean).join(' · ')}
                       </p>
                     )}
@@ -456,7 +456,7 @@ function Notices({
         </span>
         <div>
           <h2 className="font-bold text-white">Notices</h2>
-          <p className="text-xs text-zinc-400">From the head coaches, to everyone at {clubName}</p>
+          <p className="text-sm text-zinc-400">From the head coaches, to everyone at {clubName}</p>
         </div>
       </div>
       {coachTeams.length > 0 && <Composer coachTeams={coachTeams} />}
@@ -464,7 +464,7 @@ function Notices({
         <div className="rounded-3xl border border-dashed border-zinc-800 p-8 text-center">
           <Users className="mx-auto h-8 w-8 text-zinc-700" />
           <p className="mt-2 text-sm font-semibold text-zinc-300">No notices yet</p>
-          <p className="text-xs text-zinc-500">Training changes, game days and shout-outs from your coaches show up here.</p>
+          <p className="text-sm text-zinc-500">Training changes, game days and shout-outs from your coaches show up here.</p>
         </div>
       ) : (
         <ul className="space-y-3">
@@ -521,10 +521,10 @@ function Composer({ coachTeams }: { coachTeams: CoachTeam[] }) {
             {coachTeams.length > 1 ? (
               <TeamPicker teams={coachTeams} value={teamId} onChange={setTeamId} label="As coach of" />
             ) : (
-              <p className="truncate text-xs text-zinc-500">As head coach of {coachTeams[0].name}</p>
+              <p className="truncate text-sm text-zinc-500">As head coach of {coachTeams[0].name}</p>
             )}
           </div>
-          <span className={`text-[11px] tabular-nums ${length > NOTICE_MAX ? 'text-red-400' : length > NOTICE_MAX - 50 ? 'text-amber-300' : 'text-zinc-600'}`}>
+          <span className={`text-xs tabular-nums ${length > NOTICE_MAX ? 'text-red-400' : length > NOTICE_MAX - 50 ? 'text-amber-300' : 'text-zinc-500'}`}>
             {length}/{NOTICE_MAX}
           </span>
           <Button size="sm" variant="primary" isLoading={busy} disabled={!!problem || length < 2} onClick={() => void post()}>
@@ -532,8 +532,8 @@ function Composer({ coachTeams }: { coachTeams: CoachTeam[] }) {
           </Button>
         </div>
       </div>
-      {(error || problem) && <p className="px-2 text-xs text-amber-300">{error || problem}</p>}
-      <p className="px-2 text-[11px] text-zinc-500">Everyone on the club&apos;s teams sees it, and nobody can reply. No emails, phone numbers or links.</p>
+      {(error || problem) && <p className="px-2 text-sm text-amber-300">{error || problem}</p>}
+      <p className="px-2 text-sm text-zinc-500">Everyone on the club&apos;s teams sees it, and nobody can reply. No emails, phone numbers or links.</p>
     </div>
   );
 }
@@ -559,10 +559,10 @@ function NoticeCard({ notice, canDelete, isNew, now }: { notice: ClubNotice; can
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="text-sm font-semibold text-white">{notice.author_name}</span>
-            {notice.team_name && <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] font-medium text-zinc-300">{notice.team_name}</span>}
-            {isNew && <span className="rounded-full bg-sky-400 px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wide text-zinc-950">New</span>}
+            {notice.team_name && <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs font-medium text-zinc-300">{notice.team_name}</span>}
+            {isNew && <span className="rounded-full bg-sky-400 px-1.5 py-0.5 text-xs font-black uppercase tracking-wide text-zinc-950">New</span>}
           </div>
-          <p className="mt-0.5 flex items-center gap-1 text-[11px] text-zinc-500">
+          <p className="mt-0.5 flex items-center gap-1 text-sm text-zinc-500">
             <CalendarDays className="h-3 w-3" /> Head coach · {timeAgo(notice.created_at, now)}
           </p>
           <p className="mt-2.5 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-zinc-100">{notice.body}</p>
@@ -573,7 +573,7 @@ function NoticeCard({ notice, canDelete, isNew, now }: { notice: ClubNotice; can
             onClick={() => void remove()}
             disabled={busy}
             aria-label="Delete notice"
-            className="-mr-1 -mt-1 rounded-lg p-1.5 text-zinc-600 hover:bg-zinc-800 hover:text-zinc-300"
+            className="-mr-1 -mt-1 rounded-lg p-1.5 text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300"
           >
             <Trash2 className="h-4 w-4" />
           </button>

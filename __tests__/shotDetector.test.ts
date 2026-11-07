@@ -328,6 +328,22 @@ describe('ShotDetector', () => {
     expect(shot.crossMargin).toBeLessThan(0.2);
   });
 
+  it('keeps which side a miss crossed on, and does not say the rim was hit when it was not', () => {
+    // Comes down well to the left of the ring: half-rim is 0.03, so 0.44 is 2 half-rims left
+    const left = new ShotDetector(RIM);
+    left.push({ t: 0, ball: { x: 0.44, y: 0.1 } });
+    for (let i = 1; i <= 12; i++) left.push({ t: i * 33, ball: { x: 0.44, y: 0.1 + i * 0.02 } });
+    expect(left.shots[0].made).toBe(false);
+    expect(left.shots[0].crossSide).toBeCloseTo(-2, 1);
+    expect(left.shots[0].touchedRim).toBeUndefined();
+
+    const right = new ShotDetector(RIM);
+    right.push({ t: 0, ball: { x: 0.56, y: 0.1 } });
+    for (let i = 1; i <= 12; i++) right.push({ t: i * 33, ball: { x: 0.56, y: 0.1 + i * 0.02 } });
+    expect(right.shots[0].crossSide).toBeCloseTo(2, 1);
+    expect(right.shots[0].crossMargin).toBeCloseTo(Math.abs(right.shots[0].crossSide!), 6);
+  });
+
   it('ignores the ball when it is nowhere near the hoop (dribbling, passing)', () => {
     const dribbling: BallObservation[] = Array.from({ length: 90 }, (_, i) => ({
       t: i * 33,

@@ -97,13 +97,13 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
             Finish all four for a <span className="font-bold text-amber-300">+{STARTER_BONUS_XP} XP</span> bonus.
           </p>
         </div>
-        <button type="button" onClick={hide} aria-label="Hide the starting steps" className="flex-shrink-0 p-1 text-zinc-600 hover:text-zinc-300">
+        <button type="button" onClick={hide} aria-label="Hide the starting steps" className="flex-shrink-0 p-1 text-zinc-500 hover:text-zinc-300">
           <X className="h-4 w-4" />
         </button>
       </div>
 
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-zinc-800">
-        <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${(count / 4) * 100}%` }} />
+        <div className="deadeye-fill h-full rounded-full bg-amber-400 transition-[width] duration-300" style={{ width: `${(count / 4) * 100}%` }} />
       </div>
 
       <ol className="mt-3 space-y-1.5">
@@ -123,7 +123,7 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
                   <span className="block text-sm font-semibold text-white">{step.title}</span>
                   <span className="block text-xs text-zinc-500">{step.detail}</span>
                 </span>
-                <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+                <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
               </Link>
             </li>
           )
@@ -135,7 +135,7 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
           <Gift className="h-5 w-5" /> Claim +{STARTER_BONUS_XP} XP
         </Button>
       )}
-      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
     </div>
   );
 }

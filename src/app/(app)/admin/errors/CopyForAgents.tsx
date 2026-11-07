@@ -23,7 +23,7 @@ export function CopyForAgents({ text }: { text: string }) {
   return (
     <details className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
       <summary className="cursor-pointer text-sm font-semibold text-white">Copy for the agents</summary>
-      <p className="mt-2 text-xs text-zinc-400">
+      <p className="mt-2 text-sm text-zinc-400">
         Open reports and crashes with names, emails, numbers, links and ages taken out. A report that could still say who
         someone is (a school, a place, an address or a name) is held back, and you read it here yourself. Paste the rest to
         support-triage, or save it as docs/agent-os/data/YYYY-MM-DD-reports.md.

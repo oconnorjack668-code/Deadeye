@@ -63,6 +63,11 @@ shown or named without a parent's written consent.
 | Founder only | Push to main, run a migration, write production data, send anything to a player, parent or coach, post on social media, spend money, change pricing or legal text |
 | Off limits | `.env.local`, every secret and the database; names, emails, user ids or any per-player data. Agents work from counts and redacted reports |
 
+One exception to the database rule (founder, 2026-11-01): in a session the
+founder is in, Claude may run `docs/check-migrations.sql` through the Supabase
+connection in `.mcp.json`. It reads only table, column, function and index
+names, never rows. Anything else, a migration included, stays founder only.
+
 GitHub enforces the main line: with branch protection on `main` (pull
 request required, `checks` must pass, no force pushes), nothing reaches the
 live app without a pull request and green checks, whoever pushes.

@@ -61,6 +61,28 @@ lint error. If you add a table or column in a migration, add it there too,
 including its `Relationships: []` entry — and if you add an enum-like `CHECK`
 constraint, widen the matching TypeScript union, which has drifted before.
 
+## Preview deployments
+
+Every pull request gets a Vercel preview. Since 2 Nov 2026 previews can be
+signed in to, which is how a change is checked before it goes live:
+
+- **Private.** Deployment Protection is on (Standard), so a preview link asks
+  for a Vercel login first. The production address stays public.
+- **Live data.** Previews have `NEXT_PUBLIC_SUPABASE_URL` and
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, so they read and write the **live
+  database**. Sign in only as the tester account, and do not save anything you
+  would not want in production.
+- **No service key.** `SUPABASE_SERVICE_ROLE_KEY` (and any copy of it) is
+  Production-only, so unreviewed code never holds a key that bypasses row level
+  security. Features that use it fail on previews by design: data export,
+  account deletion, AI coach chat, the founding claim, photo upload and the
+  parent links. Player screens are unaffected.
+- **Built in.** `NEXT_PUBLIC_*` values are fixed when a preview is built; after
+  changing one in Vercel, a new build is needed.
+
+When migrations need testing on their own, the next step is a separate
+Supabase project for previews.
+
 ## Layout
 
 ```
@@ -160,10 +182,70 @@ check. With the taps on the ring's edges it gets 31 of 31.
 The first clip stays at 10 of 10. `DEADEYE_BENCH_START` and `_END`, in
 seconds, run one stretch of a clip, for trying variations on a single shot.
 
-The one still wrong whatever the taps is a ball that hit the rim, bounced
-back towards the camera and fell past the front of the net while the net was
-still shaking from the hit. On screen that looks exactly like a make. The
-other errors come with taps a long way off the ring.
+The errors that remain come with taps off the ring's edges. A ball off the
+rim towards the camera, falling past the front of the net, was once wrong
+whatever the taps; with the taps on the edges it is now called right. Its
+apparent size was checked as a cue (1 Nov 2026) and does not help: on the
+84.9s miss the ball falls past the net at the same size it arrived at.
+
+In three-frame mode the bench runs the app's own pipeline,
+`src/lib/video/trackerPipeline.ts`, the code the phone's worker runs, so it
+cannot drift from the app. It also reports the camera watcher
+(`src/lib/video/cameraShift.ts`): `camera moved` should say `never` on a
+tripod clip, and did on all 13 runs of both clips. `DEADEYE_BENCH_KNOCK`,
+as `seconds,dx,dy` in crop pixels, shifts the picture from that moment, as
+a knocked tripod does, to check the watcher notices: knocks of 5, 7 and 14
+pixels were each reported within 1.2 to 4.6 seconds.
+
+### The bench suite
+
+`scripts/bench-suite.mjs` runs the bench, the way the app runs, over every
+labelled clip and seven harder versions of each, and prints one table: half
+the pixels (a far or small rim), dim and grainy, washed out by bright windows,
+15 and 10 frames a second (slow phones), a wobbly mount, and small, dim and
+slow at once. The harder versions keep their labels, since the shots happen at
+the same moments; they stand in for conditions, not for new courts. Labels
+are in `scripts/bench-suite.json`; the clip files stay outside the repo.
+
+```bash
+DEADEYE_BENCH_DIR=~/Documents/deadeye-bench node scripts/bench-suite.mjs --label=mychange
+# one clip, some versions:  node scripts/bench-suite.mjs clip2 --variant=base,fps10
+```
+
+Versions are made with ffmpeg into `variants/` once and reused; reports and
+`summary.txt` go to `out/<label>/`. Compare a change's summary with
+`out/baseline/`.
+
+First runs (3 Nov 2026), 328 labelled attempts across both clips and all
+versions. Before: 221 right (67.4%), 60 never counted, 5 phantoms; as filmed
+both clips were already perfect. The failures were slow phones (10 fps: 4 of
+31 on clip 2, makes never counted at all), washed-out pictures (4 of 10 on
+clip 1) and a wobbly mount. Three changes, each measured:
+
+- Gaps and frame counts in `ShotDetector` follow the frame rate actually
+  arriving (`TUNED_FRAME_MS`): 226.
+- The motion threshold follows the picture's contrast (`adaptedThreshold` in
+  `motionBall.ts`): washed out went to 10/10 and 29/31.
+- On a slow phone a lone sighting just above the ring, then the net moving,
+  starts a shot, always marked unsure (`SLOW_PACE`): clip 2 at 10 fps went to
+  13/31.
+
+After: 254 right (77.4%), 37 never counted, 2 phantoms, with both clips as
+filmed unchanged at 10/10 and 31/31. Still weak: 10 fps on clip 1 (4 of 10,
+its makes enter from the top of the picture), the wobbly mount (17 of 31 on
+clip 2) and a small rim far away (23 of 31). The rim detector
+(`ml/rim-detector/`) is the next step for setup; these need real clips.
+
+New real clips come from the app: the owner sees **Save for the test library**
+under a checked session in the tracker's review, which saves the video and a
+`.json` of labels (the calls as corrected; shots added by hand have no time
+and are left out). Copy both into `DEADEYE_BENCH_DIR` and the suite picks them
+up. Players' videos never leave their phones; this is the owner's footage.
+
+Every session saved from the tracker now keeps the tracker's own calls next
+to the player's corrections, so real-world accuracy, by camera or upload and
+by phone type, is at `/admin/tracker`. Read it as an upper bound: a player
+who saves without checking agrees with every call.
 
 ## Three deliberate design decisions
 

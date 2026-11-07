@@ -162,7 +162,7 @@ export default function WorkoutBuilderPage() {
                 </button>
               </div>
               <p className="text-sm text-zinc-400 mb-3">{workout.warmupMinutes} min warm-up: jog, skips, leg swings, lunges with a twist, form shots close to the rim.</p>
-              {courtOnlyFocus && <p className="text-xs text-amber-400 mb-3">Court skills need a court, so this gym workout only includes gym exercises.</p>}
+              {courtOnlyFocus && <p className="text-sm text-amber-400 mb-3">Court skills need a court, so this gym workout only includes gym exercises.</p>}
 
               {workout.drills.length > 0 && (
                 <div className="space-y-1.5 mb-3">

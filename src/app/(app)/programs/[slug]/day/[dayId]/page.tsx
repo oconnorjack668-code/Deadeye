@@ -199,7 +199,7 @@ export default async function ProgramDayPage({ params }: { params: Promise<{ slu
           {isActive ? (
             <CompleteDayButton enrollmentId={active!.enrollmentId} dayId={day.id} done={done} totalDays={active!.days.length} completedCount={active!.completedIds.size} />
           ) : (
-            <p className="text-center text-xs text-zinc-500">Start this program to track completed sessions.</p>
+            <p className="text-center text-sm text-zinc-500">Start this program to track completed sessions.</p>
           )}
         </div>
       </div>

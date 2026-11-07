@@ -73,6 +73,46 @@ export const MAX_SIZE_RATIO = 2.2;
 /** Default per-channel difference before a pixel counts as having moved. */
 export const DEFAULT_DIFF_THRESHOLD = 28;
 
+/**
+ * Brightness spread (luma p90 - p10) of an ordinary hoop crop. Both bench
+ * clips measure about 107 as filmed (3 Nov 2026).
+ */
+export const REFERENCE_SPREAD = 100;
+/** Lowest the difference threshold goes on a flat picture, as a share of the default. */
+export const MIN_THRESHOLD_SCALE = 0.5;
+
+/**
+ * How far apart the dark and bright parts of a picture are: luma at the 90th
+ * percentile less the 10th, from every `step`th pixel.
+ *
+ * A fixed difference threshold assumes a fixed contrast. Behind bright
+ * windows, or in a hazy gym, everything in the picture is squeezed together -
+ * the bench's washed-out clips measure 56 against 107 - and so is the change a
+ * ball makes as it passes, which drops under the threshold. On those the ball
+ * was found on a third of the frames it was as filmed, and 4 of 10 calls were
+ * right on the first clip.
+ */
+export function lumaSpread(px: Uint8ClampedArray, step = 7): number {
+  const hist = new Uint32Array(256);
+  let n = 0;
+  for (let p = 0; p + 2 < px.length; p += 4 * step) {
+    hist[Math.round(0.299 * px[p] + 0.587 * px[p + 1] + 0.114 * px[p + 2])]++;
+    n++;
+  }
+  if (!n) return REFERENCE_SPREAD;
+  const at = (q: number) => {
+    let seen = 0;
+    for (let v = 0; v < 256; v++) if ((seen += hist[v]) >= q * n) return v;
+    return 255;
+  };
+  return at(0.9) - at(0.1);
+}
+
+/** The difference threshold for a picture of this spread: lowered on a flat one, never raised. */
+export function adaptedThreshold(spread: number, base = DEFAULT_DIFF_THRESHOLD): number {
+  return base * Math.min(1, Math.max(MIN_THRESHOLD_SCALE, spread / REFERENCE_SPREAD));
+}
+
 /** Perceived brightness, for comparing two pixels cheaply. */
 export function luma(r: number, g: number, b: number): number {
   return 0.299 * r + 0.587 * g + 0.114 * b;

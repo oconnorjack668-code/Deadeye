@@ -141,7 +141,7 @@ export function TestActions({ test }: { test: Test }) {
         Notes
         <input value={notes} maxLength={500} onChange={(e) => setNotes(e.target.value)} className={`mt-1 ${field}`} />
       </label>
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="outline" size="sm" onClick={() => setEditing(false)} disabled={busy}>
           Cancel

@@ -168,9 +168,9 @@ export default async function AdminErrorsPage() {
             reports.map((r) => (
               <div key={r.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
                 <p className="whitespace-pre-wrap break-words text-sm text-zinc-100">{r.message}</p>
-                {r.context && <p className="mt-2 break-words text-xs text-zinc-400">{r.context}</p>}
+                {r.context && <p className="mt-2 break-words text-sm text-zinc-400">{r.context}</p>}
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-sm text-zinc-500">
                     {(r.url || 'unknown page').split('?')[0]} · {when(r.created_at)} · {device(r.user_agent)}
                   </p>
                   <form action={markReportRead}>
@@ -207,21 +207,21 @@ export default async function AdminErrorsPage() {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-mono text-sm text-red-300 break-words">{latest.message}</p>
-                  <p className="mt-1 text-xs text-zinc-500">
+                  <p className="mt-1 text-sm text-zinc-500">
                     {latest.source} · {[...pages].slice(0, 3).join(', ') || 'unknown page'} · last {when(latest.created_at)} ·{' '}
                     {device(latest.user_agent)}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
                   <div className="text-lg font-black text-white">{count}×</div>
-                  <div className="text-[11px] text-zinc-500">{players.size} {players.size === 1 ? 'player' : 'players'}</div>
+                  <div className="text-xs text-zinc-500">{players.size} {players.size === 1 ? 'player' : 'players'}</div>
                 </div>
               </div>
             </summary>
             {latest.stack && (
-              <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-zinc-950 p-3 text-[11px] text-zinc-400 whitespace-pre-wrap">{latest.stack}</pre>
+              <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-zinc-950 p-3 text-xs text-zinc-400 whitespace-pre-wrap">{latest.stack}</pre>
             )}
-            {latest.digest && <p className="mt-2 text-xs text-zinc-500">Digest: {latest.digest}</p>}
+            {latest.digest && <p className="mt-2 text-sm text-zinc-500">Digest: {latest.digest}</p>}
             <form action={markResolved} className="mt-3">
               <input type="hidden" name="id" value={latest.id} />
               <button type="submit" className="rounded-lg bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-200 hover:bg-zinc-700">

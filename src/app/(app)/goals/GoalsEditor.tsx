@@ -145,7 +145,7 @@ export function GoalsEditor({ goals }: { goals: GoalRow[] }) {
         <Button variant="primary" isLoading={busy} onClick={addGoal}>
           Add goal
         </Button>
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
       </div>
     </div>
   );

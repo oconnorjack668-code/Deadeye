@@ -18,8 +18,10 @@ const files = fs
 
 describe('docs/check-migrations.sql', () => {
   it('is up to date with supabase/migrations (run: node scripts/build-migration-check.mjs)', () => {
+    // A Windows checkout (core.autocrlf) turns the file's line endings into \r\n.
+    const lf = (s: string) => s.replace(/\r\n/g, '\n');
     const committed = fs.readFileSync(path.join(__dirname, '..', 'docs', 'check-migrations.sql'), 'utf8');
-    expect(committed).toBe(buildCheck(files));
+    expect(lf(committed)).toBe(lf(buildCheck(files)));
   });
 
   it('has no apostrophe in its comments, like every migration (see 00035)', () => {

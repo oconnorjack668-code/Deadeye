@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'October 22, 2026';
+const LAST_UPDATED = 'November 3, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -21,7 +21,7 @@ export default function PrivacyPage() {
       <main className="mx-auto max-w-2xl space-y-6 text-sm leading-6 text-zinc-300">
         <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">← Deadeye</Link>
         <h1 className="text-3xl font-black text-white">Privacy Policy</h1>
-        <p className="text-xs text-zinc-500">Last updated: {LAST_UPDATED}</p>
+        <p className="text-sm text-zinc-500">Last updated: {LAST_UPDATED}</p>
         <p>This policy covers Deadeye Basketball Training (&ldquo;Deadeye&rdquo;), the app and website.</p>
 
         <section className="space-y-2">
@@ -85,7 +85,17 @@ export default function PrivacyPage() {
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
-              itself runs on your phone, so videos you analyse without uploading never leave your device.
+              itself runs on your phone, so videos you analyse without uploading never leave your device. So does the
+              shot tracker&apos;s &ldquo;Find the hoop for me&rdquo;: the picture it looks at is not uploaded.
+            </li>
+            <li>
+              Hoops you save in the shot tracker: the name you give each one and where the ring sits in the picture, so
+              you do not have to mark it again. Only you can see them.
+            </li>
+            <li>
+              For each shot tracker session you save: the tracker&apos;s own call on each shot next to yours, how smoothly
+              it ran, and your phone type (iPhone, Android or other). Used only to measure and improve the tracker, and
+              only ever added up across sessions, never shown per player.
             </li>
             <li>AI coaching reports generated from your session data.</li>
             <li>Programs, goals, challenges, badges and NBA style match results.</li>
@@ -135,8 +145,8 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, and keeping the service secure rely on our
-              legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>
@@ -234,6 +244,16 @@ export default function PrivacyPage() {
           <p>
             Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the
             EU; our providers use the EU&apos;s standard contractual clauses to protect it.
+          </p>
+        </section>
+
+        <section id="credits" className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Credits</h2>
+          <p>
+            The shot tracker&apos;s hoop finder is an RF-DETR model by Roboflow (Apache 2.0), trained by Deadeye on these
+            public datasets from Roboflow Universe: &ldquo;ballllls&rdquo; (CC BY 4.0), &ldquo;X-Basket&rdquo; (CC BY
+            4.0), &ldquo;Basketball Shot Tracking&rdquo; (CC BY 4.0) and &ldquo;basketball-computer-vision&rdquo;
+            (public domain). Thank you to their authors.
           </p>
         </section>
 

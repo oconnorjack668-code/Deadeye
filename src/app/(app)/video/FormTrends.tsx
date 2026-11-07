@@ -69,7 +69,7 @@ export function FormTrends({ records }: { records: FormCheckRecord[] }) {
         <h2 className="flex items-center gap-2 font-bold text-white">
           <TrendingUp className="h-4 w-4 text-cyan-400" /> Your form over time
         </h2>
-        <p className="mt-1 text-xs text-zinc-500">Across your last {trends[0].points.length} form checks</p>
+        <p className="mt-1 text-sm text-zinc-500">Across your last {trends[0].points.length} form checks</p>
 
         <div className="mt-4 space-y-3">
           {trends.map((t) => {
@@ -85,7 +85,7 @@ export function FormTrends({ records }: { records: FormCheckRecord[] }) {
                     {t.unit}
                   </div>
                 </div>
-                <div className={moved ? 'text-cyan-400' : 'text-zinc-600'}>
+                <div className={moved ? 'text-cyan-400' : 'text-zinc-500'}>
                   <Sparkline values={t.points.map((p) => p.value)} />
                 </div>
               </div>

@@ -58,6 +58,8 @@ const USER_TABLES = [
   // The home club and any "club not listed" suggestions (00051)
   'player_clubs',
   'club_suggestions',
+  // Hoops measured with the shot tracker, kept with the account (00055)
+  'saved_rims',
 ] as const;
 
 // Browser push keys are secrets, not personal data worth handing out

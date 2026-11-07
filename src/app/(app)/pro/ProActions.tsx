@@ -74,13 +74,13 @@ export function ProActions({
             </Button>
           )}
           {chargeFrom && (
-            <p className="text-xs text-zinc-400">
+            <p className="text-sm text-zinc-400">
               Subscribing now keeps Pro running when your founding member months end. Nothing is charged until {chargeFrom}.
             </p>
           )}
         </>
       )}
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
     </div>
   );
 }

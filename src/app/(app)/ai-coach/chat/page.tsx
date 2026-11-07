@@ -38,7 +38,7 @@ export default async function CoachChatPage() {
         </div>
         <div>
           <h1 className="font-black text-white leading-tight">Ask Coach</h1>
-          <p className="text-xs text-zinc-400">Answers use your own training data</p>
+          <p className="text-sm text-zinc-400">Answers use your own training data</p>
         </div>
       </div>
       {history.error ? (

@@ -54,7 +54,7 @@ export function ClubLinkCard({ teamId, isCoach, link }: { teamId: string; isCoac
             Take this team off the club board
           </button>
         )}
-        {error && <p className="text-xs text-red-400">{error}</p>}
+        {error && <p className="text-sm text-red-400">{error}</p>}
       </div>
     );
   }
@@ -87,9 +87,9 @@ export function ClubLinkCard({ teamId, isCoach, link }: { teamId: string; isCoac
           <p className="flex items-center gap-2 text-sm font-semibold text-amber-200">
             <Clock className="h-4 w-4" /> Waiting to join {club.name}
           </p>
-          <p className="text-xs text-amber-100/60">{clubPlace(club)}
+          <p className="text-sm text-amber-100/60">{clubPlace(club)}
           </p>
-          <p className="text-xs text-amber-100/80">
+          <p className="text-sm text-amber-100/80">
             Deadeye checks with the club before any team joins its board, so only the club&apos;s own teams can see it. This usually
             takes a day or two.
           </p>
@@ -105,7 +105,7 @@ export function ClubLinkCard({ teamId, isCoach, link }: { teamId: string; isCoac
       ) : picking ? (
         <div className="space-y-2">
           <ClubSearch id={`club-board-${teamId}`} selectedId={link?.club_id} disabled={busy} onPick={(c) => void send(c.id)} />
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             Club not in the list? Tell us from Settings → Your club → &quot;My club isn&apos;t listed&quot;, and we&apos;ll add it.
           </p>
           <button type="button" onClick={() => setPicking(false)} className="text-xs text-zinc-500 underline">

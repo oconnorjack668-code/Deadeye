@@ -1,10 +1,16 @@
 @import "tailwindcss";
+/* Light and dark themes (Settings > Appearance, System by default). Generated:
+   node scripts/build-theme-css.mjs. See docs/design.md, "Light and dark". */
+@import "./theme.css";
 
-/* Deadeye is a dark-only app */
+/* Dark until the theme script in the root layout says otherwise */
 :root {
   --background: #09090b;
   --foreground: #f4f4f5;
   color-scheme: dark;
+  /* The app's one easing curve: quick to start, gentle to land (Material's
+     standard curve). Interface changes run 150-300ms on it. */
+  --ease-deadeye: cubic-bezier(0.2, 0, 0, 1);
 }
 
 @theme inline {
@@ -12,6 +18,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+}
+
+/* Contrast fixes to Tailwind's palette, measured against WCAG 2.2 AA (4.5:1
+   for text). zinc-500, the app's secondary text, was 3.8:1 on a card. White on
+   orange-600, every primary button, was 3.6:1, and on emerald-600 3.8:1: both
+   take their 700 shade, 5.2:1 and 5.5:1. theme.css sets the light values. */
+@theme {
+  --color-zinc-500: #8b8b94;
+  --color-orange-600: oklch(55.3% 0.195 38.402);
+  --color-emerald-600: oklch(50.8% 0.118 165.612);
 }
 
 body {
@@ -77,11 +93,78 @@ body {
   }
 }
 
+/* A progress bar filling to where it stands, once, when it first appears:
+   progress you can see happen. The width is set inline as usual. */
+@keyframes deadeye-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.deadeye-fill {
+  transform-origin: left;
+  animation: deadeye-fill 450ms var(--ease-deadeye) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deadeye-fill {
+    animation: none;
+  }
+}
+
 /* Someone filming their own shooting does not need it bouncing at them */
 @media (prefers-reduced-motion: reduce) {
   .deadeye-flash {
     animation: deadeye-flash 1.4s step-end forwards;
     transform: none;
+  }
+}
+
+/* A milestone on the tracker ("10 makes"): pops in, holds long enough to read
+   from the arc, fades. Drawn the same way in a saved video (overlayArt's
+   bannerCurve), so keep the two in step. */
+@keyframes deadeye-banner {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  7% {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+  12% {
+    transform: scale(1);
+  }
+  84% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+.deadeye-banner {
+  transform-origin: left center;
+  animation: deadeye-banner 2.5s ease-out forwards;
+}
+
+@keyframes deadeye-banner-still {
+  0%,
+  99% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deadeye-banner {
+    animation: deadeye-banner-still 2.5s step-end forwards;
   }
 }
 

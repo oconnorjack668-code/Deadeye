@@ -85,7 +85,7 @@ export default function UpdatePasswordPage() {
         <div className="flex flex-col items-center mb-8 text-center">
           <Logo size={56} className="mb-3" />
           <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
         </div>
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
@@ -142,7 +142,7 @@ export default function UpdatePasswordPage() {
                   Save New Password
                 </Button>
 
-                <p className="text-xs text-center text-zinc-400">
+                <p className="text-sm text-center text-zinc-400">
                   Link stopped working?{' '}
                   <Link href="/reset-password" className="font-semibold text-red-400 hover:text-red-300 transition-colors">
                     Send a new one

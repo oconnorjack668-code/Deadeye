@@ -77,7 +77,7 @@ export default async function FuelPage() {
           </div>
         </div>
 
-        <p className="mt-5 text-xs text-zinc-500">
+        <p className="mt-5 text-sm text-zinc-500">
           This tracks habits, not calories. If you want to change how you eat for sport, talk to a parent, a coach
           or a dietitian rather than guessing from an app.
         </p>

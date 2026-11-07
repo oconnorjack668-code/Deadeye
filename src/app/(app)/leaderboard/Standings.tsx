@@ -44,19 +44,19 @@ function PodiumSpot({ player, look, first }: { player: Standing; look?: RowLook;
       </div>
       <span className="mt-2 w-full truncate text-center text-sm font-bold text-white group-hover:underline">{player.player_name}</span>
       {player.is_me ? (
-        <Badge variant="brand" className="mt-0.5 px-2 py-0 text-[10px]">
+        <Badge variant="brand" className="mt-0.5 px-2 py-0 text-xs">
           You
         </Badge>
       ) : look?.isOwner ? (
         <FounderBadge className="mt-0.5" />
       ) : look?.level ? (
-        <span className="mt-0.5 text-[11px] font-semibold text-zinc-500">Lv {look.level}</span>
+        <span className="mt-0.5 text-xs font-semibold text-zinc-500">Lv {look.level}</span>
       ) : null}
       <div
         className={`mt-2 flex w-full flex-col items-center justify-start rounded-t-2xl border border-b-0 bg-gradient-to-b to-transparent pt-2 ${tier.block} ${tier.height}`}
       >
         <span className={`text-2xl font-black tabular-nums ${tier.text}`}>{player.points}</span>
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-500">pts</span>
+        <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">pts</span>
       </div>
     </Link>
   );
@@ -67,7 +67,6 @@ export function Podium({ top, looks }: { top: Standing[]; looks: Map<string, Row
   const order = top.length === 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : top;
   return (
     <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/60 px-3 pt-5 sm:px-8">
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-0 h-48 w-48 -translate-x-1/2 rounded-full bg-amber-400/10 blur-3xl" />
       <div className="relative mx-auto flex max-w-md items-end gap-2 sm:gap-4">
         {order.map((p) => (
           <PodiumSpot key={p.user_id} player={p} look={looks.get(p.user_id)} first={p === top[0]} />
@@ -94,20 +93,20 @@ export function StandingRow({ player, look, leaderPoints }: { player: Standing; 
         <div className="flex min-w-0 items-center gap-1.5">
           <span className="truncate font-semibold text-white">{player.player_name}</span>
           {player.is_me && (
-            <Badge variant="brand" className="flex-shrink-0 px-2 py-0 text-[10px]">
+            <Badge variant="brand" className="flex-shrink-0 px-2 py-0 text-xs">
               You
             </Badge>
           )}
           {look?.isOwner && <FounderBadge />}
           {look?.level ? (
-            <span className="flex-shrink-0 rounded-md bg-zinc-800 px-1.5 py-px text-[10px] font-bold text-zinc-300">Lv {look.level}</span>
+            <span className="flex-shrink-0 rounded-md bg-zinc-800 px-1.5 py-px text-xs font-bold text-zinc-300">Lv {look.level}</span>
           ) : null}
         </div>
         <div className="mt-1.5 flex items-center gap-2">
           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-800">
             <div className="h-full rounded-full bg-gradient-to-r from-red-600 to-orange-400" style={{ width: `${share}%` }} />
           </div>
-          <span className="flex flex-shrink-0 items-center gap-1 text-[11px] text-zinc-500" title={`${player.training_days} training days`}>
+          <span className="flex flex-shrink-0 items-center gap-1 text-xs text-zinc-500" title={`${player.training_days} training days`}>
             {player.training_days}d
             {player.current_streak > 0 && (
               <>
@@ -120,7 +119,7 @@ export function StandingRow({ player, look, leaderPoints }: { player: Standing; 
       </div>
       <div className="w-12 flex-shrink-0 text-right">
         <div className="text-lg font-black leading-none tabular-nums text-white">{player.points}</div>
-        <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-widest text-zinc-500">pts</div>
+        <div className="mt-0.5 text-xs font-semibold uppercase tracking-widest text-zinc-500">pts</div>
       </div>
     </Link>
   );

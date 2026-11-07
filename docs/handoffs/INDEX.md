@@ -2,6 +2,16 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-07 · new-test-footage · Crash reports closed; push keys needed; plan for 3 new clips · open: 2 → [handoff](2026-11-07-new-test-footage.md)
+- 2026-11-03 · rim-finder · Find the hoop for me shipped; live hang fixed (plain worker); checked live · open: 3 → [handoff](2026-11-03-rim-finder.md)
+- 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 3 → [handoff](2026-11-03-tracker-accuracy-bench.md)
+- 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
+- 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
+- 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
+- 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
+- 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
+- 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
+- 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
 - 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
 - 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
 - 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
@@ -24,9 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-21 · coach-side-c1-c2 · Coach setup, coach home, mode switch, safeguarding; live, tester-checked · open: 5 → [handoff](2026-10-21-coach-side-c1-c2.md)
 - 2026-10-21 · funnel-demo-progress-coach-plan · Player funnel, landing demo, progress cards, add friend, FAQ; coach plan · open: 8 → [handoff](2026-10-21-funnel-demo-progress-coach-plan.md)
 - 2026-10-21 · app-review-fixes · Tester walkthrough of 40 pages; name filter, layout and copy fixes, shipped · open: 1 → [handoff](2026-10-21-app-review-fixes.md)
-- 2026-10-21 · first-run-tutorial · Welcome screen, sample tracker clip, starting steps +150 XP, promo on site · open: 1 → [handoff](2026-10-21-first-run-tutorial.md)
-- 2026-10-21 · promo-rim-line-fix · First rim line now ends on the ring; promo and phone page updated · open: none → [handoff](2026-10-21-promo-rim-line-fix.md)
-- 2026-10-20 · leaderboard-redesign · Leaderboard redesign with podium, avatars and a chase nudge, shipped · open: 1 → [handoff](2026-10-20-leaderboard-redesign.md)
-- 2026-10-20 · promo-video-and-coach-format · Promo v2 shipped (first promo + voice); coach replies formatted · open: 1 → [handoff](2026-10-20-promo-video-and-coach-format.md)
-- 2026-10-20 · tracker-streaks-gym-avatars · Tracker fixes, levels, streak freezes, programmes, gym/drill tools, avatars, Codex access · open: 5 → [handoff](2026-10-20-tracker-streaks-gym-avatars.md)
-- 2026-10-19 · activation-logging-reports · Two-tap shot totals, first-session nudge, player problem reports shipped · open: 1 → [handoff](2026-10-19-activation-logging-reports.md)

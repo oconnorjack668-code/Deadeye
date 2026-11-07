@@ -102,7 +102,7 @@ export function DashboardClubCard() {
         </div>
       </div>
       <ClubSearch id="dashboard-club-search" disabled={busy} onPick={(c) => void pick(c)} />
-      {error && <p className="text-xs text-red-400">{error}</p>}
+      {error && <p className="text-sm text-red-400">{error}</p>}
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <button type="button" onClick={hideOnThisDevice} className="font-semibold text-zinc-400 underline hover:text-zinc-200">
           {"I'm not at a club"}

@@ -244,7 +244,7 @@ export function AvatarEditor({
         </div>
 
         {!is16Plus && (
-          <p className="text-xs text-zinc-400">
+          <p className="text-sm text-zinc-400">
             You are under 16, so we email the parent or guardian who approved your account to approve your photo, and who
             can see it, before anyone else sees it.
           </p>
@@ -296,7 +296,7 @@ export function AvatarEditor({
       </div>
 
       {message && (
-        <p role="status" className={`text-xs ${message.tone === 'ok' ? 'text-emerald-300' : 'text-red-400'}`}>
+        <p role="status" className={`text-sm ${message.tone === 'ok' ? 'text-emerald-300' : 'text-red-400'}`}>
           {message.text}
         </p>
       )}

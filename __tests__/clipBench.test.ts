@@ -19,6 +19,7 @@ import { createBallTracker } from '@/lib/video/ballTracker';
 import { cropRectFor, ballCentreInFrame, netBoxOnCanvas, CROP_CANVAS_PX } from '@/lib/video/crop';
 import { ShotDetector, rimFromEdges } from '@/lib/video/shotDetector';
 import { createWorkload, isRepeat } from '@/lib/video/workload';
+import { createPipeline } from '@/lib/video/trackerPipeline';
 
 vi.setConfig({ testTimeout: 1_800_000 });
 
@@ -195,7 +196,61 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
 
     // Three-frame differencing reports where the ball is rather than where it
     // was and is, at one frame of lag, so the middle frame is the one measured.
+    // It is what the app runs, so it runs through the app's own pipeline
+    // (src/lib/video/trackerPipeline.ts) rather than a copy of it here.
     const threeFrame = process.env.DEADEYE_BENCH_3FRAME === '1';
+    const pipeline = threeFrame
+      ? createPipeline({
+          rim,
+          videoWidth: width,
+          videoHeight: height,
+          learn: learnColour,
+          watchNet,
+          netFrom: Number(process.env.DEADEYE_BENCH_NETFROM) || undefined,
+        })
+      : null;
+    // Camera moves the watcher reported. On a tripod clip any is a false alarm.
+    const moves: string[] = [];
+    const lights: number[] = [];
+
+    // DEADEYE_BENCH_KNOCK="seconds,dx,dy" moves the picture that many canvas
+    // pixels from that moment on, as a knocked tripod does, to check the
+    // camera watcher notices on real footage
+    const knock = (process.env.DEADEYE_BENCH_KNOCK || '').split(',').map(Number);
+    const knocked = (pixels: Uint8ClampedArray): Uint8ClampedArray => {
+      const [, kx, ky] = knock;
+      const out = new Uint8ClampedArray(pixels.length);
+      for (let y = 0; y < CANVAS; y++) {
+        const sy = Math.min(CANVAS - 1, Math.max(0, y - ky));
+        for (let x = 0; x < CANVAS; x++) {
+          const sx = Math.min(CANVAS - 1, Math.max(0, x - kx));
+          out.set(pixels.subarray((sy * CANVAS + sx) * 4, (sy * CANVAS + sx) * 4 + 4), (y * CANVAS + x) * 4);
+        }
+      }
+      return out;
+    };
+
+    /** One frame through the pipeline, recorded the way measure() records it. */
+    const throughPipeline = (original: Uint8ClampedArray, videoMs: number) => {
+      const pixels = knock.length === 3 && videoMs >= knock[0] * 1000 ? knocked(original) : original;
+      const began = performance.now();
+      const r = pipeline!.frame(pixels, CANVAS, videoMs);
+      trackerMs += performance.now() - began;
+      if (r.moved) moves.push(`${(videoMs / 1000).toFixed(1)}s (${r.moved.dx},${r.moved.dy} match ${r.moved.match.toFixed(2)} vs ${r.moved.still.toFixed(2)})`);
+      if (r.light !== null) lights.push(r.light);
+      if (!r.ready) return;
+      if (netTrace) netTrace.push(`${Math.round(r.t)},${(r.netMotion ?? 0).toFixed(3)}`);
+      if (!r.found || !r.centre) return;
+      framesWithBall++;
+      scores.push(r.found.score);
+      if (lastBallMs !== null) {
+        const gap = r.t - lastBallMs;
+        if (gap > maxGapMs) maxGapMs = gap;
+        if (gap > LOST_BALL_MS) gapsOverLimit++;
+      }
+      lastBallMs = r.t;
+      trace.push(`${Math.round(r.t)},${r.centre.x.toFixed(4)},${r.centre.y.toFixed(4)},${r.found.score.toFixed(3)},${(r.found.diameter / rimOnCanvas).toFixed(2)}`);
+    };
     let f0: Uint8ClampedArray | null = null;
     let f1: Uint8ClampedArray | null = null;
     let t1 = 0;
@@ -217,7 +272,9 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
           if (f1 && isRepeat(pixels, f1)) return;
           workload.scored(videoMs);
         }
-        if (threeFrame) {
+        if (pipeline) {
+          throughPipeline(pixels, videoMs);
+        } else if (threeFrame) {
           if (f0 && f1) measure(f0, f1, t1, pixels);
           f0 = f1;
         } else if (f1) {
@@ -230,8 +287,10 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     );
 
     // As the app does when the clip ends: call a shot still being judged
-    shotDetector.finish();
-    const shots = shotDetector.shots;
+    if (pipeline) pipeline.finish();
+    else shotDetector.finish();
+    const shots = pipeline ? pipeline.shots() : shotDetector.shots;
+    const colourSource = pipeline?.tracker() ?? tracker;
 
     // Per-shot scoring against hand-labelled makes. Counts alone hide the thing
     // that matters: a run can report "4 of 5 makes" while having two of them
@@ -306,11 +365,13 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       `differencing    ${threeFrame ? 'three frame' : 'two frame'}`,
       `colour          ${
         learnColour
-          ? tracker.colour()
-            ? `learned rgb(${Math.round(tracker.colour()!.r)}, ${Math.round(tracker.colour()!.g)}, ${Math.round(tracker.colour()!.b)}) from ${tracker.samples()} samples`
-            : `learning, only ${tracker.samples()} samples`
+          ? colourSource.colour()
+            ? `learned rgb(${Math.round(colourSource.colour()!.r)}, ${Math.round(colourSource.colour()!.g)}, ${Math.round(colourSource.colour()!.b)}) from ${colourSource.samples()} samples`
+            : `learning, only ${colourSource.samples()} samples`
           : 'not used'
       }`,
+      `camera moved    ${pipeline ? (moves.length ? moves.join(', ') : 'never') : 'not watched'}`,
+      `light           ${lights.length ? `${Math.round(Math.min(...lights))} to ${Math.round(Math.max(...lights))}` : '-'}`,
       `frames          ${frames}`,
       `ball found in   ${framesWithBall} (${((framesWithBall / Math.max(frames, 1)) * 100).toFixed(1)}%)`,
       `ball-likeness   median ${median(scores).toFixed(3)}, best ${scores.length ? Math.max(...scores).toFixed(3) : '-'}`,

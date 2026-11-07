@@ -26,6 +26,7 @@ import { StarterSteps } from '@/components/StarterSteps';
 import { FounderPostCard } from '@/components/FounderPostCard';
 import { DashboardClubCard } from '@/components/clubs/DashboardClubCard';
 import { FounderNotice } from '@/components/FounderNotice';
+import { HubGrid } from '@/components/layout/HubGrid';
 import { founderNoticeCutoff, type FounderPost } from '@/lib/founderPosts';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
@@ -72,7 +73,7 @@ function StatCard({
         <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">{label}</div>
         <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
           <span className={`text-2xl sm:text-3xl font-black leading-none ${valueClass}`}>{value}</span>
-          <Badge variant={badgeVariant} className="flex-shrink-0 text-[10px] sm:text-xs">
+          <Badge variant={badgeVariant} className="flex-shrink-0 text-xs sm:text-xs">
             {badge}
           </Badge>
         </div>
@@ -171,7 +172,15 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-7xl mx-auto">
+      <div className="p-4 md:p-8 max-w-3xl lg:max-w-6xl mx-auto">
+        {/* On a laptop: today's training down the main column, the numbers and
+            shortcuts beside it. On a phone: one column, in the order it always
+            had. It used to be one column 1,280px wide on a laptop, every card
+            stretched across the screen. */}
+        <HubGrid
+          sideLabel="Your numbers and shortcuts"
+          top={
+            <>
         {/* A post the founder sent to every player, a banner above everything
             for a couple of weeks, and one they can dismiss */}
         {notice && <FounderNotice post={notice as FounderPost} />}
@@ -292,9 +301,12 @@ export default async function DashboardPage() {
             player's first screen still asks for one thing */}
         {!firstRun && !homeClub.error && !homeClub.data && <DashboardClubCard />}
 
-        {/* Until the first log, everything below is numbers that are all still
-            zero, under a Today card asking for one thing. Folded away so a new
-            player sees that one thing (Phase 3 of the plan). Still a tap away. */}
+            </>
+          }
+          side={
+        // Until the first log, everything below is numbers that are all still
+        // zero, under a Today card asking for one thing. Folded away so a new
+        // player sees that one thing (Phase 3 of the plan). Still a tap away.
         <FoldedUntilFirstLog folded={firstRun}>
         {/* Workload. Every other number here only moves when you train, so there
             is nothing to come back for on a rest day. This one still says
@@ -368,7 +380,7 @@ export default async function DashboardPage() {
 
         {/* Quick stats. 2x2 on a phone rather than four full-width cards
             stacked, which was ~400px of scrolling for four small numbers. */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-8">
+        <div className="grid grid-cols-2 gap-3 md:gap-4 mb-8">
           <StatCard
             label="This week"
             value={metrics.thisWeekSessions}
@@ -498,6 +510,13 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
+        </FoldedUntilFirstLog>
+          }
+          // The chart and all-time totals: nothing in them before the first
+          // log, so they wait for it rather than being folded a second time
+          rest={
+            firstRun ? null : (
+              <>
         {/* Shot chart. The ranked list this replaced gave five zone names and
             percentages with no sense of where on the floor they were. */}
         {shootingByZone.length > 0 && (
@@ -549,7 +568,10 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
-        </FoldedUntilFirstLog>
+              </>
+            )
+          }
+        />
 
       </div>
     </div>

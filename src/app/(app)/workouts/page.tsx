@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { Plus, Dumbbell, BookOpen, Award, ListChecks, ChevronRight, Apple } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { DeleteRoutineButton } from './DeleteRoutineButton';
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +49,7 @@ export default async function WorkoutsPage() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
+      <div className={HUB_CONTAINER}>
         <PageHeader
           tone="gym"
           icon={Dumbbell}
@@ -56,12 +57,19 @@ export default async function WorkoutsPage() {
           subtitle="Strength, power, mobility and injury prevention"
         />
 
+        {/* Starting and the history in the main column; the tools and routines
+            beside them on a laptop, between them on a phone */}
+        <HubGrid
+          sideLabel="Gym tools and routines"
+          top={
         <Link href="/workouts/new" className="block mb-4">
           <Button variant="primary" size="lg" className="w-full gap-2 shadow-lg shadow-orange-900/30">
             <Plus className="h-5 w-5" /> Start workout
           </Button>
         </Link>
-
+          }
+          side={
+            <>
         <div className="grid grid-cols-2 gap-3 mb-3">
           <Link href="/workouts/exercises">
             <Card className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900 transition-colors h-full">
@@ -95,7 +103,7 @@ export default async function WorkoutsPage() {
             <span className="block text-sm font-semibold text-white">Fuel</span>
             <span className="block text-xs text-zinc-500">Eating, water and sleep around your training</span>
           </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
         </Link>
 
         {/* Routines */}
@@ -134,6 +142,10 @@ export default async function WorkoutsPage() {
           </div>
         )}
 
+            </>
+          }
+          rest={
+            <>
         {/* History */}
         <h2 className="text-lg font-bold text-white mb-3">History</h2>
         {workouts && workouts.length > 0 ? (
@@ -144,12 +156,12 @@ export default async function WorkoutsPage() {
                   <CardContent className="p-4 flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-white capitalize">{w.workout_type.replace(/_/g, ' ')}</h3>
-                      <p className="text-xs text-zinc-400 mt-1">
+                      <p className="text-sm text-zinc-400 mt-1">
                         {new Date(`${w.workout_date}T00:00:00`).toLocaleDateString()} · {w.duration_minutes} min · RPE {w.rpe}/10
                         {w.workout_sets?.[0]?.count ? ` · ${w.workout_sets[0].count} sets` : ''}
                       </p>
                     </div>
-                    <ChevronRight className="h-4 w-4 text-zinc-600" />
+                    <ChevronRight className="h-4 w-4 text-zinc-500" />
                   </CardContent>
                 </Card>
               </Link>
@@ -166,6 +178,9 @@ export default async function WorkoutsPage() {
             </CardContent>
           </Card>
         )}
+            </>
+          }
+        />
       </div>
     </div>
   );

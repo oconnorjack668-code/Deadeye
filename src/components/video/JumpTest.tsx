@@ -217,7 +217,7 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
             </label>
           </div>
 
-          <p className="text-xs text-zinc-500">Play or scrub to just before the jump (while standing still), then:</p>
+          <p className="text-sm text-zinc-500">Play or scrub to just before the jump (while standing still), then:</p>
           <Button variant="primary" className="w-full gap-2" isLoading={busy} onClick={() => void autoDetect()}>
             <ArrowUpFromLine className="h-4 w-4" /> Find my jump
           </Button>
@@ -253,7 +253,7 @@ export function JumpTest({ units }: { units: MeasurementSystem }) {
                 Set landing here{landing != null ? ` (${landing.toFixed(2)}s)` : ''}
               </button>
             </div>
-            <p className="text-[11px] text-zinc-500">Takeoff = last frame toes touch the floor. Landing = first frame toes touch again.</p>
+            <p className="text-sm text-zinc-500">Takeoff = last frame toes touch the floor. Landing = first frame toes touch again.</p>
           </div>
 
           {heightCm != null && flight != null && (

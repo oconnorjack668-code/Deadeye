@@ -125,7 +125,7 @@ export function FriendButton({ userId, initial }: { userId: string; initial: Fri
           </Link>
         )}
       </div>
-      {message && <p className="text-center text-xs text-zinc-400">{message}</p>}
+      {message && <p className="text-center text-sm text-zinc-400">{message}</p>}
     </div>
   );
 }

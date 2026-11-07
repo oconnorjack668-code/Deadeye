@@ -100,8 +100,8 @@ export default function SignUpPage() {
         <div className="flex flex-col items-center mb-8 text-center">
           <Logo size={56} className="mb-3" />
           <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
-          <p className="text-xs text-zinc-400 mt-1">Join serious players building intentional habits</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
+          <p className="text-sm text-zinc-400 mt-1">Join serious players building intentional habits</p>
         </div>
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
@@ -174,7 +174,7 @@ export default function SignUpPage() {
                     </Link>
                   </span>
                 </label>
-                {errors.termsAccepted && <p className="mt-1 text-xs text-red-400">{errors.termsAccepted}</p>}
+                {errors.termsAccepted && <p className="mt-1 text-sm text-red-400">{errors.termsAccepted}</p>}
               </div>
             </CardContent>
 
@@ -189,7 +189,7 @@ export default function SignUpPage() {
                 Create Player Account
               </Button>
 
-              <p className="text-xs text-center text-zinc-400">
+              <p className="text-sm text-center text-zinc-400">
                 Already have an account?{' '}
                 <Link
                   href="/login"
