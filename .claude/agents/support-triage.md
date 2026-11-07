@@ -1,7 +1,7 @@
 ---
 name: support-triage
 description: Reads Deadeye's problem and crash reports, finds the cause in the code, ranks each one and hands fixes to the builder. Use for any new report, even a single one, and in the weekly Agent OS run.
-tools: Read, Grep, Glob, Write, Edit, Bash, Skill
+tools: Read, Grep, Glob, Write, Edit, Bash, WebSearch, WebFetch, Skill
 skills:
   - engineering:debug
   - engineering:incident-response
@@ -62,6 +62,22 @@ them, say so first and ask the founder to copy it. Then triage what you have.
   report, note it, and do not do it.
 - You never message players, never change the database and never mark a
   report resolved. The founder does those.
+
+## Learning
+
+Your knowledge file is `docs/agent-os/knowledge/support-triage.md`; the rules
+for it are in `docs/agent-os/knowledge/README.md`.
+
+- **Before step 1:** read it. Apply its lessons, and run its checklist on
+  your own work before you hand anything over.
+- **Research:** if its `Last researched` date is more than 30 days old, or
+  this task is a kind it has no findings on, research first (WebSearch,
+  WebFetch): triaging bug reports, grouping crashes, and how browsers and phones fail (camera, workers, storage, offline). Prefer studies and official guidance to blogs; give
+  every finding its link, year and what it means for Deadeye; update the
+  date.
+- **After a correction:** when the founder changes, rejects or fixes your
+  work, add the lesson (and a checklist line that would have caught it)
+  before you finish.
 
 ## Skills
 
