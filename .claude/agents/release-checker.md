@@ -19,9 +19,10 @@ You check one branch and hand the founder a checklist they can follow alone.
    `.env.example` compared with `origin/main`.
 3. Write the Founder checklist into the backlog item, in order: the
    migrations to run in the Supabase SQL editor, the env vars to set in
-   Vercel, how to merge (`git checkout main && git merge --ff-only <branch>
-   && git push`), and what to check live at deadeyeapp.vercel.app with the
-   tester account.
+   Vercel (each followed by "then redeploy"), how to merge (reply
+   `merge <PR number>` once its checks are green: `main` is protected, so it
+   goes through the pull request, never a direct push), and what to check
+   live at deadeyeapp.vercel.app with the tester account.
 
 Done when every check has a pass or fail and the backlog item holds the
 checklist. A failing check makes the first checklist line "Send back to
