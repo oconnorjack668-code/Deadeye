@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-07 · new-test-footage · Crash reports closed; push keys needed; plan for 3 new clips · open: 2 → [handoff](2026-11-07-new-test-footage.md)
 - 2026-11-03 · rim-finder · Find the hoop for me: trained detector, close second look, in the tracker · open: 3 → [handoff](2026-11-03-rim-finder.md)
 - 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 4 → [handoff](2026-11-03-tracker-accuracy-bench.md)
 - 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
