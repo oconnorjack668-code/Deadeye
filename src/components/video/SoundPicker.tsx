@@ -154,12 +154,12 @@ export function SoundPicker({ onChange }: { onChange?: (next: SoundSettings) => 
       )}
 
       {value.voice !== 'off' && voices.length === 0 && (
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           This browser offers no voice choices, so the default will be used.
         </p>
       )}
 
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         Each choice plays as you pick it. Sounds are kept on this device, so a different phone has
         its own - which is the point, because they are judged through whichever speaker is in the
         gym with you.
@@ -206,7 +206,7 @@ export function SoundStatus({
         <span className="block truncate text-xs text-zinc-300">{soundSummary(value)}</span>
         {/* The picker lives in Settings, so say what is there: most players never
             find a choice they were not told about */}
-        <span className="block text-[11px] leading-snug text-zinc-500">
+        <span className="block text-xs leading-snug text-zinc-500">
           Pick your make and miss sounds in Settings: airhorn, crowd roar, sad trombone and more.
         </span>
       </span>

@@ -217,7 +217,7 @@ export function AppSearch({ mode, isOwner }: { mode: AppMode; isOwner: boolean }
                 <ul id={listId} role="listbox" aria-label="Results">
                   {sections.map((section) => (
                     <li key={section.id} role="presentation" className="mb-2">
-                      <div className="px-3 pb-1 pt-2 text-[11px] font-bold uppercase tracking-wider text-zinc-500">{section.title}</div>
+                      <div className="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wider text-zinc-500">{section.title}</div>
                       <ul role="presentation">
                         {section.results.map((r) => {
                           index += 1;
@@ -237,7 +237,7 @@ export function AppSearch({ mode, isOwner }: { mode: AppMode; isOwner: boolean }
                                 <span className="block truncate text-sm font-semibold text-white">{r.title}</span>
                                 <span className="block truncate text-xs text-zinc-500">{r.hint}</span>
                               </span>
-                              <ArrowRight className="h-4 w-4 flex-shrink-0 text-zinc-600" aria-hidden />
+                              <ArrowRight className="h-4 w-4 flex-shrink-0 text-zinc-500" aria-hidden />
                             </li>
                           );
                         })}

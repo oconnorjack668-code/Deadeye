@@ -46,7 +46,7 @@ export function FavoriteDrillButton({ drillId, userId, initial }: { drillId: str
       >
         <Star className={`h-5 w-5 ${on ? 'fill-current' : ''}`} />
       </button>
-      {error && <span className="mt-1 text-[11px] text-red-400">{error}</span>}
+      {error && <span className="mt-1 text-xs text-red-400">{error}</span>}
     </div>
   );
 }

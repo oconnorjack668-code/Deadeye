@@ -5,6 +5,7 @@ import { getActiveProgram, studySlugsIn } from '@/lib/programs';
 import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { BookOpen, CheckCircle2, Play, ChevronRight, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { DailyQuestion, type DailyQuestionView } from '@/components/study/DailyQuestion';
@@ -128,8 +129,15 @@ export default async function StudyPage() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
+      <div className={HUB_CONTAINER}>
         <PageHeader tone="iq" icon={BookOpen} title="Basketball IQ" subtitle="Lessons and quizzes to read the game" />
+
+        {/* Today's question and the sections in the main column; progress and
+            where to carry on beside them on a laptop, between them on a phone */}
+        <HubGrid
+          sideLabel="Your progress"
+          top={
+            <>
 
         {/* Question of the day sits above progress: it is the reason to open
             this page on a day you were not planning to study. */}
@@ -143,6 +151,10 @@ export default async function StudyPage() {
           />
         )}
 
+            </>
+          }
+          side={
+            <>
         {/* Overall progress */}
         <Card className="border-zinc-800 bg-zinc-900/70 mb-3">
           <CardContent className="p-5 flex items-center gap-5">
@@ -219,6 +231,10 @@ export default async function StudyPage() {
           <ChevronRight className="h-5 w-5 flex-shrink-0 text-zinc-500" />
         </Link>
 
+            </>
+          }
+          rest={
+            <>
         <h2 className="text-lg font-bold text-white mb-3">Sections</h2>
         {!isPro && (
           <ProNote className="mb-3">
@@ -246,7 +262,7 @@ export default async function StudyPage() {
                         <span className="text-sm font-bold text-blue-400 flex-shrink-0">{percent}%</span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-400 mt-2">{topic.description}</p>
+                    <p className="text-sm text-zinc-400 mt-2">{topic.description}</p>
                     <div className="mt-4 flex items-center gap-3">
                       <div className="h-1.5 flex-1 rounded-full bg-zinc-800 overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400" style={{ width: `${percent}%` }} />
@@ -261,6 +277,9 @@ export default async function StudyPage() {
             );
           })}
         </div>
+            </>
+          }
+        />
       </div>
     </div>
   );

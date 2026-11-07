@@ -47,7 +47,7 @@ export function CardDescription({
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
     <p
-      className={cn('text-xs text-zinc-400 leading-relaxed', className)}
+      className={cn('text-sm text-zinc-400 leading-relaxed', className)}
       {...props}
     />
   );

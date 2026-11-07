@@ -268,7 +268,7 @@ export default function NewGamePage() {
               <span>PF {b.pf}</span>
             </div>
           </div>
-          <div className="mt-2 text-[11px] text-zinc-500">FG {pct(b.fgm2 + b.fgm3, b.fga2 + b.fga3)} · 3P {pct(b.fgm3, b.fga3)} · FT {pct(b.ftm, b.fta)}</div>
+          <div className="mt-2 text-xs text-zinc-500">FG {pct(b.fgm2 + b.fgm3, b.fga2 + b.fga3)} · 3P {pct(b.fgm3, b.fga3)} · FT {pct(b.ftm, b.fta)}</div>
         </div>
 
         {editing ? (
@@ -304,7 +304,7 @@ export default function NewGamePage() {
                   }`}
                 >
                   <div className="text-2xl font-black">{s.label}</div>
-                  <div className="text-[11px] opacity-80">{s.sub}</div>
+                  <div className="text-xs opacity-80">{s.sub}</div>
                 </button>
               ))}
             </div>

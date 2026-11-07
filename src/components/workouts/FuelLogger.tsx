@@ -161,7 +161,7 @@ export function FuelLogger({ existing }: { existing: FuelEntry | null }) {
       <Button variant="primary" size="lg" className="w-full" isLoading={saving} onClick={() => void save()}>
         {saved ? 'Saved' : existing ? 'Update today' : 'Save today'}
       </Button>
-      <p className="text-xs text-zinc-500">
+      <p className="text-sm text-zinc-500">
         Anything you leave blank stays blank. There is no target here and nothing to hit.
       </p>
     </div>

@@ -81,9 +81,9 @@ export default async function ExerciseLibraryPage({
                     {e.name}
                     {e.is_basketball_specific && <Flame className="h-3.5 w-3.5 text-orange-400" aria-label="Basketball specific" />}
                     {exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) === 'advanced' ? (
-                      <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-[10px] font-bold text-red-300">ADVANCED</span>
+                      <span className="rounded bg-red-500/20 px-1.5 py-0.5 text-xs font-bold text-red-300">ADVANCED</span>
                     ) : exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) === 'intermediate' ? (
-                      <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">NOT FOR BEGINNERS</span>
+                      <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-xs font-bold text-amber-300">NOT FOR BEGINNERS</span>
                     ) : null}
                   </div>
                   <div className="text-xs text-zinc-500">
@@ -91,13 +91,13 @@ export default async function ExerciseLibraryPage({
                     {e.equipment?.length ? ` · ${e.equipment.map((q) => q.replace(/_/g, ' ')).join(', ')}` : ''}
                   </div>
                 </div>
-                <span className="text-zinc-600 text-xs group-open:rotate-180 transition-transform">▼</span>
+                <span className="text-zinc-500 text-xs group-open:rotate-180 transition-transform">▼</span>
               </summary>
               <div className="mt-3 space-y-2 text-sm">
                 {/* The library says nothing else about who an exercise is for, and
                     many players here are 13 to 15 */}
                 {exerciseLevel({ name: e.name, primary_muscle: e.primary_muscle, equipment: e.equipment ?? [] }) !== 'beginner' && (
-                  <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+                  <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-200">
                     Learn this one with a coach first, and build up from the easier exercises in this group. Stop if anything
                     hurts.
                   </p>
@@ -112,7 +112,7 @@ export default async function ExerciseLibraryPage({
                   </ul>
                 )}
                 {e.easier_version && (
-                  <p className="rounded-lg bg-zinc-950/60 px-3 py-2 text-xs text-zinc-300">
+                  <p className="rounded-lg bg-zinc-950/60 px-3 py-2 text-sm text-zinc-300">
                     <span className="font-semibold text-emerald-300">Easier version:</span> {e.easier_version}
                   </p>
                 )}

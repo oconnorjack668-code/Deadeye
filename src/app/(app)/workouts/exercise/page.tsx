@@ -116,7 +116,7 @@ export default async function ExerciseHistoryPage({ searchParams }: { searchPara
           </Link>
           <div className="min-w-0">
             <h1 className="truncate text-2xl font-black text-white">{name}</h1>
-            <p className="text-xs text-zinc-400">Your history</p>
+            <p className="text-sm text-zinc-400">Your history</p>
           </div>
         </div>
 
@@ -131,15 +131,15 @@ export default async function ExerciseHistoryPage({ searchParams }: { searchPara
           <>
             <div className="grid grid-cols-3 gap-2">
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
-                <div className="text-[11px] text-zinc-400">Best set</div>
+                <div className="text-xs text-zinc-400">Best set</div>
                 <div className="mt-1 text-sm font-black text-white">{best ? formatSet(best) : '—'}</div>
               </div>
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
-                <div className="text-[11px] text-zinc-400">Workouts</div>
+                <div className="text-xs text-zinc-400">Workouts</div>
                 <div className="mt-1 text-sm font-black text-white tabular-nums">{workouts.length}</div>
               </div>
               <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
-                <div className="text-[11px] text-zinc-400">Last done</div>
+                <div className="text-xs text-zinc-400">Last done</div>
                 <div className="mt-1 text-sm font-black text-white">{shortDate(workouts[0].date)}</div>
               </div>
             </div>
@@ -147,7 +147,7 @@ export default async function ExerciseHistoryPage({ searchParams }: { searchPara
             {points.length >= 2 && (
               <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
                 <h2 className="text-sm font-bold text-white">{chartTitle}</h2>
-                <p className="text-xs text-zinc-400">Best set of each workout, last {points.length}</p>
+                <p className="text-sm text-zinc-400">Best set of each workout, last {points.length}</p>
                 <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" role="img" aria-label={`${chartTitle} over your last ${points.length} workouts`}>
                   {[0, 0.5, 1].map((t) => {
                     const gy = pad.top + t * (H - pad.top - pad.bottom);
@@ -172,13 +172,13 @@ export default async function ExerciseHistoryPage({ searchParams }: { searchPara
                       />
                     </g>
                   ))}
-                  <text x={x(bestIndex)} y={y(max) - 8} textAnchor="middle" className="fill-zinc-200 text-[10px] font-semibold">
+                  <text x={x(bestIndex)} y={y(max) - 8} textAnchor="middle" className="fill-zinc-200 text-xs font-semibold">
                     {shown(max)}
                   </text>
-                  <text x={pad.left} y={H - 6} className="fill-zinc-500 text-[10px]">
+                  <text x={pad.left} y={H - 6} className="fill-zinc-500 text-xs">
                     {shortDate(points[0].date)}
                   </text>
-                  <text x={W - pad.right} y={H - 6} textAnchor="end" className="fill-zinc-500 text-[10px]">
+                  <text x={W - pad.right} y={H - 6} textAnchor="end" className="fill-zinc-500 text-xs">
                     {shortDate(points[points.length - 1].date)}
                   </text>
                 </svg>

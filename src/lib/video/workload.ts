@@ -118,3 +118,29 @@ export function isRepeat(a: Uint8ClampedArray, b: Uint8ClampedArray): boolean {
   }
   return true;
 }
+
+/**
+ * The pixels isRepeat compares, kept so a frame can be checked against the
+ * last one after that one's pixels have been handed to the worker
+ * (trackerEngine.ts) and are no longer readable here.
+ */
+export function repeatSignature(pixels: Uint8ClampedArray): Uint8Array {
+  const count = pixels.length / 4;
+  const step = Math.max(1, Math.floor(count / 257));
+  const out = new Uint8Array(Math.ceil(count / step) * 3);
+  let k = 0;
+  for (let i = 0; i < count; i += step) {
+    const p = i * 4;
+    out[k++] = pixels[p];
+    out[k++] = pixels[p + 1];
+    out[k++] = pixels[p + 2];
+  }
+  return out;
+}
+
+/** Two signatures from repeatSignature are the same picture: see isRepeat. */
+export function sameSignature(a: Uint8Array, b: Uint8Array): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}

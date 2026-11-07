@@ -79,7 +79,7 @@ export default async function DrillPage({ params }: { params: Promise<{ slug: st
             </h2>
             <p className="text-zinc-300">{drill.setup}</p>
             {drill.equipment.length > 0 && (
-              <p className="text-xs text-zinc-500 mt-1">Equipment: {drill.equipment.join(', ')}</p>
+              <p className="text-sm text-zinc-500 mt-1">Equipment: {drill.equipment.join(', ')}</p>
             )}
           </div>
 

@@ -36,7 +36,7 @@ export default async function ParentApprovalPage() {
           </p>
         </div>
         <WaitingForParent token={check.request_token} emailedTo={emailedTo} />
-        <p className="text-center text-xs text-zinc-500">
+        <p className="text-center text-sm text-zinc-500">
           If nobody approves within {UNAPPROVED_ACCOUNT_DAYS} days, your account and everything in it is deleted.
         </p>
       </div>

@@ -66,7 +66,7 @@ export function BottomNav({ mode: savedMode = 'playing' }: { mode?: AppMode }) {
               }`}
             >
               <Icon className={`h-6 w-6 ${isActive ? 'scale-110' : ''} transition-transform`} />
-              <span className="text-[11px] mt-0.5 tracking-tight">{item.label}</span>
+              <span className="text-xs mt-0.5 tracking-tight">{item.label}</span>
             </Link>
           );
         })}

@@ -11,7 +11,8 @@ import type { MeasurementSystem } from '@/lib/units';
 import { SoundPicker } from '@/components/video/SoundPicker';
 import { ReportProblem } from '@/components/ReportProblem';
 import { signOutOfThisPhone } from '@/lib/signOut';
-import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2 } from 'lucide-react';
+import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2, SunMoon } from 'lucide-react';
+import { AppearancePicker } from '@/components/AppearancePicker';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 
 type Role = 'player' | 'coach' | 'both';
@@ -277,7 +278,7 @@ export function SettingsClient({
           <span className="flex items-center gap-2">
             <Pencil className="h-4 w-4 text-zinc-500" /> Player info (height, position, hand, level, goals)
           </span>
-          <ChevronRight className="h-4 w-4 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <Row>
           <div className="flex items-center justify-between gap-3">
@@ -315,7 +316,7 @@ export function SettingsClient({
             </div>
           )}
           {emailSentTo && (
-            <p className="mt-2 text-xs text-emerald-300">
+            <p className="mt-2 text-sm text-emerald-300">
               Check {emailSentTo} for a link to confirm it. Your email changes once you open it, and until then you sign in with
               the old one.
             </p>
@@ -364,7 +365,7 @@ export function SettingsClient({
           onChange={(v) => void save({ share_with_coaches: v })}
         />
         <Row>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             Your age is never shown to other players. It&apos;s only used to put you in the right age group on the leaderboard.
           </p>
         </Row>
@@ -383,10 +384,15 @@ export function SettingsClient({
           A sound is judged through whichever speaker is in the gym, so it
           belongs to the device - and it is set here rather than in the tracker
           because it is chosen once and then wanted on every session. */}
+      {/* Kept on this device, like the sounds: it is about this screen */}
+      <Section icon={SunMoon} title="Appearance" id="appearance">
+        <AppearancePicker />
+      </Section>
+
       <Section icon={Volume2} title="Shot sounds" id="sounds">
         {/* One child, so the section draws no divider between the note and the picker */}
         <div>
-          <p className="px-4 pt-1 text-xs text-zinc-400">
+          <p className="px-4 pt-1 text-sm text-zinc-400">
             Played when you tap make or miss in a hoops session, and when the video tracker calls a shot.
           </p>
           <SoundPicker />
@@ -449,7 +455,7 @@ export function SettingsClient({
                 className="w-full rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white"
               />
             )}
-            <p className="mt-1 text-xs text-zinc-500">Used for the country and county leaderboards.</p>
+            <p className="mt-1 text-sm text-zinc-500">Used for the country and county leaderboards.</p>
           </Row>
         )}
         <Row>
@@ -475,7 +481,7 @@ export function SettingsClient({
               Use my phone&apos;s time zone ({phoneZone.replace(/_/g, ' ')})
             </button>
           )}
-          <p className="mt-1 text-xs text-zinc-500">Decides when your day starts for streaks, reminders, weekly reports and the leaderboard.</p>
+          <p className="mt-1 text-sm text-zinc-500">Decides when your day starts for streaks, reminders, weekly reports and the leaderboard.</p>
         </Row>
       </Section>
 
@@ -506,7 +512,7 @@ export function SettingsClient({
           <span>
             Plan: <span className="font-semibold">{plan}</span>
           </span>
-          <ChevronRight className="h-4 w-4 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
       </Section>
 
@@ -518,20 +524,20 @@ export function SettingsClient({
         {/* ?site=1: opened on purpose, so the installed app shows the website
             instead of bouncing back to the dashboard (StandaloneRedirect) */}
         <Link href="/?site=1" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
-          Deadeye website <ChevronRight className="h-4 w-4 text-zinc-600" />
+          Deadeye website <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <Link href="/install" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
           <span>
             How to get the app
             <span className="block text-xs text-zinc-500">A page to send to friends and teammates</span>
           </span>
-          <ChevronRight className="h-4 w-4 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <Link href="/terms" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
-          Terms of Use <ChevronRight className="h-4 w-4 text-zinc-600" />
+          Terms of Use <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <Link href="/privacy" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
-          Privacy Policy <ChevronRight className="h-4 w-4 text-zinc-600" />
+          Privacy Policy <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <ReportProblem
           className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-zinc-100 hover:bg-zinc-900"
@@ -542,17 +548,17 @@ export function SettingsClient({
                 Report a problem
                 <span className="block text-xs text-zinc-500">The tracker got a shot wrong, or something does not work</span>
               </span>
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+              <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
             </>
           }
         />
         {supportEmail && (
           <a href={`mailto:${supportEmail}?subject=Deadeye%20support`} className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
-            Contact support <ChevronRight className="h-4 w-4 text-zinc-600" />
+            Contact support <ChevronRight className="h-4 w-4 text-zinc-500" />
           </a>
         )}
         <Row>
-          <p className="text-xs text-zinc-500">Deadeye Basketball Training · version {version}</p>
+          <p className="text-sm text-zinc-500">Deadeye Basketball Training · version {version}</p>
         </Row>
       </Section>
 

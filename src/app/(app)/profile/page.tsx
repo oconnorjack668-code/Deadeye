@@ -3,6 +3,7 @@
 // streak, badges, shooting and best jump - then their player info, and a look
 // at the card other players see.
 import React from 'react';
+import { HubGrid } from '@/components/layout/HubGrid';
 import Link from 'next/link';
 import { requireUser, getCurrentProfile, getCurrentSubscription } from '@/lib/auth';
 import { planLabel } from '@/lib/entitlements';
@@ -70,7 +71,7 @@ function Stat({ icon: Icon, tone, value, label, href }: { icon: React.ElementTyp
     <Link href={href} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 hover:border-zinc-700">
       <Icon className={`h-4 w-4 ${tone}`} />
       <div className="mt-1 text-xl font-black text-white tabular-nums">{value}</div>
-      <div className="text-[11px] text-zinc-400">{label}</div>
+      <div className="text-xs text-zinc-400">{label}</div>
     </Link>
   );
 }
@@ -108,7 +109,13 @@ export default async function ProfilePage() {
   const focusAreas = [...new Set<string>((profile?.focus_areas || []).map(focusAreaLabel))];
 
   return (
-    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl mx-auto space-y-5">
+    <div className="flex-1 overflow-auto p-4 md:p-8 max-w-2xl lg:max-w-5xl mx-auto">
+      {/* The player card and their numbers in the main column, the details
+          beside them on a laptop; one column, in this order, on a phone */}
+      <HubGrid
+        sideLabel="Player info"
+        top={
+          <div className="space-y-5">
       {/* Who they are as a player */}
       <section className={`rounded-2xl border p-5 ${theme.card}`}>
         <div className="flex items-center gap-4">
@@ -165,7 +172,10 @@ export default async function ProfilePage() {
           href="/workouts/tests"
         />
       </div>
-
+          </div>
+        }
+        side={
+          <div className="mt-5 lg:mt-0">
       <Card className="border-zinc-800 bg-zinc-900/70">
         <CardHeader>
           <div className="flex items-center justify-between gap-4">
@@ -203,7 +213,10 @@ export default async function ProfilePage() {
           )}
         </CardContent>
       </Card>
-
+          </div>
+        }
+        rest={
+          <div className="mt-5 space-y-5">
       <Link
         href="/settings"
         className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 hover:bg-zinc-900"
@@ -215,14 +228,17 @@ export default async function ProfilePage() {
             <span className="block text-xs text-zinc-500">Avatar, privacy, email, notifications, sounds, units, your data</span>
           </span>
         </span>
-        <ChevronRight className="h-4 w-4 text-zinc-600" />
+        <ChevronRight className="h-4 w-4 text-zinc-500" />
       </Link>
 
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-sm text-zinc-500">
         <Link href="/privacy" className="underline hover:text-zinc-300">Privacy policy</Link>
         {' · '}
         <Link href="/terms" className="underline hover:text-zinc-300">Terms of use</Link>
       </p>
+          </div>
+        }
+      />
     </div>
   );
 }

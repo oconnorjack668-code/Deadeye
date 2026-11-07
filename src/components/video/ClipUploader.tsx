@@ -304,7 +304,7 @@ export function ClipUploader() {
                 />
                 <label htmlFor="video-input" className="cursor-pointer">
                   <div className="space-y-2">
-                    <Upload className="h-8 w-8 text-zinc-600 mx-auto" />
+                    <Upload className="h-8 w-8 text-zinc-500 mx-auto" />
                     <div className="text-sm">
                       <span className="font-semibold text-zinc-300">Click to upload</span>
                       <span className="text-zinc-500"> or drag and drop</span>

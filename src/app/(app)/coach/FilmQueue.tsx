@@ -84,7 +84,7 @@ export function FilmQueue({
         <h2 className="font-bold text-white">
           {questions.length} player{questions.length === 1 ? '' : 's'} asked about a read
         </h2>
-        <p className="text-xs text-zinc-400">
+        <p className="text-sm text-zinc-400">
           Each one shares a single moment of a single clip with you. Oldest first.
         </p>
       </div>
@@ -98,7 +98,7 @@ export function FilmQueue({
       {questions.map((q) => (
         <div key={q.id} className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
           <p className="font-semibold text-white">{q.question}</p>
-          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-zinc-500">
+          <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-sm text-zinc-500">
             <span>{names[q.player_id] || 'A player'}</span>
             <span className="flex items-center gap-1">
               <Clock className="h-3 w-3" /> {momentClock(q.moment_ms)}
@@ -139,7 +139,7 @@ export function FilmQueue({
                 maxLength={MAX_COACH_NOTE}
                 rows={3}
                 placeholder="What should they have seen? One or two sentences is plenty."
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-600"
+                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-white placeholder:text-zinc-500"
               />
 
               <div className="flex flex-wrap gap-2">

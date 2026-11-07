@@ -91,7 +91,7 @@ export default async function ClubSuggestionsPage() {
                         </button>
                       </form>
                     </div>
-                    <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-zinc-950 p-2 text-[11px] text-zinc-400">{row}</code>
+                    <code className="mt-2 block overflow-x-auto whitespace-nowrap rounded-lg bg-zinc-950 p-2 text-xs text-zinc-400">{row}</code>
                     <div className="mt-2">
                       <CopyButton text={row} label="Copy directory row" />
                     </div>

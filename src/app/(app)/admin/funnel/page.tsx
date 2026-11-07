@@ -87,7 +87,7 @@ export default async function FunnelPage({ searchParams }: { searchParams: Promi
               </section>
             ))}
 
-            <p className="text-xs text-zinc-500">
+            <p className="text-sm text-zinc-500">
               Percentages are of players who joined in this window. Your own account
               {result.excluded > 1 ? ' and test accounts are' : ' is'} left out ({result.excluded}); add test logins to
               TEST_ACCOUNT_EMAILS in Vercel to leave them out too.{' '}

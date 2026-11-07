@@ -45,7 +45,7 @@ export default function AccountDeletionPage() {
           </p>
         </section>
 
-        <p className="text-xs text-zinc-500">
+        <p className="text-sm text-zinc-500">
           See also our <Link href="/privacy" className="underline">Privacy Policy</Link>.
         </p>
       </main>

@@ -3,7 +3,9 @@
 // have "Weekly AI report" on get a week-in-review in AI Coach plus a push notification.
 // Free for everyone (no credits). At most one report per player per week.
 // Protected by CRON_SECRET ("Authorization: Bearer <CRON_SECRET>", sent by Vercel Cron).
+// Each run is saved to cron_runs (src/lib/cronRuns.ts) and shown at /admin/cron-runs.
 import { createAdminClient } from '@/lib/supabase/admin';
+import { withCronLog } from '@/lib/cronRuns';
 import { hasPro } from '@/lib/entitlements';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { buildPlayerContext } from '@/lib/ai/context';
@@ -25,7 +27,7 @@ Be encouraging and specific. If effort was very high all week, suggest a recover
 
 const day = (d: Date) => d.toISOString().slice(0, 10);
 
-export async function GET(request: Request) {
+async function run(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret || request.headers.get('authorization') !== `Bearer ${secret}`) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -99,6 +101,8 @@ export async function GET(request: Request) {
   let created = 0;
   let failed = 0;
   let pushed = 0;
+  // The first few distinct reasons a report failed, for the run log (no player ids)
+  const errors = new Set<string>();
 
   async function runOne(p: (typeof due)[number]) {
     try {
@@ -147,7 +151,9 @@ export async function GET(request: Request) {
       }
     } catch (err) {
       failed += 1;
-      console.error('Weekly report failed for a player:', err instanceof Error ? err.message : err);
+      const message = err instanceof Error ? err.message : String(err);
+      if (errors.size < 3) errors.add(message.slice(0, 200));
+      console.error('Weekly report failed for a player:', message);
     }
   }
 
@@ -157,5 +163,14 @@ export async function GET(request: Request) {
     await Promise.all(due.slice(i, i + CONCURRENCY).map(runOne));
   }
 
-  return Response.json({ active: active.length, due: due.length, created, failed, pushed });
+  return Response.json({
+    active: active.length,
+    due: due.length,
+    created,
+    failed,
+    pushed,
+    ...(errors.size ? { errors: [...errors] } : {}),
+  });
 }
+
+export const GET = withCronLog('weekly-report', run);

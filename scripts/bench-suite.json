@@ -1,0 +1,36 @@
+{
+  "_about": "Labelled clips for scripts/bench-suite.mjs. Files live outside the repo in DEADEYE_BENCH_DIR. Times in seconds. Clip 1's attempts come from the tracker's own calls on it (10 of 10 right, matching its labelled makes); clip 2's were labelled frame by frame.",
+  "clips": [
+    {
+      "id": "clip1",
+      "file": "16606.mp4",
+      "note": "51s, side-on, 10 attempts",
+      "rim": [0.5253, 0.2194, 0.5865, 0.1991],
+      "makes": [4.1, 13.9, 20.1, 25.2, 50.3],
+      "attempts": [4.1, 8.5, 13.9, 20.3, 25.2, 31.1, 35.5, 39.9, 45.9, 50.2]
+    },
+    {
+      "id": "clip2",
+      "file": "16761.mp4",
+      "note": "2:39, far and low, two rebounders and a second ball, 31 attempts",
+      "rim": [0.3574, 0.4479, 0.4037, 0.4479],
+      "makes": [23.6, 43.55, 49.4, 53.8, 90.45, 98.25, 109.3, 128.9, 136.8, 154.75],
+      "attempts": [5.25, 10.45, 15.65, 23.6, 28.5, 39.4, 43.55, 49.4, 53.8, 58.0, 62.9, 66.55, 71.6, 78.05, 84.9, 90.45, 95.2, 98.25, 101.9, 109.3, 112.7, 116.7, 121.5, 128.9, 132.5, 136.8, 140.4, 144.8, 149.15, 154.75, 158.4]
+    }
+  ],
+  "variants": [
+    { "id": "base", "about": "the clip as filmed" },
+    { "id": "lowres", "about": "half the pixels each way: a rim far away or small in the picture", "vf": "scale=trunc(iw/4)*2:trunc(ih/4)*2" },
+    { "id": "dark", "about": "a dim gym: darker, flatter, grainy", "vf": "eq=brightness=-0.16:contrast=0.8:saturation=0.8,noise=alls=10:allf=t" },
+    { "id": "washed", "about": "bright windows behind: low contrast, lifted shadows", "vf": "eq=contrast=0.6:brightness=0.14:gamma=1.25" },
+    { "id": "fps15", "about": "a phone scoring 15 frames a second", "vf": "fps=15", "fps": 15 },
+    { "id": "fps10", "about": "a slow phone scoring 10 frames a second", "vf": "fps=10", "fps": 10 },
+    {
+      "id": "shake",
+      "about": "a wobbly mount: the picture drifts up to about 0.6% each way",
+      "vf": "crop=w=iw*0.96:h=ih*0.96:x=iw*0.02+iw*0.006*sin(2*PI*t*0.7):y=ih*0.02+ih*0.006*cos(2*PI*t*0.45),scale=trunc(iw/0.96/2)*2:trunc(ih/0.96/2)*2",
+      "rimCrop": 0.02
+    },
+    { "id": "hard", "about": "small, dim and slow together", "vf": "scale=trunc(iw/4)*2:trunc(ih/4)*2,eq=brightness=-0.16:contrast=0.8:saturation=0.8,noise=alls=10:allf=t,fps=15", "fps": 15 }
+  ]
+}

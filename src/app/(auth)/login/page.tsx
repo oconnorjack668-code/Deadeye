@@ -71,8 +71,8 @@ function LoginContent() {
         <div className="flex flex-col items-center mb-8 text-center">
           <Logo size={56} className="mb-3" />
           <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
-          <p className="text-xs text-zinc-400 mt-1">Player Development Operating System</p>
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
+          <p className="text-sm text-zinc-400 mt-1">Player Development Operating System</p>
         </div>
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
@@ -140,16 +140,16 @@ function LoginContent() {
               </Button>
 
               {invited && (
-                <p className="text-xs text-center text-cyan-300">
+                <p className="text-sm text-center text-cyan-300">
                   A friend invited you. Create an account and you can add them straight after.
                 </p>
               )}
               {teamInvite && (
-                <p className="text-xs text-center text-cyan-300">
+                <p className="text-sm text-center text-cyan-300">
                   Your coach invited you to a team. Create an account and you can join it straight after.
                 </p>
               )}
-              <p className="text-xs text-center text-zinc-400">
+              <p className="text-sm text-center text-zinc-400">
                 New to Deadeye?{' '}
                 <Link
                   href="/signup"

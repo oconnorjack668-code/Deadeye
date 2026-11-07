@@ -14,6 +14,9 @@
 // v5 precaches the make and miss sounds, so a session logged offline is not silent.
 const CACHE_NAME = 'hoopiq-v5';
 const PAGE_CACHE = 'hoopiq-pages-v1';
+// The hoop finder's model (36 MB), written by its worker (src/lib/video/
+// rimModel.ts). Kept across updates, or every update would download it again.
+const MODEL_CACHE = 'deadeye-models-v1';
 const OFFLINE_PAGES = ['/basketball/new', '/workouts/new', '/games/new'];
 
 const ASSETS_TO_CACHE = [
@@ -36,7 +39,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((names) => Promise.all(names.filter((name) => name !== CACHE_NAME && name !== PAGE_CACHE).map((name) => caches.delete(name))))
+      .then((names) =>
+        Promise.all(names.filter((name) => name !== CACHE_NAME && name !== PAGE_CACHE && name !== MODEL_CACHE).map((name) => caches.delete(name)))
+      )
   );
   self.clients.claim();
 });

@@ -22,11 +22,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] select-none';
+      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)] disabled:opacity-50 disabled:pointer-events-none active:scale-[0.98] select-none';
 
     const variants = {
       primary:
-        'bg-orange-600 text-white hover:bg-orange-500 shadow-md shadow-orange-950/20 active:bg-orange-700',
+        // Hover brightens rather than switching to orange-500, on which white text
+        // falls to 2.8:1. orange-600 is deepened in globals.css for 5.2:1.
+        'bg-orange-600 text-white hover:brightness-110 shadow-md shadow-orange-950/20 active:brightness-95',
       secondary:
         'bg-zinc-800 text-zinc-100 hover:bg-zinc-700 active:bg-zinc-900 border border-zinc-700/60',
       outline:
@@ -34,7 +36,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       ghost:
         'bg-transparent text-zinc-300 hover:bg-zinc-800/60 hover:text-white',
       danger:
-        'bg-red-600 text-white hover:bg-red-500 shadow-md shadow-red-950/20',
+        'bg-red-600 text-white hover:brightness-110 shadow-md shadow-red-950/20',
       accent:
         'bg-amber-500 text-zinc-950 font-semibold hover:bg-amber-400 shadow-md shadow-amber-950/20',
     };

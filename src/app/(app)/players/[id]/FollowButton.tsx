@@ -45,12 +45,12 @@ export function FollowButton({ userId, initial }: { userId: string; initial: boo
           </button>
         )}
       </div>
-      <p className="text-center text-xs text-zinc-500">
+      <p className="text-center text-sm text-zinc-500">
         {following
           ? 'Their posts show on your dashboard. Tap Following to stop.'
           : 'Get their challenges and tips on your dashboard. They only see how many follow, never who.'}
       </p>
-      {message && <p className="text-center text-xs text-zinc-400">{message}</p>}
+      {message && <p className="text-center text-sm text-zinc-400">{message}</p>}
     </div>
   );
 }

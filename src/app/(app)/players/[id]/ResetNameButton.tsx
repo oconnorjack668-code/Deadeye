@@ -42,7 +42,7 @@ export function ResetNameButton({ userId, name }: { userId: string; name: string
       >
         <ShieldAlert className="h-4 w-4" /> {busy ? 'Resetting…' : 'Reset this name to "Player"'}
       </button>
-      {message && <p className="mt-2 text-xs text-zinc-300">{message}</p>}
+      {message && <p className="mt-2 text-sm text-zinc-300">{message}</p>}
     </div>
   );
 }

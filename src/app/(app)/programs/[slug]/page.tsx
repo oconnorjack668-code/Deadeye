@@ -114,7 +114,7 @@ export default async function ProgramPage({ params }: { params: Promise<{ slug: 
                     {completed.has(d.id) ? (
                       <CheckCircle2 className="h-5 w-5 text-emerald-400 flex-shrink-0" />
                     ) : (
-                      <Circle className="h-5 w-5 text-zinc-600 flex-shrink-0" />
+                      <Circle className="h-5 w-5 text-zinc-500 flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-semibold text-white">

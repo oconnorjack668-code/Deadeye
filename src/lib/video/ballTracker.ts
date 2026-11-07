@@ -27,8 +27,10 @@
 // by where it was heading. The one reported is one that has been above the
 // rim: a shot comes down from above, and none of those other things ever is.
 import {
+  adaptedThreshold,
   ballCandidates,
   diffMask,
+  lumaSpread,
   netMotion as netMotionIn,
   DEFAULT_DIFF_THRESHOLD,
   type BallCandidate,
@@ -147,6 +149,11 @@ export function medianColour(samples: Rgb[]): Rgb | null {
 
 export interface BallTrackerOptions {
   expectedDiameter: number;
+  /**
+   * A fixed difference threshold. Without it the threshold follows the
+   * picture's contrast (motionBall's adaptedThreshold): the default on an
+   * ordinary picture, lower on a flat, washed-out one.
+   */
   threshold?: number;
   minScore?: number;
   /**
@@ -238,7 +245,11 @@ interface Track {
 
 export function createBallTracker(options: BallTrackerOptions): BallTracker {
   const learn = options.learn ?? true;
-  const threshold = options.threshold ?? DEFAULT_DIFF_THRESHOLD;
+  const fixedThreshold = options.threshold;
+  let threshold = fixedThreshold ?? DEFAULT_DIFF_THRESHOLD;
+  // The picture's contrast, smoothed over frames so the threshold does not
+  // jump with a frame that has a bright shirt in it
+  let spread: number | null = null;
   const net = options.net ?? null;
   const D = options.expectedDiameter;
   const samples: Rgb[] = [];
@@ -294,6 +305,11 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
     track(prev, cur, width, height, next, at) {
       clock = at ?? clock + 1000 / 30;
       const now = clock;
+      if (fixedThreshold === undefined) {
+        const s = lumaSpread(cur);
+        spread = spread === null ? s : spread * 0.9 + s * 0.1;
+        threshold = adaptedThreshold(spread);
+      }
 
       const before = diff(prev, cur, width, height);
       let mask = before;

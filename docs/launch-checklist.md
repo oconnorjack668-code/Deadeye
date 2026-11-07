@@ -107,6 +107,10 @@ editor: it only reads, and lists anything missing with the migration it came fro
       choice of who sees them, and a parent approving any under-16 photo), and
       stores levels so friends can see them on player cards. It also creates
       the private `avatars` storage bucket. Safe to run more than once.
+- [x] Run `supabase/migrations/00055_saved_rims.sql` in the Supabase SQL editor.
+      It keeps the hoops a player saves in the shot tracker with their account
+      as well as on the phone. Until it is run the tracker keeps them on the
+      phone only, as before. Safe to run more than once.
 - [ ] Stripe, in live mode, in EUR. One product, "Deadeye Pro", with three
       recurring prices, and their ids in Vercel:
       - €6.99 a month → `STRIPE_PRO_MONTHLY_PRICE_ID`

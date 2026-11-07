@@ -153,7 +153,7 @@ export function ShotHeatMap({ zones }: { zones: ZoneShooting[] }) {
         {LEGEND.map((l) => (
           <span key={l.at} className="flex items-center gap-1.5">
             <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: bandFor(l.at).fill }} />
-            {bandFor(l.at).label} <span className="text-zinc-600">{l.range}</span>
+            {bandFor(l.at).label} <span className="text-zinc-500">{l.range}</span>
           </span>
         ))}
       </div>
@@ -169,7 +169,7 @@ export function ShotHeatMap({ zones }: { zones: ZoneShooting[] }) {
               <div key={z.zone} className="flex items-center justify-between gap-2 text-sm">
                 <span className="text-zinc-300 truncate">
                   {ZONE_LABELS[z.zone as CourtZone]}
-                  {lowSample && <span className="ml-1.5 text-[10px] uppercase text-zinc-600">low sample</span>}
+                  {lowSample && <span className="ml-1.5 text-[10px] uppercase text-zinc-500">low sample</span>}
                 </span>
                 <span className="flex-shrink-0 font-semibold">
                   <span className={band.text}>{z.percentage}%</span>{' '}

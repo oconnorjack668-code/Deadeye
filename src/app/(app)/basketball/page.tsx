@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
+import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import Link from 'next/link';
 import { Plus, Target, ListChecks, ClipboardList, Video, Lightbulb, ChevronRight } from 'lucide-react';
 import { formatShootingPercentage } from '@/lib/stats';
@@ -56,8 +57,15 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl mx-auto">
+      <div className={HUB_CONTAINER}>
         <PageHeader tone="hoops" icon={Target} title="Hoops" subtitle="Drills, shooting and game minutes" />
+
+        {/* Logging and the history in the main column; the numbers and
+            shortcuts beside them on a laptop, between them on a phone */}
+        <HubGrid
+          sideLabel="Your shooting and shortcuts"
+          top={
+            <>
 
         {/* The shot logger lands here after saving (?saved=1) */}
         {saved === '1' && totalSessions === 1 && <FirstSessionCelebration xp={XP_VALUES.session} />}
@@ -77,18 +85,22 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
             burying it three taps deep made it invisible. */}
         <Link
           href="/video"
-          className="mb-3 flex items-center gap-3 rounded-2xl border border-red-600/30 bg-red-600/10 p-3 hover:bg-red-600/15"
+          // Orange, not red: red means a miss or an error (docs/design.md). A
+          // plain card with the icon inline, under the orange New session button.
+          className="mb-3 flex items-center gap-3 rounded-2xl border border-orange-600/30 bg-zinc-900/70 p-3 transition-colors duration-150 hover:border-orange-500/50"
         >
-          <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-red-600/20">
-            <Video className="h-5 w-5 text-red-400" />
-          </span>
+          <Video className="h-5 w-5 flex-shrink-0 text-orange-400" />
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-bold text-white">Track with your camera</span>
             <span className="block text-xs text-zinc-400">Prop your phone up and it counts shots for you</span>
           </span>
-          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+          <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
         </Link>
 
+            </>
+          }
+          side={
+            <>
         <div className="grid grid-cols-2 gap-3 mb-6">
           <Link href="/games">
             <Card className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-900 transition-colors h-full">
@@ -152,6 +164,10 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
           </div>
         )}
 
+            </>
+          }
+          rest={
+            <>
         {/* Session History */}
         {sessions && sessions.length > 0 ? (
           <>
@@ -175,7 +191,7 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
                             <Video className="h-3.5 w-3.5 flex-shrink-0 text-cyan-400" aria-label="Counted from video" />
                           )}
                         </h3>
-                        <p className="text-xs text-zinc-400 mt-1">
+                        <p className="text-sm text-zinc-400 mt-1">
                           {new Date(`${session.session_date}T00:00:00`).toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short',
@@ -183,7 +199,7 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
                           })} · {session.duration_minutes} min · RPE {session.intensity_rpe}/10
                         </p>
                       </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-600" />
+                      <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
                     </CardContent>
                   </Card>
                 </Link>
@@ -201,6 +217,9 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
             </CardContent>
           </Card>
         )}
+            </>
+          }
+        />
       </div>
     </div>
   );
