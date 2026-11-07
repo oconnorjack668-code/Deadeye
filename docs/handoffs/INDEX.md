@@ -11,6 +11,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
 - 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
 - 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
+- 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
 - 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
 - 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
 - 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
