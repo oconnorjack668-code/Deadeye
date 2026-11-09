@@ -242,6 +242,14 @@ under a checked session in the tracker's review, which saves the video and a
 and are left out). Copy both into `DEADEYE_BENCH_DIR` and the suite picks them
 up. Players' videos never leave their phones; this is the owner's footage.
 
+Three clips filmed on 4 Nov 2026 (`clip3` to `clip5`) are the first footage
+the tracker was never tuned on. Each is cut, without re-encoding, from just
+before the first shot to just after the last (the phone being set down and
+picked up are not in them), and labelled frame by frame. `clip5` is the
+hold-out (`"holdout": true`): the suite skips it unless it is named
+(`node scripts/bench-suite.mjs clip5`). Never tune on it; score it once, when
+a change is finished, and report that as the real number.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

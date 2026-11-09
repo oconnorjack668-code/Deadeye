@@ -94,6 +94,12 @@ function parse(text) {
 const rows = [];
 for (const clip of suite.clips) {
   if (onlyClips.length && !onlyClips.includes(clip.id)) continue;
+  // A hold-out clip measures the tracker on footage it was never tuned on, so
+  // it only runs when named: a routine run must not let it be looked at
+  if (clip.holdout && !onlyClips.includes(clip.id)) {
+    console.log(`skipping ${clip.id}: hold-out, runs only when named`);
+    continue;
+  }
   if (!existsSync(path.join(dir, clip.file))) {
     console.log(`skipping ${clip.id}: ${clip.file} is not in ${dir}`);
     continue;
