@@ -2,6 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+- 2026-11-09 · hq-redesign-worker · Deadeye HQ redesign, chat, hub worker; E4 shipped and checked live · open: 3 → [handoff](2026-11-09-hq-redesign-worker.md)
 - 2026-11-09 · agent-hub-routines · Deadeye Bench hub; weekly run pushes again; 4 new routines; proxy fix · open: 3 → [handoff](2026-11-09-agent-hub-routines.md)
 - 2026-11-09 · e4-dashboard-reminder · Reminders card on dashboard for zero-session players; reminder_set marker · open: 2 → [handoff](2026-11-09-e4-dashboard-reminder.md)
 - 2026-11-09 · agent-learning-safety · Agents learn from research; streak opt-in under 18; AI safeguards; DPIA draft · open: 4 → [handoff](2026-11-09-agent-learning-safety.md)
@@ -31,4 +32,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-22 · icon-and-photos · Deadeye favicon; profile photos on leaderboard and top bar · open: 3 → [handoff](2026-10-22-icon-and-photos.md)
 - 2026-10-22 · tester-reset · Tester logins can reset to a brand-new player from Settings, live · open: none → [handoff](2026-10-22-tester-reset.md)
 - 2026-10-22 · agent-os-first-loop · First weekly loop: report, fresh counts, E1 shipped and checked live · open: 2 → [handoff](2026-10-22-agent-os-first-loop.md)
-- 2026-10-22 · agent-os · Agent OS v1: activation analyst leads a weekly build loop · open: 4 → [handoff](2026-10-22-agent-os.md)
