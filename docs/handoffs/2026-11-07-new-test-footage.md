@@ -27,7 +27,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this handoff only · Status: crash rep
 - [tracker-accuracy-bench handoff](2026-11-03-tracker-accuracy-bench.md), [rim-finder handoff](2026-11-03-rim-finder.md)
 
 ## Open
-- **Founder: add the push keys and redeploy.** A key pair was generated (`.claude/jobs/1738f077/tmp/vapid.json` in the user folder; deleted with this job, else `npx web-push generate-vapid-keys`). Vercel → Settings → Environment Variables, Production: `NEXT_PUBLIC_VAPID_PUBLIC_KEY` = publicKey, `VAPID_PRIVATE_KEY` = privateKey (Sensitive). Then redeploy: the public key is built into the page. Check: Profile → Turn on notifications → Send a test; the next 16:28 run shows Worked at `/admin/cron-runs`. Never change the pair after players subscribe.
+- **DONE 2026-11-07, do not raise again:** the founder added the push keys that day. `cron_runs` shows every reminders run from 7 Nov on returns 200 (the last 503 "VAPID keys missing" was 6 Nov). Original note, kept for reference: A key pair was generated (`.claude/jobs/1738f077/tmp/vapid.json` in the user folder; deleted with this job, else `npx web-push generate-vapid-keys`). Vercel → Settings → Environment Variables, Production: `NEXT_PUBLIC_VAPID_PUBLIC_KEY` = publicKey, `VAPID_PRIVATE_KEY` = privateKey (Sensitive). Then redeploy: the public key is built into the page. Check: Profile → Turn on notifications → Send a test; the next 16:28 run shows Worked at `/admin/cron-runs`. Never change the pair after players subscribe.
 - Next session: steps 1–8 above.
 
 ## Gotchas

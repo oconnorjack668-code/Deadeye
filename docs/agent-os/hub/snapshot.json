@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-09T13:30:00Z",
+  "updatedBy": "Claude Code (hub set-up)",
+  "scoreboard": {
+    "joined": 33,
+    "setup": 24,
+    "first": 3,
+    "second": 1,
+    "third": 0,
+    "goalCount": 10,
+    "goalPct": 40,
+    "goalDate": "2026-11-19",
+    "lastSignup": "2026-10-24",
+    "nextRun": "2026-11-16T09:00:00Z",
+    "openProblems": 0,
+    "openCrashes": 0
+  },
+  "health": [
+    { "name": "Weekly run", "status": "ok", "detail": "Pushes to GitHub again since 9 Nov (repo source added). Runs on 26 Oct, 2 Nov and 9 Nov 09:04 were lost." },
+    { "name": "Agent skills", "status": "ok", "detail": "Plugins load in the cloud from 9 Nov (setup script). This week's run still ran without them." },
+    { "name": "Counts job", "status": "ok", "detail": "Saved data/2026-11-09-funnel.md at 08:43." },
+    { "name": "Training reminders", "status": "ok", "detail": "Push keys added 7 Nov; every run since returns 200." },
+    { "name": "Live site", "status": "ok", "detail": "Running ff49c02 (PR #73, sign-in cookie fix). Home, login and the login redirect checked." },
+    { "name": "Problems and crashes", "status": "ok", "detail": "0 problem reports and 0 crash reports open." },
+    { "name": "New players", "status": "warn", "detail": "Nobody has joined since 24 Oct." }
+  ],
+  "calls": [
+    { "id": "pr-74", "kind": "merge", "agent": "builder", "title": "Merge E4: training-days reminder on the dashboard", "detail": "Shows the reminders card to players with no session yet. Safety PASS, 1021 tests pass, no migration, no new env vars. Three small follow-ups noted (privacy wording, default days look picked, marker counts days saved).", "words": "merge 74", "link": "https://github.com/oconnorjack668-code/Deadeye/pull/74" },
+    { "id": "pr-75", "kind": "merge", "agent": "activation-analyst", "title": "Merge this week's report and plans", "detail": "Activation report, marketing plan, club plan, backlog (E4 in review, E5 and E6 new, C4 new). Docs only.", "words": "merge 75", "link": "https://github.com/oconnorjack668-code/Deadeye/pull/75" },
+    { "id": "mkt-openings", "kind": "approve", "agent": "marketing", "title": "Pick the promo opening to test first", "detail": "Same 24.5s promo body, three first-3-seconds: A live count ticking, B first make 1/1, C \"Do you count your makes in your head?\". Note which one you want first.", "options": ["A", "B", "C"] },
+    { "id": "mkt-week", "kind": "approve", "agent": "marketing", "title": "Approve this week's posting calendar", "detail": "Mon promo (opening A), Tue Story poll, Wed \"log it in 20 seconds\", Thu 5-spot challenge (needs filming), Fri promo opening B or C, Sat IQ question, Sun round-up. Drafts only; you post." },
+    { "id": "mkt-founder-posts", "kind": "approve", "agent": "marketing", "title": "Approve two founder posts for the app", "detail": "1. Log a session without a court in about 20 seconds. 2. This week's 5-spot challenge. Delete \"I read every one\" if it is not true." },
+    { "id": "mkt-landing-every", "kind": "approve", "agent": "marketing", "title": "Fix \"count every make and miss\" on the landing page", "detail": "The demo paragraph in src/app/page.tsx still says \"every\". Approve to send it to the builder as a one-line copy fix." },
+    { "id": "mkt-analytics", "kind": "task", "agent": "marketing", "title": "Paste views and link taps for anything you posted", "detail": "Marketing can't tell whether the 23 Oct promo went out. Views, follows and bio link taps per post." },
+    { "id": "club-blazers", "kind": "task", "agent": "club-growth", "title": "Settle the Wexford Blazers trial", "detail": "Agree a head coach (18+, vetting confirmed), one team (U12 to U14 avoids the 16 and 17 gap), a start date and a decision date. To finish before December it needs to start by about 16 Nov.", "due": "2026-11-16" },
+    { "id": "club-outreach", "kind": "approve", "agent": "club-growth", "title": "Send outreach to Enniscorthy BC and Gorey BC", "detail": "Two short drafts are ready in clubs/2026-11-09-clubs.md. The agent suggests waiting until the Blazers date is set. Approve to send after that, or say not now." },
+    { "id": "c4-consent", "kind": "task", "agent": "club-growth", "title": "Decide consent wording for parents of 16 and 17 year olds (C4)", "detail": "Needed before an U16 to U18 team can trial. Parent emails are personal data; decide the wording, then safety-reviewer checks it." },
+    { "id": "e0", "kind": "task", "agent": "activation-analyst", "title": "E0: message 5 players who stopped", "detail": "Ask what they expected, what stopped them logging, what would make them open it after training. Paste answers without names into data/YYYY-MM-DD-notes.md." },
+    { "id": "dpia", "kind": "task", "agent": "safety-reviewer", "title": "Read, correct and sign the DPIA with your mam", "detail": "docs/legal/dpia.md is a draft. Then its 6 open actions." },
+    { "id": "billing", "kind": "task", "agent": "release-checker", "title": "deadeye.ie, then Resend, then Stripe Pro", "detail": "docs/founder-setup-guide.md parts 1 to 5. Stripe Pro live by 8 Jan 2027; ask Claude to start club billing by mid-December.", "due": "2027-01-08" }
+  ],
+  "agents": [
+    { "id": "activation-analyst", "num": 1, "name": "Activation analyst", "role": "Lead. Reads the funnel, picks the one experiment marked NEXT.", "lastRun": "2026-11-09T12:24:00Z", "output": "Report: biggest drop is setup to first session (21 of 24). E4 marked NEXT, E5 and E6 added.", "skills": "fixed", "lessons": 0, "sources": 30, "researched": "2026-11-07", "schedule": "Mondays 09:00", "ask": "Ask the activation analyst why players who finish setup never log a session, using this week's funnel." },
+    { "id": "builder", "num": 2, "name": "Builder", "role": "Builds the NEXT experiment on its own branch, with tests.", "lastRun": "2026-11-09T12:24:00Z", "output": "Built E4 on exp/E4-dashboard-reminder (PR #74).", "skills": "fixed", "lessons": 13, "sources": 23, "researched": "2026-11-07", "schedule": "Mondays, after the analyst", "ask": "Ask the builder to fix the three follow-up notes on E4 in a small PR." },
+    { "id": "safety-reviewer", "num": 3, "name": "Safety reviewer", "role": "Checks every branch for under-18s, parents, personal data and messages.", "lastRun": "2026-11-09T12:24:00Z", "output": "E4: PASS with three non-blocking notes.", "skills": "fixed", "lessons": 0, "sources": 19, "researched": "2026-11-07", "schedule": "On every agent PR", "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds." },
+    { "id": "release-checker", "num": 4, "name": "Release checker", "role": "Types, lint, tests, migrations, env vars, and your step-by-step checklist.", "lastRun": "2026-11-09T12:24:00Z", "output": "E4 checklist: no migration, no env vars, 5 checks after deploy.", "skills": "fixed", "lessons": 9, "sources": 16, "researched": "2026-11-07", "schedule": "On every agent PR", "ask": "Ask the release checker for the after-deploy checklist for PR #74." },
+    { "id": "support-triage", "num": 5, "name": "Support triage", "role": "Reads problem and crash reports, finds the cause, ranks fixes.", "lastRun": "2026-11-09T12:15:00Z", "output": "Skipped: 0 problem and 0 crash reports open.", "skills": "fixed", "lessons": 7, "sources": 24, "researched": "2026-11-07", "schedule": "Daily 08:00 (morning check)", "ask": "Ask support triage to check last night's live errors in Vercel." },
+    { "id": "marketing", "num": 6, "name": "Marketing", "role": "TikTok and Instagram ideas, scripts and posts. Drafts only.", "lastRun": "2026-11-09T12:16:00Z", "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.", "skills": "fixed", "lessons": 8, "sources": 33, "researched": "2026-11-07", "schedule": "Mondays, and Thursdays 10:00", "ask": "Ask marketing to script the 5-spot challenge video shot by shot." },
+    { "id": "club-growth", "num": 7, "name": "Club growth", "role": "Finds clubs, drafts outreach, plans and tracks trials.", "lastRun": "2026-11-09T12:17:00Z", "output": "Blazers trial plan and call prep; Enniscorthy and Gorey drafts; C4 added.", "skills": "fixed", "lessons": 0, "sources": 32, "researched": "2026-11-07", "schedule": "Mondays, and the 1st of the month", "ask": "Ask club growth to prep me for a call with the Wexford Blazers coach." }
+  ],
+  "funnel": {
+    "main": [
+      { "step": "Joined", "n": 33 },
+      { "step": "Finished setup", "n": 24 },
+      { "step": "1st session", "n": 3 },
+      { "step": "2nd session", "n": 1 },
+      { "step": "3rd session", "n": 0 }
+    ],
+    "welcome": [
+      { "step": "Saw the welcome screen", "n": 7 },
+      { "step": "Played the sample clip", "n": 1 },
+      { "step": "Watched it to the end", "n": 1 }
+    ],
+    "tracker": [
+      { "step": "Opened the tracker", "n": 3 },
+      { "step": "Set the rim", "n": 3 },
+      { "step": "Started tracking", "n": 2 },
+      { "step": "Reached results", "n": 2 },
+      { "step": "Saved", "n": 1 }
+    ],
+    "history": [
+      { "date": "2026-10-19", "setup": 17, "first": 3 },
+      { "date": "2026-10-22", "setup": 18, "first": 2 },
+      { "date": "2026-11-02", "setup": 24, "first": 3 },
+      { "date": "2026-11-09", "setup": 24, "first": 3 }
+    ]
+  },
+  "backlog": [
+    { "id": "E4", "title": "Training-days reminder on the dashboard", "status": "review", "why": "Forgot: most stalled players never saw a reminder prompt.", "link": "https://github.com/oconnorjack668-code/Deadeye/pull/74" },
+    { "id": "E5", "title": "Tracker \"no shots detected\" offers a by-hand log", "status": "idea", "why": "Can't: a 0-shot run ends in a dead end." },
+    { "id": "E6", "title": "Markers for the dashboard and the Today card", "status": "idea", "why": "A stall before the logger looks like no activity." },
+    { "id": "C4", "title": "Parents of 16 and 17 year olds can see coach posts", "status": "idea", "why": "A DSCO may stop an U16 to U18 trial without it." },
+    { "id": "E0", "title": "Ask 5 players why they stopped", "status": "founder", "why": "5 answers beat a week of guessing." },
+    { "id": "E3", "title": "Markers for the welcome answer and the by-hand logger", "status": "kept", "why": "Shipped 25 Oct. Unverified: no signups since." },
+    { "id": "E2", "title": "\"Trained already? Log it\" for players away from a court", "status": "kept", "why": "Shipped 25 Oct. Not yet readable." },
+    { "id": "E1", "title": "First log opens in \"Enter totals\"", "status": "kept", "why": "Shipped 22 Oct. 3 of 24 vs 2 of 18: a hint only." }
+  ],
+  "clubs": {
+    "oneThing": "Settle with the Wexford Blazers: a head coach, one team, a start date and a decision date.",
+    "rows": [
+      { "club": "Wexford Blazers", "county": "Wexford", "stage": "talking", "levels": "Girls and boys U9 to U18", "next": "Agree coach, team and start date by about 16 Nov" },
+      { "club": "Enniscorthy BC", "county": "Wexford", "stage": "target", "levels": "Underage from age 7", "next": "Draft ready; send after the Blazers date" },
+      { "club": "Gorey BC", "county": "Wexford", "stage": "target", "levels": "U10, U12, U14", "next": "Draft ready; send after the Blazers date" }
+    ],
+    "directory": 277,
+    "leagues": 39,
+    "coaches": 0,
+    "teams": 0
+  },
+  "film": {
+    "experiment": "One promo, three openings. Keep the opening with the best 6-second hold once each has about 1,000 views.",
+    "days": [
+      { "day": "Mon 9", "where": "TikTok 17:00 · Reel 18:00", "post": "Promo, opening A" },
+      { "day": "Tue 10", "where": "IG Story 18:00", "post": "Demo on a phone, poll: do you count your makes?" },
+      { "day": "Wed 11", "where": "TikTok 17:00 · Reel 17:30", "post": "Log it in 20 seconds, no court" },
+      { "day": "Thu 12", "where": "TikTok 17:30 · Reel 18:00", "post": "5-spot challenge (needs filming)" },
+      { "day": "Fri 13", "where": "TikTok 17:00 · Reel 18:00", "post": "Promo, opening B or C" },
+      { "day": "Sat 14", "where": "IG Story", "post": "Film IQ: one question" },
+      { "day": "Sun 15", "where": "IG Story 17:00", "post": "Challenge round-up, counts only" }
+    ]
+  },
+  "log": [
+    { "at": "2026-11-09T12:55:00Z", "tone": "ok", "text": "Plugin check: campaign-plan, draft-outreach, metrics-review and analyze all load in the cloud." },
+    { "at": "2026-11-09T12:32:00Z", "tone": "ok", "text": "PR #73 merged and live: sign-in cookies kept on redirects." },
+    { "at": "2026-11-09T12:28:00Z", "tone": "ok", "text": "Weekly re-run finished: PR #74 (E4) and PR #75 (report and plans) opened." },
+    { "at": "2026-11-09T12:14:00Z", "tone": "info", "text": "Weekly routine given its repository and re-run." },
+    { "at": "2026-11-09T09:05:00Z", "tone": "bad", "text": "Weekly run could not push (403): this week's first run was lost." },
+    { "at": "2026-11-09T08:43:00Z", "tone": "ok", "text": "Counts job saved this week's funnel." },
+    { "at": "2026-11-07T16:28:00Z", "tone": "ok", "text": "Training reminders work again (push keys added)." },
+    { "at": "2026-11-02T09:08:00Z", "tone": "bad", "text": "Weekly run finished in a minute; likely the same push failure." },
+    { "at": "2026-10-24T12:00:00Z", "tone": "warn", "text": "Last new player joined." }
+  ],
+  "learn": [
+    { "agent": "marketing", "date": "2026-11-07", "latest": "Check the whole video yourself, frame by frame where things move, before the founder sees it. Show a finished cut, not a draft to proofread.", "lessons": 8 },
+    { "agent": "builder", "date": "2026-11-03", "latest": "Build locally with Turbopack (plain next build), never --webpack; run any worker on the live site before calling it done.", "lessons": 13 },
+    { "agent": "release-checker", "date": "2026-11-07", "latest": "Every variable in .env.example that the changed code reads must be confirmed in Vercel Production by name.", "lessons": 9 },
+    { "agent": "support-triage", "date": "2026-11-07", "latest": "Silent failures (cron, push, email) never arrive as reports. Read /admin/cron-runs and the counts too.", "lessons": 7 }
+  ],
+  "deadlines": [
+    { "date": "2026-11-16", "title": "Blazers trial start", "detail": "Latest start to finish before December" },
+    { "date": "2026-11-19", "title": "Activation goal", "detail": "10 of 24 players logging" },
+    { "date": "2026-12-07", "title": "Agents research again", "detail": "30 days after 7 Nov" },
+    { "date": "2026-12-15", "title": "Start club billing", "detail": "Ask Claude by mid-December" },
+    { "date": "2026-12-31", "title": "Founding club offer closes", "detail": "First 3 clubs with 4+ teams" },
+    { "date": "2027-01-08", "title": "Stripe Pro live", "detail": "Founding Pro ends from about 20 Jan" },
+    { "date": "2027-02-01", "title": "Club billing live", "detail": "Team Pass and Club plan" }
+  ],
+  "commands": [
+    { "label": "Run the whole weekly loop now", "cmd": "/agent-os" },
+    { "label": "Work with one agent for a session", "cmd": "claude --agent marketing" },
+    { "label": "Merge E4", "cmd": "merge 74" },
+    { "label": "Merge this week's report", "cmd": "merge 75" },
+    { "label": "Hand over and wrap up a session", "cmd": "/handoff" }
+  ]
+}
