@@ -17,7 +17,7 @@ Each item:
 - Result: <after a week live: the numbers, then kept or dropped>
 ```
 
-## E1 · First log opens in "Enter totals" · shipped 2026-10-22
+## E1 · First log opens in "Enter totals" · kept (shipped 2026-10-22)
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals-first-log` (commit 34cd6a8, 1 commit ahead of main)
 
@@ -57,9 +57,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
      phone has a mode saved.
 - Live check (2026-10-22, founder): merged to main (pull request 18). A new account's first log opens in
   Enter totals; an account that has logged before still opens in Track every shot.
-- Result: read after a week live, from `/admin/funnel` "Everyone", against 2 of 18 (11%).
+- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups.
 
-## E2 · "Trained already? Log it" for players away from a court · shipped 2026-10-25
+## E2 · "Trained already? Log it" for players away from a court · kept (shipped 2026-10-25)
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (commit 204d097)
 
@@ -89,9 +89,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      today already? Log it by hand" shows under the intro, and opens the logger in Enter totals.
   5. Open Watch the tracker call a session, let it finish: the end card has Open the tracker, Log shots by hand
      and Back to my dashboard.
-- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup.
+- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed.
 
-## E3 · Markers for the welcome answer and the by-hand logger · shipped 2026-10-25
+## E3 · Markers for the welcome answer and the by-hand logger · kept (shipped 2026-10-25)
 
 Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (commit 204d097)
 
@@ -124,7 +124,52 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      spot logged. At `/admin/funnel` the new rows show 1 at each step you reached (the page counts players who
      joined in the window, so use a new test account).
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
-- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault).
+- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup.
+
+## E4 · Training-days reminder on the dashboard for a player with no session · NEXT
+
+Report: [2026-11-09](reports/2026-11-09-activation.md)
+
+- Hypothesis: barrier **forgot** (no cue). About 17 of the 24 who finished setup did so before the welcome
+  screen existed (10-21) and never saw its reminders card; `dashboard/page.tsx` has no reminder prompt, and
+  reminders live only on the welcome "later" branch and the profile. Unconfirmed until E0 notes arrive.
+- Change: for a player with no saved session, show the existing `RemindersCard` (`showWeekly={false}`) on the
+  dashboard under the Today card and starting steps, with the copy "When do you next train? Pick your days."
+  Nothing is asked on load: the card's existing tap flow asks for push permission. Add one marker,
+  `reminder_set`, fired when the player saves training days (`src/lib/events.ts`; no migration, the name check
+  is a regex). iPhone not installed to the Home Screen: no web push there; the card already says to add
+  Deadeye to the Home Screen, and the reminder is the only thing lost, so reach is lower than it looks.
+- Signal: `reminder_set` count, then first session within 7 days from 3 of 24 (12%). Under 30 players: a hint.
+  Needs new signups or returning stalled players to read at all.
+- Safety: to be reviewed (a message to under-18s: wording must stay neutral, no urgency or guilt).
+- Founder checklist: <from release-checker>
+- Result:
+
+## E5 · Tracker "no shots detected" offers a by-hand log · idea
+
+Report: [2026-11-09](reports/2026-11-09-activation.md)
+
+- Hypothesis: barrier **can't**. `components/video/ShotTracker.tsx` (l.1849) shows only advice when a run finds
+  0 shots, and Save errors; the player's only ways on are adding shots by hand or starting over. 2 players
+  reached results and 1 saved.
+- Change: below that text, a "Log this session by hand" link to `/basketball/new`.
+- Signal: tracker saved plus first session, from 1 of 2 who reached results. Hint at best (2 players).
+- Safety: <safety-reviewer verdict>
+- Founder checklist: <from release-checker>
+- Result:
+
+## E6 · Markers for the dashboard and the Today card · idea
+
+Report: [2026-11-09](reports/2026-11-09-activation.md)
+
+- Hypothesis: the dashboard is where a stalled player returns, and nothing records arriving there or tapping
+  "Log shots", so a stall before the logger looks like no activity.
+- Change: add `dashboard_seen` (zero-session players) and `today_log_tapped` to `src/lib/events.ts`, list them
+  on `/admin/funnel` and in `docs/funnel-counts.sql`. No migration.
+- Signal: counts at the two steps in the next data file; not activation itself.
+- Safety: <safety-reviewer verdict>
+- Founder checklist: <from release-checker>
+- Result:
 
 ## E0 · Ask 5 players why they stopped · founder
 
@@ -133,4 +178,12 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
   what did you expect the app to do, what stopped you logging, what would
   make you open it after training.
 - Signal: answers, paraphrased without names, in `data/YYYY-MM-DD-notes.md`.
+- Result:
+
+## C4 · Parents of 16 and 17 year olds can see coach posts · idea
+- Hypothesis: a DSCO checks that coach contact with minors includes other adults (BI social media policy). Parents of under-16s see every coach post on their approval link; parents of 16 and 17 year olds have no link, so a club with U16 to U18 teams (the Wexford Blazers have U18) may stop at the DSCO.
+- Change: let a 16 or 17 year old's parent receive the same read-only view of coach posts, by a parent email the player enters and the parent confirms. No messages, no new data shown to the coach. Founder decides the consent and data-protection wording first (parent emails are personal data; deadeye.ie and Resend already exist).
+- Signal: not a funnel step. It unblocks a trial team with players aged 16 and 17; read as "a club with U16+ teams starts a trial" and "no DSCO objection on this point".
+- Safety: pending (safety-reviewer: minors, parent emails, privacy text).
+- Founder checklist: pending.
 - Result:
