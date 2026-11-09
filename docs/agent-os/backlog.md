@@ -126,7 +126,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
 - Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup.
 
-## E4 · Training-days reminder on the dashboard for a player with no session · NEXT
+## E4 · Training-days reminder on the dashboard for a player with no session · review (exp/E4-dashboard-reminder)
 
 Report: [2026-11-09](reports/2026-11-09-activation.md)
 
@@ -141,8 +141,48 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
   Deadeye to the Home Screen, and the reminder is the only thing lost, so reach is lower than it looks.
 - Signal: `reminder_set` count, then first session within 7 days from 3 of 24 (12%). Under 30 players: a hint.
   Needs new signups or returning stalled players to read at all.
-- Safety: to be reviewed (a message to under-18s: wording must stay neutral, no urgency or guilt).
-- Founder checklist: <from release-checker>
+- Safety: PASS (2026-11-09), commit 9b23ff3, with three non-blocking notes. Files: `dashboard/page.tsx`,
+  `profile/RemindersCard.tsx`, `events.ts`, `funnel.ts`, `docs/funnel-counts.sql`, `privacy/page.tsx`. Parent gate:
+  the dashboard sits in the `(app)` layout, which sends under-16s without approval to `/parent-approval`. Personal
+  data: one more step name in `app_events` (no free text), in the privacy policy, in the export, deleted with the
+  account and after 90 days. Wording: neutral and a question, no urgency. Push permission only after the tap on
+  "Turn on notifications on this device". Notes: (1) the policy clause says "saving training days" but the marker
+  also fires on turning "Remind me" on; say "or turning reminders on", and split the clause into its own sentence
+  (`privacy/page.tsx:122`). (2) The Mon/Wed/Fri default shows as picked before anything is saved, and a day tap
+  gives no message; "Pick your days" can read as done with no reminder set until notifications are turned on.
+  Consider "Saved. Turn on notifications to get the reminder." (3) `reminder_set` fires on a day tap even with
+  reminders off, so it counts days saved, not reminders that can arrive; read it that way. DPIA: no new kind of
+  processing (existing events table, existing push address); mention the step in the next DPIA update.
+- Founder checklist (release-checker, 2026-11-09, branch `exp/E4-dashboard-reminder`, commit 9b23ff3, up to date
+  with `origin/main`). Checks: types pass, eslint on the 7 changed files pass, tests pass (1021 passed, 2 skipped).
+  No migrations. No new env vars. Skills: deploy-checklist was not installed, so this follows the release-checker
+  knowledge file's checklist.
+  1. Migrations to run in the Supabase SQL editor: none. The `reminder_set` name fits the existing `app_events`
+     name rule (`^[a-z_]{1,40}$`), so nothing to run.
+  2. Env vars to set in Vercel: none new. The card already reads `NEXT_PUBLIC_VAPID_PUBLIC_KEY`; confirm by name
+     that `NEXT_PUBLIC_VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` are both in Vercel Production (Settings ->
+     Environment Variables). Without them the card's push button cannot work. If you had to add either, then
+     redeploy (the public one is built into the page until you do). Never change the pair once players have
+     subscribed.
+  3. Merge: the agent opens the pull request for `exp/E4-dashboard-reminder` (none exists yet). When its checks are
+     green, reply `merge <PR number>`. `main` is protected, so it goes through the pull request, never a direct
+     push; the agent merges with `--match-head-commit 9b23ff3`.
+  4. After Vercel deploys, at deadeyeapp.vercel.app signed in as the tester account (use one with no saved
+     session, or a new test account):
+     - Dashboard shows the "Training reminders" card reading "When do you next train? Pick your days." with no
+       weekly-report toggle, and the browser does not ask for notification permission on load.
+     - Tap a day: it saves with no error. Tap "Turn on notifications on this device" on a phone installed to the
+       Home Screen: the permission prompt appears only then.
+     - Save a session for the tester account: the card is gone from the dashboard.
+     - `/admin/funnel` shows a "Reminders" row with 1 after you saved days (new test account; test accounts may be
+       left out of the counts, as with E2).
+     - Open `/privacy`: the events clause mentions saving training days.
+  5. If it is broken: Vercel -> project -> Instant Rollback, then "Undo Rollback" once fixed. No migration to undo.
+  - Known, non-blocking (from the safety notes, builder may fix in a follow-up): (1) the privacy clause should say
+    "or turning reminders on" and be its own sentence (`privacy/page.tsx:122`); the marker fires on that too, so
+    until fixed the policy is slightly narrower than the behaviour. (2) The Mon/Wed/Fri default shows as picked
+    before anything is saved, with no "saved" message. (3) `reminder_set` means days saved, not a reminder that
+    can arrive, and fires from any RemindersCard (profile, welcome, dashboard); read it that way.
 - Result:
 
 ## E5 · Tracker "no shots detected" offers a by-hand log · idea
