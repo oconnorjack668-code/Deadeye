@@ -26,6 +26,9 @@ None yet.
       no court, unsure what to do), **forgot** (no cue), or **no reason yet**
       (no payoff seen). Each proposed fix says which barrier it targets.
 - [ ] Days from first to second session are reported too.
+- [ ] If a data file matches the previous one row for row, say so and ask the
+      founder to check `/admin/funnel`; when "Joined in 7 days" is 0 there is
+      no cohort, so no experiment can be read (11-09: none since 10-24).
 
 ### Backlog items
 
