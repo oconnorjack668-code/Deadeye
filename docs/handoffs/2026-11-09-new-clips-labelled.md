@@ -1,11 +1,12 @@
 # 3 new test clips cut, labelled, in the bench suite (2026-11-09)
 
-Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: in progress (baseline 22 of 32 runs)
+Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: baseline done; diagnosis (step 6) next
 
 ## Outcome
 - The 4 Nov clips are in `scripts/bench-suite.json` as `clip3`, `clip4`, `clip5`: cut (stream copy, bit-identical frames) from just before the first shot to 2.5s after the last, labelled frame by frame.
 - `clip5` is the hold-out. `bench-suite.mjs` now skips any `"holdout": true` clip unless it is named.
-- First score on unseen footage: **clip3 as filmed 15/17** (1 missed, 2 phantoms). Old clips unchanged: clip1 10/10, clip2 31/31 as filmed.
+- Baseline, all 32 runs: **535/656 (81.6%)**, 61 missed, 24 phantoms. Old clips 254/328 (77.4%, identical to 3 Nov); new clips 281/328 (85.7%) but **22 phantoms against 2**.
+- As filmed: clip3 15/17, clip4 23/24, clip1 10/10, clip2 31/31.
 
 ## The clips (in `Documents/deadeye-bench/`; originals kept beside them)
 | clip | from | cut at | attempts / makes | what it is |
@@ -16,12 +17,15 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 - Label time = original time minus the cut start. Rim taps from a settled frame at 1:00; the mount does not drift.
 - The tracker was never run on clip5 (its labels were made by eye, so they owe nothing to its calls).
 
-## Baseline `out/baseline-nov7/` (stopped by Claude Code for low memory; no summary.txt)
-- clip1: 10, 10, 10, 10, 10, **4**, 9, 10 /10 (base, lowres, dark, washed, fps15, fps10, shake, hard)
+## Baseline `out/baseline-nov7/summary.txt` (base, lowres, dark, washed, fps15, fps10, shake, hard)
+- clip1: 10, 10, 10, 10, 10, **4**, 9, 10 /10
 - clip2: 31, 23, 27, 29, 26, **13**, 17, 15 /31
-- clip3: 15, 16, 16, 16, 13, **10** /17 (shake, hard not run); clip4: not run
-- clip3 as filmed, the 2 wrong: the make at 30.05s called late (32.2s) as a miss; the make at 84.75s called a miss, crossed at 1.44 half-rims (tiny rim). Phantom at 126.6s: a player dribbling.
-- Untrimmed drafts (`out/draft-nov7/`): clip4's tracker called the rattle-out at 88.1 (cut time) a make; the setup and someone walking past the lens made phantoms. Cutting removes the setup ones.
+- clip3: 15, 16, 16, 16, 13, **10**, **10** (5 phantoms), 15 /17
+- clip4: 23, 24, 24, 23, 22, **12**, 20, 22 /24
+- Weakest: 10 fps (all four clips) and the wobbly mount; phantoms come almost only from the new clips.
+- clip3 as filmed: the make at 30.05s called late (32.2s) as a miss; the make at 84.75s called a miss, crossed at 1.44 half-rims (tiny rim); phantom at 126.6s, a player dribbling.
+- clip4 as filmed: the rattle-out at 88.1s called a make (crossed 0.21, ball bouncing on the ring); phantom at 62.6s, the founder's head at the bottom of the picture.
+- The run was split (Claude Code stopped the first for low memory); `summary.txt` was rebuilt from all 32 per-run reports with the suite's own scoring.
 
 ## Decisions
 - Hold-out is clip5, chosen before any tuning: least like clip1/clip2 (Claude; founder can swap it before tuning starts).
@@ -30,11 +34,10 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 
 ## Open
 - Founder: watch the 3 cut clips against the labels (`scripts/bench-suite.json`); flag any shot missing. Least sure: clip3 30.05 and 84.75 (makes), clip4 81.0 and 101.0 (airballs right of the ring).
-- Rerun the baseline when memory allows: `node scripts/bench-suite.mjs clip3 clip4 --label=baseline-nov7` (variants are made; clip1/2 results are in place).
-- Then plan steps 6–8 (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
+- Plan steps 6–8 (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
 - Consent: a second player is in clip4 and clip5; ask them before any frames go to Colab/Drive.
 - Push keys (from the 7 Nov handoff) still open.
 
 ## Gotchas
 - `ffmpeg -ss <exact keyframe pts>` decodes one frame later; compare frames with `framemd5`, not `-ss`.
-- A 30-run suite outlives a background shell; run it in smaller batches by clip.
+- A 32-run suite can be stopped for low memory; run it in batches by clip. A stop mid-encode left a truncated `variants/clip3-shake.mp4` that every later run reused ("failed (exit 1)"); the suite now encodes to `.part.mp4` and renames when done.
