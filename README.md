@@ -250,6 +250,18 @@ hold-out (`"holdout": true`): the suite skips it unless it is named
 (`node scripts/bench-suite.mjs clip5`). Never tune on it; score it once, when
 a change is finished, and report that as the real number.
 
+Two changes from those clips (9 Nov 2026), measured over all 32 runs:
+
+- A ball resting on the ring is not counted as through it (`ON_RING` in
+  `shotDetector.ts`): 535 to 537 right, no run worse.
+- A shot whose ball never reached the ring is dropped, not called a miss.
+  Calls with no shot behind them went from 24 to 7: passes across the picture,
+  balls going up beside the ring, a player walking past the lens. Accepted by
+  the founder although it breaks the "no run worse" rule once: on the small,
+  dim, 15 fps version of clip 2 the ball is lost before the ring on two real
+  misses, which are no longer called (15 to 13 of 31). Nothing was lost on any
+  clip as filmed.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

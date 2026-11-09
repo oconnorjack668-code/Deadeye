@@ -921,8 +921,22 @@ export class ShotDetector {
     p.first = inside === outside ? p.order[0] : inside > outside ? 'inside' : 'outside';
   }
 
-  /** A miss, timed at the ring when the ball got there. */
-  private miss(t: number, confident: boolean): DetectedShot {
+  /**
+   * A miss, timed at the ring when the ball got there - or nothing, when it
+   * never got there.
+   *
+   * A shot starts on two sightings above the rim, the second lower, and that
+   * is also what a pass across the picture, a ball going up beside the ring
+   * or someone walking past the lens can look like for a frame. Every call
+   * with no shot behind it on the 4 Nov clips was one of those, timed out as
+   * a miss without the ball ever coming near the ring. A shot that never
+   * reached the ring is dropped rather than called.
+   */
+  private miss(t: number, confident: boolean): DetectedShot | null {
+    if (this.pending === null && this.nearAt === null && this.touchedAt === null) {
+      this.reset(t);
+      return null;
+    }
     return this.decide(t, false, confident, undefined, this.touchedAt ?? this.nearAt ?? undefined);
   }
 
@@ -948,6 +962,15 @@ export class ShotDetector {
       ...(this.touchedAt !== null ? { touchedRim: true } : {}),
     };
     this.shots.push(shot);
+    // The pause after a call is for the ball bouncing about the ring. One that
+    // never got there has nothing to bounce off, and pausing then can only
+    // miss the next shot.
+    this.reset(reached ? t + COOLDOWN_MS : t);
+    return shot;
+  }
+
+  /** Forgets the shot being followed, ignoring anything until `cooldownUntil`. */
+  private reset(cooldownUntil: number) {
     this.armedAt = null;
     this.lastAbove = null;
     this.approach = null;
@@ -960,10 +983,6 @@ export class ShotDetector {
     this.swingFrames = 0;
     this.lateNet = null;
     this.ballId = null;
-    // The pause after a call is for the ball bouncing about the ring. One that
-    // never got there has nothing to bounce off, and pausing then can only
-    // miss the next shot.
-    this.cooldownUntil = reached ? t + COOLDOWN_MS : t;
-    return shot;
+    this.cooldownUntil = cooldownUntil;
   }
 }

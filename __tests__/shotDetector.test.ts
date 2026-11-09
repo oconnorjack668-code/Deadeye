@@ -178,11 +178,20 @@ describe('ShotDetector', () => {
     expect(shots[0].made).toBe(false);
   });
 
-  it('counts an airball that never reaches the rim area as a miss', () => {
+  it('drops a shot whose ball is lost before it reaches the ring', () => {
+    // Decided 9 Nov 2026: a shot that never reached the ring is not called.
+    // Passes, balls going up beside the ring and people at the lens look like
+    // this, and were 17 of the 24 calls with no shot on the bench; the cost
+    // was 2 real misses on the smallest, dimmest, slowest test footage, where
+    // the ball is lost before the ring. See README, "The bench suite".
     const shots = run(arc(0, 0.2, 0.44, 0.2, 30).map((o) => (o.t > 700 ? { ...o, ball: null } : o)).concat([{ t: 3000, ball: null }]));
+    expect(shots).toHaveLength(0);
+  });
+
+  it('still calls a miss on a ball that came down beside the ring and was lost there', () => {
+    const shots = run(arc(0, 0.2, 0.545, 0.2, 30).map((o) => (o.t > 950 ? { ...o, ball: null } : o)).concat([{ t: 4000, ball: null }]));
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(false);
-    expect(shots[0].confident).toBe(false);
   });
 
   it('counts several shots in a row and ignores rim bounces right after a decision', () => {

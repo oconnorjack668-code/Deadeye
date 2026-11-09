@@ -2,7 +2,7 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
-- 2026-11-09 · new-clips-labelled · New clips labelled; rattle-out fix 81.9%; phantoms traced · open: 4 → [handoff](2026-11-09-new-clips-labelled.md)
+- 2026-11-09 · new-clips-labelled · New clips labelled; rattle-out fix; phantom calls 24→7 · open: 4 → [handoff](2026-11-09-new-clips-labelled.md)
 - 2026-11-07 · new-test-footage · Crash reports closed; push keys needed; plan for 3 new clips · open: 2 → [handoff](2026-11-07-new-test-footage.md)
 - 2026-11-03 · rim-finder · Find the hoop for me shipped; live hang fixed (plain worker); checked live · open: 3 → [handoff](2026-11-03-rim-finder.md)
 - 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 3 → [handoff](2026-11-03-tracker-accuracy-bench.md)

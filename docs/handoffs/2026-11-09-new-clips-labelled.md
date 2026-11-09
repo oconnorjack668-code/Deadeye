@@ -1,6 +1,6 @@
 # 3 new test clips cut, labelled, in the bench suite (2026-11-09)
 
-Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: fix 2 (rattle-outs) accepted at 537/656; phantoms traced, not fixed
+Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: rattle-out fix (537/656) and phantom fix (phantoms 24 -> 7) shipped on the branch
 
 ## Outcome
 - The 4 Nov clips are in `scripts/bench-suite.json` as `clip3`, `clip4`, `clip5`: cut (stream copy, bit-identical frames) from just before the first shot to 2.5s after the last, labelled frame by frame.
@@ -29,7 +29,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 
 ## Fix 2 and the traces (`out/fix2-nov9/`, `out/trace-nov9/`)
 - Rattle-out cause: the frame that placed the crossing also counted as the ball seen under the ring. It no longer does when it is within `ON_RING` (0.35 rim widths) of the line. 535 -> **537/656**; clip4 as filmed 24/24; no run worse; phantoms 24 -> 24. 0.35 sits between the only two measured cases (rattle 0.25, a 15 fps make 0.499).
-- Phantoms all end with the ball never reaching the ring (1.5s lost-ball timeout): sideways or rising passes that "armed" on a depth jitter (clip4 62.6, 118.4), a player at the lens (clip3 126.6, net 0.55 > 0.36), and one real make lost because the tracker gave the ball two ids and `sameBall` threw out the real one (clip3 30.05 -> phantom 32.2). Next fix; it must keep clip4 81.0/101.0 (in front of the ring, saved only by a still net).
+- Phantoms all end with the ball never reaching the ring (1.5s lost-ball timeout): sideways or rising passes that "armed" on a depth jitter (clip4 62.6, 118.4), a player at the lens (clip3 126.6, net 0.55 > 0.36), and one real make lost because the tracker gave the ball two ids and `sameBall` threw out the real one (clip3 30.05 -> phantom 32.2). Fixed (`out/phantom-nov9/`): a shot that never reached the ring is dropped. Phantoms 24 -> 7, right 537 -> 535: clip2 hard lost 2 real misses (ball lost before the ring at 10.4, 28.5). Founder accepted the trade on 9 Nov. Still open: the two-id case (clip3 30.05 is still never called; `sameBall` throws out the real ball).
 - Tiny-rim make (clip3 84.75): crossed 1.43 half-rims, net 2 frames. Left alone: loosening either check turns clip4's near-misses into makes.
 - Real-world fps: 14 saved sessions, 1 with quality data (a computer, 29.7 fps). No phone data yet.
 
@@ -40,7 +40,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 
 ## Open
 - Founder: watch the 3 cut clips against the labels (`scripts/bench-suite.json`); flag any shot missing. Least sure: clip3 30.05 and 84.75 (makes), clip4 81.0 and 101.0 (airballs right of the ring).
-- The phantom fix (above), then plan steps 7–8 (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
+- The two-id `sameBall` case (above), then plan steps 7–8 (score clip5 once; rim finder frames) (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
 - Consent: a second player is in clip4 and clip5; ask them before any frames go to Colab/Drive.
 - Push keys (from the 7 Nov handoff) still open.
 
