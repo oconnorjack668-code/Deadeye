@@ -215,6 +215,22 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 .chip:hover { background: var(--card-2); }
 .answer { white-space: pre-wrap; background: var(--card-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-height: 90px; font-size: 15px; line-height: 1.6; color: var(--fg-2); }
 .cmds { display: grid; gap: 10px; }
+.chat { display: grid; gap: 12px; }
+.chat-log { display: flex; flex-direction: column; gap: 10px; min-height: 260px; max-height: 58vh; overflow-y: auto; padding: 4px 2px; }
+.chat-empty { color: var(--muted); font-size: 15px; padding: 8px 2px; }
+.bubble { max-width: 82%; padding: 11px 14px; border-radius: 16px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble.me { align-self: flex-end; background: var(--action); color: #fff; border-bottom-right-radius: 6px; }
+.bubble.ai { align-self: flex-start; background: var(--card-2); border: 1px solid var(--line); color: var(--fg-2); border-bottom-left-radius: 6px; }
+.bubble .did { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--good); }
+.chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.chat-form textarea { flex: 1; min-width: 0; min-height: 46px; max-height: 160px; resize: vertical; border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg); padding: 12px 14px; font-size: 15px; }
+.progress-box { border: 1px solid var(--line); background: var(--card-2); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+.pb-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--fg-2); }
+.progress-box p { margin: 0; font-size: 14px; }
+.pb-steps { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.pb-steps li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; font-size: 13px; color: var(--fg-2); }
+@media (max-width: 520px) { .pb-steps li { grid-template-columns: 1fr; gap: 0; } }
+.quiet { color: var(--quiet); font-size: 12px; }
 
 .notice { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--card-2); color: var(--fg-2); font-size: 14px; }
 .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 40; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
@@ -290,11 +306,12 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 
     <!-- Ask -->
     <section class="page" data-page="ask" hidden>
-      <div class="hello"><h1>Ask Claude</h1><p>Answers come only from what's in this hub: the numbers, your to-dos, the schedule and your decisions.</p></div>
-      <section class="card ask">
+      <div class="head"><div class="hello"><h1>Chat</h1><p>Ask about any task, what an agent is doing, or what to do next. Claude can also approve, finish or push back tasks, and pass notes to the agents, when you ask it to.</p></div><button class="btn sm quiet" id="chat-clear" type="button">New chat</button></div>
+      <section class="card chat">
+        <div class="chat-log" id="chat-log" aria-live="polite"></div>
         <div class="chips" id="chips"></div>
-        <form id="ask-form"><label for="ask-q" style="position:absolute;left:-9999px">Your question</label><input id="ask-q" autocomplete="off" placeholder="What should I do today?"><button class="btn primary" id="ask-go" type="submit">Ask</button></form>
-        <div class="answer" id="answer" aria-live="polite">Ask anything about Deadeye's week.</div>
+        <form id="ask-form" class="chat-form"><label for="ask-q" style="position:absolute;left:-9999px">Message</label><textarea id="ask-q" rows="1" placeholder="Message Deadeye HQ"></textarea><button class="btn primary" id="ask-go" type="submit">Send</button></form>
+        <p class="foot">Claude sees what's in this hub. It can't change code or post anything; the agents do the work on their runs.</p>
       </section>
     </section>
   </main>
@@ -315,11 +332,19 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
     info: '<path d="M12 11v5M12 7.5v.5"/>'
   };
   const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
-  const PAGES = [["home", "Home"], ["todo", "To-do"], ["growth", "Growth"], ["agents", "Agents"], ["outreach", "Clubs and content"], ["ask", "Ask Claude"]];
+  const PAGES = [["home", "Home"], ["todo", "To-do"], ["growth", "Growth"], ["agents", "Agents"], ["outreach", "Clubs and content"], ["ask", "Chat"]];
   const BAR = ["home", "todo", "growth", "agents", "ask"];
   const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", founder: "You" };
   const STATUS = { approved: ["In progress", "info"], done: ["Done", "good"], later: ["Later", "neutral"] };
-  let snap = null, decisions = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
+  let snap = null, decisions = {}, progress = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
+  const PSTATE = { queued: ["Queued", "neutral"], working: ["Working on it", "info"], done: ["Finished", "good"], blocked: ["Blocked", "bad"] };
+  // The hub worker runs hourly, 08:00 to 22:00 Irish time
+  function nextCheck() {
+    const now = new Date(), irish = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Dublin" }));
+    let h = irish.getHours() + 1; if (h < 8) h = 8;
+    if (h > 22) return "tomorrow at 08:00";
+    return (h === irish.getHours() + 1 ? "at " : "at ") + String(h).padStart(2, "0") + ":00";
+  }
   const $ = (id) => document.getElementById(id);
   const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; };
   const DAY = 86400000;
@@ -343,7 +368,7 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
       const a = el("a"); a.href = "#" + id; a.dataset.page = id; a.innerHTML = icon(id); a.appendChild(el("span", null, label));
       if (id === "todo" && waiting) a.appendChild(el("span", "badge num", String(waiting)));
       side.appendChild(a);
-      if (BAR.includes(id)) { const b = el("a"); b.href = "#" + id; b.dataset.page = id; b.innerHTML = icon(id); b.appendChild(el("span", null, id === "ask" ? "Ask" : label));
+      if (BAR.includes(id)) { const b = el("a"); b.href = "#" + id; b.dataset.page = id; b.innerHTML = icon(id); b.appendChild(el("span", null, label));
         if (id === "todo" && waiting) b.appendChild(el("span", "badge num", String(waiting))); bar.appendChild(b); }
     }
     route();
@@ -428,6 +453,7 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
     if (c.onApprove && st === "waiting") { const e = el("div", "effect"); e.innerHTML = icon("info"); const s = el("span"); s.append(el("b", null, "If you approve: "), document.createTextNode(c.onApprove)); e.appendChild(s); card.appendChild(e); }
     const d = decisions[c.id];
     if (d && (d.note || d.pick)) card.appendChild(el("div", "status-line", `Your note${d.pick ? " · picked " + d.pick : ""}${d.note ? ": “" + d.note + "”" : ""}`));
+    if (st === "approved" || st === "done") card.appendChild(progressBlock(c, st));
     let pick = d?.pick || null;
     if (c.options && st === "waiting") {
       const o = el("div", "opts"); o.setAttribute("role", "group"); o.setAttribute("aria-label", "Choose an option");
@@ -446,8 +472,29 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
       a.appendChild(el("span", "status-line", "Only the owner can approve."));
     }
     if (c.link) { const l = el("a", "btn sm quiet", c.kind === "merge" ? "View the change" : "Open"); l.href = c.link; l.target = "_blank"; l.rel = "noopener"; a.appendChild(l); }
+    const askB = el("button", "btn sm quiet", "Ask about this"); askB.type = "button"; askB.onclick = () => openChat(`About "${c.title}": what's happening with it, and what do you need from me?`); a.appendChild(askB);
     card.appendChild(a);
     return card;
+  }
+
+  /* What the agent is doing with an approved task (written by the hub worker to progress/<id>) */
+  function progressBlock(c, st) {
+    const p = progress[c.id], box = el("div", "progress-box");
+    if (!p) {
+      box.appendChild(el("div", "pb-head", st === "done" ? "Finished." : `Queued. The hub worker picks this up ${nextCheck()}.`));
+      return box;
+    }
+    const [label, cls] = PSTATE[p.state] || [p.state, "neutral"];
+    const head = el("div", "pb-head"); head.append(el("span", "pill " + cls, label)); if (p.updatedAt) head.append(el("span", "quiet", "Updated " + fwhen(p.updatedAt))); box.appendChild(head);
+    if (p.summary) box.appendChild(el("p", null, p.summary));
+    const steps = (p.steps || []).slice(-5);
+    if (steps.length) { const ul = el("ol", "pb-steps"); steps.forEach(s => { const li = el("li"); li.append(el("span", "quiet", fwhen(s.at)), el("span", null, s.text)); ul.appendChild(li); }); box.appendChild(ul); }
+    const links = el("div", "actions");
+    if (p.pr) { const l = el("a", "btn sm", "View the pull request"); l.href = p.pr; l.target = "_blank"; l.rel = "noopener"; links.appendChild(l); }
+    if (p.file) links.appendChild(el("span", "status-line", "Draft: " + p.file));
+    const runs = el("a", "btn sm quiet", "See the agent's runs"); runs.href = "https://claude.ai/code/routines/trig_015kxehjQDGT72Yn4Fi3X7Lk"; runs.target = "_blank"; runs.rel = "noopener"; links.appendChild(runs);
+    box.appendChild(links);
+    return box;
   }
   async function decide(id, status, pick, note) {
     if (!db) return;
@@ -530,22 +577,61 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
     snap.film.days.forEach(d => { const card = el("div", "day" + (parseInt(d.day.split(" ")[1], 10) === today ? " today" : "")); card.append(el("div", "d", d.day), el("div", "w", d.where), el("p", null, d.post)); wk.appendChild(card); });
   }
 
-  /* Ask */
-  let ctl = null;
+  /* Chat: a real conversation that knows the hub and can act on tasks */
+  let ctl = null, chat = [];
+  try { chat = JSON.parse(localStorage.getItem("hq-chat") || "[]"); } catch { chat = []; }
+  const saveChat = () => { try { localStorage.setItem("hq-chat", JSON.stringify(chat.slice(-30))); } catch {} };
   function renderAsk() {
     const ch = $("chips"); ch.replaceChildren();
-    ["What should I do today?", "Is anything broken?", "Which to-do matters most?", "Help me write to the Blazers coach"].forEach(q => { const b = el("button", "chip", q); b.type = "button"; b.onclick = () => { $("ask-q").value = q; ask(q); }; ch.appendChild(b); });
+    if (!chat.length) ["What should I do today?", "What are the agents working on?", "Is anything broken?", "Help me write to the Blazers coach"].forEach(q => { const b = el("button", "chip", q); b.type = "button"; b.onclick = () => send(q); ch.appendChild(b); });
+    renderChat();
   }
-  async function ask(q) {
-    const out = $("answer"), go = $("ask-go");
-    if (!sample) { out.textContent = "Asking Claude isn't available here. Open the hub on claude.ai while signed in."; return; }
-    ctl?.abort(); ctl = new AbortController(); go.disabled = true; out.textContent = "Thinking…";
-    const prompt = `You are the assistant inside "Deadeye HQ", the founder's hub for Deadeye, a basketball training app for players aged 13+ in Ireland, run by one founder with seven AI agents. Answer using ONLY the JSON below. Plain English, short (under 160 words), no headings. Name the exact to-do, number or date. Statuses: waiting = needs the founder's decision, approved = in progress, later = pushed to next week, done = finished. If the data can't answer, say what's missing. Never invent numbers. Never suggest contacting a child directly.\n\nDATA:\n${JSON.stringify({ today: new Date().toISOString().slice(0, 10), snapshot: snap, decisions })}\n\nQUESTION: ${q}`;
-    try { await sample(prompt, { signal: ctl.signal, cache: false, onText: ({ text }) => { out.textContent = text; } }); }
-    catch (e) { if (e?.name === "AbortError") return; out.textContent = e?.code === "not_granted" ? "Claude isn't allowed for this page yet. Allow it in the page's permissions." : e?.code === "rate_limited" ? "Too many questions for now. Try again soon." : "Couldn't get an answer. Try again."; }
-    finally { go.disabled = false; }
+  function renderChat() {
+    const log = $("chat-log"); log.replaceChildren();
+    if (!chat.length) log.appendChild(el("div", "chat-empty", "Hi. Ask me anything about Deadeye: your tasks, what each agent is doing, the numbers, or what to do next."));
+    chat.forEach(m => { const b = el("div", "bubble " + (m.role === "user" ? "me" : "ai")); b.textContent = m.content; if (m.actions?.length) { const a = el("div", "did"); a.textContent = m.actions.join(" · "); b.appendChild(a); } log.appendChild(b); });
+    log.scrollTop = log.scrollHeight;
   }
-  $("ask-form").addEventListener("submit", e => { e.preventDefault(); const q = $("ask-q").value.trim(); if (q) ask(q); });
+  function openChat(q) { location.hash = "#ask"; setTimeout(() => { const t = $("ask-q"); t.value = q; t.focus(); }, 50); }
+  function context() {
+    return `You are the assistant inside "Deadeye HQ", the private hub of Deadeye's founder. Deadeye is a basketball training app for players aged 13+ in Ireland, run by one founder with seven AI agents. Today is ${new Date().toISOString().slice(0, 10)}.
+How the hub works: each to-do (a "call") is waiting until the founder presses Approve (then it's approved, shown as In progress), Done (finished) or Later (next week). Approved tasks are picked up by the hub worker, a cloud agent that runs every hour from 08:00 to 22:00 Irish time; it writes its progress per task (queued, working, done, blocked, with steps). Scheduled runs: weekly loop Mondays 09:00, morning check daily 08:00, marketing Thursdays 10:00, learning digest Fridays 16:00, clubs monthly. Code changes go live only when merged; the founder says "merge N" to Claude Code or approves it here and Claude merges it in the next chat.
+Rules: answer only from the data below; plain, friendly English; short (under 150 words) unless asked for a draft; no headings. Name the exact task, number or date. Never invent numbers or progress. If something hasn't started, say when it will. Never suggest contacting a child directly. Use the tools only when the founder clearly asks you to change a task; say what you changed.
+DATA: ${JSON.stringify({ snapshot: snap, decisions, progress })}`;
+  }
+  const TOOLS = () => [
+    { name: "set_task", description: "Change a to-do's status when the founder asks: approve it (yes, go ahead), mark it done, push it to later, or put it back to waiting. Optionally attach a note for the agent.",
+      inputSchema: { type: "object", properties: { id: { type: "string", description: "The call id from the data" }, status: { type: "string", enum: ["approved", "done", "later", "waiting"] }, note: { type: "string" } }, required: ["id", "status"] },
+      execute: async ({ id, status, note }) => {
+        const c = snap.calls.find(x => x.id === id); if (!c) throw new Error("No task with that id");
+        if (!canWrite) throw new Error("Only the owner can change tasks");
+        if (status === "waiting") { await db.doc("decisions/" + id).delete(); }
+        else { const body = { status, at: new Date().toISOString() }; const n = note || decisions[id]?.note; if (n) body.note = String(n).slice(0, 600); await db.doc("decisions/" + id).set(body); }
+        pending.push(`${{ approved: "Approved", done: "Marked done", later: "Moved to later", waiting: "Back to waiting" }[status]}: ${c.title}`);
+        return { ok: true, task: c.title, status };
+      } }
+  ];
+  let pending = [];
+  async function send(text) {
+    const q = (text ?? $("ask-q").value).trim(); if (!q) return;
+    if (!sample) { chat.push({ role: "user", content: q }, { role: "assistant", content: "Chat isn't available here. Open Deadeye HQ on claude.ai while signed in." }); renderAsk(); return; }
+    $("ask-q").value = ""; ctl?.abort(); ctl = new AbortController(); pending = [];
+    chat.push({ role: "user", content: q }); const reply = { role: "assistant", content: "Thinking…" }; chat.push(reply); renderAsk();
+    const msgs = chat.slice(0, -1).slice(-16).map(m => ({ role: m.role, content: m.content }));
+    while (msgs.length && msgs[0].role !== "user") msgs.shift();
+    msgs[0] = { role: "user", content: context() + "\n\nFOUNDER: " + msgs[0].content };
+    const go = $("ask-go"); go.disabled = true;
+    try {
+      const r = await sample(msgs, { signal: ctl.signal, cache: false, tools: TOOLS(), onText: ({ text }) => { reply.content = text; renderChat(); } });
+      reply.content = r.text || reply.content;
+    } catch (e) {
+      if (e?.name === "AbortError") return;
+      reply.content = e?.code === "not_granted" ? "Claude isn't allowed on this page yet. Allow it in the page's permissions, then try again." : e?.code === "rate_limited" ? "Too many messages for now. Try again in a little while." : (e?.text || "Couldn't get an answer. Try again.");
+    } finally { if (pending.length) reply.actions = pending.slice(); go.disabled = false; saveChat(); renderAsk(); }
+  }
+  $("ask-form").addEventListener("submit", e => { e.preventDefault(); send(); });
+  $("ask-q").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("chat-clear").addEventListener("click", () => { chat = []; saveChat(); renderAsk(); });
 
   function renderAll() { renderNav(); renderHome(); renderTodo(); renderGrowth(); renderAgents(); renderOutreach(); renderAsk(); }
   function showState(m) { const s = $("state"); s.textContent = m; s.hidden = !m; }
@@ -562,6 +648,7 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
       clearTimeout(timer); showState(""); const b = d.data(); snap = typeof b.json === "string" ? JSON.parse(b.json) : b; renderAll();
     }, () => { clearTimeout(timer); showState("The hub's data couldn't load. Reopen the page to try again."); });
     db.collection("decisions").onSnapshot(q => { const n = {}; q.docs.forEach(d => { if (d.exists) n[d.id] = d.data(); }); decisions = n; if (snap) renderAll(); }, () => {});
+    db.collection("progress").onSnapshot(q => { const n = {}; q.docs.forEach(d => { if (d.exists) n[d.id] = d.data(); }); progress = n; if (snap) { renderHome(); renderTodo(); } }, () => {});
   })();
 })();
 </script>

@@ -18,7 +18,14 @@ data: the page's database, mirrored in `snapshot.json` here.
 | Collection / doc | Who writes | What |
 | --- | --- | --- |
 | `hub/snapshot` | Agents (via Claude) | The page's data, same shape as `snapshot.json`. |
-| `decisions/<call id>` | The founder, from the page | `{status: approved | done | later, note?, pick?, at}` |
+| `decisions/<call id>` | The founder, from the page or its chat | `{status: approved | done | later, note?, pick?, at}` |
+| `progress/<call id>` | The hub worker and any agent run | `{state: queued | working | done | blocked, summary, steps: [{at, text}], pr?, file?, updatedAt}` |
+
+**The hub worker** (routine `trig_015kxehjQDGT72Yn4Fi3X7Lk`, hourly 08:00 to 22:00 Irish time) picks up
+approved calls (not merges), does what each `onApprove` says as the named agent, and writes its steps
+to `progress/<call id>` so the founder can watch on the task card. An hour with nothing approved ends
+in one line. **Chat** (the page's Chat tab) answers from the snapshot, decisions and progress, and can
+approve, finish or push back a task when the founder asks; it never changes code or posts anything.
 
 No decision document means the call is waiting for the founder. Only the owner and editors write.
 
