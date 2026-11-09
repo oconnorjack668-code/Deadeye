@@ -23,6 +23,9 @@ everything, as the Monday 09:00 scheduled run does.
 
 ## Steps
 
+00. Read the founder's decisions on the hub (Deadeye Bench) and act on them,
+   as `docs/agent-os/hub/README.md` says. Pass each agent the decisions on
+   its own calls when you dispatch it.
 0. Read the newest file in `docs/agent-os/data/`. If it is more than 7 days
    old, the weekly counts job did not run: say so first in the report
    (check `AGENT_DATA_GITHUB_TOKEN` in Vercel and the job's log), then go on
@@ -51,6 +54,10 @@ everything, as the Monday 09:00 scheduled run does.
 8b. Dispatch `club-growth` when `docs/agent-os/clubs/pipeline.md` has a club
    in `talking`, `trial` or `active`, and on the first Monday of each month
    in any case. Done when its plan exists.
+8c. Update the hub: `docs/agent-os/hub/snapshot.json` and its `hub/snapshot`
+   document, with this run's numbers, calls (one per pull request, approval
+   and founder job), agents, backlog, clubs, film, log and learn
+   (`docs/agent-os/hub/README.md`). Commit it with step 7's changes.
 9. Report to the founder in under 20 lines: any `Skills failed` line first,
    then the numbers and biggest drop, problems found and their ranks, what
    was built, the safety verdict, the pull request links, the marketing
