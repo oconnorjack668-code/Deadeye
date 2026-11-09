@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { ProBadge } from '@/components/ProGate';
+import { track } from '@/lib/events';
 import { REMINDER_TIME_LABEL, streakWarningAllowed } from '@/lib/reminders';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -18,8 +19,19 @@ function vapidKeyToBytes(base64: string): Uint8Array {
   return Uint8Array.from(raw, (c) => c.charCodeAt(0));
 }
 
-/** showWeekly: false on the welcome screen, where a Pro report is not what a brand-new player came for. */
-export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: boolean; showWeekly?: boolean }) {
+/**
+ * showWeekly: false on the welcome screen and dashboard, where a Pro report is not what a brand-new player came for.
+ * description: replaces the line under the title, for a place that asks the question itself.
+ */
+export function RemindersCard({
+  isPro = false,
+  showWeekly = true,
+  description,
+}: {
+  isPro?: boolean;
+  showWeekly?: boolean;
+  description?: string;
+}) {
   const [loaded, setLoaded] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [days, setDays] = useState<number[]>([1, 3, 5]);
@@ -89,6 +101,7 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
       })
       .eq('user_id', user.id);
     if (error) setMessage(`Could not save: ${error.message}`);
+    else if (next.days || next.enabled) track('reminder_set');
   }
 
   async function saveWeekly(next: boolean) {
@@ -182,7 +195,7 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
           <Bell className="h-5 w-5 text-orange-400" /> Training reminders
         </CardTitle>
         <CardDescription>
-          A nudge on your training days, {REMINDER_TIME_LABEL}, only if you haven&apos;t trained yet.
+          {description ?? <>A nudge on your training days, {REMINDER_TIME_LABEL}, only if you haven&apos;t trained yet.</>}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

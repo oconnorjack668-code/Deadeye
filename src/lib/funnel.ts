@@ -65,6 +65,10 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
       { name: 'log_finish_opened', label: 'Pressed Finish with shots logged' },
     ],
   },
+  {
+    title: 'Reminders',
+    steps: [{ name: 'reminder_set', label: 'Saved training days or turned reminders on' }],
+  },
 ];
 
 export function buildFunnel(players: FunnelPlayer[], events: Array<{ user_id: string; name: string }>, sessions: FunnelSession[]): Funnel {
