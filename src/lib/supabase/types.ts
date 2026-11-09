@@ -459,6 +459,8 @@ export interface Database {
           timezone: string;
           last_reminded_on: string | null;
           weekly_report: boolean;
+          // Added by 00057_streak_warning_choice.sql: NULL = decided by age
+          streak_warning: boolean | null;
           last_weekly_report_on: string | null;
           created_at: string;
           updated_at: string;
@@ -476,6 +478,7 @@ export interface Database {
           timezone?: string;
           last_reminded_on?: string | null;
           weekly_report?: boolean;
+          streak_warning?: boolean | null;
           last_weekly_report_on?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -486,6 +489,7 @@ export interface Database {
           timezone?: string;
           last_reminded_on?: string | null;
           weekly_report?: boolean;
+          streak_warning?: boolean | null;
           last_weekly_report_on?: string | null;
           reminder_time?: string;
           quiet_hours_start?: string | null;

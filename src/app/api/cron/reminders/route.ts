@@ -6,7 +6,7 @@
 import { createAdminClient } from '@/lib/supabase/admin';
 import { CRON_RUN_KEEP_DAYS, withCronLog } from '@/lib/cronRuns';
 import { pushConfigured, sendPush } from '@/lib/push';
-import { reminderDue, reminderPush, reminderWindowOpen, type ReminderPrefs } from '@/lib/reminders';
+import { reminderDue, reminderPush, reminderWindowOpen, streakWarningAllowed, type ReminderPrefs } from '@/lib/reminders';
 import { streakState } from '@/lib/achievements';
 import { addDays } from '@/lib/dates';
 import { deleteAccount } from '@/lib/accountDeletion';
@@ -91,6 +91,17 @@ async function run(request: Request) {
     .in('consent_status', ['pending', 'withdrawn']);
   const lockedIds = new Set((locked || []).map((r) => r.user_id));
 
+  // The streak warning: each player's own choice (00057), else on for adults
+  // and off for under-18s (streakWarningAllowed). Separate queries so the job
+  // still runs before 00057 is applied: then everyone gets the age default.
+  const ids = (prefs || []).map((p) => p.user_id);
+  const [{ data: choices }, { data: ages }] = await Promise.all([
+    admin.from('notification_preferences').select('user_id, streak_warning').in('user_id', ids),
+    admin.from('profiles').select('id, age_bracket').in('id', ids),
+  ]);
+  const choiceOf = new Map(((choices || []) as Array<{ user_id: string; streak_warning: boolean | null }>).map((c) => [c.user_id, c.streak_warning]));
+  const bracketOf = new Map((ages || []).map((a) => [a.id, a.age_bracket as string | null]));
+
   const now = new Date();
   let sent = 0;
   let skipped = 0;
@@ -115,7 +126,8 @@ async function run(request: Request) {
     }
 
     const programName = (enrollment as unknown as { training_programs: { name: string } | null } | null)?.training_programs?.name;
-    const payload = reminderPush({ chosenDay, streak: await streakFor(admin, p.user_id, localDate), programName });
+    const streakWarning = streakWarningAllowed(choiceOf.get(p.user_id), bracketOf.get(p.user_id));
+    const payload = reminderPush({ chosenDay, streak: await streakFor(admin, p.user_id, localDate), programName, streakWarning });
     if (!payload) continue;
     await admin.from('notification_preferences').update({ last_reminded_on: localDate }).eq('user_id', p.user_id);
     for (const s of subs) {

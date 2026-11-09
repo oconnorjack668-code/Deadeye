@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Bell } from 'lucide-react';
 import Link from 'next/link';
 import { ProBadge } from '@/components/ProGate';
-import { REMINDER_TIME_LABEL } from '@/lib/reminders';
+import { REMINDER_TIME_LABEL, streakWarningAllowed } from '@/lib/reminders';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -27,6 +27,8 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [weekly, setWeekly] = useState<boolean | null>(null);
+  // null until loaded, and stays null (switch hidden) before migration 00057
+  const [streakWarning, setStreakWarning] = useState<boolean | null>(null);
 
   const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
   const supported = typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
@@ -56,6 +58,13 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
         .eq('user_id', user.id)
         .maybeSingle();
       if (!weeklyError && weeklyRow) setWeekly(!!weeklyRow.weekly_report);
+      // Separate query: the column only exists after migration 00057. With no
+      // choice made, show what the player gets now: on for 18+, off under 18.
+      const [{ data: streakRow, error: streakError }, { data: profile }] = await Promise.all([
+        supabase.from('notification_preferences').select('streak_warning').eq('user_id', user.id).maybeSingle(),
+        supabase.from('profiles').select('age_bracket').eq('id', user.id).maybeSingle(),
+      ]);
+      if (!streakError && streakRow) setStreakWarning(streakWarningAllowed(streakRow.streak_warning, profile?.age_bracket));
       if (supported) {
         const reg = await navigator.serviceWorker.getRegistration();
         setDeviceOn(!!(await reg?.pushManager.getSubscription()));
@@ -90,6 +99,17 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
     } = await supabase.auth.getUser();
     if (!user) return;
     const { error } = await supabase.from('notification_preferences').update({ weekly_report: next }).eq('user_id', user.id);
+    if (error) setMessage(`Could not save: ${error.message}`);
+  }
+
+  async function saveStreakWarning(next: boolean) {
+    setStreakWarning(next);
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+    const { error } = await supabase.from('notification_preferences').update({ streak_warning: next }).eq('user_id', user.id);
     if (error) setMessage(`Could not save: ${error.message}`);
   }
 
@@ -200,10 +220,24 @@ export function RemindersCard({ isPro = false, showWeekly = true }: { isPro?: bo
                 </button>
               ))}
             </div>
-            <p className="text-sm text-zinc-500">
-              Reminders come once a day, {REMINDER_TIME_LABEL}. If your streak would end tonight, you also get one warning
-              then, even on a day you did not pick.
-            </p>
+            <p className="text-sm text-zinc-500">Reminders come once a day, {REMINDER_TIME_LABEL}, on the days you pick.</p>
+            {streakWarning !== null && (
+              <label className="flex items-center justify-between gap-4 text-sm text-zinc-200">
+                <span>
+                  Streak warning
+                  <span className="block text-xs text-zinc-500">
+                    If your streak would end tonight, one message {REMINDER_TIME_LABEL}, even on a day you did not pick.
+                  </span>
+                </span>
+                <input
+                  type="checkbox"
+                  role="switch"
+                  checked={streakWarning}
+                  onChange={(e) => void saveStreakWarning(e.target.checked)}
+                  className="h-5 w-5 accent-orange-500"
+                />
+              </label>
+            )}
             <div className="flex flex-wrap gap-2">
               {deviceOn ? (
                 <>

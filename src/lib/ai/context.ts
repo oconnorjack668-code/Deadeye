@@ -67,7 +67,7 @@ export async function buildPlayerContext(
   const [profile, sessions, zones30, workouts, goals, enrollment, formCheck, style, games] = await Promise.all([
     supabase
       .from('profiles')
-      .select('display_name, age_bracket, height_cm, position, dominant_hand, playing_level, goals, strengths, focus_areas')
+      .select('age_bracket, height_cm, position, dominant_hand, playing_level, goals, strengths, focus_areas')
       .eq('id', userId)
       .maybeSingle(),
     supabase
@@ -125,7 +125,9 @@ export async function buildPlayerContext(
   const p = profile.data;
   if (p) {
     lines.push(
-      `Player: ${p.display_name}; age ${p.age_bracket || 'unknown'}; ${p.height_cm ? `${Math.round(p.height_cm)} cm` : 'height unknown'}; position ${p.position || 'unknown'}; ${p.dominant_hand || 'unknown'}-handed; level ${p.playing_level || 'unknown'}.`
+      // No name: the AI provider gets only what coaching uses (data minimisation;
+      // the display name may be a real name, and the coach speaks to "you")
+      `Player: age ${p.age_bracket || 'unknown'}; ${p.height_cm ? `${Math.round(p.height_cm)} cm` : 'height unknown'}; position ${p.position || 'unknown'}; ${p.dominant_hand || 'unknown'}-handed; level ${p.playing_level || 'unknown'}.`
     );
     if (p.goals?.length) lines.push(`Goals: ${p.goals.join(', ')}.`);
     if (p.focus_areas?.length) lines.push(`Focus areas: ${p.focus_areas.join(', ')}.`);

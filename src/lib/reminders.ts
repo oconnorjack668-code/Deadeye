@@ -64,6 +64,26 @@ export function reminderWindowOpen(prefs: ReminderPrefs, now: Date): boolean {
   return prefs.reminder_enabled && prefs.push_enabled && prefs.last_reminded_on !== date;
 }
 
+/** Age brackets (profiles.age_bracket) that mean 18 or over. */
+const ADULT_BRACKETS = new Set(['18-22', '23-30', '30+']);
+
+export function isAdultBracket(bracket: string | null | undefined): boolean {
+  return !!bracket && ADULT_BRACKETS.has(bracket);
+}
+
+/**
+ * Whether tonight's "your streak ends tonight" warning may go out (00057).
+ * The player's own choice wins. With no choice made, it is on for adults and
+ * off for under-18s and anyone whose age we do not know: a warning built on
+ * the fear of losing a streak is the kind of engagement pressure the DPC's
+ * Fundamentals and the EU's 2025 guidelines on minors (DSA Art. 28) want off
+ * by default for children. Under-18s can still turn it on in Settings.
+ */
+export function streakWarningAllowed(choice: boolean | null | undefined, ageBracket: string | null | undefined): boolean {
+  if (typeof choice === 'boolean') return choice;
+  return isAdultBracket(ageBracket);
+}
+
 export interface ReminderPush {
   title: string;
   body: string;
@@ -77,15 +97,17 @@ export interface ReminderPush {
  * it can still be saved is what a streak is for, and finding out the next
  * morning is the version of this that makes people quit. Only from two days,
  * because "your 1-day streak" is not worth a buzz. Otherwise, only on the days
- * the player chose.
+ * the player chose. streakWarning (streakWarningAllowed) switches the warning
+ * off; the player then gets only their usual reminder on a chosen day.
  */
 export function reminderPush(input: {
   chosenDay: boolean;
   streak: { current: number; atRisk: boolean };
   programName?: string | null;
+  streakWarning?: boolean;
 }): ReminderPush | null {
   const { current, atRisk } = input.streak;
-  if (atRisk && current >= 2) {
+  if (input.streakWarning !== false && atRisk && current >= 2) {
     return { title: `Your ${current}-day streak ends tonight 🔥`, body: 'Any session or workout today keeps it alive.', url: '/basketball/new' };
   }
   if (!input.chosenDay) return null;

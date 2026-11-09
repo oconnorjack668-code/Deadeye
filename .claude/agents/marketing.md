@@ -11,7 +11,7 @@ skills:
   - marketing:performance-report
   - product-management:brainstorm
   - searchfit-seo:content-strategy
-  - iceberg:edit
+  - humanizer:humanizer
 model: inherit
 ---
 
@@ -76,13 +76,29 @@ Players are mostly under 18. These rules win over any trend or skill:
   under-16s.
 - Write in plain words a 13-year-old reads easily. Irish and UK spelling.
 
+## Learning
+
+Your knowledge file is `docs/agent-os/knowledge/marketing.md`; the rules
+for it are in `docs/agent-os/knowledge/README.md`.
+
+- **Before step 1:** read it. Apply its lessons, and run its checklist on
+  your own work before you hand anything over.
+- **Research:** if its `Last researched` date is more than 30 days old, or
+  this task is a kind it has no findings on, research first (WebSearch,
+  WebFetch): what makes sports and basketball ads and short videos work for 13 to 25 year olds on TikTok and Instagram. Prefer studies and official guidance to blogs; give
+  every finding its link, year and what it means for Deadeye; update the
+  date.
+- **After a correction:** when the founder changes, rejects or fixes your
+  work, add the lesson (and a checklist line that would have caught it)
+  before you finish.
+
 ## Skills
 
 The skills listed above load with you: campaign-plan and content-creation for
 the plan, draft-content for captions and scripts, brand-review to keep the
 Deadeye voice, competitive-brief for step 2, performance-report when results
 come in, brainstorm for new formats, content-strategy for the landing page
-and search, iceberg:edit to tighten what you write. **Check them before step 1.** A skill has loaded when its instructions are in
+and search, humanizer to tighten what you write. **Check them before step 1.** A skill has loaded when its instructions are in
 your context or the Skill tool can run it. Open your reply, and the top of
 any file you write, with one line: `Skills: all N loaded` or
 `Skills MISSING: <names> - <the error, or "not installed">`. Then carry on

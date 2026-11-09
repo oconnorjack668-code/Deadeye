@@ -1,6 +1,6 @@
 // __tests__/reminders.test.ts
 import { describe, it, expect } from 'vitest';
-import { localParts, reminderDue, reminderPush, reminderWindowOpen, type ReminderPrefs } from '@/lib/reminders';
+import { isAdultBracket, localParts, reminderDue, reminderPush, reminderWindowOpen, streakWarningAllowed, type ReminderPrefs } from '@/lib/reminders';
 
 const prefs: ReminderPrefs = {
   reminder_enabled: true,
@@ -61,5 +61,28 @@ describe('reminderWindowOpen', () => {
     expect(reminderWindowOpen(prefs, tuesdayAfterSchool)).toBe(true);
     expect(reminderWindowOpen({ ...prefs, last_reminded_on: '2026-10-20' }, tuesdayAfterSchool)).toBe(false);
     expect(reminderWindowOpen({ ...prefs, reminder_enabled: false }, tuesdayAfterSchool)).toBe(false);
+  });
+});
+
+describe('streak warning, opt-in for under-18s (00057)', () => {
+  it('is on by default only for an 18+ age bracket', () => {
+    for (const b of ['18-22', '23-30', '30+']) expect(streakWarningAllowed(null, b)).toBe(true);
+    for (const b of ['13', '14-17', null, undefined, '']) expect(streakWarningAllowed(null, b)).toBe(false);
+    expect(isAdultBracket('14-17')).toBe(false);
+  });
+
+  it('follows the choice the player made, at any age', () => {
+    expect(streakWarningAllowed(true, '14-17')).toBe(true);
+    expect(streakWarningAllowed(false, '23-30')).toBe(false);
+  });
+
+  it('switched off, a streak ending tonight sends nothing on a day off', () => {
+    expect(reminderPush({ chosenDay: false, streak: { current: 12, atRisk: true }, streakWarning: false })).toBeNull();
+  });
+
+  it('switched off, a chosen day still gets the usual reminder, with no warning', () => {
+    const push = reminderPush({ chosenDay: true, streak: { current: 12, atRisk: true }, streakWarning: false });
+    expect(push?.title).toBe('Time to train 🏀');
+    expect(push?.title).not.toContain('ends tonight');
   });
 });
