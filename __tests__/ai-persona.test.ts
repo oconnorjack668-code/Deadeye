@@ -31,6 +31,11 @@ describe('the safety rules themselves', () => {
     ['under-18 nutrition caution', /under-18/i],
     ['no personal contact details', /contact details/i],
     ['never invent numbers', /never invent numbers/i],
+    ['distress, self-harm or abuse: stop and point to Childline', /Childline/],
+    ['danger now: 112 or 999', /112 or 999/],
+    ['no meeting, other apps or secrets', /keeping anything secret/i],
+    ['stays on safe topics', /sexual content/i],
+    ['says it is an AI', /You are an AI/],
   ];
 
   for (const [name, pattern] of required) {
