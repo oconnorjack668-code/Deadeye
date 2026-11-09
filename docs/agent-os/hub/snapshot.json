@@ -152,23 +152,6 @@
   ],
   "calls": [
     {
-      "agent": "builder",
-      "detail": "The reminders card shows Mon/Wed/Fri as suggested days until you switch reminders on, says what is still missing after each change, and only counts reminders that can actually arrive. The automatic check passed: safety OK, all 1,029 tests pass, no database changes.",
-      "id": "pr-77",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/77",
-      "onApprove": "Claude merges it the next time you chat (if the checks are still green) and it goes live about a minute later. To do it straight away, tell Claude \"merge 77\".",
-      "title": "E4 follow-ups are ready to go live"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "The tester account already has a session, so the new reminders card is hidden for it (correctly). In the app: Settings, Reset to a new player, type RESET and the tester password. Claude isn't allowed to type passwords.",
-      "id": "e4-live",
-      "kind": "task",
-      "onApprove": "It moves to In progress. After the reset, tell Claude \"check E4 live\" and it tests the card in Chrome.",
-      "title": "Reset the tester account so Claude can check E4 live"
-    },
-    {
       "agent": "marketing",
       "detail": "The same 24.5-second promo with three different first 3 seconds. A: the live count ticking. B: the first make, 1/1. C: \"Do you count your makes in your head?\". Pick one before approving.",
       "id": "mkt-openings",
@@ -248,7 +231,7 @@
     },
     {
       "agent": "safety-reviewer",
-      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that.",
+      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that. Google Play's data safety form asks the same questions, so this comes before the Play Store.",
       "id": "dpia",
       "kind": "task",
       "onApprove": "It moves to In progress until it's signed.",
@@ -256,12 +239,38 @@
     },
     {
       "agent": "release-checker",
-      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan.",
+      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan. The Play Store app waits for the domain.",
       "due": "2027-01-08",
       "id": "billing",
       "kind": "task",
       "onApprove": "Claude walks you through deadeye.ie step by step the next time you chat.",
       "title": "Set up deadeye.ie, email and Stripe payments"
+    },
+    {
+      "agent": "marketing",
+      "detail": "The ready-made listing in docs/play-store/README.md says \"Track every shot\" (the tracker can't promise every shot) and uses emoji. It should follow the same rules as your posts.",
+      "id": "play-listing",
+      "kind": "approve",
+      "onApprove": "Marketing rewrites the listing and it comes back here for you to check before the Play Store step.",
+      "title": "Fix the Google Play listing words"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Do this once deadeye.ie is live and the data protection assessment is signed. The app wraps the website, so site updates reach it automatically. Your parent opens the Google Play developer account ($25, once). The App Store waits until iPhone players ask for it.",
+      "id": "play-store",
+      "kind": "task",
+      "onApprove": "Once deadeye.ie is live, Claude builds the Android app on the new address and walks you through Play Console, following docs/play-store/README.md.",
+      "title": "Publish Deadeye on Google Play (after the domain)"
+    },
+    {
+      "id": "merge-80",
+      "kind": "merge",
+      "agent": "builder",
+      "title": "Landing page: say \"count makes and misses\"",
+      "detail": "One-line wording fix on the landing page demo, from your approved call. Checks are running on the pull request.",
+      "onApprove": "The next Claude Code session you open merges it once checks are green, and the fix goes live.",
+      "words": "watch it count makes and misses",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/80"
     }
   ],
   "clubs": {
@@ -304,10 +313,6 @@
       "label": "Work with one agent for a whole session"
     },
     {
-      "cmd": "check E4 live",
-      "label": "Have Claude test E4 on the live site (after the reset)"
-    },
-    {
       "cmd": "/handoff",
       "label": "Wrap up a session and write the handoff"
     }
@@ -339,6 +344,11 @@
       "title": "Founding club offer closes"
     },
     {
+      "date": "2026-12-31",
+      "detail": "After deadeye.ie is live and the assessment is signed",
+      "title": "Aim: Deadeye on Google Play"
+    },
+    {
       "date": "2027-01-08",
       "detail": "Founding members' free Pro starts ending from about 20 Jan",
       "title": "Stripe Pro payments live"
@@ -354,7 +364,7 @@
       {
         "day": "Mon 9",
         "post": "Promo, opening A",
-        "where": "TikTok 17:00 · Reel 18:00"
+        "where": "TikTok 17:00 \u00b7 Reel 18:00"
       },
       {
         "day": "Tue 10",
@@ -364,17 +374,17 @@
       {
         "day": "Wed 11",
         "post": "Log it in 20 seconds, no court",
-        "where": "TikTok 17:00 · Reel 17:30"
+        "where": "TikTok 17:00 \u00b7 Reel 17:30"
       },
       {
         "day": "Thu 12",
         "post": "5-spot challenge (needs filming)",
-        "where": "TikTok 17:30 · Reel 18:00"
+        "where": "TikTok 17:30 \u00b7 Reel 18:00"
       },
       {
         "day": "Fri 13",
         "post": "Promo, opening B or C",
-        "where": "TikTok 17:00 · Reel 18:00"
+        "where": "TikTok 17:00 \u00b7 Reel 18:00"
       },
       {
         "day": "Sat 14",
@@ -493,7 +503,7 @@
       "status": "ok"
     },
     {
-      "detail": "Running E4 (PR #74). Deploy ready.",
+      "detail": "Running the E4 follow-ups (PR #77). Checked live on the tester account: card, suggested days and messages all work, no errors.",
       "name": "Live site",
       "status": "ok"
     },
@@ -508,7 +518,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open (#77), checks passed. Every agent pull request is checked automatically.",
+      "detail": "None open. Every agent pull request is checked automatically.",
       "name": "Code changes",
       "status": "ok"
     }
@@ -541,13 +551,43 @@
   ],
   "log": [
     {
+      "at": "2026-11-09T16:08:00Z",
+      "text": "Landing page fix ready as PR #80, waiting for your go-ahead to go live. The welcome page also says \"calls every make and miss\"; left for you.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T16:15:00Z",
+      "text": "Parent consent wording for 16 and 17 year olds drafted for you to edit: docs/agent-os/clubs/2026-11-09-parent-consent-16-17.md. Nothing sent.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:28:00Z",
+      "text": "E4 checked live on the reset tester account: reminders card shows, suggested days, all three messages right, no console errors.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:25:00Z",
+      "text": "PR #77 (E4 follow-ups) and PR #78 (hub redesign) merged. Hub pinned to your claude.ai sidebar.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:20:00Z",
+      "text": "PR check re-ran on PR #78 after it was brought up to date: safety passed.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:10:00Z",
+      "text": "PR check ran on PR #78 (hub redesign): safety passed.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-09T14:58:00Z",
-      "text": "PR check ran on PR #77 (E4 follow-ups): safety PASS, tsc, eslint and tests pass, comment posted.",
+      "text": "PR check ran on PR #77: safety passed, all checks green.",
       "tone": "ok"
     },
     {
       "at": "2026-11-09T14:42:00Z",
-      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog are on main.",
+      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog.",
       "tone": "ok"
     },
     {
@@ -556,43 +596,23 @@
       "tone": "ok"
     },
     {
-      "at": "2026-11-09T14:34:00Z",
-      "text": "PR check ran itself on PR #74's new commits: safety PASS, tsc, eslint and tests pass, comment posted.",
-      "tone": "ok"
-    },
-    {
       "at": "2026-11-09T14:14:00Z",
-      "text": "Morning check: 0 runtime errors in 24h, production READY on newest main commit, 3 open PRs none red. No P1.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:55:00Z",
-      "text": "Plugin check: campaign-plan, draft-outreach, metrics-review and analyze all load in the cloud.",
+      "text": "Morning check: no errors, live site up to date, no urgent problems.",
       "tone": "ok"
     },
     {
       "at": "2026-11-09T12:32:00Z",
-      "text": "PR #73 merged and live: sign-in cookies kept on redirects.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:28:00Z",
-      "text": "Weekly re-run finished: PR #74 (E4) and PR #75 (report and plans) opened.",
+      "text": "PR #73 merged and live: sign-in fix.",
       "tone": "ok"
     },
     {
       "at": "2026-11-09T09:05:00Z",
-      "text": "Weekly run could not push (403): this week's first run was lost.",
+      "text": "This week's first agent run couldn't save to GitHub; fixed and re-run at 12:14.",
       "tone": "bad"
     },
     {
-      "at": "2026-11-09T08:43:00Z",
-      "text": "Counts job saved this week's funnel.",
-      "tone": "ok"
-    },
-    {
       "at": "2026-11-07T16:28:00Z",
-      "text": "Training reminders work again (push keys added).",
+      "text": "Training reminders working again.",
       "tone": "ok"
     },
     {
@@ -615,7 +635,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-09T15:05:00Z",
-  "updatedBy": "Claude Code (hub redesign)",
+  "updatedAt": "2026-11-09T16:15:00Z",
+  "updatedBy": "Hub worker",
   "version": 1
 }
