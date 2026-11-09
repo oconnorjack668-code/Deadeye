@@ -25,6 +25,8 @@ export const EVENT_NAMES = [
   'log_opened',
   /** Pressed Finish with something logged, so the Finish panel opened */
   'log_finish_opened',
+  /** Saved their training days, or turned reminders on, on a reminders card */
+  'reminder_set',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

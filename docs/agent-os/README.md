@@ -12,6 +12,16 @@ logging their first session within 7 days of finishing setup.
 
 Everything the agents build serves that number until the target is met.
 
+**The hub:** [Deadeye Bench](https://claude.ai/artifact/8kXcpLQbJ2QSfkzosne5yE) is the
+founder's one page: the calls waiting on them, the funnel, every agent, the schedule. The founder
+approves or declines there; every run reads those decisions first and refreshes the page after
+(`hub/README.md`).
+
+**Schedule** (cloud routines, Europe/Dublin): weekly loop Mondays 09:00 (counts job 08:30);
+morning check daily 08:00 (live errors, pull requests, hub); marketing Thursdays 10:00; learning
+digest Fridays 16:00; club growth on the 1st of the month 09:30; safety and release review on
+every agent pull request.
+
 ## The weekly loop
 
 It runs by itself every Monday at 09:00 Irish time (a scheduled cloud
