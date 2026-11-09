@@ -5,6 +5,7 @@
 import { getCurrentUser, awaitingParentApproval, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { needsSupportLine, SUPPORT_LINE, withSupportLine } from '@/lib/ai/safety';
 import { hasUnlimitedCredits } from '@/lib/ai/service';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import type { ChatMessage } from '@/lib/ai/provider';
@@ -91,8 +92,14 @@ export async function POST(request: Request) {
     reply = await ai.provider.generateChat(messages, ai.config);
   } catch (err) {
     console.error('Coach chat failed:', err);
-    return Response.json({ error: 'The coach is unavailable right now. Please try again in a minute.' }, { status: 502 });
+    // A player asking for help still gets it when the AI is down
+    if (!needsSupportLine(message)) {
+      return Response.json({ error: 'The coach is unavailable right now. Please try again in a minute.' }, { status: 502 });
+    }
+    reply = SUPPORT_LINE;
   }
+  // Support lines for distress, self-harm or abuse, whatever the model wrote (src/lib/ai/safety.ts)
+  reply = withSupportLine(message, reply);
 
   const admin = createAdminClient();
   const at = Date.now();

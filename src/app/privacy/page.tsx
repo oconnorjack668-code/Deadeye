@@ -166,6 +166,11 @@ export default function PrivacyPage() {
               notes), the video numbers you choose to share, or your style match results, only when you ask for AI
               feedback, to write the report. Videos are never sent to {ai === 'Our AI provider' ? 'them' : ai}.
             </li>
+            <li>
+              When you use AI Coach chat or an AI report, {ai === 'Our AI provider' ? 'it' : ai} also receives your age
+              range, height, position, strong hand, playing level, goals and recent training numbers, so the advice fits
+              you. It never receives your name, email address or photo.
+            </li>
             <li>Stripe processes Pro payments.</li>
             {emailConfigured() && (
               <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>

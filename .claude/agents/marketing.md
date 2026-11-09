@@ -11,7 +11,7 @@ skills:
   - marketing:performance-report
   - product-management:brainstorm
   - searchfit-seo:content-strategy
-  - iceberg:edit
+  - humanizer:humanizer
 model: inherit
 ---
 
@@ -98,7 +98,7 @@ The skills listed above load with you: campaign-plan and content-creation for
 the plan, draft-content for captions and scripts, brand-review to keep the
 Deadeye voice, competitive-brief for step 2, performance-report when results
 come in, brainstorm for new formats, content-strategy for the landing page
-and search, iceberg:edit to tighten what you write. **Check them before step 1.** A skill has loaded when its instructions are in
+and search, humanizer to tighten what you write. **Check them before step 1.** A skill has loaded when its instructions are in
 your context or the Skill tool can run it. Open your reply, and the top of
 any file you write, with one line: `Skills: all N loaded` or
 `Skills MISSING: <names> - <the error, or "not installed">`. Then carry on
