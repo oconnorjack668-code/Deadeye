@@ -338,12 +338,13 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
   const STATUS = { approved: ["In progress", "info"], done: ["Done", "good"], later: ["Later", "neutral"] };
   let snap = null, decisions = {}, progress = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
   const PSTATE = { queued: ["Queued", "neutral"], working: ["Working on it", "info"], done: ["Finished", "good"], blocked: ["Blocked", "bad"] };
-  // The hub worker runs hourly, 08:00 to 22:00 Irish time
+  // The hub worker runs at 09:00 and 19:00 Irish time
   function nextCheck() {
     const now = new Date(), irish = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Dublin" }));
-    let h = irish.getHours() + 1; if (h < 8) h = 8;
-    if (h > 22) return "tomorrow at 08:00";
-    return (h === irish.getHours() + 1 ? "at " : "at ") + String(h).padStart(2, "0") + ":00";
+    const h = irish.getHours();
+    if (h < 9) return "at 09:00";
+    if (h < 19) return "at 19:00";
+    return "tomorrow at 09:00";
   }
   const $ = (id) => document.getElementById(id);
   const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; };

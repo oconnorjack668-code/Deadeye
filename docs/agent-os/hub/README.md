@@ -21,7 +21,7 @@ data: the page's database, mirrored in `snapshot.json` here.
 | `decisions/<call id>` | The founder, from the page or its chat | `{status: approved | done | later, note?, pick?, at}` |
 | `progress/<call id>` | The hub worker and any agent run | `{state: queued | working | done | blocked, summary, steps: [{at, text}], pr?, file?, updatedAt}` |
 
-**The hub worker** (routine `trig_015kxehjQDGT72Yn4Fi3X7Lk`, hourly 08:00 to 22:00 Irish time) picks up
+**The hub worker** (routine `trig_015kxehjQDGT72Yn4Fi3X7Lk`, 09:00 and 19:00 Irish time) picks up
 approved calls (not merges), does what each `onApprove` says as the named agent, and writes its steps
 to `progress/<call id>` so the founder can watch on the task card. An hour with nothing approved ends
 in one line. **Chat** (the page's Chat tab) answers from the snapshot, decisions and progress, and can
