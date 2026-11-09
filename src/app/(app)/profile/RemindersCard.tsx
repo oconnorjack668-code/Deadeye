@@ -91,17 +91,28 @@ export function RemindersCard({
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return;
+    const willBeOn = next.enabled ?? enabled;
     const { error } = await supabase
       .from('notification_preferences')
       .update({
-        reminder_enabled: next.enabled ?? enabled,
+        reminder_enabled: willBeOn,
         reminder_days: next.days ?? days,
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id);
-    if (error) setMessage(`Could not save: ${error.message}`);
-    else if (next.days || next.enabled) track('reminder_set');
+    if (error) {
+      setMessage(`Could not save: ${error.message}`);
+      return;
+    }
+    // The marker counts reminders that can arrive: days saved with "Remind me" on,
+    // not a day tapped while reminders are off (E4 safety note, 9 Nov 2026).
+    if (willBeOn) track('reminder_set');
+    // Say what is still missing, so picking days never reads as "done" when nothing will arrive
+    if (next.enabled === false) setMessage('Reminders are off.');
+    else if (!willBeOn) setMessage('Saved. Switch on Remind me to get reminders on these days.');
+    else if (!deviceOn) setMessage('Saved. Turn on notifications on this device to get the reminder.');
+    else setMessage('Saved.');
   }
 
   async function saveWeekly(next: boolean) {
@@ -216,22 +227,33 @@ export function RemindersCard({
                 className="h-5 w-5 accent-orange-500"
               />
             </label>
+            {/* Until reminders are on, the days are a suggestion: outlined, not filled, so
+                the Mon/Wed/Fri default never looks like a choice already made */}
+            {!enabled && <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Suggested days · tap to change</p>}
             <div className="flex gap-1.5">
-              {DAYS.map((d, i) => (
-                <button
-                  key={d}
-                  type="button"
-                  aria-pressed={days.includes(i)}
-                  onClick={() => {
-                    const next = days.includes(i) ? days.filter((x) => x !== i) : [...days, i].sort();
-                    setDays(next);
-                    savePrefs({ days: next });
-                  }}
-                  className={`flex-1 rounded-lg py-1.5 text-xs font-semibold ${days.includes(i) ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-zinc-400'}`}
-                >
-                  {d}
-                </button>
-              ))}
+              {DAYS.map((d, i) => {
+                const picked = days.includes(i);
+                const look = !picked
+                  ? 'border border-transparent bg-zinc-800 text-zinc-400'
+                  : enabled
+                    ? 'border border-orange-600 bg-orange-600 text-white'
+                    : 'border border-orange-500/60 bg-transparent text-orange-300';
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    aria-pressed={picked}
+                    onClick={() => {
+                      const next = picked ? days.filter((x) => x !== i) : [...days, i].sort();
+                      setDays(next);
+                      savePrefs({ days: next });
+                    }}
+                    className={`flex-1 rounded-lg py-1.5 text-xs font-semibold ${look}`}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
             </div>
             <p className="text-sm text-zinc-500">Reminders come once a day, {REMINDER_TIME_LABEL}, on the days you pick.</p>
             {streakWarning !== null && (

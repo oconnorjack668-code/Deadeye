@@ -126,9 +126,14 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
 - Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup.
 
-## E4 · Training-days reminder on the dashboard for a player with no session · review (exp/E4-dashboard-reminder)
+## E4 · Training-days reminder on the dashboard for a player with no session · shipped 2026-11-09
 
 Report: [2026-11-09](reports/2026-11-09-activation.md)
+
+- Shipped: PR #74, merged and live 2026-11-09. Follow-up (branch `fix/e4-followups`, from the three safety
+  notes): default days show as "Suggested" until reminders are on; a message after each save says what is still
+  missing; `reminder_set` now fires only when reminders end up on (turned on, or days changed while on), so read
+  it as reminders that can arrive; the privacy clause says so in its own sentence.
 
 - Hypothesis: barrier **forgot** (no cue). About 17 of the 24 who finished setup did so before the welcome
   screen existed (10-21) and never saw its reminders card; `dashboard/page.tsx` has no reminder prompt, and
