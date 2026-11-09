@@ -1,54 +1,61 @@
-# Deadeye Bench (the agent hub)
+# Deadeye HQ (the agent hub)
 
 The founder's one page for the Agent OS: https://claude.ai/artifact/8kXcpLQbJ2QSfkzosne5yE
-(private to the founder). Built 2026-11-09. Source: `index.html` here; data: `snapshot.json` here
-and the page's database.
+(private to the founder). Built 2026-11-09, redesigned the same day after the founder's feedback
+(plain headings, the real red logo, one Approve / Done / Later flow). Source: `index.html` here;
+data: the page's database, mirrored in `snapshot.json` here.
 
 ## What it shows
 
-- **Scorebug**: activation (first sessions of players who finished setup) against the goal, days
-  since a new player, next weekly run, overall status.
-- **Today**: the clipboard of calls waiting on the founder (merges, approvals, the founder's own
-  jobs), the funnel as a box score, the "injury report" (what's working), deadlines, a
-  play-by-play log, and the words to send Claude.
-- **Bench** (the 7 agents), **Playbook** (backlog), **Clubs** (pipeline), **Film room** (this
-  week's posts), **Learning** (lessons and sources per agent), **Ask** (Claude answers from the
-  page's data).
+- **Home**: the activation goal in a full sentence with progress, players, systems; what needs a
+  decision; what's in progress; coming up; recent activity; systems.
+- **To-do**: every call, filtered by Needs decision / In progress / Later / Done.
+- **Growth** (funnel, experiments, weekly rate), **Agents** (with latest lesson and prompts to copy),
+  **Clubs and content**, **Ask Claude** (answers from the page's data).
 
-## The database (read and write it with the ArtifactData tool, `url` above)
+## The database (ArtifactData tool, `url` above)
 
 | Collection / doc | Who writes | What |
 | --- | --- | --- |
-| `hub/snapshot` | Agents (via Claude) | The whole page's data, same shape as `snapshot.json`. |
-| `decisions/<call id>` | The founder, from the page | `{status: approved | rejected | later | done, note?, pick?, at}` |
+| `hub/snapshot` | Agents (via Claude) | The page's data, same shape as `snapshot.json`. |
+| `decisions/<call id>` | The founder, from the page | `{status: approved | done | later, note?, pick?, at}` |
 
-Only the owner (and editors) can write; anyone the page is shared with can read.
+No decision document means the call is waiting for the founder. Only the owner and editors write.
 
-## Every run that touches the hub does this
+## What the founder's buttons mean
 
-1. **Read decisions first**: `ArtifactData list`, collection `decisions`. For each one that names
-   a call your agent owns (`calls[].agent`):
-   - `approved`: go ahead with what the call proposed, as the founder's go-ahead. A `pick`
-     is the option chosen; a `note` changes the plan. Approval never covers posting, sending,
-     spending or merging by itself: those still wait for the founder's words in chat.
-   - `rejected` with a note: don't do it. Add the note to that agent's knowledge file under
-     "Lessons from the founder" as a dated rule (`docs/agent-os/knowledge/<agent>.md`).
-   - `done`: drop the call from the next snapshot.
-   - `later`: keep the call, unchanged.
-2. **Update `snapshot.json`** in the repo with what changed (numbers, calls, agents' last run and
-   output, backlog, clubs, film, log, learn, health). Keep the shape. Newest log line first; keep
-   at most 20 log lines. Set `updatedAt` (UTC) and `updatedBy` (the routine's name).
-3. **Push it to the page**: `ArtifactData get` `hub/snapshot` for its `version`, then
-   `ArtifactData set` `hub/snapshot` with `file_path` = `docs/agent-os/hub/snapshot.json` and
-   `if_version` = that version. On a version conflict, re-read and redo once.
-4. **Delete decisions you acted on** that are `done` or `rejected` (the page keeps them in
-   "Decided" until then): `ArtifactData delete` with the version you read.
-5. If the ArtifactData tool is missing in this session, still update `snapshot.json`, commit it,
-   and put "Hub not updated: ArtifactData missing" first in the report.
+- **Approve** = yes, go ahead. The call moves to In progress. The agent named on the call does what
+  its `onApprove` line promised. A `pick` is the option chosen; a `note` changes the plan.
+- **Approve to go live** (calls of kind `merge`): the founder's go-ahead to merge that pull request.
+  Scheduled routines never merge (auto mode refuses giving them that standing permission, 9 Nov 2026).
+  The next Claude Code session the founder opens checks `decisions` and merges approved pull requests
+  whose GitHub checks are green, whose PR check safety verdict is PASS and whose branch is up to date
+  (`gh pr merge --merge --match-head-commit <sha>`), then marks the decision done. Routines only report
+  approved-but-unmerged pull requests in their notification.
+- **Done** = finished. Drop the call from the next snapshot and delete the decision.
+- **Later** = not this week. Keep the call; the next weekly run may put it back to waiting by
+  deleting the decision.
+- A **note** with feedback on how an agent worked becomes a dated rule in that agent's knowledge file
+  under "Lessons from the founder".
+- Approval never covers posting, sending, messaging anyone or spending money: those stay the
+  founder's own actions.
+
+## Every run that touches the hub
+
+1. **Start from the page's data**, not the repo file: `ArtifactData get` `hub/snapshot` (note its
+   `version`). The repo's `snapshot.json` can be older.
+2. **Read decisions**: `ArtifactData list` `decisions`, and act on those for your agent's calls as above.
+3. **Edit the snapshot** with what changed. Every call needs `id`, `kind` (`merge` | `approve` |
+   `task`), `agent`, `title` (plain words, what it is), `detail` (why, in a sentence or two) and
+   `onApprove` (what happens if the founder approves, in one sentence); `link` for pull requests;
+   `options` for a pick; `due` (YYYY-MM-DD) when there is one. Newest log line first, at most 20.
+   Plain English everywhere: no jargon, no sports terms. Set `updatedAt` (UTC) and `updatedBy`.
+4. **Save it**: write it to `docs/agent-os/hub/snapshot.json`, then `ArtifactData set` `hub/snapshot`
+   with `file_path` and `if_version`. On a version conflict, re-read and redo once.
+5. **Tidy decisions** you acted on that are done (delete with the version you read).
+6. If the ArtifactData tool is missing, say "Hub not updated: ArtifactData missing" first in the report.
 
 ## Rules
 
-- Counts only, never names, emails or ids of players. The page can be shared later.
+- Counts only, never names, emails or ids of players.
 - Every number comes from a file in `docs/agent-os/data/` or a report; never estimate.
-- A call has `id`, `kind` (`merge` | `approve` | `task`), `agent`, `title`, `detail`, and
-  `words` + `link` for merges, `options` for a pick, `due` (YYYY-MM-DD) when there is one.
