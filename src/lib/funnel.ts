@@ -67,7 +67,7 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
   },
   {
     title: 'Reminders',
-    steps: [{ name: 'reminder_set', label: 'Saved training days or turned reminders on' }],
+    steps: [{ name: 'reminder_set', label: 'Turned reminders on (or changed days with them on)' }],
   },
 ];
 
