@@ -1,6 +1,6 @@
 # 3 new test clips cut, labelled, in the bench suite (2026-11-09)
 
-Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: baseline done; diagnosis (step 6) next
+Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) · Status: fix 2 (rattle-outs) accepted at 537/656; phantoms traced, not fixed
 
 ## Outcome
 - The 4 Nov clips are in `scripts/bench-suite.json` as `clip3`, `clip4`, `clip5`: cut (stream copy, bit-identical frames) from just before the first shot to 2.5s after the last, labelled frame by frame.
@@ -27,6 +27,12 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 - clip4 as filmed: the rattle-out at 88.1s called a make (crossed 0.21, ball bouncing on the ring); phantom at 62.6s, the founder's head at the bottom of the picture.
 - The run was split (Claude Code stopped the first for low memory); `summary.txt` was rebuilt from all 32 per-run reports with the suite's own scoring.
 
+## Fix 2 and the traces (`out/fix2-nov9/`, `out/trace-nov9/`)
+- Rattle-out cause: the frame that placed the crossing also counted as the ball seen under the ring. It no longer does when it is within `ON_RING` (0.35 rim widths) of the line. 535 -> **537/656**; clip4 as filmed 24/24; no run worse; phantoms 24 -> 24. 0.35 sits between the only two measured cases (rattle 0.25, a 15 fps make 0.499).
+- Phantoms all end with the ball never reaching the ring (1.5s lost-ball timeout): sideways or rising passes that "armed" on a depth jitter (clip4 62.6, 118.4), a player at the lens (clip3 126.6, net 0.55 > 0.36), and one real make lost because the tracker gave the ball two ids and `sameBall` threw out the real one (clip3 30.05 -> phantom 32.2). Next fix; it must keep clip4 81.0/101.0 (in front of the ring, saved only by a still net).
+- Tiny-rim make (clip3 84.75): crossed 1.43 half-rims, net 2 frames. Left alone: loosening either check turns clip4's near-misses into makes.
+- Real-world fps: 14 saved sessions, 1 with quality data (a computer, 29.7 fps). No phone data yet.
+
 ## Decisions
 - Hold-out is clip5, chosen before any tuning: least like clip1/clip2 (Claude; founder can swap it before tuning starts).
 - Cut clips, keep originals: founder asked for cuts from just before the first shot to just after the last.
@@ -34,7 +40,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this branch (`bench/new-test-clips`) �
 
 ## Open
 - Founder: watch the 3 cut clips against the labels (`scripts/bench-suite.json`); flag any shot missing. Least sure: clip3 30.05 and 84.75 (makes), clip4 81.0 and 101.0 (airballs right of the ring).
-- Plan steps 6–8 (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
+- The phantom fix (above), then plan steps 7–8 (diagnose, change, score clip5 once; rim finder frames) from the [new-test-footage handoff](2026-11-07-new-test-footage.md).
 - Consent: a second player is in clip4 and clip5; ask them before any frames go to Colab/Drive.
 - Push keys (from the 7 Nov handoff) still open.
 

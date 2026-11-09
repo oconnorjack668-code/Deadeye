@@ -146,7 +146,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
 
     // How much of the net moved on each frame, ball excluded, for tuning the
     // make confirmation against labelled shots
-    const netTrace: string[] | null = process.env.DEADEYE_BENCH_NETTRACE ? ['t_ms,net'] : null;
+    const netTrace: string[] | null = process.env.DEADEYE_BENCH_NETTRACE ? ['t_ms,net,under'] : null;
     // DEADEYE_BENCH_NONET=1 runs without watching the net, to measure what it adds
     const watchNet = process.env.DEADEYE_BENCH_NONET !== '1';
 
@@ -239,7 +239,9 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       if (r.moved) moves.push(`${(videoMs / 1000).toFixed(1)}s (${r.moved.dx},${r.moved.dy} match ${r.moved.match.toFixed(2)} vs ${r.moved.still.toFixed(2)})`);
       if (r.light !== null) lights.push(r.light);
       if (!r.ready) return;
-      if (netTrace) netTrace.push(`${Math.round(r.t)},${(r.netMotion ?? 0).toFixed(3)}`);
+      // The third column is underNet: something ball-like under the net, which
+      // counts as the ball seen under the ring after a crossing
+      if (netTrace) netTrace.push(`${Math.round(r.t)},${(r.netMotion ?? 0).toFixed(3)},${pipeline!.tracker()?.underNet() ? 1 : 0}`);
       if (!r.found || !r.centre) return;
       framesWithBall++;
       scores.push(r.found.score);
