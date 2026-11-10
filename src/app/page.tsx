@@ -273,7 +273,7 @@ export default async function Home() {
             <h3 className="text-2xl font-black tracking-tight text-white">Watch it call real shots</h3>
             <p className="mt-2 mb-5 text-sm text-zinc-400">
               This is the real tracker, running right here in your browser on a clip from a real session. Press play and
-              watch it count every make and miss.
+              watch it count makes and misses.
             </p>
             <LandingDemo signedIn={signedIn} />
           </div>
