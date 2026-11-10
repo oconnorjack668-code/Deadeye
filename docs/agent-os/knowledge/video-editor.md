@@ -138,6 +138,13 @@ edit log `docs/agent-os/video/2026-11-10-caught-fire.md`).
 - Delivery: upload a near-lossless master (CRF 16 to 18, YouTube's spec as the
   house spec); platforms publish no loudness target, -14 LUFS is consensus.
 
+## Tools
+
+Ranked options (voice, analytics, video understanding, Resolve) are in
+`docs/agent-os/video/tools.md`; nothing there is installed. Never send footage
+that shows under-18s to an outside AI service without a DPIA update and consent
+naming it; prefer the tracker's own event log and local ffmpeg filmstrips.
+
 ## Open questions
 
 - Cut rate for sports montages: the only benchmark covers talking heads.
