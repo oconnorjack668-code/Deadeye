@@ -74,6 +74,19 @@ the same goal: a new player logging a first session. It only drafts. Every
 post, message, ad and payment is the founder's, and no under-18 player is
 shown or named without a parent's written consent.
 
+## Video
+
+**video-editor** (`.claude/agents/video-editor.md`, `/agent-os video`) turns
+marketing's scripts and the founder's footage into finished TikTok and Reels
+videos with HyperFrames and ffmpeg (founder's ask, 2026-11-10: marketing keeps
+what makes a good video and the research; the editor has the craft and the
+video skills). Every version is a new file kept for the founder to compare;
+footage and videos stay out of git in the founder's recordings folder, and
+the edit log goes in `docs/agent-os/video/`. Before the founder sees a cut,
+the lead runs the critic panel (`video/critic-panel.md`): six teen-player
+viewers who find every flaw, then the editor fixes what the footage allows.
+It runs locally only, since cloud sessions cannot reach the footage.
+
 ## Permissions
 
 | Tier | What |
@@ -97,6 +110,7 @@ live app without a pull request and green checks, whoever pushes.
 - `backlog.md`: the experiments, ranked. The single source of truth for what gets built.
 - `data/`: weekly counts and paraphrased player notes, added by the founder.
 - `reports/`: one activation report per week, written by the analyst.
+- `video/`: the video editor's edit logs, the critic panel and the craft playbook.
 
 ## Clubs
 
