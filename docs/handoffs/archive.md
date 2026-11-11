@@ -2,6 +2,9 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-10-22 · icon-and-photos · Deadeye favicon; profile photos on leaderboard and top bar · open: 3 → [handoff](2026-10-22-icon-and-photos.md)
+- 2026-10-22 · tester-reset · Tester logins can reset to a brand-new player from Settings, live · open: none → [handoff](2026-10-22-tester-reset.md)
+- 2026-10-22 · agent-os-first-loop · First weekly loop: report, fresh counts, E1 shipped and checked live · open: 2 → [handoff](2026-10-22-agent-os-first-loop.md)
 - 2026-10-22 · agent-os · Agent OS v1: activation analyst leads a weekly build loop · open: 4 → [handoff](2026-10-22-agent-os.md)
 - 2026-10-22 · signup-email-limit · Auth email via Gmail SMTP, friendly limit message, test page hydration fix · open: 2 → [handoff](2026-10-22-signup-email-limit.md)
 - 2026-10-21 · training-gaps · Warm-ups, off-ball drills, drill timer, easier versions, metre sprints; live, tester-checked · open: 2 → [handoff](2026-10-21-training-gaps.md)
