@@ -46,7 +46,9 @@ for (const file of fs.readdirSync(SRC).filter((f) => f.endsWith('.md')).sort()) 
   if (text.includes("'''")) throw new Error(`${file}: body contains ''' and cannot be a TOML literal string`);
   const toml = `name = ${tomlBasic(name)}\ndescription = ${tomlBasic(fm.description || '')}\ndeveloper_instructions = '''\n${note}\n\n${text}\n'''\n`;
   const out = path.join(OUT, `${name}.toml`);
-  const old = fs.existsSync(out) ? fs.readFileSync(out, 'utf8') : null;
+  const old = fs.existsSync(out) ? fs.readFileSync(out, 'utf8').replace(/
+/g, '
+') : null;
   if (old === toml) continue;
   stale++;
   if (check) console.log(`stale: ${out}`);
