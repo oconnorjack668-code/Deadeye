@@ -21,7 +21,7 @@ Files in this folder:
 **App name** (max 30): `Deadeye AI Basketball Trainer`
 
 **Short description** (max 80):
-`Track every shot, check your shooting form with AI and train like the pros.`
+`Your phone counts your makes and misses. Form check, drills and an AI coach.`
 
 **Full description** (max 4000):
 

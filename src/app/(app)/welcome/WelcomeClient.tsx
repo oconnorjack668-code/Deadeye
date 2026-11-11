@@ -46,7 +46,7 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
         <div>
           <h1 className="text-3xl font-black tracking-tight text-white">Let&apos;s count your shots</h1>
           <p className="mt-2 text-zinc-400">
-            Set the phone down, tap the two sides of the rim once, and shoot. Deadeye calls every make and miss.
+            Set the phone down, tap the two sides of the rim once, and shoot. Deadeye counts your makes and misses.
           </p>
         </div>
 
