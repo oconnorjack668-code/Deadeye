@@ -23,6 +23,7 @@ Deadeye is for players from 13, so most users are under 18.
 | Profile: height, position, hand, level, goals | Player | Coaching, AI feedback | Contract | Account life |
 | Training logs, shots, drills, workouts, tests, quiz scores | Player | The core service | Contract | Account life |
 | Videos (only if uploaded), analysis numbers | Player | Video feedback | Contract | Account life |
+| Routine import: pasted text or screenshot (passes through, not stored by Deadeye); import count (date, text or picture); imported programs, reps targets and notes | Player; anyone named or shown in the text or picture | Bring routines from other apps; count the free monthly allowance | Contract; parent consent for 13-15s | Text/picture: not stored by Deadeye, deleted by the AI provider within 30 days (up to 2 years if flagged for misuse). Count: up to 2 months. Programs: account life |
 | Profile photo (optional) | Player; parent approves under 16 | Avatar | Consent | Account life |
 | Saved hoops, tracker accuracy data, phone type | Player | Tracker | Contract; legitimate interest (accuracy, aggregate only) | Account life |
 | AI coach chat and reports | Player | Coaching | Contract | Until cleared or account deleted |
@@ -32,7 +33,9 @@ Deadeye is for players from 13, so most users are under 18.
 | Crash reports, problem reports, app steps | Player | Fixing bugs, finding where new players stall | Legitimate interest | 90 days |
 
 Processors: Supabase (database, files), Vercel (hosting), Anthropic (AI coach:
-receives profile and training numbers, never name, email, photo or video),
+receives profile and training numbers, never name, email, photo or video;
+routine import: receives only the pasted text or screenshot, with no account
+details; deletes API data within 30 days),
 Stripe (payments), Resend or Gmail SMTP (email). Check each one's data
 processing terms and where it stores data (EU or with transfer safeguards).
 
@@ -46,6 +49,9 @@ location data, no profiling for marketing, no direct messages between users.
 - Video analysis and "Find the hoop" run on the phone; nothing is uploaded
   unless the player chooses to save a video.
 - The AI provider gets the minimum for coaching (no name since 2026-11-07).
+- Routine import sends only the text or picture the player chooses, shrunk on
+  the phone (location data removed), with no account id. CSV import never
+  leaves the phone. It stops when AI coaching is switched off.
 - Retention: everything goes with the account; diagnostics after 90 days;
   unapproved under-16 accounts after 30 days.
 
@@ -65,6 +71,7 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
 | R8 | Personal data in diagnostics or agent files | Low | Medium | Crash and problem reports kept 90 days; agents work from counts only; funnel steps first-party, once a day | Low |
 | R9 | Video of players (faces, other children in shot) | Medium | Medium | Analysis on the phone; upload optional; videos never sent to the AI provider. No consent step for other people in shot | Medium |
 | R10 | Marketing reaches or targets children unfairly | Medium | Medium | Marketing agent rules: no identifiable under-18s without written parent consent, ASAI code, no pressure, no money talk to under-16s | Low |
+| R11 | A screenshot or pasted message carries other people's details (names, faces, phone numbers, other children) or the player's own to the AI provider | Medium | Low-medium | Sent only when the player chooses; shrunk on the phone; no account id; not stored by Deadeye; provider deletes within 30 days; a line on the screen asks players to crop out names and faces; the model is told not to copy names or numbers; stops when AI is off | Low |
 
 ## 4. Open actions
 
@@ -82,6 +89,11 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
    within 72 hours where there is a risk to people).
 6. **Records of processing (GDPR Art. 30):** section 1 can serve as the record;
    keep it in step with the privacy policy.
+7. **R11, routine import:** confirm the Anthropic agreement covers images,
+   where they are processed and the transfer safeguard. Parents who approved
+   before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
+   no under-16 had signed up, so every parent approval is given on the
+   updated parent page, which names routine import.
 
 ## 5. Consultation
 

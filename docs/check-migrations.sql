@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00057, 57 files, 262 things). Do not edit it by
+-- (00001 to 00058, 58 files, 271 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -282,7 +282,16 @@ WITH expected(migration, kind, obj, col) AS (
     ('00056', 'table', 'cron_runs', ''),
     ('00056', 'index', 'cron_runs_started_idx', ''),
     ('00056', 'index', 'cron_runs_job_started_idx', ''),
-    ('00057', 'column', 'notification_preferences', 'streak_warning')
+    ('00057', 'column', 'notification_preferences', 'streak_warning'),
+    ('00058', 'column', 'routine_exercises', 'target_reps'),
+    ('00058', 'column', 'routine_exercises', 'notes'),
+    ('00058', 'table', 'user_programs', ''),
+    ('00058', 'index', 'idx_user_programs_user', ''),
+    ('00058', 'column', 'workout_routines', 'program_id'),
+    ('00058', 'column', 'workout_routines', 'day_order'),
+    ('00058', 'index', 'idx_workout_routines_program', ''),
+    ('00058', 'table', 'routine_imports', ''),
+    ('00058', 'index', 'idx_routine_imports_user', '')
 ),
 checked AS (
   SELECT

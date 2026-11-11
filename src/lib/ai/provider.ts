@@ -67,6 +67,20 @@ export abstract class AIProvider {
 
   /** Plain-text multi-turn chat completion. */
   abstract generateChat(messages: ChatMessage[], config: AIProviderConfig): Promise<string>;
+
+  /** Like generateJson, with one picture sent before the text (a screenshot to read). */
+  abstract generateJsonFromImage(
+    system: string,
+    user: string,
+    image: AIImage,
+    config: AIProviderConfig
+  ): Promise<Record<string, unknown>>;
+}
+
+/** A picture for the model: base64 without the data: prefix. */
+export interface AIImage {
+  mediaType: 'image/jpeg' | 'image/png' | 'image/webp';
+  data: string;
 }
 
 // The failure mode this guards against is the one players actually punish.
@@ -169,6 +183,21 @@ export class OpenAIProvider extends AIProvider {
 
   /** Sends one system + user prompt to OpenAI in JSON mode and returns the parsed object. */
   async generateJson(system: string, user: string, config: AIProviderConfig): Promise<Record<string, unknown>> {
+    return this.json(system, user, config);
+  }
+
+  async generateJsonFromImage(system: string, user: string, image: AIImage, config: AIProviderConfig): Promise<Record<string, unknown>> {
+    return this.json(
+      system,
+      [
+        { type: 'image_url', image_url: { url: `data:${image.mediaType};base64,${image.data}` } },
+        { type: 'text', text: user },
+      ],
+      config
+    );
+  }
+
+  private async json(system: string, user: string | Array<Record<string, unknown>>, config: AIProviderConfig): Promise<Record<string, unknown>> {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${config.apiKey}`, 'Content-Type': 'application/json' },
@@ -221,7 +250,11 @@ export class AnthropicProvider extends AIProvider {
   readonly name = 'anthropic';
   private static readonly API_VERSION = '2023-06-01';
 
-  private async send(system: string, messages: Array<{ role: 'user' | 'assistant'; content: string }>, config: AIProviderConfig): Promise<string> {
+  private async send(
+    system: string,
+    messages: Array<{ role: 'user' | 'assistant'; content: string | Array<Record<string, unknown>> }>,
+    config: AIProviderConfig
+  ): Promise<string> {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -245,6 +278,16 @@ export class AnthropicProvider extends AIProvider {
   async generateJson(system: string, user: string, config: AIProviderConfig): Promise<Record<string, unknown>> {
     const jsonSystem = `${system}\n\nRespond with ONLY the JSON object and no other text, markdown, or explanation.`;
     const text = await this.send(jsonSystem, [{ role: 'user', content: user }], config);
+    return extractJson(text);
+  }
+
+  async generateJsonFromImage(system: string, user: string, image: AIImage, config: AIProviderConfig): Promise<Record<string, unknown>> {
+    const jsonSystem = `${system}\n\nRespond with ONLY the JSON object and no other text, markdown, or explanation.`;
+    const content = [
+      { type: 'image', source: { type: 'base64', media_type: image.mediaType, data: image.data } },
+      { type: 'text', text: user },
+    ];
+    const text = await this.send(jsonSystem, [{ role: 'user', content }], config);
     return extractJson(text);
   }
 

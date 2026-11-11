@@ -1,8 +1,8 @@
-Skills MISSING: compliance-check, legal-risk-assessment, accessibility-review - not installed (Unknown skill); security-review loaded (2026-11-09 run)
+Skills: all 5 loaded (2026-11-11 run)
 
 # Safety reviewer knowledge
 
-Last researched: 2026-11-09
+Last researched: 2026-11-11
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -59,6 +59,24 @@ file). Newest first, each with the date, what happened, and the rule.
       13-year-old, including why a setting is off for them.
 - [ ] **Promo and upsell copy** (ASAI): no pester power, no "only/just" on a
       price, no "left behind", no results an ordinary player cannot reach.
+- [ ] **Parent page in step.** Any new data sent to a processor (AI, email,
+      storage) is named in `src/app/parents/WhatParentsAgreeTo.tsx` as well
+      as the privacy policy, and every switch that page promises (AI off in
+      Settings) still stops the new feature. Under-16 consent covers only what
+      the parent was told.
+- [ ] **"Not kept" is true at the processor too.** Before passing "not kept",
+      "not stored" or "deleted", check the processor's retention (Anthropic
+      API: deleted within 30 days, up to 2 years if flagged; see findings).
+      Say "deleted by <processor> within 30 days" instead.
+- [ ] **Uploads that can show other people.** Screenshots, pasted messages and
+      photos sent anywhere get a line at the point of upload: crop out names,
+      faces, numbers and anyone else's details. The AI is told not to copy
+      them, and the player can remove anything read before it is saved.
+- [ ] **AI that reads player content** (prompt injection, OWASP LLM01): no
+      tools, nothing else in the context, output validated and shown only to
+      the same player, who checks it before it is saved.
+- [ ] **Counters and logs have a retention.** A row kept only to count a
+      monthly limit is deleted when it no longer counts, and the policy says so.
 - [ ] **DPIA.** A new kind of processing (new data type, recipient, upload,
       AI use, public surface) is named in the verdict as needing the DPIA
       updated.
