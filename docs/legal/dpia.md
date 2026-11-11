@@ -90,8 +90,10 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
 6. **Records of processing (GDPR Art. 30):** section 1 can serve as the record;
    keep it in step with the privacy policy.
 7. **R11, routine import:** confirm the Anthropic agreement covers images,
-   where they are processed and the transfer safeguard; decide whether parents
-   who approved before 2026-11-11 need telling (legal advice).
+   where they are processed and the transfer safeguard. Parents who approved
+   before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
+   no under-16 had signed up, so every parent approval is given on the
+   updated parent page, which names routine import.
 
 ## 5. Consultation
 

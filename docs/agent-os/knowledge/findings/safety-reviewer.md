@@ -174,9 +174,11 @@ when a better source arrives, rather than adding beside it.
 
 ## Open questions
 
-- Does a new AI use (routine import, Nov 2026) need fresh parent consent from
-  parents who approved before it existed, or is an updated parent page and
-  a notice enough? **(legal advice)**
+- Does a new AI use need fresh consent from parents who approved before it
+  existed, or is an updated parent page and a notice enough? **(legal
+  advice)** Not needed for routine import (Nov 2026): the founder confirmed no
+  under-16 had signed up, so no earlier approval existed. Ask again the next
+  time a new AI use ships once under-16s are on the app.
 - Does Deadeye's Anthropic agreement (DPA) cover images, and where is the data
   processed (EU or SCCs)?
 
