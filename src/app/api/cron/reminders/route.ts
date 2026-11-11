@@ -12,6 +12,7 @@ import { addDays } from '@/lib/dates';
 import { deleteAccount } from '@/lib/accountDeletion';
 import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 import { FOUNDING_REMINDER_DAYS } from '@/lib/founding';
+import { pruneOldRoutineImports } from '@/lib/routineImport';
 
 async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClient>): Promise<number> {
   const { data: waiting, error } = await admin
@@ -66,6 +67,13 @@ async function run(request: Request) {
       () => undefined,
       () => undefined
     );
+
+  // Housekeeping: routine import counts only matter this month; the privacy
+  // policy says they are kept for up to two months (00058)
+  await pruneOldRoutineImports(admin).then(
+    () => undefined,
+    () => undefined
+  );
 
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
   // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)

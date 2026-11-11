@@ -158,6 +158,14 @@ when a better source arrives, rather than adding beside it.
   [Anthropic Privacy Center, retention](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data),
   updated 2026-07-01, provider terms;
   [covered models](https://privacy.claude.com/en/articles/15425996-data-retention-practices-for-covered-models), 2026, provider terms.
+  Re-checked 2026-11-11: unchanged (30 days; up to 2 years if flagged; classifier scores 7 years).
+- Anthropic and the EU-US Data Privacy Framework: sources conflict. A
+  law-firm review says Anthropic holds no DPF certification; vendor sites say
+  it does. Its DPA uses the EU SCCs (Modules 2 and 3) either way. **For
+  Deadeye:** rely on the SCCs; record a check of dataprivacyframework.gov or a
+  short transfer impact assessment in the DPIA **(legal advice)**.
+  [Heuking](https://www.heuking.de/en/news-events/newsletter-articles/detail/anthropic-claude-in-the-enterprise-data-protection-and-compliance-requirements-for-the-use-of-generative-ai.html), 2026, practitioner;
+  [companyscope](https://companyscope.io/vendors/anthropic), 2026, practitioner (says certified).
 - OWASP LLM01:2025 (prompt injection) adds multimodal attacks: instructions
   hidden in an image can steer the model, and no current defence fully stops
   them. **For Deadeye:** any AI call that reads a pasted text or screenshot
@@ -179,8 +187,10 @@ when a better source arrives, rather than adding beside it.
   advice)** Not needed for routine import (Nov 2026): the founder confirmed no
   under-16 had signed up, so no earlier approval existed. Ask again the next
   time a new AI use ships once under-16s are on the app.
-- Does Deadeye's Anthropic agreement (DPA) cover images, and where is the data
-  processed (EU or SCCs)?
+- Answered 2026-11-11 (DPIA action 7): Anthropic's DPA covers all submitted
+  data including images; transfers use the EU SCCs; processing is in the US.
+  Still open: is Anthropic on the DPF list, or do we need a short transfer
+  impact assessment? **(legal advice)**
 
 - Is there a written DPIA covering video, AI coach and public surfaces?
 - Legal basis for each kind of processing, for 16-17s and approved under-16s?

@@ -11,6 +11,8 @@ const state = vi.hoisted(() => ({
   aiResult: null as unknown,
   aiError: false,
   aiOff: false,
+  waitingForParent: false,
+  noProfile: false,
   pruned: [] as unknown[],
   inserted: [] as unknown[],
   deleted: [] as unknown[],
@@ -19,7 +21,7 @@ const state = vi.hoisted(() => ({
 
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: async () => ({ id: 'player-1', email: 'p@example.com' }),
-  awaitingParentApproval: async () => false,
+  awaitingParentApproval: async () => state.waitingForParent,
   PARENT_APPROVAL_NEEDED: 'parent approval needed',
 }));
 
@@ -62,7 +64,9 @@ vi.mock('@/lib/supabase/server', () => ({
     from: (table: string) => {
       if (table === 'routine_imports') return query({ count: state.used, error: null });
       if (table === 'subscriptions') return query({ data: { plan_type: 'free' }, error: null });
-      if (table === 'profiles') return query({ data: { ai_coaching_enabled: !state.aiOff }, error: null });
+      if (table === 'profiles') {
+        return query(state.noProfile ? { data: null, error: { message: 'down' } } : { data: { ai_coaching_enabled: !state.aiOff }, error: null });
+      }
       if (table === 'exercise_library') return query({ data: [{ id: 'bench', name: 'Barbell Bench Press' }], error: null });
       return query({ data: null, error: null });
     },
@@ -103,7 +107,7 @@ function post(body: unknown) {
 const GOOD = { name: 'Push', routines: [{ name: 'Push', exercises: [{ name: 'Bench Press (Barbell)', sets: 4, reps: '6-8' }] }] };
 
 beforeEach(() => {
-  Object.assign(state, { used: 0, pro: false, aiResult: GOOD, aiError: false, aiOff: false, inserted: [], deleted: [], pruned: [], aiCalls: [] });
+  Object.assign(state, { used: 0, pro: false, aiResult: GOOD, aiError: false, aiOff: false, waitingForParent: false, noProfile: false, inserted: [], deleted: [], pruned: [], aiCalls: [] });
 });
 
 describe('POST /api/workouts/import', () => {
@@ -167,6 +171,22 @@ describe('POST /api/workouts/import', () => {
     ]) {
       expect((await post(body)).status).toBe(400);
     }
+    expect(state.aiCalls).toHaveLength(0);
+    expect(state.inserted).toHaveLength(0);
+  });
+
+  it('sends nothing for an under-16 still waiting for a parent', async () => {
+    state.waitingForParent = true;
+    const res = await post({ kind: 'text', text: 'Bench 4x6-8' });
+    expect(res.status).toBe(403);
+    expect(state.aiCalls).toHaveLength(0);
+    expect(state.inserted).toHaveLength(0);
+  });
+
+  it('sends nothing when the AI setting cannot be read (fails closed)', async () => {
+    state.noProfile = true;
+    const res = await post({ kind: 'text', text: 'Bench 4x6-8' });
+    expect(res.status).toBe(503);
     expect(state.aiCalls).toHaveLength(0);
     expect(state.inserted).toHaveLength(0);
   });

@@ -77,8 +77,10 @@ export async function POST(request: Request) {
   // The AI coaching switch is what parents and the privacy policy describe as
   // the way to stop sending anything to the AI, so it covers import too
   const supabase = await createClient();
+  // Fails closed: if the setting cannot be read, nothing is sent
   const { data: profile } = await supabase.from('profiles').select('ai_coaching_enabled').eq('id', user.id).maybeSingle();
-  if (profile?.ai_coaching_enabled === false) {
+  if (!profile) return Response.json({ error: 'Could not check your settings. Please try again.' }, { status: 503 });
+  if (profile.ai_coaching_enabled === false) {
     return Response.json(
       { error: 'AI is switched off in your settings, so routines can only be imported from a CSV file.', aiOff: true },
       { status: 403 }

@@ -66,6 +66,18 @@ export function importRetentionCutoffIso(now: Date = new Date()): string {
   return lastMonth.toISOString();
 }
 
+/**
+ * Deletes every player's import-count rows that no longer count (before last
+ * month). Run by the daily housekeeping job, so the policy's "kept for up to
+ * two months" holds for a player who never imports again.
+ */
+export async function pruneOldRoutineImports(
+  admin: SupabaseClient<Database>,
+  now: Date = new Date()
+): Promise<void> {
+  await admin.from('routine_imports').delete().lt('created_at', importRetentionCutoffIso(now));
+}
+
 export function monthlyImportLimit(unlimited: boolean): number {
   return unlimited ? PRO_MONTHLY_ROUTINE_IMPORTS : FREE_MONTHLY_ROUTINE_IMPORTS;
 }

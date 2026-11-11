@@ -44,7 +44,7 @@ interface EditableRoutine {
 
 /** Said under the paste box and the screenshot picker. */
 const SENT_NOTE =
-  "Sent to our AI provider only to read the exercises. Your name and account are not sent. Deadeye doesn't keep it, and the provider deletes it within 30 days.";
+  "Sent to our AI provider only to read the exercises. Your name and account are not sent. Deadeye doesn't keep it, and the provider deletes it within 30 days, or longer if it is flagged for misuse.";
 
 let keyCounter = 0;
 const nextKey = () => `k${++keyCounter}`;
@@ -424,7 +424,7 @@ export default function ImportRoutinesPage() {
               <p className="text-sm text-zinc-300">
                 Take a screenshot of the routine in your other app, then choose it here. One routine per screenshot reads best.
               </p>
-              <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-600 text-sm font-semibold text-zinc-200 hover:bg-zinc-800/60">
+              <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-600 text-sm font-semibold text-zinc-200 hover:bg-zinc-800/60 focus-within:ring-2 focus-within:ring-orange-500">
                 <ImageIcon className="h-4 w-4" /> {imageFile ? 'Choose a different screenshot' : 'Choose a screenshot'}
                 <input
                   type="file"
@@ -452,7 +452,7 @@ export default function ImportRoutinesPage() {
                 Export your data as a CSV from Strong or Hevy (in their settings), or use a spreadsheet with routine, exercise, sets and reps
                 columns. Each workout becomes a routine, as you last did it.
               </p>
-              <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-600 text-sm font-semibold text-zinc-200 hover:bg-zinc-800/60">
+              <label className="flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-600 text-sm font-semibold text-zinc-200 hover:bg-zinc-800/60 focus-within:ring-2 focus-within:ring-orange-500">
                 <FileSpreadsheet className="h-4 w-4" /> Choose a CSV file
                 <input
                   type="file"
