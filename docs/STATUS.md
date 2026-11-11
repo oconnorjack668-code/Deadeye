@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (routine import done: #88-#91; S21 opened)
+Last updated: 2026-11-11 (planner/TY timetable session: no Deadeye items changed; Opera browser connected)
 
 ## Rules
 
@@ -48,10 +48,12 @@ Last updated: 2026-11-11 (routine import done: #88-#91; S21 opened)
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S21 | US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. | Founder decides (legal advice) | 2026-11-11 | 2026-11-11: raised by the safety re-review |
+| S22 | Merge PR #93 (docs only: 11 Nov planner / TY timetable handoff and this STATUS update). | Founder | 2026-11-11 | 2026-11-11: open |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
 
+- 2026-11-11 · Opera connected to Claude in Chrome beside Chrome: Opera for everyday Deadeye work, Chrome keeps the tester account for signed-in tests. Confirmed with switch_browser; device ids in Claude memory `test-live-in-chrome`.
 - 2026-11-11 · **Gym routine import live** (paste, screenshot, CSV; 10 free AI reads a month): PR #88 merged (2f5f682), migration 00058 run by the founder, Anthropic terms checked (PR #89, DPIA action 7); founder confirmed the API key is Anthropic's and saved the DPA. Closes S20. Safety re-review 11 Nov: earlier fixes confirmed; its one block (count rows only deleted on the player's next import) and smaller items fixed in PR #91 (47ec091), daily clean-up in `cron/reminders`.
 - 2026-11-11 · Overclaiming wording gone everywhere: homepage meta (#80, earlier); site-wide meta in `layout.tsx`, `public/manifest.json`, the welcome page and the Play Store short description in PR fix/overclaim-wording. Live check after merge: `/login` meta says "counts your makes and misses".
 - 2026-11-11 · Status file and SessionStart hook live: PR #85 merged (4809180). The 9 Nov HQ redesign / hub worker handoff reached main with PR #81 (its open items are in S3, S7, S11, S19).
