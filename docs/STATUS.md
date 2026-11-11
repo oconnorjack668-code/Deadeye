@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (routine import built on ccr-27e5f26f-5wusn5, not merged)
+Last updated: 2026-11-11 (routine import merged, PR #88)
 
 ## Rules
 
@@ -47,7 +47,7 @@ Last updated: 2026-11-11 (routine import built on ccr-27e5f26f-5wusn5, not merge
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
-| S20 | Gym routine import (paste, screenshot, CSV; free, 10 AI reads a month) on branch `ccr-27e5f26f-5wusn5`, not merged, no PR yet. Safety review's 3 blocks and 3 fix-soons are fixed; a re-review has not run. Migration 00058 also tightens the `routine_exercises` write rule (an exercise only in the player's own routine). Anthropic's 30-day API retention checked on its Privacy Center (updated 2026-07-01) on 11 Nov; Haiku, which import uses by default, is not a "covered model". Before going live: run migration 00058; confirm Deadeye's Anthropic terms cover images and the transfer safeguard (DPIA action 7). No parents to re-ask: founder confirmed 11 Nov that no under-16 has signed up, so all approvals use the updated parent page. | Founder | 2026-11-11 | 2026-11-11: tests, types, lint, build pass; RLS checked on local Postgres |
+| S20 | Routine import live: PR #88 merged (2f5f682), migration 00058 run by the founder. Anthropic's terms checked 11 Nov: its Data Processing Addendum covers all submitted data including screenshots, with EU Standard Contractual Clauses for the transfer (DPIA action 7). Left: confirm the AI_API_KEY in Vercel is from an Anthropic Console account (Commercial Terms) and save a copy of the DPA; optional safety re-review of the fixes. | Founder | 2026-11-11 | 2026-11-11: merged; CI green |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)

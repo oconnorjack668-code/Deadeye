@@ -89,8 +89,16 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
    within 72 hours where there is a risk to people).
 6. **Records of processing (GDPR Art. 30):** section 1 can serve as the record;
    keep it in step with the privacy policy.
-7. **R11, routine import:** confirm the Anthropic agreement covers images,
-   where they are processed and the transfer safeguard. Parents who approved
+7. **R11, routine import:** checked 2026-11-11 against Anthropic's Data
+   Processing Addendum (effective 2025-02-24): it covers "all data or other
+   information submitted through the Services", whatever the format, so
+   screenshots are covered; transfers out of the EU use the EU Standard
+   Contractual Clauses (Modules 2 and 3) and the UK addendum; the DPA is part
+   of Anthropic's Commercial Terms, which apply to API keys from the Anthropic
+   Console. It does not name a data location (processing is in the US through
+   its listed subprocessors). Left to do: confirm the AI_API_KEY in Vercel is
+   from a Console account under the Commercial Terms, and keep a copy of the
+   DPA (action 4). Parents who approved
    before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
    no under-16 had signed up, so every parent approval is given on the
    updated parent page, which names routine import.
