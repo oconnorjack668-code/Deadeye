@@ -9,6 +9,7 @@ founder's corrections, so the same mistake is not made twice.
 | File | Agent | Field |
 | --- | --- | --- |
 | `marketing.md` | marketing | Sports and basketball ads, short video, social, youth audiences |
+| `video-editor.md` | video-editor | Short-form and sports video editing, sports advertising, sound, platform specs (long technique notes in `../video/playbook.md`) |
 | `club-growth.md` | club-growth | Selling to clubs and volunteer coaches, trials, youth sport in Ireland |
 | `activation-analyst.md` | activation-analyst | Onboarding and activation in consumer, fitness and sports apps |
 | `support-triage.md` | support-triage | Triage, crash grouping, browser and phone failure patterns |

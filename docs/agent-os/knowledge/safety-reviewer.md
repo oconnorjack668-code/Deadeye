@@ -1,6 +1,8 @@
+Skills MISSING: compliance-check, legal-risk-assessment, accessibility-review - not installed (Unknown skill); security-review loaded (2026-11-09 run)
+
 # Safety reviewer knowledge
 
-Last researched: 2026-11-07
+Last researched: 2026-11-09
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -41,6 +43,10 @@ None yet.
       privacy policy names (`src/lib/ai/context.ts`); keeps `COACH_SAFETY` in
       every prompt (`src/lib/ai/persona.ts`); AI text shown outside the AI
       Coach screen says it is AI.
+- [ ] **Push and prompts.** Permission is asked only after a tap, never on
+      load; the card says what will be sent and when; what a tap saves is
+      shown to the player ("Saved"); a marker counts what really happened,
+      and the privacy clause names every action that fires it.
 - [ ] **Plain words.** New data use is explained where it happens, for a
       13-year-old, including why a setting is off for them.
 - [ ] **Promo and upsell copy** (ASAI): no pester power, no "only/just" on a
@@ -110,6 +116,22 @@ None yet.
   someone uniquely, as face recognition does. **For Deadeye:** ball and rim
   tracking is ordinary personal data; "find me in the clip" would cross into
   Art. 9. [EDPB video guidelines 3/2019](https://www.edpb.europa.eu/sites/default/files/files/file1/edpb_guidelines_201903_video_devices_en.pdf), 2020, regulator.
+
+### Push notifications and device consent
+
+- ePrivacy Regulations 2011 (S.I. 336/2011) Reg. 5(3): storing or reading
+  information on a user's device needs consent unless strictly necessary for a
+  service the user asked for; consent can be given by technical means. **For
+  Deadeye:** the browser's push prompt after the player taps "Turn on
+  notifications" is the right shape; never prompt on load. Whether a push
+  address counts under Reg. 5 is unsettled in what I found **(legal advice)**.
+  [DPC cookie sweep report](https://www.dataprotection.ie/sites/default/files/uploads/2020-04/Report%20by%20the%20DPC%20on%20the%20use%20of%20cookies%20and%20other%20tracking%20technologies.pdf), 2020, regulator.
+- ICO guidance for games (2023): avoid nudges that push children to weaken
+  privacy, with care around time-limited offers; a stronger "yes" than "no".
+  Nothing found that says notifications must be off by default; the DSA
+  guidelines above are the closest. **For Deadeye:** a reminder the player
+  opts into is fine; the streak warning stays off by default under 18.
+  [Hill Dickinson summary](https://www.hilldickinson.com/insights/articles/privacy-protection-children-new-ico-guidance-game-developers), 2023, practitioner.
 
 ### Age-appropriate design (benchmarks)
 
@@ -182,5 +204,6 @@ None yet.
   **(legal advice)**
 - Does Children First apply to Deadeye, or only to clubs using it? **(legal advice)**
 - What happens to parent approval and under-16 data at 16?
-- Next research: AI Act Art. 5 (exploiting age), ePrivacy and push
+- Does Reg. 5 ePrivacy apply to a web push subscription? **(legal advice)**
+- Next research: AI Act Art. 5 (exploiting age), a DPC or EDPB text on push
   notifications, Sport Ireland's online safeguarding text.

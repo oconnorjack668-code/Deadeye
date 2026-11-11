@@ -1,0 +1,655 @@
+<title>Deadeye HQ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@500;600&display=swap">
+<style>
+/* Layout: an app shell. Sidebar of sections on wide screens, a bottom tab bar on phones.
+   Home is a briefing (goal, players, status), then what needs a decision, then what's in progress. */
+:root {
+  --bg: #09090b; --side: #0c0c0f; --card: #131316; --card-2: #19191d; --line: #232328; --line-2: #33333a;
+  --fg: #fafafa; --fg-2: #d4d4d8; --muted: #a1a1aa; --quiet: #8b8b94;
+  --brand: #e5262b; --brand-soft: rgba(229,38,43,.14);
+  --action: #ea580c; --action-text: #fb923c; --action-soft: rgba(234,88,12,.14);
+  --good: #34d399; --good-soft: rgba(52,211,153,.13);
+  --warn: #fbbf24; --warn-soft: rgba(251,191,36,.13);
+  --bad: #f87171; --bad-soft: rgba(248,113,113,.13);
+  --info: #60a5fa; --info-soft: rgba(96,165,250,.13);
+  --shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 8px 24px -12px rgba(0,0,0,.6);
+  --f: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, Consolas, monospace;
+  --ease: cubic-bezier(.2,0,0,1);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) {
+  --bg: #f6f6f7; --side: #ffffff; --card: #ffffff; --card-2: #f4f4f5; --line: #e7e7ea; --line-2: #d6d6db;
+  --fg: #0b0b0d; --fg-2: #3f3f46; --muted: #55555e; --quiet: #63636b;
+  --brand: #c8181d; --brand-soft: rgba(200,24,29,.08); --action: #c2410c; --action-text: #c2410c; --action-soft: rgba(194,65,12,.08);
+  --good: #047857; --good-soft: rgba(4,120,87,.08); --warn: #a15c07; --warn-soft: rgba(180,83,9,.09);
+  --bad: #b91c1c; --bad-soft: rgba(185,28,28,.08); --info: #1d4ed8; --info-soft: rgba(29,78,216,.08);
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -16px rgba(0,0,0,.18); color-scheme: light; } }
+:root[data-theme="light"] {
+  --bg: #f6f6f7; --side: #ffffff; --card: #ffffff; --card-2: #f4f4f5; --line: #e7e7ea; --line-2: #d6d6db;
+  --fg: #0b0b0d; --fg-2: #3f3f46; --muted: #55555e; --quiet: #63636b;
+  --brand: #c8181d; --brand-soft: rgba(200,24,29,.08); --action: #c2410c; --action-text: #c2410c; --action-soft: rgba(194,65,12,.08);
+  --good: #047857; --good-soft: rgba(4,120,87,.08); --warn: #a15c07; --warn-soft: rgba(180,83,9,.09);
+  --bad: #b91c1c; --bad-soft: rgba(185,28,28,.08); --info: #1d4ed8; --info-soft: rgba(29,78,216,.08);
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px -16px rgba(0,0,0,.18); color-scheme: light; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--f); -webkit-font-smoothing: antialiased; }
+button, input, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--action-text); outline-offset: 2px; border-radius: 8px; }
+.num { font-variant-numeric: tabular-nums; }
+svg.i { width: 18px; height: 18px; flex: none; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Shell */
+.app { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100%; }
+.side { position: sticky; top: 0; height: 100vh; background: var(--side); border-right: 1px solid var(--line); display: flex; flex-direction: column; padding: 20px 14px; gap: 22px; padding-left: max(14px, env(safe-area-inset-left, 0px)); }
+.brand { display: flex; align-items: center; gap: 11px; padding: 0 8px; }
+.brand img { width: 34px; height: 34px; border-radius: 50%; }
+.brand b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+.brand span { display: block; font-size: 12px; color: var(--quiet); }
+.nav { display: grid; gap: 2px; }
+.nav a { display: flex; align-items: center; gap: 11px; padding: 9px 10px; border-radius: 10px; text-decoration: none; color: var(--muted); font-weight: 500; font-size: 14px; }
+.nav a:hover { background: var(--card-2); color: var(--fg); }
+.nav a[aria-current="page"] { background: var(--card-2); color: var(--fg); font-weight: 600; }
+.nav a .badge { margin-left: auto; }
+.side-foot { margin-top: auto; font-size: 12px; color: var(--quiet); padding: 0 8px; line-height: 1.5; }
+.main { min-width: 0; padding: 28px 36px 64px; padding-right: max(36px, env(safe-area-inset-right, 0px)); }
+.page { max-width: 1120px; margin: 0 auto; display: grid; gap: 22px; }
+.page[hidden] { display: none !important; }
+.tabbar { display: none; }
+@media (max-width: 860px) {
+  .app { grid-template-columns: 1fr; }
+  .side { display: none; }
+  .main { padding: 18px 0 calc(88px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .mobile-top { display: flex !important; }
+  .tabbar { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--side); border-top: 1px solid var(--line);
+    padding: 6px max(8px, env(safe-area-inset-right, 0px)) calc(6px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); }
+  .tabbar a { display: grid; justify-items: center; gap: 3px; padding: 6px 0; font-size: 11px; font-weight: 600; color: var(--quiet); text-decoration: none; position: relative; }
+  .tabbar a[aria-current="page"] { color: var(--fg); }
+  .tabbar a .badge { position: absolute; top: 0; left: calc(50% + 6px); }
+}
+.mobile-top { display: none; align-items: center; gap: 10px; margin-bottom: 14px; }
+.mobile-top img { width: 30px; height: 30px; border-radius: 50%; }
+.mobile-top b { font-weight: 800; }
+.mobile-top .more { margin-left: auto; }
+
+/* Type */
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.hello h1 { font-size: 28px; font-weight: 800; letter-spacing: -.02em; }
+.hello p { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
+.sub { margin: 3px 0 0; color: var(--muted); font-size: 14px; }
+.label { font-size: 12px; font-weight: 600; color: var(--quiet); text-transform: uppercase; letter-spacing: .06em; }
+.head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+/* Cards */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); min-width: 0; }
+.stats { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; }
+@media (max-width: 980px) { .stats { grid-template-columns: 1fr 1fr; } .stats .goal { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .stats { grid-template-columns: 1fr; } }
+.stat .big { font-size: 34px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin-top: 8px; }
+.stat .big small { font-size: 18px; color: var(--quiet); font-weight: 600; }
+.stat p { margin: 8px 0 0; font-size: 14px; color: var(--fg-2); }
+.progress { margin-top: 14px; height: 10px; border-radius: 99px; background: var(--card-2); border: 1px solid var(--line); position: relative; overflow: hidden; }
+.progress i { position: absolute; inset: 0 auto 0 0; background: var(--action); border-radius: 99px; }
+.progress b { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--fg); opacity: .5; }
+.progress-legend { display: flex; justify-content: space-between; font-size: 12px; color: var(--quiet); margin-top: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 9px; border-radius: 99px; white-space: nowrap; }
+.pill.good { background: var(--good-soft); color: var(--good); } .pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); } .pill.info { background: var(--info-soft); color: var(--info); }
+.pill.neutral { background: var(--card-2); color: var(--muted); } .pill.action { background: var(--action-soft); color: var(--action-text); }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: none; }
+.badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 99px; background: var(--action); color: #fff; font-size: 11px; font-weight: 700; display: inline-grid; place-items: center; }
+.two { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 980px) { .two { grid-template-columns: 1fr; } }
+.stack { display: grid; gap: 22px; min-width: 0; }
+
+/* Tasks */
+.tabs { display: flex; gap: 4px; padding: 4px; background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; overflow-x: auto; }
+.tabs button { flex: none; border: 0; background: transparent; padding: 7px 12px; border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.tabs button[aria-pressed="true"] { background: var(--card); color: var(--fg); box-shadow: 0 1px 2px rgba(0,0,0,.25); }
+.tabs .n { font-size: 11px; color: var(--quiet); }
+.tasks { display: grid; gap: 10px; }
+.task { border: 1px solid var(--line); border-radius: 14px; background: var(--card); padding: 16px; display: grid; gap: 10px; box-shadow: var(--shadow); }
+.task-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.task-top .who { font-size: 13px; color: var(--quiet); }
+.task-top .when { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--warn); }
+.task h3 { font-size: 16px; font-weight: 650; line-height: 1.35; }
+.task p { margin: 0; font-size: 14px; color: var(--fg-2); max-width: 75ch; }
+.effect { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; color: var(--muted); background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; }
+.effect b { color: var(--fg-2); font-weight: 600; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 40px; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--card); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; transition: filter .15s var(--ease), transform .15s var(--ease), background .15s var(--ease); }
+.btn:hover { background: var(--card-2); }
+.btn:active { transform: scale(.98); }
+.btn.primary { background: var(--action); border-color: var(--action); color: #fff; }
+.btn.primary:hover { filter: brightness(1.1); background: var(--action); }
+.btn.good { background: var(--good-soft); border-color: transparent; color: var(--good); }
+.btn.quiet { border-color: transparent; background: transparent; color: var(--muted); }
+.btn.sm { height: 34px; padding: 0 11px; font-size: 13px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.opts { display: inline-flex; border: 1px solid var(--line-2); border-radius: 10px; overflow: hidden; }
+.opts button { border: 0; background: transparent; height: 38px; min-width: 44px; padding: 0 12px; font-weight: 700; cursor: pointer; color: var(--muted); }
+.opts button + button { border-left: 1px solid var(--line-2); }
+.opts button[aria-pressed="true"] { background: var(--action); color: #fff; }
+.note { width: 100%; resize: vertical; min-height: 40px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg); padding: 9px 12px; font-size: 14px; }
+.copyline { display: inline-flex; align-items: center; gap: 8px; font: 600 13px var(--mono); background: var(--bg); border: 1px dashed var(--line-2); border-radius: 9px; padding: 0 0 0 10px; height: 34px; }
+.copyline button { height: 32px; border: 0; border-left: 1px solid var(--line-2); background: transparent; padding: 0 10px; cursor: pointer; font: 600 12px var(--f); color: var(--muted); }
+.status-line { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.linkbtn { border: 0; background: none; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 13px; padding: 2px; }
+.empty { padding: 26px; text-align: center; color: var(--muted); border: 1px dashed var(--line-2); border-radius: 14px; font-size: 14px; }
+
+/* Lists */
+.rows { display: grid; }
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+.row:last-child { border-bottom: 0; }
+.row .t { min-width: 0; }
+.row .t b { display: block; font-weight: 600; }
+.row .t span { color: var(--muted); font-size: 13px; }
+.row .r { font-size: 13px; color: var(--quiet); white-space: nowrap; }
+.days { width: 52px; text-align: center; border-radius: 10px; background: var(--card-2); border: 1px solid var(--line); padding: 5px 0; }
+.days b { display: block; font-size: 18px; font-weight: 800; line-height: 1; }
+.days span { font-size: 10px; color: var(--quiet); text-transform: uppercase; letter-spacing: .06em; }
+.days.soon b { color: var(--warn); }
+.ic { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+.ic.good { background: var(--good-soft); color: var(--good); } .ic.bad { background: var(--bad-soft); color: var(--bad); }
+.ic.warn { background: var(--warn-soft); color: var(--warn); } .ic.info { background: var(--info-soft); color: var(--info); }
+.ic svg { width: 15px; height: 15px; }
+
+/* Funnel */
+.funnel { display: grid; gap: 12px; }
+.fstep { display: grid; grid-template-columns: minmax(120px, 190px) 1fr 90px; gap: 14px; align-items: center; font-size: 14px; }
+.fbar { height: 28px; border-radius: 8px; background: var(--card-2); position: relative; overflow: hidden; border: 1px solid var(--line); }
+.fbar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--action), color-mix(in srgb, var(--action) 70%, var(--brand))); border-radius: 7px; }
+.fbar span { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; font-weight: 700; color: #fff; mix-blend-mode: normal; }
+.fstep .r { text-align: right; font-size: 13px; color: var(--muted); }
+.fstep .r.drop { color: var(--bad); font-weight: 600; }
+@media (max-width: 560px) { .fstep { grid-template-columns: 1fr 70px; } .fstep .fbar { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Agents */
+.agents { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.agent { display: grid; gap: 12px; }
+.agent-top { display: flex; gap: 12px; align-items: center; }
+.avatar { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-weight: 800; font-size: 14px; background: var(--card-2); border: 1px solid var(--line); color: var(--fg-2); }
+.agent h3 { font-size: 16px; font-weight: 700; }
+.agent .role { font-size: 13px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.fact { background: var(--card-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; }
+.fact b { display: block; font-size: 17px; font-weight: 800; }
+.fact span { font-size: 11px; color: var(--quiet); }
+.agent .last { font-size: 14px; color: var(--fg-2); margin: 0; }
+.agent .lesson { font-size: 13px; color: var(--muted); border-left: 2px solid var(--good); padding-left: 10px; margin: 0; }
+
+/* Experiments, clubs, content */
+.exp { display: grid; grid-template-columns: 48px 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.exp:last-child { border-bottom: 0; }
+.exp .id { font-weight: 800; color: var(--quiet); font-size: 15px; }
+.exp b { font-weight: 600; }
+.exp p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+@media (max-width: 560px) { .exp { grid-template-columns: 40px 1fr; } .exp .pill { grid-column: 2; justify-self: start; } }
+.pipeline { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.stage { background: var(--card-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; min-height: 140px; display: grid; align-content: start; gap: 8px; }
+.stage .label { display: flex; justify-content: space-between; }
+.club { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 13px; }
+.club b { display: block; font-size: 14px; }
+.club span { color: var(--muted); }
+@media (max-width: 860px) { .pipeline { grid-template-columns: 1fr 1fr; } }
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+.day { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; display: grid; gap: 6px; align-content: start; box-shadow: var(--shadow); }
+.day .d { font-weight: 700; }
+.day .w { font-size: 12px; color: var(--quiet); }
+.day p { margin: 0; font-size: 13px; color: var(--fg-2); }
+.day.today { border-color: var(--action); }
+@media (max-width: 980px) { .week { grid-template-columns: repeat(2, 1fr); } }
+
+/* Ask */
+.ask { display: grid; gap: 12px; }
+.ask form { display: flex; gap: 8px; }
+.ask input { flex: 1; min-width: 0; height: 46px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg); padding: 0 14px; font-size: 15px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line-2); background: var(--card); border-radius: 99px; padding: 6px 12px; font-size: 13px; font-weight: 500; cursor: pointer; color: var(--fg-2); }
+.chip:hover { background: var(--card-2); }
+.answer { white-space: pre-wrap; background: var(--card-2); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-height: 90px; font-size: 15px; line-height: 1.6; color: var(--fg-2); }
+.cmds { display: grid; gap: 10px; }
+.chat { display: grid; gap: 12px; }
+.chat-log { display: flex; flex-direction: column; gap: 10px; min-height: 260px; max-height: 58vh; overflow-y: auto; padding: 4px 2px; }
+.chat-empty { color: var(--muted); font-size: 15px; padding: 8px 2px; }
+.bubble { max-width: 82%; padding: 11px 14px; border-radius: 16px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble.me { align-self: flex-end; background: var(--action); color: #fff; border-bottom-right-radius: 6px; }
+.bubble.ai { align-self: flex-start; background: var(--card-2); border: 1px solid var(--line); color: var(--fg-2); border-bottom-left-radius: 6px; }
+.bubble .did { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line-2); font-size: 12px; font-weight: 600; color: var(--good); }
+.chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.chat-form textarea { flex: 1; min-width: 0; min-height: 46px; max-height: 160px; resize: vertical; border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg); padding: 12px 14px; font-size: 15px; }
+.progress-box { border: 1px solid var(--line); background: var(--card-2); border-radius: 12px; padding: 12px; display: grid; gap: 8px; }
+.pb-head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--fg-2); }
+.progress-box p { margin: 0; font-size: 14px; }
+.pb-steps { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 6px; }
+.pb-steps li { display: grid; grid-template-columns: 110px 1fr; gap: 10px; font-size: 13px; color: var(--fg-2); }
+@media (max-width: 520px) { .pb-steps li { grid-template-columns: 1fr; gap: 0; } }
+.quiet { color: var(--quiet); font-size: 12px; }
+
+.notice { padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-2); background: var(--card-2); color: var(--fg-2); font-size: 14px; }
+.toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-weight: 600; font-size: 14px; z-index: 40; box-shadow: 0 8px 24px rgba(0,0,0,.3); }
+@media (min-width: 861px) { .toast { bottom: 28px; } }
+.foot { font-size: 12px; color: var(--quiet); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <aside class="side" aria-label="Sections">
+    <div class="brand"><img alt="Deadeye logo" src="data:image/webp;base64,UklGRvIdAABXRUJQVlA4WAoAAAAQAAAA/wAA/wAAQUxQSNwEAAABoIVt+/lG+oppo7WL9e7YKsYsxz4yztf2bjGqxvYU15i1hhnbNsNB2v93Ovi+N3s0jYgJoDr/1/n/JV1N9eNGf5s+f3VhYZXdXlVYuHp++reje9cP9YdsUeOzy67y0zaulmWPj7L5L5EjsvbX8HNYsy9reIT/YeqRYufn+uysZJMfYR2S7+EX0JM32OIXBCWs8vAL614ZF4hexG8X+QW/8Es4cu1za1hA36q2oAX0rWQxy5MDAEvax6LaE9HqvpPF3dENqS/WssirP0PplfTHLPSjVBtECRdZ8Kv98Hl3OQu/9B1wel9j8W8lI2OZwRoa2WZYmhxnJY82AmWYm9V0DUYkOMVgTWfVg8O2kZUtfA2MyEOs7oFwKFpcZYWvNAMi5j6rfC8Khs5OVtrdA4Q4L6vtjYOgq5cV93YBIMrJqns6qNfiPit/r5ly4ZdZ/auRqr1ygAE8/JpiwVsZwk1Bek1hEFPVGsYoGkOUauqGgZ0NVbIcZyCPmDWayVBmKpRsYGEkqPPuLQbzxtvarGA4FyuTwIAmqfLqJUTOWzWZzJD+o8hnjzB5/LkeaxnUAjW6M6xdtNiBS7USSQxsnAoBu5GxB2jQl6FN1KAKm1IF2jG4beTLRWeFeBE+dHzh0v3G8P4kXOAFfM4FypbAAPeUbRVCy0SzuhFymiUbyhAPkKwAo5WCmTwYuULl6s0gd5drGkrpcp1A6YhYHzLM4VINx2mIVDk4ZUh1ACe7ULYanHxWmaIY6HYyTURqrEw5SGXIVI5UiUzXkLoskslAqjZUogYM9ecSxWHVU6IxWI2S6HusvpEoHasUieZjNUei1VgVSLQFq40SlWBVJFEVVpUS7cZq9/9RVVhVSlSCVZFEW7DaKNFqrAokmofVbIlSsfpXom+x+kqiMViNkigOqx4S1cfqc4lMBlK1oRLRVaQukcjlSJXIlIXUVJnGIzVapiik2slkq8HJZ5GJ9uG0h4TOwmmqVMNxGixVJE5hUtEJlA6R2FNRSpOrF0rd5DJ5MHKGyEV5GC0nwQdj1E8yixshh0kyWonQEhI9HqHusgVewOdcoGz0Kz4/kvARPnR8YdLRKnSWkfjt0GktH5VjU0wKJmMTrwHtQmZPgAoJyPQiHXfgUkVKdsWlkxa0GpVcUvPTR5g8/FgPSsXkT1L0lYuInLVoQvGI9CJdl+KxgJR9+wYa19/ShhINLIw40jcbi6mksPkoEgdNGlEjFw6O+qRzPwMFYyBpnYbCP6R28GYMNgTpRa/sR2CfjTQPu6TflQjSvdk97e42Ie3bO3VztCX9u3o183YmBOO8enl6E4adHFq5uhOKUfd0utuWcGx2WaOLTQjJ8P367A0jLG3rtdn6KqEZ9LuhiZERTIAOcurh6E+YNjqixaH6hKo5y9DAmGYiYHtele9mImH79mLhjIVvEbydT0l2rhchbP33oVTevy0E8if5MuV+TEB3rpKnsiOBHbdblp29CO+AxFI5iuMJ9DYrfRL4lrci4MN/Pveinf0xjMAP7LnU+eI4lvQIJH/QPGCl60VwrehvIv8xuEOK3Xiuzs5KDiW/M2xIht33PPj2TBv8Afmt1rZjM0ou1z6t2svFGWPbWsgPDvmi58ivU+bmFhZW2u2VhYW5c//7amTPL0Kozv91/n9JV1ZQOCDwGAAAkGkAnQEqAAEAAT4ZCoNBoQXKRAQAYSxN3C5+Hzrn/D/xrs9qN9Z/rv65fuL/nfmpqT8p+4P7Wf7bp/Kt+0D2+fE/zH/Ff1D9o/77///+592f8B/gP47+uXyN/TP+t/ofwBfxH+M/3j+l/6T/P/2z///LN/gPYd5hP51/TP93/mPel/rn+h/rXuU/s/7Ve4B/RP6R/xPz2+bP/X+wP+4HsAf0X/Hell/1/9b+//0TftD/4/7/+//0F/yb+hf8X86/kA/8fqAf8/2LP4B+//uP9ZP7H+Kvif/hvyf6Jr2qzkf2q/WfmJ+WPyj/wPDXgBeoP8x+U3Dm2a9AL3C+yf83+4eOtq0ZAHBvx6efp/2/5z0B/R37HfAb+q//W7DH7Pex9+pv//JgXZMpyRl7FyRl7FyRl7FyRl7Fv7oycK5n3zpE+c5jdfXbELfXd7vty//A/LifuMAF59MFvshDxj7+k+zhz0kXJZqAbvIVHtmeSMnS1xCC1pStB+BH469tbVMdVjQB4SqU9qfLXgkhVzDQOF9v8oOxEyXQUU01ahV86hzp+2exRIGB68tOqbMw+dzpZ+6J4PWE/W5HpIeMrMpP4AvTfqC+MUtSUDl2uTyZvpP9OKeT/Jexh40VVQoODzq6ulEMw6z+HPtChwN/l2yGH4ZEUejIHb7JYX0NAkn0d9sFlqEhkxwtDDKAeWjlc9JpBgLdsMnkMqw/cjULYvj2qNP+H7qKd36j6Af3i153+bbR9HqO7Qj2ZmZDgCGyH8IENHlHrTIytfinLV9wTj8JI2tiBkzDaHwixMP4uLCSYK6QTJrl3+fM3QSEtrZvpCOcM68FSPvz9NodyF5Nm8NluGu1EApwPGmfWgyWDuQYAoyDeJUUncGX7FwMQr5rrRhYMC6biZuWCGgCekaorkH3EEs2AgFFKP3xPTBDEqVwPpiLxnx5/FmO5vJiaXooGR3tvN4949pMqIrdIAFkc9iuuqkCoY1X1/kVb9d9pqiqxENBtYYCY/uwv+SITQohKDsMp1TUud8CrfBfAknlHkvLbYnwgI7lH1Sidu55sgSD8D8tmx+X53NNwH7ftqgkb56isbYrAB9QuK+MtLjThvGhOfJNi5Iy9i5Iy9i5Iy9i5Iy9i5IkAAD+//KPAAAA+5hNkREjh1U3cM7JnUizMPIIC5NBJHX/S5mVMXmK9OG3ZmRqBNKS7051/IW3Ua4tudF9nouFfmC8vE2XGY+0yCrVTM+g+3OqQyzbGQHXZh/DTc8Yqf9xwURqKmcMSw3mTiswo+zq9SYv0Nh5dDiMXPLsmtbJzsX3aObcaoxMnWYJT/ze/+rG/8m0+WSaNVWU+pojjon6r44v8HdnS2ZvQ9LqnaX3eZoYTQoRGCyUCzh6nmOBArS6Ctl7XDc8A4MPjn6Z/mEYMatMzYuqb9mTSQu/qGY6xg4zS1Tnii3eKSG6FGgNV5O6le/mOwDBfdqM4s0kTS3/5HLTlc7FGgIYRESOHVl7ODWsURJZ6C+cmZIJ18JXR1KX8vgN1b9WTxtCF0jfLdyN2GY1KLvE5R64yc+rj+KfZp2irys2Q49F6PiwyUZ3qvjpCmOt/SGZHSDnuq4t/ye/OHV3bcy3Vj/URUpllKadiXnrr7ezlkzP1koa+2bd6aLS/m8yUr6CKMjWLmB/KrKITh4n5cHsM9DsDQkeinkw06ALaz50N3IwfQB/6jbt8DCv8q0iKgRkfFcidalVY78xog7kElETMDLaETLIz0+04IpCSAjAUhJAQmRpGVI2UBK3kVirn6IP2CG7/V5J7p9xRqhOHG4MDllmfzsyEUZdZb/iVd9pgyKj4ItFF3igIoQrdkTj81iBxdIcR//LblDG8xRoMeyViBxKu9Gd0fEisGxUwi8WygpTR3uyivVfRfw30VhEBpgHxGQOyYjAsRna5izSPDfR1yZ5l4vEPJ+AZveljGpbE4j4m2KKH6zUsSlkBDcvy/t5sQDVeTupXwVaIUpTwoGdRVCPqM34F04Ijn43KBF4fELyHuL89Uor7SUUqd/iqb16+yseXWlv4+Uon10wuNz2Wkzb6287kKDv9tpNC7Y/0jMRaAyhwbKnhwaXMjjmz1rx605uW/2fBMZ51Y3BGvJJoBF6A4pyBea5ygNWgyAZKk1VyaCkHcUDDP7dlYkaI8oikB/MsrS+mPnVnPBzzhtqKgCSOrXm5LDcOLp6xCsIYufnGKgzbyeKmY4svzajRcCaO2HG1IWJSc/GbeEUCDp8YhKtmbX9HU2+uJzV1+s2eY5loQ/Owwb6Mwrk7kNKAHt+I/ClnUmnYPJcl1G9bP79cNm3rEagL9e/c/jDt2UbZQOZ2kVZEt/drG4LpR9IvvXUyNJpLTny+U53MMErM3y1CLJafp2PLitXvgx59Cn7FKTRYLY5INP8mwAg9ZSE8wFkGBD8ywKOcjLR61l+ztHKT1E3FmxuTGhy8uEZGnMHZPuLv88MozFljG9L/gpVT7PeJlDuRJamgYMEiRfBbhCZnlez1VkxuSq2R7udx/nXnfFl46Duuuq42E7xjVzC93VqdwA+cnpkbacd4oJQH4F2lK8SZ5VVcGq8igkpslDj+Qv55Q6kNc5ssEguP8S0yaQ+HaN5C4v2VQC2XMfn3FUVXbjoQLq3BF+/WGswg+bBMAT6sya3h9Gein0+t+xgKZ7AJftV8FF2i4B+abAwSAhBsf58kM9yJJPUCPmp34lc+f37aLLCc8sR5zTtnk9EH35Eogjvov5W7a9+Vcf8fPoTM446vyMbFWrvFij5eYzpzE0fGm4MOUgJn0dv9FpqOrPSksROejrU6uvRBy7VXLrJZ241j1luBUCv8LPfMwo1NqcGb+qaQvIKdvP2SfcnRKHY7yFoD1hXUBd/smh4UPelMesKQAW4ZV7OgssirYZMXE46wuauwSST9SeKdZqeXx7Sg/PP/jNnXFviRRQCu2zeFHwsQp311aTUdmVBm4VTZW6gaz5LSv2p9m+NVA5dHjH9Rn7uHPPsS4WaBZ3wTFWpt4oSInl7UiQZtKeX+7ZTjGa3oqkLvl6AOFGZNX+/jLSjJtmEFhbA4w7LrOzrBF8Gx8EaFx4vNCOIE2Peb1Y7OEptwvegAZSDM7VgNVZOaS6r1DPAQrVFd8LwzQYx9MjrBisW7gdVD99qxPpxecCVjD8xtSv1LeY8MSBKK+KJYHGyEH2IhLYCTzfIqP32SF8rqtiUJ9WHrYCdHj4dUJY6+59f5jWe2k7foSgRXKo7vlDUerfx7nKsiKpDV7qFALbNYOJcRgzYCBalFdHEIeHlgCbBIce4VTBmqHJDF8a04pFdMO7FhCqF/r+NstUVCYnKGlzh9FZVxZ8ZkCGisBUlj0gYSbMCWaqBDT9L9cTA7njZP40wP/xevGWCPhNv1/5fAHYwsTx2LuHtNbthBjfOSGNiqwZBbyP+y9dMyRMsZr+5+9jXlRAr6mYoBr1kcIyYSGw2F8mptBCixA4GTHL8I3n1aeNEnuKRjUHSv5djo0ffe3JQxQ5eYWIlJqM99HHoAf/b1BAarwM4xii6fHRXnh6Zx8hZrSfrZxpycXwAVDTQZevCPVpG/6xA58KCc44fv8LqTulC/Y2ZCDcNIRln1oRTigL3sxWrL4ctT7rCSkNU1ACuBSO+gVMTvWDmRTiTMudLuupWVb0rH8+nuKdNCePv+7VNdIpmIDYt31CRwxYghkufMjrsw0jZ/09+ocIQioEv2534ztHV8QdJeOyTIwkEvnU5/A3XWjS+esW+bOalwUEyFh45nfwKA6Kup2CNB6zr8eDTcQZM1/w5KDQw2Bip2T/N2E8QNtJ+/MIOyzAxsnlfpMvdFtz2jYkFC7lqnqk32fO/4HuCvdpD7J11PpyTLynNvHIyV3eDqVdCkGWqinXsSy93W3PjjmEAJZgh1R+oxZEgN9VWFK/sZZlMOHsY/c8jcjFU++UzqGHraS/c2nRyX+aJcU2eMyuiJFQZH27MZYjgzYbJd5gp7FSGBY58+ixb0mf0XM78je3f5aov8BV7+atf+YUN6tTKQorBd1QNvYs4DyIsUg12qogOX0SyR4cXkpmaoy6Fae/0Iqor+oEBX9z68n+BESF+HOoL612Ag+ZaFN87x6+Iy4w/tGjyYLi7IrsPD/3cBd5qPBcS1A1ZoJ5Mvgiwe1Gps+s6ID2M8psYwsaXxIUv5DZTFxVjNUODnIwvpMaOU3jzi4EGDwLrgKD+ILHoxr8AOYG3GSa73P859xRn5yKToZpuoGjFjPqGgXuXdenkDBYMA8IKVgVCUsAcAa2kz5oeRN8fltqt8s/Up+q+tpiSKz29kMW/vpM0P/L/R4ndq3gjVIitFg3LJ2lNK61X/3i6v2wLhCylf98O8Hm5DmwatWQ9XZJr3yLVomBcXmm959bqaUCVOhYkXAh/1paj5zxZ8NcJ0i8ErDILO8U2BcbXapSTh3XhxcplGtX7C8sjJZc3umMGLbM+m7SkfZn91V1ZQVcMR/7EOyh/yseRPw0mlti49gWTaO+xdhINKtl3SD1x20kYX9r8vaJ+6TCGkUtP9DcDwRscawFXfEIuc7kGbOPWuSHLU8HafOHWPf8rd1Th+RN/adhYezNBuIXCwREKIncm9ADNTzfM4AGUVP3PzbZVHmgV9wwLW4THa72yo344Meer9Sr6HlCtwAPvVp8G6xC+Wv2PYxBsfcyl80JYiARneOXzoV4QZx5fYW9QMGsa5s62rA5THqIo0B4NmKPxOW7xHT1KVci/HqI4Sud/M87FsLh9ffIJMFyF8qGPQBVa1GjMsH3p2CpYJlGFwDGYVhNbpubctvTtPOO1rX55c8ub9QpUMa1s8aF+WQQAV3nAIFjOZjhEOUCXcyrDBur6PyLJ6aw5a3ft5zdslK9U2svGjZ1QP/eFWMpOUNEnqul4JGK8n/DZsnl9msA6u3ClvIe6SYI/efuyTowf+JXF9W3zu6s1cljxTflGviaUCTutsm4u6W/GdXkvX5MbzitNG+xsYgjBMlNrEK/kgBFNNHI/RGAnMPRG6OSMo7Sr04UD6LVer8RVxVhXNtDza+2Gh2k2cWZ8BLnT+90gr4ILt9Mu1G+gREo6xSGpkgye3BhURVut1LNO0+AR/UibwF/74Vcp2s5gUig5oaJJME4LklViiBfheq1PiGWMg7pbtM3V0VkcGAxPPbgUXeTeO38IGgyQjcDRM8PDOhFvLjFSepqv1GpcY5jNeoVh0mamXZ3u6SciUlR9j6fNz7FrF9LgZWUKL2aCitCPocRUpfJ7RO63c2NwXLd+dH88eCon7Y5k+BMfoxEMcnl9ifqgSmHa4f8Nu24ivL541wz7TMx6sLctjE3DSStgSBv4A8xJfOsj2lVyeoaCrVCoOTT4czJ2iJCgVW/uakhrp4MLsrW+Uyjna0uiPFbZ+xoyQrvTbTxyMjXnRPdtFd4y5MBD44AhxFTHX+XUUAy3Upt4kmsudcSFvjQinEYmrFyy3UC63rYKYCI6CgNpOncIVapzCPuXv9C+hhZiMfvPRekt3BWKL/cETHVYGb6nfdIByk8DdnZsq4epEy89UGJjwRz5w/zLvpbAaCcqBgq66hsGMjc7uBgO4fhI9MjJf3qmTNtuOHQcyZO9FAYn+7avHd/XCLIfj3tJPIj6rDmAfToipEMGgHXhCbGUXJSQmrAJ5gQrDM4CkYteKBxU4xS887nbaX2nnC9HxNiEmc0grCnVt1ueC3j0ASIWhqinOjtIzywUmsXquBzQWyvL6/9cHuujdSMoQzY6wGzQVNU+wNvJn+AN5OdidbZHpyHMRIWzc7N+rotbS+c7LKT+NW9E0lF9n1n/HRVrgjXvd0E3/wQZTLvq7yXReLsgYqdvTU/rebs3iLoo4c+349YhpRJkqdk5a8D+fy6yxWZVcPcQm0Vat7HN3q5Ax5otyl2YlGzhr5LPJO/JTAwSYt9R+TptsR9t2DAXIq6SvoSPUnQb5lzr4Xq2K6rXVmTL8tBNTvKQVV/GdxEvMAXTqjXJLIHqvZv5UlicPUSXsgEfeR2MSgyHX4OGvQTXzKm+n3+GJgLfHZkCAQBlTh625ye7kSgmYKPsSPDg8PYZoN/9mSUq18/aUoj3nILV9k/aZ0sljtiNJjd8hBuCWMRrJ911XusWQpwfYmGLYZy9XCd8sBrPpFhgIA2TI1WsMWWFHsxZy93hx9d2p9Qpc902/XzaWzLA6hu0PVt1totOPgKeti+oBs5Zm2fX5fYhjINTNETtFxEVNdnkQE7WO9kkE2M4dRQkTVnzmUz4uacmFXUbl7whdoIwuyYChgfT73LLUIIsGmuyT/+BuaWxdSmIxATuB4gI/FIklzfCGEWJ7R6B/9QF0xm449JC9lt+0Sql0Ze/oGA9NUU/TIkRAZBWDiKWdI2MLpITq3FTatg8fKCFNBCfHdSWuEU1v70QS9h/AQiIuPNc5Cxe5Ip3CJbz50lpW7itNbJpgtKruNHE8Tk2lAitM5PFEBu/GLfQzII/ETDjBl0gB1scFI/g4pXi8ghC5WM99iO8bQfQcnIXP/2gHsSRo0/5zbKXiQf1g+E+Gs0NMMR1345Xuj4b13H/zGLJqI/OmhdNjsZtx0N5WNk2AzWETb6Ew9e8YrIbCEsoKIcp/87UKd3FzWxToqPwAkezQxIRLzMj/05zCw5xBuF5vp/kSrpULFAuh3W5h8XQdE1656brkYX5pHRhylD3g/EvatX6AuJyPioX7L7s6hAbTbBPpZT+3LPvdzVV4WHCOs8S2REhh9ADwDMNthlLO3/+18+sFfh6jdYBNDbNffh8WXsy6YErujleXAftib4GojhXlPc4JHW9/3o8lJq/t8QWmiGaYYb+jN7pktPofUYx5BJlGtFy+29rTIQMDi1+qWllmgdAuoP7tr35H+BTs+0INgpY/0xRmJ+Nc9zPr/woA0I04aSXFXPWQ5TlUV6k0cubVfUhOT3XgPY9R/GKO5BADJZ4bx7/r3/z3Envg2mteYNSP0Xd3zvCp4vnuGks+O8kRTZd1Jzf6f3gb5FeF1H0WE7vbcIO669WYkCYxCdTepNMN+T1abyYyk9f4ZFLPp47FvsPl7AAMQotN2AOXN+rEneCzlq6Kjt8kGehR/fA1gjPW6HPZV2tycjzPo80eqbOl+qxSj7MPePzoeg6PTa5/a8Ol7/RUGzKXSeKeiMZPNGKciKQEw2hshu0PmJyVmP5B45cbzKQ8iW/TMfFQtrOWHO62KLYDlwCafy9KCkOcHznNxOU5+2C+13TN7MfH7w/2Znn0AWW01crG0os8wgn+Jfgw51CTcQrlqGgYJ6Dq+eHi47PTnPQgKFI9ATNwXXhB9TITt6Z/nr4nXXCLtU7z/v/NqM1e2YS9wEKFHLjc+oudO0uPPRSqXGoK/6oh4ztJMgd6IiLU64oqcvr2Rer92ZFOMvrnbPcprvSIh7wU9mkKY3vn/DxlYHqvbcMDAxE3xDORjpt1WLceCBfm2yVGMOdhxxdaIhjEOHotB23yfnCqh0JVoKp/5DKAG/2s0Bxpa2Q/h3WUA04+3aU1MDLGHrjNvYcLoXU6D6+Sed1I2R6P+uDgLafKi5RfL3AS4OnwiJ4+42O9tqy3G53EiekvCN5OjfpwfB+WKHWfUg5VuypCX4+IQ0HwWCH1qUVhPGdlbIY2oj9Cp4LH2mK4cgFYz0k2vOsbEggQYjvoI+AXEOrzzWMn/ryTsxNJ//twsdNIvOXLvfjOpqj8iXkCa2xDswcGUAUAJuWp1J0oRCgvO5zuMxr16A38qNodviTrceqorsTP0htN0uZVhU4Jx1TSCjuNTUL3EIkx7naH0dkdAL2K/LYyx9hac+nzxAW2wCtNZ0cF8dNvNVjR4pJ9o2PULVJerrenQ4LW21vxiFLaHzvJC7kvPKkFwZ5o8PiaAgQpmF6jERv14mUjYf92auK36V9lJhUbrSt5T2Y4KJQ/IHeT4m01MQZZ9dsrKUoK6UQtbO6REyXjjoLczT6Fy23FBwcibqPb3i1Hztv+6FWG8tPaatNVEO3TS2EMvpAV9OGfGYZYNIZ3RMlGzN+ccPgbXmIfoKOrrNjl6MRDXq3mUP1x2onu4vxEmowU5Ayle6hY2AIq41q1Ao42a81uzbNFKEiSwcfiLHGklkeqIgI2fQEhLpe3ZV5bkiorvijhHHGeMGEjHerNpmnUv0gcMKgM+j+bLQf/APAFFKd248ItJSivSSVTJknwn+qu6vjcxcj+fpNNfiI9lATtMsxdYXRsRqGEEzCV+JTuMfqg90oUrlFOabtUo2HRS+/rvVzrBY0B/ulS7j218jXbIm1ObqsuybCnvXJ+Qpj3cAwEABcmo8TAxQ6VFh5OPsxc3aoWMe8iePkXM+cDjMuiWSGPzAhusr+UkRlvCXCDw/q2SWhGEouL9Qp5IibpBtOpSTJNSpcN0kMVvUU1/E5cF9Z2Px45d+/RcJJoqf/bCqWKzo7U7qxl2aInki6rJBLBUE0gepycHSIBoFhAM0gkKKWgAAAAAAA"><div><b>Deadeye HQ</b><span>Your agents, in one place</span></div></div>
+    <nav class="nav" id="nav-side"></nav>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+
+  <main class="main">
+    <div class="mobile-top"><img alt="Deadeye logo" src="data:image/webp;base64,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"><b>Deadeye HQ</b></div>
+    <div id="state" class="notice" hidden></div>
+
+    <!-- Home -->
+    <section class="page" data-page="home">
+      <div class="hello"><h1 id="hello-h">Loading…</h1><p id="hello-p">Getting this week's numbers and your to-do list.</p></div>
+      <div class="stats" id="stats"></div>
+      <div class="two">
+        <div class="stack">
+          <section class="card">
+            <div class="head"><div><h2>Needs your decision</h2><p class="sub">Approve to say yes. Then mark it Done when it's finished, or Later to push it to next week.</p></div><a class="btn sm" href="#todo">All to-dos</a></div>
+            <div class="tasks" id="home-waiting" style="margin-top:14px"></div>
+          </section>
+          <section class="card" id="home-progress-card">
+            <div class="head"><div><h2>In progress</h2><p class="sub">Things you approved. Mark them Done when they're finished.</p></div></div>
+            <div class="tasks" id="home-progress" style="margin-top:14px"></div>
+          </section>
+        </div>
+        <div class="stack">
+          <section class="card"><h2>Coming up</h2><div class="rows" id="deadlines" style="margin-top:6px"></div></section>
+          <section class="card"><h2>Recent activity</h2><div class="rows" id="activity" style="margin-top:6px"></div></section>
+          <section class="card"><h2>Systems</h2><p class="sub">Checked by the morning run every day at 08:00.</p><div class="rows" id="health" style="margin-top:6px"></div></section>
+        </div>
+      </div>
+    </section>
+
+    <!-- To-do -->
+    <section class="page" data-page="todo" hidden>
+      <div class="head"><div class="hello"><h1>To-do</h1><p>Everything that needs you. Approve says yes, Done means it's finished, Later moves it to next week. Add a note to tell the agent anything.</p></div></div>
+      <div class="tabs" id="todo-tabs" role="group" aria-label="Filter to-dos"></div>
+      <div class="tasks" id="todo-list"></div>
+    </section>
+
+    <!-- Growth -->
+    <section class="page" data-page="growth" hidden>
+      <div class="hello"><h1>Growth</h1><p>How players move from joining to training regularly, and the experiments to improve it.</p></div>
+      <section class="card"><div class="head"><div><h2>From joining to first session</h2><p class="sub" id="funnel-sub"></p></div></div><div class="funnel" id="funnel" style="margin-top:16px"></div></section>
+      <div class="two">
+        <section class="card"><h2>Experiments</h2><p class="sub">The activation analyst ranks these; one is built at a time.</p><div id="exps" style="margin-top:4px"></div></section>
+        <section class="card"><h2>First-session rate by week</h2><p class="sub">Players who finished setup and logged a session. Goal line at 40%.</p><div id="trend" style="margin-top:10px"></div></section>
+      </div>
+    </section>
+
+    <!-- Agents -->
+    <section class="page" data-page="agents" hidden>
+      <div class="hello"><h1>Agents</h1><p>Your seven agents, what they did last and what they've learned. Copy a prompt into Claude Code to give one a job.</p></div>
+      <div class="agents" id="agents"></div>
+      <section class="card"><h2>Quick commands</h2><p class="sub">Type these into Claude Code.</p><div class="cmds" id="cmds" style="margin-top:12px"></div></section>
+    </section>
+
+    <!-- Clubs & content -->
+    <section class="page" data-page="outreach" hidden>
+      <div class="hello"><h1>Clubs and content</h1><p id="clubs-p"></p></div>
+      <section class="card"><h2>Club pipeline</h2><p class="sub" id="clubs-sub"></p><div class="pipeline" id="pipeline" style="margin-top:14px"></div></section>
+      <section><div class="head" style="margin-bottom:12px"><div><h2>This week's posts</h2><p class="sub" id="film-sub"></p></div></div><div class="week" id="week"></div><p class="foot" style="margin-top:10px">Drafts only. The marketing agent never posts; you post, then paste the numbers back.</p></section>
+    </section>
+
+    <!-- Ask -->
+    <section class="page" data-page="ask" hidden>
+      <div class="head"><div class="hello"><h1>Chat</h1><p>Ask about any task, what an agent is doing, or what to do next. Claude can also approve, finish or push back tasks, and pass notes to the agents, when you ask it to.</p></div><button class="btn sm quiet" id="chat-clear" type="button">New chat</button></div>
+      <section class="card chat">
+        <div class="chat-log" id="chat-log" aria-live="polite"></div>
+        <div class="chips" id="chips"></div>
+        <form id="ask-form" class="chat-form"><label for="ask-q" style="position:absolute;left:-9999px">Message</label><textarea id="ask-q" rows="1" placeholder="Message Deadeye HQ"></textarea><button class="btn primary" id="ask-go" type="submit">Send</button></form>
+        <p class="foot">Claude sees what's in this hub. It can't change code or post anything; the agents do the work on their runs.</p>
+      </section>
+    </section>
+  </main>
+
+  <nav class="tabbar" id="nav-bar" aria-label="Sections"></nav>
+</div>
+
+<script>
+(() => {
+  const ICONS = {
+    home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+    todo: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/>',
+    growth: '<path d="M4 19h16"/><path d="M6 15l4-4 3 3 5-6"/>',
+    agents: '<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 19c.8-3 3.2-5 6-5s5.2 2 6 5"/><path d="M15 14.5c2.4 0 4.4 1.6 5 4.5"/>',
+    outreach: '<path d="M4 12h3l9-6v12l-9-6H4z"/><path d="M19 9a4 4 0 010 6"/>',
+    ask: '<path d="M5 18l-1 3 4-1.5A8.5 8.5 0 1012 3.5 8.5 8.5 0 005 18z"/>',
+    check: '<path d="M5 12l4 4 10-10"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>', alert: '<path d="M12 8v5M12 16.5v.5"/>', dot: '<circle cx="12" cy="12" r="3"/>',
+    info: '<path d="M12 11v5M12 7.5v.5"/>'
+  };
+  const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
+  const PAGES = [["home", "Home"], ["todo", "To-do"], ["growth", "Growth"], ["agents", "Agents"], ["outreach", "Clubs and content"], ["ask", "Chat"]];
+  const BAR = ["home", "todo", "growth", "agents", "ask"];
+  const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", founder: "You" };
+  const STATUS = { approved: ["In progress", "info"], done: ["Done", "good"], later: ["Later", "neutral"] };
+  let snap = null, decisions = {}, progress = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
+  const PSTATE = { queued: ["Queued", "neutral"], working: ["Working on it", "info"], done: ["Finished", "good"], blocked: ["Blocked", "bad"] };
+  // The hub worker runs at 09:00 and 19:00 Irish time
+  function nextCheck() {
+    const now = new Date(), irish = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Dublin" }));
+    const h = irish.getHours();
+    if (h < 9) return "at 09:00";
+    if (h < 19) return "at 19:00";
+    return "tomorrow at 09:00";
+  }
+  const $ = (id) => document.getElementById(id);
+  const el = (t, c, txt) => { const n = document.createElement(t); if (c) n.className = c; if (txt != null) n.textContent = txt; return n; };
+  const DAY = 86400000;
+  const d0 = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; };
+  const parse = (s) => new Date(s.length === 10 ? s + "T00:00:00" : s);
+  const daysTo = (s) => Math.round((parse(s) - d0()) / DAY);
+  const fdate = (s) => parse(s).toLocaleDateString("en-IE", { day: "numeric", month: "short" });
+  const fwhen = (s) => { const d = parse(s), today = d0(), diff = Math.round((new Date(d).setHours(0,0,0,0) - today) / DAY);
+    const t = d.toLocaleTimeString("en-IE", { hour: "2-digit", minute: "2-digit" });
+    return diff === 0 ? "Today " + t : diff === -1 ? "Yesterday " + t : fdate(s) + " " + t; };
+  const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
+  const toast = (m) => { const t = el("div", "toast", m); t.setAttribute("role", "status"); document.body.appendChild(t); setTimeout(() => t.remove(), 1800); };
+  async function copy(text) { try { await navigator.clipboard.writeText(text); toast("Copied"); } catch { toast("Couldn't copy. Select the text instead."); } }
+  const stateOf = (c) => decisions[c.id]?.status || "waiting";
+
+  /* Navigation */
+  function renderNav() {
+    const waiting = snap ? snap.calls.filter(c => stateOf(c) === "waiting").length : 0;
+    const side = $("nav-side"), bar = $("nav-bar"); side.replaceChildren(); bar.replaceChildren();
+    for (const [id, label] of PAGES) {
+      const a = el("a"); a.href = "#" + id; a.dataset.page = id; a.innerHTML = icon(id); a.appendChild(el("span", null, label));
+      if (id === "todo" && waiting) a.appendChild(el("span", "badge num", String(waiting)));
+      side.appendChild(a);
+      if (BAR.includes(id)) { const b = el("a"); b.href = "#" + id; b.dataset.page = id; b.innerHTML = icon(id); b.appendChild(el("span", null, label));
+        if (id === "todo" && waiting) b.appendChild(el("span", "badge num", String(waiting))); bar.appendChild(b); }
+    }
+    route();
+  }
+  function route() {
+    const want = (location.hash || "#home").slice(1), id = PAGES.some(p => p[0] === want) ? want : "home";
+    document.querySelectorAll(".page").forEach(p => p.hidden = p.dataset.page !== id);
+    document.querySelectorAll("[data-page]").forEach(a => { if (a.tagName === "A") a.dataset.page === id ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
+    window.scrollTo(0, 0);
+  }
+  addEventListener("hashchange", route);
+
+  /* Home */
+  function renderHome() {
+    const s = snap.scoreboard, h = new Date().getHours();
+    $("hello-h").textContent = (h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening");
+    const waiting = snap.calls.filter(c => stateOf(c) === "waiting").length;
+    const issues = snap.health.filter(x => x.status !== "ok");
+    $("hello-p").textContent = `${waiting ? waiting + " thing" + (waiting === 1 ? "" : "s") + " need" + (waiting === 1 ? "s" : "") + " your decision" : "Nothing needs your decision right now"}. ${issues.length ? issues.length + " warning" + (issues.length === 1 ? "" : "s") + " under Systems." : "All systems are working."}`;
+    const st = $("stats"); st.replaceChildren();
+    const need = Math.max(0, s.goalCount - s.first), quiet = Math.max(0, -daysTo(s.lastSignup));
+    // Goal
+    const g = el("section", "card stat goal");
+    g.innerHTML = `<div class="head"><span class="label">Goal by ${fdate(s.goalDate)}</span><span class="pill ${need ? "action" : "good"}">${need ? daysTo(s.goalDate) + " days left" : "Reached"}</span></div>
+      <div class="big num">${s.first} <small>of ${s.goalCount} players</small></div>`;
+    g.appendChild(el("p", null, `The goal: ${s.goalPct}% of players who finish setup log their first training session. That's ${s.goalCount} of the ${s.setup} who have set up. ${s.first} have so far, so ${need} more are needed.`));
+    const pr = el("div", "progress"); const fill = el("i"); fill.style.width = Math.min(100, pct(s.first, s.goalCount)) + "%"; pr.appendChild(fill); g.appendChild(pr);
+    const lg = el("div", "progress-legend"); lg.append(el("span", null, "0"), el("span", null, `Goal: ${s.goalCount}`)); g.appendChild(lg);
+    // Players
+    const p = el("section", "card stat");
+    p.innerHTML = `<div class="head"><span class="label">Players</span><span class="pill ${quiet > 7 ? "warn" : "good"}">${quiet > 7 ? "No new players" : "Growing"}</span></div><div class="big num">${s.joined}</div>`;
+    p.appendChild(el("p", null, `${s.setup} finished setup. Last new player ${quiet} days ago (${fdate(s.lastSignup)}).`));
+    // Status
+    const bad = snap.health.filter(x => x.status === "bad"), warn = snap.health.filter(x => x.status === "warn");
+    const c = el("section", "card stat");
+    const n = bad.length + warn.length;
+    const word = bad.length ? `${bad.length} problem${bad.length === 1 ? "" : "s"}` : warn.length ? `${n} warning${n === 1 ? "" : "s"}` : "All working";
+    c.innerHTML = `<div class="head"><span class="label">Systems</span><span class="pill ${bad.length ? "bad" : warn.length ? "warn" : "good"}"><span class="dot"></span>${bad.length ? "Needs a fix" : warn.length ? "Everything runs" : "OK"}</span></div><div class="big">${word}</div>`;
+    c.appendChild(el("p", null, bad[0]?.detail || warn[0]?.detail || `Live site, weekly run, reminders and crash reports all checked. Next weekly run ${new Date(s.nextRun).toLocaleDateString("en-IE", { weekday: "long", day: "numeric", month: "short" })}, 09:00.`));
+    st.append(g, p, c);
+
+    const w = $("home-waiting"); w.replaceChildren();
+    const wl = snap.calls.filter(c => stateOf(c) === "waiting").slice(0, 4);
+    if (!wl.length) w.appendChild(el("div", "empty", "Nothing waiting. Your agents are working."));
+    wl.forEach(c => w.appendChild(taskCard(c)));
+    const more = snap.calls.filter(c => stateOf(c) === "waiting").length - wl.length;
+    if (more > 0) { const a = el("a", "btn sm quiet", `See ${more} more`); a.href = "#todo"; w.appendChild(a); }
+    const ip = $("home-progress"); ip.replaceChildren();
+    const pl = snap.calls.filter(c => stateOf(c) === "approved");
+    $("home-progress-card").hidden = !pl.length;
+    pl.forEach(c => ip.appendChild(taskCard(c)));
+
+    const dl = $("deadlines"); dl.replaceChildren();
+    [...snap.deadlines].sort((a, b) => a.date.localeCompare(b.date)).filter(x => daysTo(x.date) >= 0).slice(0, 5).forEach(x => {
+      const n = daysTo(x.date), row = el("div", "row");
+      const d = el("div", "days" + (n <= 7 ? " soon" : "")); d.innerHTML = `<b class="num">${n}</b><span>${n === 1 ? "day" : "days"}</span>`;
+      const t = el("div", "t"); t.append(el("b", null, x.title), el("span", null, x.detail));
+      row.append(d, t, el("span", "r", fdate(x.date))); dl.appendChild(row);
+    });
+    const ac = $("activity"); ac.replaceChildren();
+    const ICN = { ok: ["good", "check"], bad: ["bad", "x"], warn: ["warn", "alert"], info: ["info", "info"] };
+    snap.log.slice(0, 6).forEach(x => { const [cls, ic] = ICN[x.tone] || ICN.info; const row = el("div", "row"); const i = el("span", "ic " + cls); i.innerHTML = icon(ic);
+      const t = el("div", "t"); t.append(el("span", null, x.text)); t.firstChild.style.color = "var(--fg-2)"; row.append(i, t, el("span", "r", fwhen(x.at))); ac.appendChild(row); });
+    const he = $("health"); he.replaceChildren();
+    snap.health.forEach(x => { const cls = x.status === "ok" ? "good" : x.status; const row = el("div", "row"); const i = el("span", "ic " + cls); i.innerHTML = icon(x.status === "ok" ? "check" : "alert");
+      const t = el("div", "t"); t.append(el("b", null, x.name), el("span", null, x.detail)); row.append(i, t, el("span")); he.appendChild(row); });
+    $("side-foot").textContent = `Updated ${fwhen(snap.updatedAt)} by ${snap.updatedBy}.`;
+  }
+
+  /* Task card: Approve → In progress; Done; Later */
+  function taskCard(c) {
+    const st = stateOf(c), card = el("article", "task");
+    const top = el("div", "task-top");
+    const kind = c.kind === "merge" ? ["Code ready to go live", "action"] : c.kind === "task" ? ["Your job", "warn"] : ["Agent asks", "info"];
+    top.appendChild(el("span", "pill " + kind[1], kind[0]));
+    if (st !== "waiting") top.appendChild(el("span", "pill " + STATUS[st][1], STATUS[st][0]));
+    top.appendChild(el("span", "who", "From " + (AGENT[c.agent] || c.agent)));
+    if (c.due && st !== "done") { const n = daysTo(c.due); top.appendChild(el("span", "when num", n < 0 ? `${-n} days overdue` : n === 0 ? "Due today" : `Due in ${n} days`)); }
+    card.appendChild(top);
+    card.appendChild(el("h3", null, c.title));
+    card.appendChild(el("p", null, c.detail));
+    if (c.onApprove && st === "waiting") { const e = el("div", "effect"); e.innerHTML = icon("info"); const s = el("span"); s.append(el("b", null, "If you approve: "), document.createTextNode(c.onApprove)); e.appendChild(s); card.appendChild(e); }
+    const d = decisions[c.id];
+    if (d && (d.note || d.pick)) card.appendChild(el("div", "status-line", `Your note${d.pick ? " · picked " + d.pick : ""}${d.note ? ": “" + d.note + "”" : ""}`));
+    if (st === "approved" || st === "done") card.appendChild(progressBlock(c, st));
+    let pick = d?.pick || null;
+    if (c.options && st === "waiting") {
+      const o = el("div", "opts"); o.setAttribute("role", "group"); o.setAttribute("aria-label", "Choose an option");
+      c.options.forEach(x => { const b = el("button", null, x); b.type = "button"; b.setAttribute("aria-pressed", "false"); b.onclick = () => { pick = x; o.querySelectorAll("button").forEach(y => y.setAttribute("aria-pressed", String(y === b))); }; o.appendChild(b); });
+      card.appendChild(o);
+    }
+    let note = null;
+    if (canWrite && st !== "done") { note = el("textarea", "note"); note.rows = 1; note.id = "note-" + c.id; note.placeholder = "Add a note for the agent (optional)"; note.setAttribute("aria-label", "Note for " + c.title); card.appendChild(note); }
+    const a = el("div", "actions");
+    if (canWrite) {
+      if (st === "waiting" || st === "later") { const b = el("button", "btn primary", c.kind === "merge" ? "Approve to go live" : "Approve"); b.type = "button"; b.title = "Yes, go ahead"; b.innerHTML = icon("check") + b.textContent; b.onclick = () => decide(c.id, "approved", pick, note?.value); a.appendChild(b); }
+      if (st !== "done") { const b = el("button", "btn good", "Done"); b.type = "button"; b.title = "It's finished"; b.onclick = () => decide(c.id, "done", pick, note?.value); a.appendChild(b); }
+      if (st !== "later" && st !== "done") { const b = el("button", "btn quiet", "Later"); b.type = "button"; b.title = "Not this week"; b.onclick = () => decide(c.id, "later", pick, note?.value); a.appendChild(b); }
+      if (st !== "waiting") { const u = el("button", "linkbtn", "Undo"); u.type = "button"; u.onclick = () => undo(c.id); a.appendChild(u); }
+    } else {
+      a.appendChild(el("span", "status-line", "Only the owner can approve."));
+    }
+    if (c.link) { const l = el("a", "btn sm quiet", c.kind === "merge" ? "View the change" : "Open"); l.href = c.link; l.target = "_blank"; l.rel = "noopener"; a.appendChild(l); }
+    const askB = el("button", "btn sm quiet", "Ask about this"); askB.type = "button"; askB.onclick = () => openChat(`About "${c.title}": what's happening with it, and what do you need from me?`); a.appendChild(askB);
+    card.appendChild(a);
+    return card;
+  }
+
+  /* What the agent is doing with an approved task (written by the hub worker to progress/<id>) */
+  function progressBlock(c, st) {
+    const p = progress[c.id], box = el("div", "progress-box");
+    if (!p) {
+      box.appendChild(el("div", "pb-head", st === "done" ? "Finished." : `Queued. The hub worker picks this up ${nextCheck()}.`));
+      return box;
+    }
+    const [label, cls] = PSTATE[p.state] || [p.state, "neutral"];
+    const head = el("div", "pb-head"); head.append(el("span", "pill " + cls, label)); if (p.updatedAt) head.append(el("span", "quiet", "Updated " + fwhen(p.updatedAt))); box.appendChild(head);
+    if (p.summary) box.appendChild(el("p", null, p.summary));
+    const steps = (p.steps || []).slice(-5);
+    if (steps.length) { const ul = el("ol", "pb-steps"); steps.forEach(s => { const li = el("li"); li.append(el("span", "quiet", fwhen(s.at)), el("span", null, s.text)); ul.appendChild(li); }); box.appendChild(ul); }
+    const links = el("div", "actions");
+    if (p.pr) { const l = el("a", "btn sm", "View the pull request"); l.href = p.pr; l.target = "_blank"; l.rel = "noopener"; links.appendChild(l); }
+    if (p.file) links.appendChild(el("span", "status-line", "Draft: " + p.file));
+    const runs = el("a", "btn sm quiet", "See the agent's runs"); runs.href = "https://claude.ai/code/routines/trig_015kxehjQDGT72Yn4Fi3X7Lk"; runs.target = "_blank"; runs.rel = "noopener"; links.appendChild(runs);
+    box.appendChild(links);
+    return box;
+  }
+  async function decide(id, status, pick, note) {
+    if (!db) return;
+    const body = { status, at: new Date().toISOString() }; if (pick) body.pick = pick; if (note && note.trim()) body.note = note.trim().slice(0, 600);
+    else if (decisions[id]?.note) body.note = decisions[id].note;
+    try { await db.doc("decisions/" + id).set(body); toast({ approved: "Approved. It's in progress.", done: "Marked done", later: "Moved to later" }[status]); }
+    catch (e) { toast(e?.code === "permission_denied" ? "Only the owner can do that." : "Couldn't save. Check your connection."); }
+  }
+  async function undo(id) { try { await db.doc("decisions/" + id).delete(); toast("Back to waiting"); } catch { toast("Couldn't undo. Try again."); } }
+
+  /* To-do page */
+  function renderTodo() {
+    const groups = [["waiting", "Needs decision"], ["approved", "In progress"], ["later", "Later"], ["done", "Done"]];
+    const tabs = $("todo-tabs"); tabs.replaceChildren();
+    groups.forEach(([id, label]) => { const n = snap.calls.filter(c => stateOf(c) === id).length; const b = el("button"); b.type = "button"; b.setAttribute("aria-pressed", String(todoFilter === id));
+      b.append(document.createTextNode(label), el("span", "n num", String(n))); b.onclick = () => { todoFilter = id; renderTodo(); }; tabs.appendChild(b); });
+    const list = $("todo-list"); list.replaceChildren();
+    const items = snap.calls.filter(c => stateOf(c) === todoFilter);
+    if (!items.length) list.appendChild(el("div", "empty", { waiting: "Nothing needs a decision.", approved: "Nothing in progress.", later: "Nothing pushed to later.", done: "Nothing finished yet this week." }[todoFilter]));
+    items.forEach(c => list.appendChild(taskCard(c)));
+  }
+
+  /* Growth */
+  function renderGrowth() {
+    const f = snap.funnel.main, top = f[0].n || 1;
+    $("funnel-sub").textContent = `All players so far. The biggest drop is the step marked in red.`;
+    let worst = 1; for (let i = 1; i < f.length; i++) if (f[i - 1].n - f[i].n > f[worst - 1].n - f[worst].n) worst = i;
+    const box = $("funnel"); box.replaceChildren();
+    f.forEach((s, i) => { const row = el("div", "fstep"); row.appendChild(el("span", null, s.step));
+      const bar = el("div", "fbar"); const fill = el("i"); fill.style.width = Math.max(2, 100 * s.n / top) + "%"; bar.appendChild(fill); const lab = el("span", "num", String(s.n)); if (100 * s.n / top < 12) lab.style.color = "var(--fg-2)"; lab.style.left = 100 * s.n / top < 12 ? `calc(${Math.max(2, 100 * s.n / top)}% + 8px)` : "10px"; bar.appendChild(lab); row.appendChild(bar);
+      const r = el("span", "r num" + (i === worst ? " drop" : ""), i === 0 ? "" : `${pct(s.n, f[i - 1].n)}% of previous`); if (i === worst) r.textContent = `−${f[i - 1].n - s.n} lost here`; row.appendChild(r); box.appendChild(row); });
+    const ex = $("exps"); ex.replaceChildren();
+    const SP = { shipped: ["Live", "good"], review: ["Ready to merge", "action"], NEXT: ["Next up", "action"], idea: ["Idea", "neutral"], founder: ["Your job", "warn"], kept: ["Kept", "good"], dropped: ["Dropped", "bad"] };
+    snap.backlog.forEach(x => { const row = el("div", "exp"); const t = el("div"); t.append(el("b", null, x.title), el("p", null, x.why)); const [l, c] = SP[x.status] || [x.status, "neutral"]; row.append(el("span", "id", x.id), t, el("span", "pill " + c, l)); ex.appendChild(row); });
+    const h = snap.funnel.history, W = 520, H = 200, px = 40, n = h.length;
+    const xs = (i) => px + i * (W - px - 20) / Math.max(1, n - 1), ys = (v) => H - 30 - v * (H - 60) / 50;
+    let svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="First-session rate by week">`;
+    [0, 10, 20, 30, 40, 50].forEach(g => svg += `<line x1="${px}" x2="${W - 10}" y1="${ys(g)}" y2="${ys(g)}" stroke="var(--line)"/><text x="${px - 8}" y="${ys(g) + 4}" text-anchor="end" font-size="11" fill="var(--quiet)">${g}%</text>`);
+    svg += `<line x1="${px}" x2="${W - 10}" y1="${ys(40)}" y2="${ys(40)}" stroke="var(--action-text)" stroke-dasharray="5 4"/><text x="${W - 12}" y="${ys(40) - 7}" text-anchor="end" font-size="11" font-weight="600" fill="var(--action-text)">Goal 40%</text>`;
+    const pts = h.map((r, i) => [xs(i), ys(pct(r.first, r.setup))]);
+    svg += `<path d="M${pts.map(p => p.join(",")).join(" L")} L${pts[n - 1][0]},${ys(0)} L${pts[0][0]},${ys(0)} Z" fill="var(--action)" fill-opacity=".12"/><polyline points="${pts.map(p => p.join(",")).join(" ")}" fill="none" stroke="var(--action)" stroke-width="2.5" stroke-linejoin="round"/>`;
+    h.forEach((r, i) => svg += `<circle cx="${pts[i][0]}" cy="${pts[i][1]}" r="${i === n - 1 ? 5 : 3.5}" fill="var(--action)"/><text x="${pts[i][0]}" y="${pts[i][1] - 11}" text-anchor="middle" font-size="12" font-weight="700" fill="var(--fg)">${pct(r.first, r.setup)}%</text><text x="${pts[i][0]}" y="${H - 8}" text-anchor="middle" font-size="11" fill="var(--quiet)">${fdate(r.date)}</text>`);
+    $("trend").innerHTML = svg + "</svg>";
+  }
+
+  /* Agents */
+  function renderAgents() {
+    const box = $("agents"); box.replaceChildren();
+    const lessons = Object.fromEntries((snap.learn || []).map(l => [l.agent, l]));
+    snap.agents.forEach(a => {
+      const c = el("article", "card agent");
+      const top = el("div", "agent-top"); const av = el("div", "avatar", a.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase());
+      const t = el("div"); t.append(el("h3", null, a.name), el("div", "role", a.role)); top.append(av, t); c.appendChild(top);
+      const facts = el("div", "facts");
+      [[a.lessons, "Lessons learned"], [a.sources, "Sources read"], [a.skills === "missing" ? "No" : "Yes", "Skills loaded"]].forEach(([v, l]) => { const f = el("div", "fact"); f.append(el("b", "num", String(v)), el("span", null, l)); facts.appendChild(f); });
+      c.appendChild(facts);
+      c.appendChild(el("p", "last", a.output));
+      if (lessons[a.id]) c.appendChild(el("p", "lesson", "Latest lesson: " + lessons[a.id].latest));
+      c.appendChild(el("div", "status-line", `Last ran ${fwhen(a.lastRun)} · ${a.schedule}`));
+      const acts = el("div", "actions"); const b = el("button", "btn sm", "Copy a prompt"); b.type = "button"; b.title = a.ask; b.onclick = () => copy(a.ask);
+      const b2 = el("button", "btn sm quiet", "Copy session command"); b2.type = "button"; b2.onclick = () => copy("claude --agent " + a.id); acts.append(b, b2); c.appendChild(acts);
+      box.appendChild(c);
+    });
+    const cm = $("cmds"); cm.replaceChildren();
+    snap.commands.forEach(x => { const row = el("div", "row"); const t = el("div", "t"); t.append(el("b", null, x.label)); const cl = el("span", "copyline"); cl.append(document.createTextNode(x.cmd)); const b = el("button", null, "Copy"); b.type = "button"; b.onclick = () => copy(x.cmd); cl.appendChild(b); row.append(el("span"), t, cl); cm.appendChild(row); });
+  }
+
+  /* Clubs and content */
+  function renderOutreach() {
+    const c = snap.clubs; $("clubs-p").textContent = "This week's one thing: " + c.oneThing;
+    $("clubs-sub").textContent = `${c.directory} clubs and ${c.leagues} leagues in the directory. Coaches using the app: ${c.coaches}. Teams: ${c.teams}.`;
+    const pl = $("pipeline"); pl.replaceChildren();
+    [["target", "To approach"], ["contacted", "Contacted"], ["talking", "Talking"], ["trial", "On trial"], ["active", "Using it"]].forEach(([id, label]) => {
+      const rows = c.rows.filter(r => r.stage === id), col = el("div", "stage"); const lb = el("div", "label"); lb.append(el("span", null, label), el("span", "num", String(rows.length))); col.appendChild(lb);
+      rows.forEach(r => { const card = el("div", "club"); card.append(el("b", null, r.club), el("span", null, r.levels)); const n = el("div", null, "Next: " + r.next); n.style.marginTop = "6px"; n.style.color = "var(--fg-2)"; card.appendChild(n); col.appendChild(card); });
+      pl.appendChild(col);
+    });
+    $("film-sub").textContent = snap.film.experiment;
+    const wk = $("week"); wk.replaceChildren(); const today = new Date().getDate();
+    snap.film.days.forEach(d => { const card = el("div", "day" + (parseInt(d.day.split(" ")[1], 10) === today ? " today" : "")); card.append(el("div", "d", d.day), el("div", "w", d.where), el("p", null, d.post)); wk.appendChild(card); });
+  }
+
+  /* Chat: a real conversation that knows the hub and can act on tasks */
+  let ctl = null, chat = [];
+  try { chat = JSON.parse(localStorage.getItem("hq-chat") || "[]"); } catch { chat = []; }
+  const saveChat = () => { try { localStorage.setItem("hq-chat", JSON.stringify(chat.slice(-30))); } catch {} };
+  function renderAsk() {
+    const ch = $("chips"); ch.replaceChildren();
+    if (!chat.length) ["What should I do today?", "What are the agents working on?", "Is anything broken?", "Help me write to the Blazers coach"].forEach(q => { const b = el("button", "chip", q); b.type = "button"; b.onclick = () => send(q); ch.appendChild(b); });
+    renderChat();
+  }
+  function renderChat() {
+    const log = $("chat-log"); log.replaceChildren();
+    if (!chat.length) log.appendChild(el("div", "chat-empty", "Hi. Ask me anything about Deadeye: your tasks, what each agent is doing, the numbers, or what to do next."));
+    chat.forEach(m => { const b = el("div", "bubble " + (m.role === "user" ? "me" : "ai")); b.textContent = m.content; if (m.actions?.length) { const a = el("div", "did"); a.textContent = m.actions.join(" · "); b.appendChild(a); } log.appendChild(b); });
+    log.scrollTop = log.scrollHeight;
+  }
+  function openChat(q) { location.hash = "#ask"; setTimeout(() => { const t = $("ask-q"); t.value = q; t.focus(); }, 50); }
+  function context() {
+    return `You are the assistant inside "Deadeye HQ", the private hub of Deadeye's founder. Deadeye is a basketball training app for players aged 13+ in Ireland, run by one founder with seven AI agents. Today is ${new Date().toISOString().slice(0, 10)}.
+How the hub works: each to-do (a "call") is waiting until the founder presses Approve (then it's approved, shown as In progress), Done (finished) or Later (next week). Approved tasks are picked up by the hub worker, a cloud agent that runs every hour from 08:00 to 22:00 Irish time; it writes its progress per task (queued, working, done, blocked, with steps). Scheduled runs: weekly loop Mondays 09:00, morning check daily 08:00, marketing Thursdays 10:00, learning digest Fridays 16:00, clubs monthly. Code changes go live only when merged; the founder says "merge N" to Claude Code or approves it here and Claude merges it in the next chat.
+Rules: answer only from the data below; plain, friendly English; short (under 150 words) unless asked for a draft; no headings. Name the exact task, number or date. Never invent numbers or progress. If something hasn't started, say when it will. Never suggest contacting a child directly. Use the tools only when the founder clearly asks you to change a task; say what you changed.
+DATA: ${JSON.stringify({ snapshot: snap, decisions, progress })}`;
+  }
+  const TOOLS = () => [
+    { name: "set_task", description: "Change a to-do's status when the founder asks: approve it (yes, go ahead), mark it done, push it to later, or put it back to waiting. Optionally attach a note for the agent.",
+      inputSchema: { type: "object", properties: { id: { type: "string", description: "The call id from the data" }, status: { type: "string", enum: ["approved", "done", "later", "waiting"] }, note: { type: "string" } }, required: ["id", "status"] },
+      execute: async ({ id, status, note }) => {
+        const c = snap.calls.find(x => x.id === id); if (!c) throw new Error("No task with that id");
+        if (!canWrite) throw new Error("Only the owner can change tasks");
+        if (status === "waiting") { await db.doc("decisions/" + id).delete(); }
+        else { const body = { status, at: new Date().toISOString() }; const n = note || decisions[id]?.note; if (n) body.note = String(n).slice(0, 600); await db.doc("decisions/" + id).set(body); }
+        pending.push(`${{ approved: "Approved", done: "Marked done", later: "Moved to later", waiting: "Back to waiting" }[status]}: ${c.title}`);
+        return { ok: true, task: c.title, status };
+      } }
+  ];
+  let pending = [];
+  async function send(text) {
+    const q = (text ?? $("ask-q").value).trim(); if (!q) return;
+    if (!sample) { chat.push({ role: "user", content: q }, { role: "assistant", content: "Chat isn't available here. Open Deadeye HQ on claude.ai while signed in." }); renderAsk(); return; }
+    $("ask-q").value = ""; ctl?.abort(); ctl = new AbortController(); pending = [];
+    chat.push({ role: "user", content: q }); const reply = { role: "assistant", content: "Thinking…" }; chat.push(reply); renderAsk();
+    const msgs = chat.slice(0, -1).slice(-16).map(m => ({ role: m.role, content: m.content }));
+    while (msgs.length && msgs[0].role !== "user") msgs.shift();
+    msgs[0] = { role: "user", content: context() + "\n\nFOUNDER: " + msgs[0].content };
+    const go = $("ask-go"); go.disabled = true;
+    try {
+      const r = await sample(msgs, { signal: ctl.signal, cache: false, tools: TOOLS(), onText: ({ text }) => { reply.content = text; renderChat(); } });
+      reply.content = r.text || reply.content;
+    } catch (e) {
+      if (e?.name === "AbortError") return;
+      reply.content = e?.code === "not_granted" ? "Claude isn't allowed on this page yet. Allow it in the page's permissions, then try again." : e?.code === "rate_limited" ? "Too many messages for now. Try again in a little while." : (e?.text || "Couldn't get an answer. Try again.");
+    } finally { if (pending.length) reply.actions = pending.slice(); go.disabled = false; saveChat(); renderAsk(); }
+  }
+  $("ask-form").addEventListener("submit", e => { e.preventDefault(); send(); });
+  $("ask-q").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+  $("chat-clear").addEventListener("click", () => { chat = []; saveChat(); renderAsk(); });
+
+  function renderAll() { renderNav(); renderHome(); renderTodo(); renderGrowth(); renderAgents(); renderOutreach(); renderAsk(); }
+  function showState(m) { const s = $("state"); s.textContent = m; s.hidden = !m; }
+
+  renderNav();
+  (async () => {
+    const timer = setTimeout(() => { if (!snap) showState("The hub can't be reached yet. It will appear when the connection comes back."); }, 10000);
+    try { db = await claude.use("db"); } catch { db = null; }
+    try { sample = await claude.use("sample"); } catch { sample = null; }
+    try { const u = await claude.use("user"); canWrite = u ? !!(u.isOwner() || u.canEdit()) : false; } catch { canWrite = false; }
+    if (!db) { clearTimeout(timer); showState("Sign in to claude.ai to see the hub. It's private to you."); $("hello-h").textContent = "Deadeye HQ"; return; }
+    db.doc("hub/snapshot").onSnapshot(d => {
+      if (!d.exists) { if (!d.metadata.fromCache) { clearTimeout(timer); showState("No data yet. The next agent run will fill it."); } return; }
+      clearTimeout(timer); showState(""); const b = d.data(); snap = typeof b.json === "string" ? JSON.parse(b.json) : b; renderAll();
+    }, () => { clearTimeout(timer); showState("The hub's data couldn't load. Reopen the page to try again."); });
+    db.collection("decisions").onSnapshot(q => { const n = {}; q.docs.forEach(d => { if (d.exists) n[d.id] = d.data(); }); decisions = n; if (snap) renderAll(); }, () => {});
+    db.collection("progress").onSnapshot(q => { const n = {}; q.docs.forEach(d => { if (d.exists) n[d.id] = d.data(); }); progress = n; if (snap) { renderHome(); renderTodo(); } }, () => {});
+  })();
+})();
+</script>

@@ -18,11 +18,15 @@ plugin on in Settings. Say what the agent did without it. A reply with no
 `Skills:` line counts as a failure too.
 
 Arguments: `review` runs steps 1 and 2 only. `support` runs step 1 only.
-`marketing` runs step 8 only. `clubs` runs step 8b only. No argument runs
-everything, as the Monday 09:00 scheduled run does.
+`marketing` runs step 8 only. `clubs` runs step 8b only. `video` runs step
+8v only (local sessions: the footage is on the founder's laptop). No argument
+runs everything, as the Monday 09:00 scheduled run does; it skips 8v.
 
 ## Steps
 
+00. Read the founder's decisions on the hub (Deadeye Bench) and act on them,
+   as `docs/agent-os/hub/README.md` says. Pass each agent the decisions on
+   its own calls when you dispatch it.
 0. Read the newest file in `docs/agent-os/data/`. If it is more than 7 days
    old, the weekly counts job did not run: say so first in the report
    (check `AGENT_DATA_GITHUB_TOKEN` in Vercel and the job's log), then go on
@@ -48,9 +52,19 @@ everything, as the Monday 09:00 scheduled run does.
    (`.claude/skills/handoff/SKILL.md`) on `agent-os`, push it, and open or
    update the pull request from `agent-os` into `main`.
 8. Dispatch `marketing`. Done when its plan exists.
+8v. On `/agent-os video` with a script and the footage's folder: dispatch
+   `video-editor`. When it says a cut is ready, run the critic panel
+   (`docs/agent-os/video/critic-panel.md`): six critics at once, then merge
+   their files into `critique-vN-SUMMARY.md`. Dispatch `video-editor` again
+   with the summary for the next version. Done when the founder has the
+   versions side by side and the edit log in `docs/agent-os/video/`.
 8b. Dispatch `club-growth` when `docs/agent-os/clubs/pipeline.md` has a club
    in `talking`, `trial` or `active`, and on the first Monday of each month
    in any case. Done when its plan exists.
+8c. Update the hub: `docs/agent-os/hub/snapshot.json` and its `hub/snapshot`
+   document, with this run's numbers, calls (one per pull request, approval
+   and founder job), agents, backlog, clubs, film, log and learn
+   (`docs/agent-os/hub/README.md`). Commit it with step 7's changes.
 9. Report to the founder in under 20 lines: any `Skills failed` line first,
    then the numbers and biggest drop, problems found and their ranks, what
    was built, the safety verdict, the pull request links, the marketing

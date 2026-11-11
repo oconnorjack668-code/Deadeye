@@ -22,6 +22,7 @@ import { ShotHeatMap } from '@/components/basketball/ShotHeatMap';
 import { recommendedProgramGoal, programGoalLabel } from '@/lib/recommend';
 import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
+import { RemindersCard } from '@/app/(app)/profile/RemindersCard';
 import { StarterSteps } from '@/components/StarterSteps';
 import { FounderPostCard } from '@/components/FounderPostCard';
 import { DashboardClubCard } from '@/components/clubs/DashboardClubCard';
@@ -288,6 +289,15 @@ export default async function DashboardPage() {
         {/* Straight under Today: three of the four can be done away from a
             court, which is where most new players are (src/lib/starter.ts) */}
         {showStarterSteps && <StarterSteps iqDone={(iqAnswers.count || 0) > 0} shotsDone={metrics.totalSessions > 0} />}
+
+        {/* Nobody has saved a session: most players who stalled never saw the
+            reminders on the welcome screen. Asks for nothing on load; the card's
+            own button asks for push permission. */}
+        {metrics.totalSessions === 0 && (
+          <div className="mb-4">
+            <RemindersCard showWeekly={false} description="When do you next train? Pick your days." />
+          </div>
+        )}
 
         {/* The founding member offer while it can still be claimed, or the
             heads-up in the last week of a founding member's free months. Under

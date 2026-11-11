@@ -68,7 +68,7 @@ describe('buildFunnel', () => {
     expect(count(f, 'log_finish_opened')).toBe(1);
     // The tracker group still carries tracker_saved, whatever groups follow it
     expect(f.groups.find((g) => g.title === 'Shot tracker')?.steps.map((s) => s.key)).toContain('tracker_saved');
-    expect(f.groups.map((g) => g.title)).toEqual(['Joining and logging', 'Welcome', 'Shot tracker', 'Logging shots']);
+    expect(f.groups.map((g) => g.title)).toEqual(['Joining and logging', 'Welcome', 'Shot tracker', 'Logging shots', 'Reminders']);
   });
 
   it('names the step on the main line that loses the most players', () => {
