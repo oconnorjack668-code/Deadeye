@@ -53,7 +53,15 @@ export interface WorkoutSavePayload {
   }>;
   routine: {
     name: string;
-    exercises: Array<{ exercise_id: string | null; exercise_name: string; target_sets: number; display_order: number }>;
+    exercises: Array<{
+      exercise_id: string | null;
+      exercise_name: string;
+      target_sets: number;
+      display_order: number;
+      /** Carried over from a routine that had them (00058); left out otherwise so older databases still take the row */
+      target_reps?: string;
+      notes?: string;
+    }>;
   } | null;
 }
 

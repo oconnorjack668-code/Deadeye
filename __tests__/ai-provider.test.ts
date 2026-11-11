@@ -166,3 +166,32 @@ describe('getAIProvider', () => {
     expect(() => getAIProvider('made-up-provider')).toThrow('not supported');
   });
 });
+
+describe('reading a screenshot (routine import)', () => {
+  afterEach(() => vi.unstubAllGlobals());
+  const image = { mediaType: 'image/png' as const, data: 'iVBORw0KGgo=' };
+
+  it('sends Claude the picture as an image block before the text', async () => {
+    mockFetch(200, { content: [{ type: 'text', text: '{"name":"P","routines":[]}' }] });
+    const out = await new AnthropicProvider().generateJsonFromImage('sys', 'read this', image, {
+      apiKey: 'k',
+      model: 'claude-haiku-5-5',
+      maxTokens: 4000,
+      use: 'chat',
+    });
+    expect(out).toEqual({ name: 'P', routines: [] });
+    const body = JSON.parse((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+    expect(body.messages[0].content).toEqual([
+      { type: 'image', source: { type: 'base64', media_type: 'image/png', data: 'iVBORw0KGgo=' } },
+      { type: 'text', text: 'read this' },
+    ]);
+  });
+
+  it('sends OpenAI the picture as a data URL', async () => {
+    mockFetch(200, { choices: [{ message: { content: '{"routines":[]}' } }] });
+    await new OpenAIProvider().generateJsonFromImage('sys', 'read this', image, config);
+    const body = JSON.parse((fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1].body);
+    expect(body.messages[1].content[0]).toEqual({ type: 'image_url', image_url: { url: 'data:image/png;base64,iVBORw0KGgo=' } });
+    expect(body.response_format).toEqual({ type: 'json_object' });
+  });
+});

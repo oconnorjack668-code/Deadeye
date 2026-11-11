@@ -69,6 +69,9 @@ interface LoggedExercise {
   previous: HistorySet[]; // sets from the last workout with this exercise
   history: HistorySet[]; // all earlier sets (for PR detection)
   sets: LoggedSet[];
+  /** From the routine: the reps to aim for ("8-10") and a note. Missing before 00058. */
+  targetReps?: string | null;
+  note?: string | null;
 }
 
 interface Draft {
@@ -290,15 +293,25 @@ export default function NewWorkoutPage() {
           })
         );
       } else if (routineId) {
-        const { data: routineRows } = await supabase
+        type RoutineRow = { exercise_id: string | null; exercise_name: string; target_sets: number; target_reps?: string | null; notes?: string | null };
+        // The reps target and notes came with 00058; before it, ask without them
+        const withTargets = (await supabase
           .from('routine_exercises')
-          .select('exercise_id, exercise_name, target_sets, display_order')
+          .select('exercise_id, exercise_name, target_sets, target_reps, notes, display_order')
           .eq('routine_id', routineId)
-          .order('display_order');
+          .order('display_order')) as { data: RoutineRow[] | null; error: unknown };
+        let routineRows = withTargets.data;
+        if (withTargets.error) {
+          ({ data: routineRows } = (await supabase
+            .from('routine_exercises')
+            .select('exercise_id, exercise_name, target_sets, display_order')
+            .eq('routine_id', routineId)
+            .order('display_order')) as { data: RoutineRow[] | null; error: unknown });
+        }
         const byId = new Map(((lib || []) as LibraryExercise[]).map((e) => [e.id, e]));
         requested = await Promise.all(
-          ((routineRows || []) as Array<{ exercise_id: string | null; exercise_name: string; target_sets: number }>).map((r) =>
-            buildExercise(
+          (routineRows || []).map(async (r) => ({
+            ...(await buildExercise(
               user.id,
               {
                 id: r.exercise_id,
@@ -306,8 +319,10 @@ export default function NewWorkoutPage() {
                 primary_muscle: (r.exercise_id && byId.get(r.exercise_id)?.primary_muscle) || null,
               },
               r.target_sets
-            )
-          )
+            )),
+            targetReps: r.target_reps ?? null,
+            note: r.notes ?? null,
+          }))
         );
       }
       if (saved && saved.exercises.length > 0) {
@@ -585,6 +600,8 @@ export default function NewWorkoutPage() {
                 exercise_name: e.name,
                 target_sets: Math.min(20, Math.max(1, e.sets.filter((s) => s.done).length || e.sets.length)),
                 display_order: i,
+                ...(e.targetReps ? { target_reps: e.targetReps } : {}),
+                ...(e.note ? { notes: e.note } : {}),
               })),
             }
           : null,
@@ -745,6 +762,13 @@ export default function NewWorkoutPage() {
                       </>
                     )}
                   </p>
+                  {(e.targetReps || e.note) && (
+                    <p className="text-sm text-zinc-400">
+                      {e.targetReps && <>Aim for {e.targetReps}</>}
+                      {e.targetReps && e.note && ' · '}
+                      {e.note}
+                    </p>
+                  )}
                   <div role="group" aria-label={`How ${e.name} is measured`} className="mt-1.5 inline-flex rounded-lg bg-zinc-800/70 p-0.5">
                     {(['reps', 'time', 'distance'] as const).map((m) => (
                       <button
@@ -809,7 +833,7 @@ export default function NewWorkoutPage() {
                     <input
                       inputMode={mode === 'distance' ? 'decimal' : 'numeric'}
                       value={s.reps}
-                      placeholder={prevAmount ? String(prevAmount) : '0'}
+                      placeholder={prevAmount ? String(prevAmount) : e.targetReps || '0'}
                       onChange={(ev) => updateSet(e.key, i, { reps: ev.target.value, done: false, isPR: false })}
                       aria-label={`${e.name} set ${i + 1} ${mode === 'time' ? 'seconds' : mode === 'distance' ? 'metres' : 'reps'}`}
                       className="w-full rounded-lg bg-zinc-800 px-2 py-2 text-center text-sm text-white placeholder:text-zinc-500"

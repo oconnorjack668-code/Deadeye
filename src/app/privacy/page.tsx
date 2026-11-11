@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 3, 2026';
+const LAST_UPDATED = 'November 11, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -166,6 +166,11 @@ export default function PrivacyPage() {
               {ai} receives the details of a session (type, duration, intensity, shooting numbers, drills and your
               notes), the video numbers you choose to share, or your style match results, only when you ask for AI
               feedback, to write the report. Videos are never sent to {ai === 'Our AI provider' ? 'them' : ai}.
+            </li>
+            <li>
+              When you import a routine by pasting it or adding a screenshot, {ai === 'Our AI provider' ? 'it' : ai} receives
+              only that text or picture, to read the exercises out of it. Nothing about you is sent with it, and Deadeye does
+              not keep the text or picture. A CSV file is read on your phone and is not uploaded.
             </li>
             <li>
               When you use AI Coach chat or an AI report, {ai === 'Our AI provider' ? 'it' : ai} also receives your age
