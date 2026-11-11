@@ -7,7 +7,8 @@ import { ISSUE_TEXT, type HealthReading } from '@/lib/video/liveHealth';
 import type { DrillProgress } from '@/lib/video/drillModes';
 import type { Streaks } from '@/lib/video/shotStats';
 import { heatLevel } from '@/lib/video/overlayTimeline';
-import { heatLabel } from '@/lib/video/overlayArt';
+import { callSpot, heatLabel } from '@/lib/video/overlayArt';
+import type { Rim } from '@/lib/video/shotDetector';
 import { StreakFlame } from './StreakFlame';
 
 export interface ShotFlash {
@@ -47,6 +48,7 @@ export function TrackerHud({
   onFixRim,
   canFixRim,
   banner = null,
+  rim = null,
 }: {
   makes: number;
   attempts: number;
@@ -66,11 +68,14 @@ export function TrackerHud({
   canFixRim: boolean;
   /** A milestone just reached (overlayTimeline's milestoneFor), keyed so each one animates afresh. */
   banner?: { id: number; label: string } | null;
+  /** The rim in use, for putting the make/miss call beside it. The HUD box has the video's shape, so its fractions are the box's. */
+  rim?: Rim | null;
 }) {
   const pct = attempts ? Math.round((makes / attempts) * 100) : 0;
   const issues = health.issues;
   const heat = heatLevel(streak.current);
   const hotLabel = heatLabel(streak.current);
+  const spot = callSpot(rim);
 
   return (
     <>
@@ -81,15 +86,12 @@ export function TrackerHud({
       <div className="pointer-events-none absolute left-3 top-2 text-white" aria-live="polite" aria-atomic="true">
         <div className="flex items-end gap-2">
           <span className="text-5xl sm:text-6xl font-black leading-none tabular-nums drop-shadow-lg">
-            {/* On a hot streak the makes count burns: the flame stands on the
-                number's baseline and the digits sit over it */}
-            <span className="relative inline-block">
-              <StreakFlame heat={heat} className="absolute -bottom-2 left-1/2 h-[170%] w-[170%] min-w-16 -translate-x-1/2" />
-              <span className="relative">{makes}</span>
-            </span>
+            {makes}
             <span className="text-3xl sm:text-4xl text-zinc-300">/{attempts}</span>
           </span>
           <span className="mb-1 text-2xl sm:text-3xl font-black leading-none text-orange-400 tabular-nums drop-shadow-lg">{pct}%</span>
+          {/* On a hot streak a flame stands beside the score, never over the numbers */}
+          <StreakFlame heat={heat} className="h-12 w-10 sm:h-14 sm:w-12" />
         </div>
         <div className="mt-1 flex items-center gap-2 text-sm font-semibold tabular-nums text-zinc-300 drop-shadow">
           {paused && <Pause className="h-3.5 w-3.5" aria-label="Paused" />}
@@ -171,33 +173,42 @@ export function TrackerHud({
       </button>
 
       {/* Confirmation a shot registered, read from the arc rather than up
-          close: a tinted wash of the whole frame carries at a distance where a
-          centred box does not, and leaves the hoop visible underneath. */}
+          close: a tinted wash of the whole frame carries at a distance, and
+          the word stands beside the rim (callSpot), where the ball went,
+          leaving the hoop clear. Centred when there is no room beside it. */}
       {flash && (
         <div
           key={flash.id}
-          className={`pointer-events-none absolute inset-0 flex flex-col items-center justify-center deadeye-flash ${
-            flash.made ? 'bg-emerald-500/25' : 'bg-red-500/20'
+          className={`pointer-events-none absolute inset-0 deadeye-flash ${flash.made ? 'bg-emerald-500/25' : 'bg-red-500/20'} ${
+            spot ? '' : 'flex flex-col items-center justify-center'
           }`}
+          style={spot ? { transformOrigin: `${spot.x * 100}% ${spot.y * 100}%` } : undefined}
         >
-          <span
-            className={`text-6xl font-black uppercase tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-7xl ${
-              flash.made ? 'text-emerald-300' : 'text-red-300'
-            }`}
+          <div
+            className={spot ? `absolute flex -translate-y-1/2 flex-col ${spot.side === 'right' ? 'items-start text-left' : 'items-end text-right'}` : 'flex flex-col items-center'}
+            // The text keeps its size while the picture shrinks, so in the small
+            // inline view it is also held clear of the status pill and the dots
+            style={spot ? { top: `clamp(5.5rem, ${spot.y * 100}%, calc(100% - 4rem))`, ...(spot.side === 'right' ? { left: `${spot.x * 100}%` } : { right: `${(1 - spot.x) * 100}%` }) } : undefined}
           >
-            {flash.made ? 'Make' : 'Miss'}
-          </span>
-          <span className="mt-1 text-2xl font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-            {flash.makes}/{flash.attempts}
-          </span>
-          {flash.made && flash.streak >= 3 && (
-            <span className="mt-1 flex items-center gap-1 text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-              <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+            <span
+              className={`font-black uppercase leading-none tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] ${
+                spot ? 'text-5xl sm:text-6xl' : 'text-6xl sm:text-7xl'
+              } ${flash.made ? 'text-emerald-300' : 'text-red-300'}`}
+            >
+              {flash.made ? 'Make' : 'Miss'}
             </span>
-          )}
-          {!flash.confident && (
-            <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
-          )}
+            <span className={`mt-1 font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${spot ? 'text-xl' : 'text-2xl'}`}>
+              {flash.makes}/{flash.attempts}
+            </span>
+            {flash.made && flash.streak >= 3 && (
+              <span className="mt-1 flex items-center gap-1 text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+              </span>
+            )}
+            {!flash.confident && (
+              <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
+            )}
+          </div>
         </div>
       )}
     </>

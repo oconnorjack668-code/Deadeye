@@ -16,7 +16,7 @@ import {
   MAX_FRAMES,
   type OverlayTimeline,
 } from '@/lib/video/overlayTimeline';
-import { bannerCurve, flashCurve, heatLabel, hudUnit, verticalLayout } from '@/lib/video/overlayArt';
+import { bannerCurve, callSpot, flashCurve, heatLabel, hudUnit, verticalLayout } from '@/lib/video/overlayArt';
 import { exportPlan, exportRange, planLengthMs } from '@/components/video/TrackerVideoExport';
 import { TrackerHud } from '@/components/video/TrackerHud';
 import { FREE } from '@/lib/video/drillModes';
@@ -299,5 +299,51 @@ describe('TrackerHud on a streak', () => {
   it('stays plain below three', () => {
     render(<TrackerHud {...base} streak={{ current: 2, best: 2, coldRun: 0 }} flash={null} />);
     expect(screen.queryByText(/Heating up|On fire/)).toBeNull();
+  });
+
+  it('puts the call beside the rim', () => {
+    render(
+      <TrackerHud
+        {...base}
+        streak={{ current: 1, best: 1, coldRun: 0 }}
+        flash={{ id: 1, made: true, confident: true, makes: 1, attempts: 1, streak: 1 }}
+        rim={{ x: 0.35, y: 0.45, width: 0.12 }}
+      />
+    );
+    const stack = screen.getByText('Make').parentElement as HTMLElement;
+    expect(parseFloat(stack.style.left)).toBeCloseTo(44, 5);
+    expect(stack.getAttribute('style')).toContain('45%');
+  });
+
+  it('centres the call with no rim', () => {
+    render(<TrackerHud {...base} streak={{ current: 1, best: 1, coldRun: 0 }} flash={{ id: 1, made: false, confident: true, makes: 0, attempts: 1, streak: 0 }} />);
+    const stack = screen.getByText('Miss').parentElement as HTMLElement;
+    expect(stack.style.left).toBe('');
+  });
+});
+
+describe('the make/miss call beside the rim', () => {
+  it('goes right of the rim, away from the score, and left only when the right is full', () => {
+    const right = callSpot({ x: 0.6, y: 0.45, width: 0.12 });
+    expect(right?.side).toBe('right');
+    expect(right!.x).toBeGreaterThan(0.66);
+    const left = callSpot({ x: 0.82, y: 0.45, width: 0.12 });
+    expect(left?.side).toBe('left');
+    expect(left!.x).toBeLessThan(0.76);
+  });
+
+  it('stays below the score and above the last calls', () => {
+    expect(callSpot({ x: 0.3, y: 0.05, width: 0.1 })!.y).toBe(0.28);
+    expect(callSpot({ x: 0.85, y: 0.05, width: 0.1 })!.y).toBe(0.4);
+    expect(callSpot({ x: 0.3, y: 0.95, width: 0.1 })!.y).toBe(0.75);
+  });
+
+  it('follows a tilted rim at the end it sits beside', () => {
+    expect(callSpot({ x: 0.3, y: 0.5, width: 0.2, tilt: 0.5 })!.y).toBeCloseTo(0.55, 5);
+  });
+
+  it('is centred with no rim, or a rim filling the width', () => {
+    expect(callSpot(null)).toBeNull();
+    expect(callSpot({ x: 0.5, y: 0.5, width: 0.6 })).toBeNull();
   });
 });

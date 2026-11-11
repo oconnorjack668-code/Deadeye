@@ -34,6 +34,36 @@ function rimEnds(rim: Rim, w: number, h: number): [[number, number], [number, nu
   ];
 }
 
+/** Gap between the rim's end and the make/miss call, as a share of the picture's width. */
+const CALL_GAP = 0.03;
+/** Room the call needs beside the rim, as a share of the width; less on both sides and it goes in the middle. */
+const CALL_ROOM = 0.22;
+
+/**
+ * Where the make/miss call goes: beside the rim, on its right unless there is
+ * no room there, so the word is read where the ball went and never covers the hoop. `x` is
+ * the call's edge nearest the rim and `y` its middle, both fractions of the
+ * picture. The middle is kept below the score and the status pill, and above
+ * the last-calls dots.
+ * Null with no rim, or no room either side: then the call is centred.
+ * Shared by the live HUD and the saved video so they put it in one place.
+ */
+export function callSpot(rim: Rim | null): { side: 'left' | 'right'; x: number; y: number } | null {
+  if (!rim) return null;
+  const left = rim.x - rim.width / 2;
+  const right = rim.x + rim.width / 2;
+  const roomLeft = left - CALL_GAP;
+  const roomRight = 1 - right - CALL_GAP;
+  // The right if it fits: the score and its banners fill the top left, and on
+  // the right there is only the small "Ball tracked" pill
+  const side = roomRight >= CALL_ROOM ? 'right' : roomLeft >= CALL_ROOM ? 'left' : null;
+  if (!side) return null;
+  const edge = side === 'right' ? right : left;
+  const top = side === 'right' ? 0.28 : 0.4;
+  const y = Math.min(0.75, Math.max(top, rimYAt(rim, edge)));
+  return { side, x: side === 'right' ? right + CALL_GAP : left - CALL_GAP, y };
+}
+
 /**
  * The rim line the tracking is measured against: the span between the two
  * taps, following the rim's tilt. It takes the colour of a call for a moment
@@ -199,7 +229,7 @@ function pill(ctx: Ctx, x: number, y: number, h: number, text: string, bg: strin
 /**
  * The HUD for a saved video, laid out as TrackerHud lays it out on the phone:
  * the score top left, whether the ball is tracked top right, the last calls
- * bottom left, a make or miss across the middle. The buttons and the amber
+ * bottom left, a make or miss beside the rim (callSpot). The buttons and the amber
  * warnings are left out - they are for the player at the time, not for anyone
  * watching afterwards. `t` drives the flame; `family` is the page's font.
  *
@@ -215,9 +245,11 @@ export function drawHud(
   s: OverlayState,
   t: number,
   family: string,
-  { area, replay = false }: { area?: Rect; replay?: boolean } = {}
+  { area, picture, replay = false }: { area?: Rect; picture?: Rect; replay?: boolean } = {}
 ) {
   const a = area ?? { x: 0, y: 0, w: canvasW, h: canvasH };
+  // Where the footage sits, for placing the call beside the rim (the HUD's area unless a vertical video sets it)
+  const pic = picture ?? a;
   const w = a.w;
   const h = a.h;
   const u = hudUnit(w, h);
@@ -246,8 +278,6 @@ export function drawHud(
   ctx.font = font(48, 900);
   const makesText = String(s.makes);
   const makesW = ctx.measureText(makesText).width;
-  // Sized as StreakFlame is behind the live score: 1.7 times the digits, base just under them
-  if (heat) drawFlame(ctx, left + makesW / 2, base + 6 * u, Math.max(makesW * 1.7 * 0.9, 58 * u), 82 * u * 0.85, t, heat);
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 8 * u;
   ctx.fillStyle = '#ffffff';
@@ -259,8 +289,16 @@ export function drawHud(
   const attemptsW = ctx.measureText(attemptsText).width;
   ctx.font = font(24, 900);
   ctx.fillStyle = '#fb923c';
-  ctx.fillText(`${pct(s.makes, s.attempts)}%`, left + makesW + attemptsW + 8 * u, base - 3 * u);
+  const pctText = `${pct(s.makes, s.attempts)}%`;
+  const pctX = left + makesW + attemptsW + 8 * u;
+  ctx.fillText(pctText, pctX, base - 3 * u);
   ctx.shadowBlur = 0;
+  // On a hot streak a flame stands beside the score, never over the numbers.
+  // Sized as StreakFlame is on the live HUD (40 x 48, after the %)
+  if (heat) {
+    const fx = pctX + ctx.measureText(pctText).width + 6 * u + 20 * u;
+    drawFlame(ctx, fx, base + 1 * u, 36 * u, 41 * u, t, heat);
+  }
 
   // Clock, and the streak once it is hot
   ctx.font = font(14, 600);
@@ -327,7 +365,11 @@ export function drawHud(
   }
 
   drawMark(ctx, w, h, u, family);
-  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family);
+  if (s.flash) {
+    const spot = callSpot(s.rim);
+    const at = spot ? { side: spot.side, x: pic.x - a.x + spot.x * pic.w, y: pic.y - a.y + spot.y * pic.h } : null;
+    drawFlash(ctx, w, h, s.flash, u, family, at);
+  }
   ctx.restore();
 }
 
@@ -430,11 +472,8 @@ export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: stri
   ctx.fillStyle = 'rgba(255,255,255,0.92)';
   const x = w - 12 * u;
   const y = h - 14 * u;
+  // No underline: the brand never puts one under DEADEYE (docs/brand/video-style.md)
   ctx.fillText('DEADEYE', x, y);
-  const tw = ctx.measureText('DEADEYE').width;
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = ORANGE;
-  ctx.fillRect(x - tw, y + 3 * u, tw * 0.35, 2.5 * u);
   ctx.restore();
 }
 
@@ -447,7 +486,20 @@ export function flashCurve(age: number): { opacity: number; scale: number } {
   return { opacity, scale: 1 };
 }
 
-function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string) {
+/**
+ * The make/miss call: a tint over the whole frame, which reads from the arc,
+ * and the word beside the rim (`at`, from callSpot, in HUD pixels), or in the
+ * middle when there is no room beside it.
+ */
+function drawFlash(
+  ctx: Ctx,
+  w: number,
+  h: number,
+  f: NonNullable<OverlayState['flash']>,
+  u: number,
+  family: string,
+  at: { side: 'left' | 'right'; x: number; y: number } | null = null
+) {
   const { opacity, scale } = flashCurve(f.age);
   if (opacity <= 0) return;
   ctx.save();
@@ -458,34 +510,43 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   ctx.fillStyle = f.made ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.restore();
-  ctx.translate(w / 2, h / 2);
+  // Beside the rim the stack is smaller and lined up on the rim's side; the
+  // word's middle sits level with the rim
+  const big = at ? 48 : 60;
+  const align: CanvasTextAlign = at ? (at.side === 'right' ? 'left' : 'right') : 'center';
+  if (at) ctx.translate(at.x, at.y + big * 0.35 * u);
+  else ctx.translate(w / 2, h / 2);
   ctx.scale(scale, scale);
-  ctx.textAlign = 'center';
+  ctx.textAlign = align;
   ctx.textBaseline = 'alphabetic';
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 12 * u;
-  ctx.font = `900 ${60 * u}px ${family}`;
+  ctx.font = `900 ${big * u}px ${family}`;
   ctx.fillStyle = f.made ? '#6ee7b7' : '#fca5a5';
   ctx.fillText(f.made ? 'MAKE' : 'MISS', 0, 0);
-  ctx.font = `900 ${24 * u}px ${family}`;
+  const small = at ? 20 : 24;
+  ctx.font = `900 ${small * u}px ${family}`;
   ctx.fillStyle = '#ffffff';
-  ctx.fillText(`${f.makes}/${f.attempts}`, 0, 32 * u);
+  ctx.fillText(`${f.makes}/${f.attempts}`, 0, (small + 8) * u);
   ctx.shadowBlur = 0;
+  const third = (small + 8) * u + 26 * u;
   if (f.made && f.streak >= 3) {
     ctx.font = `900 ${16 * u}px ${family}`;
     ctx.fillStyle = '#fdba74';
-    ctx.fillText(`${f.streak} IN A ROW`, 0, 58 * u);
+    ctx.fillText(`${f.streak} IN A ROW`, 0, third);
   } else if (!f.confident) {
     ctx.font = `800 ${12 * u}px ${family}`;
     const label = 'CHECK THIS ONE';
     const tw = ctx.measureText(label).width + 20 * u;
+    const bx = align === 'left' ? 0 : align === 'right' ? -tw : -tw / 2;
     ctx.fillStyle = 'rgba(245,158,11,0.9)';
     ctx.beginPath();
-    ctx.roundRect(-tw / 2, 42 * u, tw, 20 * u, 10 * u);
+    ctx.roundRect(bx, third - 16 * u, tw, 20 * u, 10 * u);
     ctx.fill();
     ctx.fillStyle = '#09090b';
+    ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(label, 0, 52.5 * u);
+    ctx.fillText(label, bx + tw / 2, third - 5.5 * u);
   }
   ctx.restore();
 }
@@ -498,8 +559,13 @@ export interface EndCardStats {
   personalBest?: boolean;
 }
 
-/** The last seconds of a saved video: the session's numbers on the app's own background. `p` 0..1 fades it in. */
-export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats, p: number, family: string) {
+/**
+ * The last seconds of a saved video: the session's numbers on the app's own
+ * background, signed with the red logo and the name (no underline, no orange:
+ * docs/brand/video-style.md). `logo` is public/logo.png, left out if it did
+ * not load. `p` 0..1 fades it in.
+ */
+export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats, p: number, family: string, logo?: CanvasImageSource | null) {
   const u = hudUnit(w, h);
   ctx.save();
   ctx.globalAlpha = Math.min(1, p * 3);
@@ -524,18 +590,23 @@ export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats,
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 ${64 * u}px ${family}`;
   ctx.fillText(`${stats.makes}/${stats.attempts}`, w / 2, cy - 4 * u);
-  ctx.fillStyle = '#fb923c';
-  ctx.font = `900 ${28 * u}px ${family}`;
+  ctx.fillStyle = '#d4d4d8';
+  ctx.font = `800 ${26 * u}px ${family}`;
   const line = stats.bestRun >= 2 ? `${pct(stats.makes, stats.attempts)}%  ·  best run ${stats.bestRun}` : `${pct(stats.makes, stats.attempts)}%`;
   ctx.fillText(line, w / 2, cy + 36 * u);
   ctx.fillStyle = '#a1a1aa';
   ctx.font = `600 ${14 * u}px ${family}`;
   ctx.fillText('Tracked live by', w / 2, cy + 78 * u);
+  // The logo and the name side by side, centred together
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 ${26 * u}px ${family}`;
-  ctx.fillText('DEADEYE', w / 2, cy + 108 * u);
-  const tw = ctx.measureText('DEADEYE').width;
-  ctx.fillStyle = ORANGE;
-  ctx.fillRect(w / 2 - tw / 2, cy + 114 * u, tw * 0.35, 3 * u);
+  const nameW = ctx.measureText('DEADEYE').width;
+  const size = logo ? 34 * u : 0;
+  const gap = logo ? 10 * u : 0;
+  const startX = w / 2 - (size + gap + nameW) / 2;
+  const rowY = cy + 108 * u;
+  if (logo) ctx.drawImage(logo, startX, rowY - 26 * u, size, size);
+  ctx.textAlign = 'left';
+  ctx.fillText('DEADEYE', startX + size + gap, rowY);
   ctx.restore();
 }
