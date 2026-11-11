@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-11 · status-followups · #85, #81, #86 merged; last overclaims gone (live); 3 of 4 credits → [handoff](2026-11-11-status-followups.md)
 - 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)
 - 2026-11-11 · marketing-video-editor · Video-editor agent merged; Tuesday video v4 ready; marketing week plan · open: 7 → [handoff](2026-11-11-marketing-video-editor.md)
 - 2026-11-09 · hq-redesign-worker · Deadeye HQ redesign, chat, hub worker; E4 shipped and checked live · open: 3 → [handoff](2026-11-09-hq-redesign-worker.md)
