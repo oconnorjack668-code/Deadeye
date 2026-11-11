@@ -1,6 +1,8 @@
 <!-- Tools research for the video editor, 2026-11-10. Recommendations only: nothing installed or signed up for. -->
 # Tools for Deadeye's video-editor agent: research, 2026-11-10
 
+**Update 2026-11-11.** The founder doesn't like the Kokoro voice: the "Kokoro British voices until then" stopgap below is replaced by the playbook skill's order (a real voice; else a synthetic voice the founder picks from samples; Kokoro only if chosen). `npx hyperframes` is now v0.9.33 and adds `audio` (onsets and loudness in film time), `measure` (cuts, events, look, faces) and `normalize-audio`; `doctor` on the laptop shows whisper.cpp and Kokoro not installed (Parakeet installs with `npx hyperframes models install parakeet`). Canva, Adobe and Figma are now in the agent's tools but work only once the founder signs in to each. Details: `docs/agent-os/knowledge/findings/video-editor.md` ("Tools the editor has").
+
 Research only: nothing was installed, enabled, signed up for or run. Limits referred to below: (1) can't watch video, (2) American/robotic voice, (3) no licensed music, (4) no performance feedback, (5) far, low-resolution amateur footage.
 Context checked in the repo: `docs/legal/dpia.md` R9 says app videos are "never sent to the AI provider". The tracker already logs the ball on each scored frame, the rim and each call (`src/lib/video/overlayTimeline.ts`). Python 3.14 is installed (checked 2026-11-10; the 2026-10-20 handoff said none). Remote (HTTP) MCPs avoid all ARM64 problems; uvx/Python ones need an ARM64 Python + uv first.
 
