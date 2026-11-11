@@ -111,6 +111,48 @@
       "schedule": "On request, local only",
       "skills": "fixed",
       "sources": 55
+    },
+    {
+      "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
+      "id": "designer",
+      "lastRun": null,
+      "lessons": 1,
+      "name": "Designer",
+      "num": 9,
+      "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
+      "researched": "2026-11-11",
+      "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
+      "schedule": "On request, and before any screen change is built",
+      "skills": "new",
+      "sources": 70
+    },
+    {
+      "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
+      "id": "player-outreach",
+      "lastRun": null,
+      "lessons": 0,
+      "name": "Player outreach",
+      "num": 10,
+      "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
+      "researched": "2026-11-11",
+      "role": "Finds communities, adult creators, events and partners that bring in players, and drafts what you send. Never contacts anyone.",
+      "schedule": "Mondays",
+      "skills": "new",
+      "sources": 0
+    },
+    {
+      "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
+      "id": "qa-tester",
+      "lastRun": null,
+      "lessons": 0,
+      "name": "QA tester",
+      "num": 11,
+      "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
+      "researched": "2026-11-11",
+      "role": "Tests the live app like a new player on a phone, and reports what is broken before players find it.",
+      "schedule": "Mondays (signed-out in the cloud), full run in a local session",
+      "skills": "new",
+      "sources": 0
     }
   ],
   "backlog": [
@@ -629,7 +671,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-09T15:05:00Z",
-  "updatedBy": "Claude Code (hub redesign)",
+  "updatedAt": "2026-11-11T19:30:00Z",
+  "updatedBy": "Claude (new agents)",
   "version": 1
 }

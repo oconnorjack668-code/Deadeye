@@ -20,7 +20,9 @@ approves or declines there; every run reads those decisions first and refreshes 
 **Schedule** (cloud routines, Europe/Dublin): weekly loop Mondays 09:00 (counts job 08:30);
 morning check daily 08:00 (live errors, pull requests, hub); marketing Thursdays 10:00; learning
 digest Fridays 16:00; club growth on the 1st of the month 09:30; safety and release review on
-every agent pull request.
+every agent pull request. Player outreach runs in the Monday loop; QA runs in the Monday loop
+(signed-out checks only in the cloud) and fully in any local session with `/agent-os qa`; the
+designer runs on request and on any `NEXT` item that changes what players see.
 
 ## The weekly loop
 
@@ -31,16 +33,19 @@ session), or on demand with `/agent-os` (`.claude/skills/agent-os/SKILL.md`).
    this week's funnel and problem counts to `data/`. Counts only. Without
    its token set, the founder pastes them as before (`data/README.md`).
 2. **support-triage** reads problem and crash reports, finds causes, ranks
-   them; a P1 (crash, lost data, safety) is built first.
+   them; a P1 (crash, lost data, safety) is built first. **qa-tester** walks
+   the live app's main journeys and finds bugs players have not reported.
 3. **activation-analyst** writes a report in `reports/`, updates
    `backlog.md` and marks one item `NEXT`.
-4. **builder** builds the `NEXT` item on its own branch, with tests.
+4. **designer** mocks up the `NEXT` item first when it changes what players
+   see. **builder** builds the `NEXT` item on its own branch, with tests.
 5. **safety-reviewer** checks the branch: minors, parents, personal data,
    messages to people.
 6. **release-checker** runs the checks and writes the founder's checklist.
 7. The lead opens a **pull request**; GitHub runs the `checks` workflow on it.
 8. **marketing** drafts the week's posts and video ideas; **club-growth**
-   plans clubs (when one is in talks, on trial or active, and monthly).
+   plans clubs (when one is in talks, on trial or active, and monthly);
+   **player-outreach** finds other routes to players and drafts for them.
 9. **Founder** reads the report and replies `merge <number>`; the agent
    merges. The founder runs any migration, checks it live and posts the
    approved content.
@@ -144,6 +149,9 @@ line and nowhere else:
 | marketing | Canva, Figma, Ahrefs, Similarweb | Drafts and research. Never publish or share. |
 | club-growth | Gmail (drafts only, no recipient), Google Calendar (read free times), Google Drive (create and read its own docs), Canva | Never send, read the inbox, create events or share files. |
 | video-editor | Canva, Adobe, Figma | Drafts. Never publish or share. |
+| designer | Chrome (live and preview), Figma, Canva, Adobe | Look and screenshot with the tester account; drafts. Never publish or share. |
+| player-outreach | Gmail (drafts only, no recipient), Canva | Never send, read the inbox or publish. |
+| qa-tester | Chrome (live and preview); Vercel deployments, runtime errors and logs | Tester account only, no messages or cron; Vercel read only. |
 
 Each needs the founder's one-time sign-in. An agent whose tool is not
 connected says so and carries on without it.
@@ -160,6 +168,56 @@ live app without a pull request and green checks, whoever pushes.
 - `exams/`: each agent's exam and the results log.
 - `knowledge/findings/`: each agent's research, with sources.
 - `video/`: the video editor's edit logs, the critic panel and the craft playbook.
+- `design/`: the designer's proposals, reviews and mockups.
+- `trends/`: this week's ads and visual trend boards.
+- `outreach/`: player-outreach's routes and weekly plans.
+- `qa/`: the qa-tester's runs and screenshots.
+
+## Design
+
+**designer** (`.claude/agents/designer.md`, `/agent-os design <task>`) is
+Deadeye's artist and product designer (founder's ask, 2026-11-11: an agent
+with an artist's skills that knows from research what looks good and cool in
+basketball). It keeps the visual trend board (`trends/visual.md`), designs
+screens, share cards, badges, social templates and store screenshots as
+mockups in `design/`, hands screen changes to the builder as `D<n>` backlog
+items, reviews every agent's visuals, and changes `docs/design.md` only after
+the founder approves. Original work only: no league, team or brand marks.
+
+## Trends
+
+`trends/` holds what is popular this week (founder's ask, 2026-11-11): the
+ads board (`ads.md`, kept by marketing each Thursday from TikTok Creative
+Center, the Meta Ad Library and basketball accounts) and the visual board
+(`visual.md`, kept by the designer). The video-editor, marketing, designer
+and player-outreach read both before they start.
+
+## Player outreach
+
+**player-outreach** (`.claude/agents/player-outreach.md`, `/agent-os
+outreach`) brings individual players through routes other than clubs and
+Deadeye's own posts: online communities, adult creators, partners and
+events, the founder's network, referrals and the Play Store listing. It keeps
+`outreach/routes.md`, judges each route by first sessions, drafts everything
+for the founder to send, and adds product ideas as `G<n>` backlog items. It
+never drafts a direct message to a young person the founder does not know,
+and records communities and creator types, never people.
+
+## QA
+
+**qa-tester** (`.claude/agents/qa-tester.md`, `/agent-os qa`) tests the live
+app and preview links in Chrome at phone size with the tester account,
+walking the main journeys a new player takes, and writes runs in `qa/`. P1
+and P2 bugs go to support-triage to check, then to the backlog as `S<n>`
+items. It never types a password, uses another account, sends anything to a
+person or calls a cron route. Signed-in tests need a local session.
+
+## Future agents
+
+Kept as possibilities (founder, 2026-11-11), not built: **SEO / website**
+(search and AI-search visibility, landing pages; worth it around the Play
+Store launch) and **retention analyst** (why players stop after their first
+weeks; once there are enough players, until then activation-analyst covers it).
 
 ## Clubs
 
