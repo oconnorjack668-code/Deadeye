@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (agent-upgrades + handoff-status sessions)
+Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
 
 ## Rules
 
@@ -28,25 +28,25 @@ Last updated: 2026-11-11 (agent-upgrades + handoff-status sessions)
 | --- | --- | --- | --- | --- |
 | S1 | Sign the DPIA (`docs/legal/dpia.md`, section 7) with the account holder, then its 6 open actions. Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions). | Founder | 2026-11-07 | 2026-11-11: file still says DRAFT |
 | S2 | Hoop model credits: three dataset links in `ml/rim-detector/ATTRIBUTION.md` still "to confirm", but rim-finding shipped 3 Nov. CC BY needs the credit. Founder sends the Roboflow links; then add them. | Founder, then builder | 2026-11-03 | 2026-11-11: still "to confirm" |
-| S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`). | Founder | 2026-11-09 | 2026-11-09 |
-| S4 | Merge PR #81 (handoff for the 9 Nov HQ redesign and hub worker). Until it merges, that session's handoff is missing from main. | Founder (`merge 81`) | 2026-11-09 | 2026-11-11: open |
+| S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`); then the Play Store. | Founder | 2026-11-09 | 2026-11-09 |
 | S5 | Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). | Founder | 2026-11-11 | 2026-11-11 |
 | S6 | Send the promo's numbers per platform (profile visits, link taps, post dates) into `docs/agent-os/marketing/results.md`. | Founder | 2026-11-11 | 2026-11-11 |
-| S7 | Site meta description says "Track every shot" (`src/app/layout.tsx:21`): banned wording. One-line fix. | Builder | 2026-11-11 | 2026-11-11: still there |
+| S7 | Overclaiming wording still in the app: site meta description "Track every shot" (`src/app/layout.tsx:21`) and the welcome page "Deadeye calls every make and miss" (`src/app/(app)/welcome/WelcomeClient.tsx:49`). Use "count makes and misses", as the landing page does (PR #80). | Builder | 2026-11-09 | 2026-11-11: both still there |
 | S8 | Tracker visuals: flame beside the count, not over it; MAKE/MISS beside the rim; no underline on the export end card. | Builder | 2026-11-11 | 2026-11-11 |
 | S9 | `docs/brand/promo-video/PLAN.md` says 150 drills; the app has 168 (`DRILL_COUNT`). | Marketing | 2026-11-11 | 2026-11-11 |
 | S10 | New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. | Founder | 2026-11-11 | 2026-11-11 |
-| S11 | Getting players in: no new signups since 2026-10-24 (as of 9 Nov). Wexford Blazers trial (`docs/agent-os/clubs/pipeline.md`), first social posts, E0 (message 5 players). | Founder + agents | 2026-11-09 | unconfirmed since 2026-11-09 |
+| S11 | Getting players in: no new signups since 2026-10-24 (as of 9 Nov). Wexford Blazers trial by 16 Nov (`docs/agent-os/clubs/pipeline.md`), first social posts, E0 (message 5 players). | Founder + agents | 2026-11-09 | unconfirmed since 2026-11-09 |
 | S12 | Run the first agent exams to set a baseline: `/agent-os exam all`. | Lead (local) | 2026-11-11 | 2026-11-11 |
 | S13 | Hoop finder: retry with the live camera on a phone (Chrome's permission bubble blocked it in testing). | Founder | 2026-11-03 | unconfirmed since 2026-11-03 |
 | S14 | PR check routine (`trig_01MSRh74ux3XbaYfzerJjJtz`) not yet seen firing on an agent PR; check it ran on #84. | Lead | 2026-11-09 | unconfirmed since 2026-11-09 |
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
-| S18 | Merge PR #85 (this status file, the SessionStart hook and the 11 Nov handoff). Until then new chats do not get STATUS. | Founder (`merge 85`) | 2026-11-11 | 2026-11-11: open |
+| S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
 
+- 2026-11-11 · Status file and SessionStart hook live: PR #85 merged (4809180). The 9 Nov HQ redesign / hub worker handoff reached main with PR #81 (its open items are in S3, S7, S11, S19).
 - 2026-11-11 · Agents to professional level: playbooks, briefs, exams, guard hooks, trade tools, video-editor upgrade. PR #84 merged (b676120). Canva, Figma, Ahrefs, Adobe connected; Sentry and Similarweb skipped (S15).
 - 2026-11-11 · Old hand-made `.codex/agents/*.toml` removed from the main checkout; generated ones in sync (`node scripts/sync-codex-agents.mjs --check`).
 - 2026-11-11 · Video-editor agent, Tuesday video v1-v4, marketing week plan: PRs #82, #83 merged.
