@@ -1,4 +1,11 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(**/.env.local)",
+      "Edit(**/.env.local)",
+      "Write(**/.env.local)"
+    ]
+  },
   "extraKnownMarketplaces": {
     "knowledge-work-plugins": {
       "source": {

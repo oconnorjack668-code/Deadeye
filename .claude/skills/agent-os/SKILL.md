@@ -19,8 +19,10 @@ plugin on in Settings. Say what the agent did without it. A reply with no
 
 Arguments: `review` runs steps 1 and 2 only. `support` runs step 1 only.
 `marketing` runs step 8 only. `clubs` runs step 8b only. `video` runs step
-8v only (local sessions: the footage is on the founder's laptop). No argument
-runs everything, as the Monday 09:00 scheduled run does; it skips 8v.
+8v only (local sessions: the footage is on the founder's laptop). `exam <agent>` or
+`exam all` runs the agents' exams (`docs/agent-os/exams/README.md`) and
+nothing else. No argument runs everything, as the Monday 09:00 scheduled
+run does; it skips 8v and exams.
 
 ## Steps
 
@@ -65,12 +67,31 @@ runs everything, as the Monday 09:00 scheduled run does; it skips 8v.
    document, with this run's numbers, calls (one per pull request, approval
    and founder job), agents, backlog, clubs, film, log and learn
    (`docs/agent-os/hub/README.md`). Commit it with step 7's changes.
+Peer review runs inside the steps above (table below). Pass the reviewer
+only the work to review and its own agent file's "Peer review" lines; send
+its findings back to the author once, then move on.
+
 9. Report to the founder in under 20 lines: any `Skills failed` line first,
    then the numbers and biggest drop, problems found and their ranks, what
    was built, the safety verdict, the pull request links, the marketing
    short list, the clubs (stages, health, outreach drafts waiting), and the
    Founder checklist. End with the exact words to send
    to merge, e.g. `merge 31`.
+
+## Peer review
+
+Professionals have their work checked before it ships. Each agent's file
+says who reviews it; you dispatch the reviewer.
+
+| After step | Reviewer | Checks |
+| --- | --- | --- |
+| 2 (analyst picks `NEXT`) | builder | Is `NEXT` the smallest build that tests the bet? "Too big" goes back to the analyst once. |
+| 1 (a P1 found) | builder, during step 3 | Does the code agree with the root cause? |
+| 3, 4, 5 | safety-reviewer, release-checker | As now. Release-checker also checks the safety verdict has a line per changed file. |
+| next run after a merge | release-checker | `get_runtime_errors` since the deploy; new errors on changed routes go to support-triage. |
+| 8 (marketing plan) | safety-reviewer | Ideas showing a person who may be under 18, upsell copy, claims. |
+| 8v (each cut) | critic panel, marketing, safety-reviewer | As in `docs/agent-os/video/critic-panel.md`; safety-reviewer when a person may be under 18. |
+| 8b (club drafts) | marketing, then safety-reviewer | Tone and brand of outreach; trial plans touching children's data. |
 
 ## Merging, only on the founder's word
 
