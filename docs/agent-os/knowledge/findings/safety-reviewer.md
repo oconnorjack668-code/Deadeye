@@ -146,7 +146,39 @@ when a better source arrives, rather than adding beside it.
   **For Deadeye:** keep the coach on basketball; don't drift into companion
   talk. [Common Sense Media](https://commonsensemedia.org/press-releases/nearly-3-in-4-teens-have-used-ai-companions-new-national-survey-finds), 2025, study (n=1,060, US).
 
+### Sending player content to an AI provider
+
+- Anthropic API (commercial) inputs and outputs are deleted from its backend
+  within 30 days; kept up to 2 years (classifier scores 7 years) if flagged
+  for a Usage Policy breach; Files API files stay until deleted. From 9 June
+  2026 "covered models" (Mythos-class) keep 30 days even for zero-retention
+  customers; Haiku and Sonnet are not covered. Commercial terms: no training
+  on customer content. **For Deadeye:** "not kept" is only true of Deadeye;
+  the policy and screens must say the AI provider deletes it within 30 days.
+  [Anthropic Privacy Center, retention](https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data),
+  updated 2026-07-01, provider terms;
+  [covered models](https://privacy.claude.com/en/articles/15425996-data-retention-practices-for-covered-models), 2026, provider terms.
+- OWASP LLM01:2025 (prompt injection) adds multimodal attacks: instructions
+  hidden in an image can steer the model, and no current defence fully stops
+  them. **For Deadeye:** any AI call that reads a pasted text or screenshot
+  must have no tools and no other player's data in context, and its output
+  must be validated and shown only to the player who sent it.
+  [OWASP LLM01:2025](https://genai.owasp.org/llmrisk/llm01-prompt-injection/), 2025, benchmark;
+  [CSA research note](https://labs.cloudsecurityalliance.org/research/csa-research-note-image-prompt-injection-multimodal-llm-2026/), 2026, practitioner.
+- EDPB Opinion 28/2024 (asked for by the DPC): if the purpose can be met
+  without the personal data, processing it is not necessary; deployers should
+  use safeguards against storing or regurgitating personal data. **For
+  Deadeye:** a routine screenshot needs only the exercises, so ask players to
+  crop out names and faces and tell the model not to copy them.
+  [EDPB Opinion 28/2024](https://edpb.europa.eu/system/files/2024-12/edpb_opinion_202428_ai-models_en.pdf), 2024, regulator.
+
 ## Open questions
+
+- Does a new AI use (routine import, Nov 2026) need fresh parent consent from
+  parents who approved before it existed, or is an updated parent page and
+  a notice enough? **(legal advice)**
+- Does Deadeye's Anthropic agreement (DPA) cover images, and where is the data
+  processed (EU or SCCs)?
 
 - Is there a written DPIA covering video, AI coach and public surfaces?
 - Legal basis for each kind of processing, for 16-17s and approved under-16s?

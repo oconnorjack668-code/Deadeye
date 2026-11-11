@@ -8,6 +8,8 @@
 --   3. routine_imports: one row per AI read of a pasted routine or screenshot,
 --      to count the free monthly allowance. Only the server writes it, so a
 --      player cannot reset their own count. It holds no routine content.
+--   4. tighter write rules: a routine can only go in the player's own program,
+--      and a routine exercise only in the player's own routine
 -- Safe to re-run.
 
 -- =============================================================================
@@ -74,6 +76,17 @@ CREATE POLICY "Users manage own routines" ON public.workout_routines
       program_id IS NULL
       OR EXISTS (SELECT 1 FROM public.user_programs p WHERE p.id = program_id AND p.user_id = auth.uid())
     )
+  );
+
+-- An exercise may only be added to the player's own routine. 00011 checked
+-- only user_id, so a row could name another player's routine_id (it could not
+-- be read across accounts, but it should not be writable either).
+DROP POLICY IF EXISTS "Users manage own routine exercises" ON public.routine_exercises;
+CREATE POLICY "Users manage own routine exercises" ON public.routine_exercises
+  FOR ALL USING (auth.uid() = user_id)
+  WITH CHECK (
+    auth.uid() = user_id
+    AND EXISTS (SELECT 1 FROM public.workout_routines r WHERE r.id = routine_id AND r.user_id = auth.uid())
   );
 
 -- Players can see their own count; only the server (service role) adds to it
