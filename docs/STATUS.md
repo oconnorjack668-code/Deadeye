@@ -42,6 +42,7 @@ Last updated: 2026-11-11 (agent-upgrades + handoff-status sessions)
 | S14 | PR check routine (`trig_01MSRh74ux3XbaYfzerJjJtz`) not yet seen firing on an agent PR; check it ran on #84. | Lead | 2026-11-09 | unconfirmed since 2026-11-09 |
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
+| S18 | Merge PR #85 (this status file, the SessionStart hook and the 11 Nov handoff). Until then new chats do not get STATUS. | Founder (`merge 85`) | 2026-11-11 | 2026-11-11: open |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
