@@ -57,7 +57,9 @@ run does; it skips 8v and exams.
 8v. On `/agent-os video` with a script and the footage's folder: dispatch
    `video-editor`. When it says a cut is ready, run the critic panel
    (`docs/agent-os/video/critic-panel.md`): six critics at once, then merge
-   their files into `critique-vN-SUMMARY.md`. Dispatch `video-editor` again
+   their files into `critique-vN-SUMMARY.md`. Also dispatch `marketing` on
+   the cut (claims, script fit) and, if anyone in shot may be under 18,
+   `safety-reviewer`; the founder sees it only after both pass. Dispatch `video-editor` again
    with the summary for the next version. Done when the founder has the
    versions side by side and the edit log in `docs/agent-os/video/`.
 8b. Dispatch `club-growth` when `docs/agent-os/clubs/pipeline.md` has a club

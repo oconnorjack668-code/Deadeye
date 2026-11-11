@@ -42,8 +42,9 @@ instead.
 - Promo videos, social posts and anything else marketing: read
   `docs/agent-os/knowledge/marketing.md` first (the founder's past
   corrections and the checklist), whichever agent does the work. Cutting or
-  re-cutting a video also means `docs/agent-os/knowledge/video-editor.md`
-  and `docs/agent-os/video/playbook.md` (the video editor's craft rules).
+  re-cutting a video also means `docs/agent-os/knowledge/video-editor.md`,
+  `docs/agent-os/video/playbook.md` (the video editor's craft rules), the
+  `video-editor-playbook` skill and `docs/brand/video-style.md`.
   Each Agent OS agent keeps its own file in `docs/agent-os/knowledge/`.
 - Never read, print, commit, or modify `.env.local`. Use `.env.example` for
   configuration requirements.

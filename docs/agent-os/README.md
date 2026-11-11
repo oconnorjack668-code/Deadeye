@@ -109,6 +109,13 @@ the lead runs the critic panel (`video/critic-panel.md`): six teen-player
 viewers who find every flaw, then the editor fixes what the footage allows.
 It runs locally only, since cloud sessions cannot reach the footage.
 
+Its method is the `video-editor-playbook` skill, its look
+`docs/brand/video-style.md`, its research `knowledge/findings/video-editor.md`,
+its exam `exams/video-editor.md`. Before the founder sees a cut, marketing
+checks claims and script fit, and safety-reviewer checks anyone who may be
+under 18, as well as the critic panel. Strong reference videos go in
+`video/references.md`.
+
 ## Permissions
 
 | Tier | What |
