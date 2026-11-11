@@ -16,6 +16,9 @@ founder's corrections, so the same mistake is not made twice.
 | `builder.md` | builder | Next.js, React, Supabase, testing, PWA and camera on phones |
 | `safety-reviewer.md` | safety-reviewer | Children's data and safety: GDPR, Irish DPC, age-appropriate design |
 | `release-checker.md` | release-checker | Release checks, migrations, rollbacks, Vercel and Supabase |
+| `designer.md` | designer | Basketball visual culture, sports app design, children's design codes, accessibility, store listings |
+| `player-outreach.md` | player-outreach | Early growth for consumer apps, youth communities, creators, referrals, safeguarding |
+| `qa-tester.md` | qa-tester | Exploratory and risk-based testing, mobile web and PWA, accessibility and speed |
 
 ## What each file holds
 
