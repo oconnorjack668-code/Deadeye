@@ -28,7 +28,7 @@ function RoutineRow({ routine }: { routine: Routine }) {
         <div className="text-xs text-zinc-500 truncate">{names.join(', ') || 'No exercises'}</div>
       </div>
       <div className="flex items-center gap-1 flex-shrink-0">
-        <DeleteRoutineButton routineId={routine.id} name={routine.name} />
+        <DeleteRoutineButton routineId={routine.id} name={routine.name} programId={routine.program_id ?? null} />
         <Link href={`/workouts/new?routine=${routine.id}`}>
           <Button variant="secondary" size="sm">Start</Button>
         </Link>

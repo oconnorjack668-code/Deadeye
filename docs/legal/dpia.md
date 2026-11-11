@@ -97,7 +97,13 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
    of Anthropic's Commercial Terms, which apply to API keys from the Anthropic
    Console. It does not name a data location (processing is in the US through
    its listed subprocessors). Done 2026-11-11: the founder confirmed the
-   AI_API_KEY comes from Anthropic and saved a copy of the DPA. Parents who approved
+   AI_API_KEY comes from Anthropic and saved a copy of the DPA. Before
+   changing AI_CHAT_MODEL, AI_MODEL or AI_PROVIDER, re-check the provider's
+   retention for that model (Anthropic's "covered models" differ) and the
+   import wording. Still open (legal advice): sources disagree on whether
+   Anthropic is on the EU-US Data Privacy Framework list; the SCCs are a valid
+   basis either way, but record a check of dataprivacyframework.gov or a short
+   transfer impact assessment. Parents who approved
    before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
    no under-16 had signed up, so every parent approval is given on the
    updated parent page, which names routine import.

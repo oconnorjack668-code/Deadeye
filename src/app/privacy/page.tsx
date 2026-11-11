@@ -80,7 +80,7 @@ export default function PrivacyPage() {
               other hidden data. If you are under 16, we also keep when your parent or guardian approved it.
             </li>
             <li>Your level and XP, worked out from your training, so friends can see your level.</li>
-            <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests.</li>
+            <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests, and the routines and programs you save or import (with their reps targets and notes).</li>
             <li>Study activity: quiz scores and lesson progress.</li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>

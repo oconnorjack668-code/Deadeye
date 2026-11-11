@@ -1,4 +1,4 @@
-Skills: all 5 loaded (2026-11-11 run)
+Skills: all 5 loaded (2026-11-11 re-review run)
 
 # Safety reviewer knowledge
 
@@ -20,7 +20,12 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-11 · Routine import re-review: I asked for import-count rows to be
+  "deleted before last month" without saying when. The builder deleted them on
+  the player's next import, so a player who stops importing keeps them for
+  ever while the policy says "up to two months". Rule: when I ask for a
+  retention, I say it must run on a schedule (the daily housekeeping in
+  `src/app/api/cron/reminders/route.ts`), not on the player's next use.
 
 ## Checklist (every branch, beside the rules in the agent file)
 
@@ -75,8 +80,15 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] **AI that reads player content** (prompt injection, OWASP LLM01): no
       tools, nothing else in the context, output validated and shown only to
       the same player, who checks it before it is saved.
-- [ ] **Counters and logs have a retention.** A row kept only to count a
-      monthly limit is deleted when it no longer counts, and the policy says so.
+- [ ] **Counters and logs have a retention, run by a schedule.** A row kept
+      only to count a monthly limit is deleted when it no longer counts by the
+      daily housekeeping job (not only on the player's next use, which never
+      comes for players who leave), and the policy's "kept for up to X" is true
+      for a player who never comes back.
+- [ ] **Short notices match the policy.** Every place that says how long a
+      processor keeps something (parent page, screen line) carries the same
+      exceptions as the privacy policy ("longer only if flagged"), and a model
+      or provider can't be switched by an env var without re-checking that wording.
 - [ ] **DPIA.** A new kind of processing (new data type, recipient, upload,
       AI use, public surface) is named in the verdict as needing the DPIA
       updated.

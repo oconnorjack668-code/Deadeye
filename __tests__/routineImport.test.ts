@@ -17,6 +17,7 @@ import {
   normalizeReps,
   parseCsv,
   parseWorkoutCsv,
+  pruneOldRoutineImports,
   saveImportedProgram,
   FREE_MONTHLY_ROUTINE_IMPORTS,
   PRO_MONTHLY_ROUTINE_IMPORTS,
@@ -314,5 +315,24 @@ describe('saveImportedProgram', () => {
     const { client, calls } = fakeSupabase();
     expect((await saveImportedProgram(client, 'u1', { name: 'x', routines: [] }, 'text')).error).toBeTruthy();
     expect(calls).toHaveLength(0);
+  });
+});
+
+describe('pruneOldRoutineImports (daily housekeeping)', () => {
+  it('deletes every player\'s count rows from before last month', async () => {
+    const calls: Array<[string, string, unknown]> = [];
+    const admin = {
+      from: (table: string) => ({
+        delete: () => ({
+          lt: async (col: string, value: unknown) => {
+            calls.push([table, col, value]);
+            return { error: null };
+          },
+        }),
+      }),
+    };
+    await pruneOldRoutineImports(admin as never, new Date('2026-12-03T16:00:00Z'));
+    // No user filter: players who never import again are cleared too
+    expect(calls).toEqual([['routine_imports', 'created_at', '2026-11-01T00:00:00.000Z']]);
   });
 });
