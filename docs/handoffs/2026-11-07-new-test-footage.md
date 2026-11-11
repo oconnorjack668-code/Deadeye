@@ -1,6 +1,6 @@
 # Cron and crash check; plan for the 3 new test clips (2026-11-07)
 
-Agent: Claude Code (Opus 5.5) · Commits: this handoff only · Status: crash reports closed; reminders wait on the founder; clips not started
+Agent: Claude Code (Opus 5.5) · Commits: this handoff only · Status: crash reports closed; push keys DONE (added 2026-11-07, see update); clips not started
 
 ## Outcome
 - **Training reminders** fail every day (503 "VAPID keys missing"): production has never had push keys. Its clean-up part still runs before that check (old reports, unapproved under-16 accounts: `removed 0`). Weekly AI report is fine.
@@ -27,7 +27,7 @@ Agent: Claude Code (Opus 5.5) · Commits: this handoff only · Status: crash rep
 - [tracker-accuracy-bench handoff](2026-11-03-tracker-accuracy-bench.md), [rim-finder handoff](2026-11-03-rim-finder.md)
 
 ## Open
-- **Founder: add the push keys and redeploy.** A key pair was generated (`.claude/jobs/1738f077/tmp/vapid.json` in the user folder; deleted with this job, else `npx web-push generate-vapid-keys`). Vercel → Settings → Environment Variables, Production: `NEXT_PUBLIC_VAPID_PUBLIC_KEY` = publicKey, `VAPID_PRIVATE_KEY` = privateKey (Sensitive). Then redeploy: the public key is built into the page. Check: Profile → Turn on notifications → Send a test; the next 16:28 run shows Worked at `/admin/cron-runs`. Never change the pair after players subscribe.
+- **DONE 2026-11-07 (checked 2026-11-09: keys in Vercel Production, reminders 200 every day since 7 Nov). Do not raise again.** ~~Founder: add the push keys and redeploy.~~ A key pair was generated (`.claude/jobs/1738f077/tmp/vapid.json` in the user folder; deleted with this job, else `npx web-push generate-vapid-keys`). Vercel → Settings → Environment Variables, Production: `NEXT_PUBLIC_VAPID_PUBLIC_KEY` = publicKey, `VAPID_PRIVATE_KEY` = privateKey (Sensitive). Then redeploy: the public key is built into the page. Check: Profile → Turn on notifications → Send a test; the next 16:28 run shows Worked at `/admin/cron-runs`. Never change the pair after players subscribe.
 - Next session: steps 1–8 above.
 
 ## Gotchas
