@@ -29,6 +29,10 @@ hooks:
       hooks:
         - type: command
           command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs" nopublish'
+    - matcher: "mcp__plugin_marketing_ahrefs__.*|mcp__plugin_marketing_similarweb__.*"
+      hooks:
+        - type: command
+          command: 'node "$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs" readonly'
 ---
 
 ## Brief
