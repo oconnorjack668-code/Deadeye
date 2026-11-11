@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
+Last updated: 2026-11-11 (routine import built on ccr-27e5f26f-5wusn5, not merged)
 
 ## Rules
 
@@ -47,6 +47,7 @@ Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
+| S20 | Gym routine import (paste, screenshot, CSV; free, 10 AI reads a month) on branch `ccr-27e5f26f-5wusn5`, not merged, no PR yet. Safety review's 3 blocks and 3 fix-soons are fixed in the second commit; a re-review has not run. Before going live: run migration 00058; confirm the Anthropic agreement covers images and its 30-day API retention (wording now in privacy policy, parent page and screen); legal question whether parents who approved before 11 Nov need telling (DPIA action 7). Follow-up, not from this branch: the `routine_exercises` policy (00011) checks only `user_id`, not that the routine is the player's. | Founder | 2026-11-11 | 2026-11-11: tests, types, lint, build pass; RLS checked on local Postgres |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)

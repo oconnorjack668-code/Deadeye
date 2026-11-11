@@ -103,7 +103,9 @@ export default function PrivacyPage() {
             <li>Settings you choose: country, county/region, time zone, whether you use Deadeye as a player or coach, and your privacy choices.</li>
             <li>Reminder settings (time, days, time zone) and, if you turn reminders on, your browser&apos;s push address.</li>
             <li>
-              Your plan: Free or Pro, how many AI reports you have used this month, and if you claim the founding member
+              Your plan: Free or Pro, how many AI reports you have used this month, how many routines you have imported
+              with the AI this month (the date, and whether it was text or a picture, kept for up to two months), and if
+              you claim the founding member
               offer, when you claimed it and when it ends. If you buy Pro, your billing status. Card details are handled by
               Stripe and never reach us.
             </li>
@@ -169,8 +171,11 @@ export default function PrivacyPage() {
             </li>
             <li>
               When you import a routine by pasting it or adding a screenshot, {ai === 'Our AI provider' ? 'it' : ai} receives
-              only that text or picture, to read the exercises out of it. Nothing about you is sent with it, and Deadeye does
-              not keep the text or picture. A CSV file is read on your phone and is not uploaded.
+              only that text or picture, to read the exercises out of it. Your name, email and account are not sent with it,
+              but anything shown in the picture or written in the text is, so crop out names, faces and other people&apos;s
+              details first. Deadeye does not keep the text or picture; {ai === 'Our AI provider' ? 'our AI provider' : ai}{' '}
+              deletes it within 30 days (longer only if its safety systems flag it for misuse). A CSV file is read on your
+              phone and is not uploaded. If you switch AI coaching off, routines can only be imported from a CSV file.
             </li>
             <li>
               When you use AI Coach chat or an AI report, {ai === 'Our AI provider' ? 'it' : ai} also receives your age

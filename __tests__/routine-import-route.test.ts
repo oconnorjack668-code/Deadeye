@@ -10,6 +10,8 @@ const state = vi.hoisted(() => ({
   pro: false,
   aiResult: null as unknown,
   aiError: false,
+  aiOff: false,
+  pruned: [] as unknown[],
   inserted: [] as unknown[],
   deleted: [] as unknown[],
   aiCalls: [] as Array<{ system: string; user: string; image?: unknown }>,
@@ -60,6 +62,7 @@ vi.mock('@/lib/supabase/server', () => ({
     from: (table: string) => {
       if (table === 'routine_imports') return query({ count: state.used, error: null });
       if (table === 'subscriptions') return query({ data: { plan_type: 'free' }, error: null });
+      if (table === 'profiles') return query({ data: { ai_coaching_enabled: !state.aiOff }, error: null });
       if (table === 'exercise_library') return query({ data: [{ id: 'bench', name: 'Barbell Bench Press' }], error: null });
       return query({ data: null, error: null });
     },
@@ -74,9 +77,17 @@ vi.mock('@/lib/supabase/admin', () => ({
         return { select: () => ({ single: async () => ({ data: { id: 'use-1' }, error: null }) }) };
       },
       delete: () => ({
-        eq: async (_col: string, id: unknown) => {
-          state.deleted.push(id);
-          return { error: null };
+        eq: (col: string, id: unknown) => {
+          // delete().eq('user_id', ...).lt('created_at', cutoff) clears old rows;
+          // delete().eq('id', ...) gives one use back
+          const done = Promise.resolve({ error: null });
+          if (col === 'id') state.deleted.push(id);
+          return Object.assign(done, {
+            lt: async (_c: string, cutoff: unknown) => {
+              state.pruned.push({ user: id, cutoff });
+              return { error: null };
+            },
+          });
         },
       }),
     }),
@@ -92,7 +103,7 @@ function post(body: unknown) {
 const GOOD = { name: 'Push', routines: [{ name: 'Push', exercises: [{ name: 'Bench Press (Barbell)', sets: 4, reps: '6-8' }] }] };
 
 beforeEach(() => {
-  Object.assign(state, { used: 0, pro: false, aiResult: GOOD, aiError: false, inserted: [], deleted: [], aiCalls: [] });
+  Object.assign(state, { used: 0, pro: false, aiResult: GOOD, aiError: false, aiOff: false, inserted: [], deleted: [], pruned: [], aiCalls: [] });
 });
 
 describe('POST /api/workouts/import', () => {
@@ -158,6 +169,21 @@ describe('POST /api/workouts/import', () => {
     }
     expect(state.aiCalls).toHaveLength(0);
     expect(state.inserted).toHaveLength(0);
+  });
+
+  it('sends nothing to the AI when AI coaching is switched off', async () => {
+    state.aiOff = true;
+    const res = await post({ kind: 'image', mediaType: 'image/jpeg', data: 'AAAA' });
+    expect(res.status).toBe(403);
+    expect((await res.json()).aiOff).toBe(true);
+    expect(state.aiCalls).toHaveLength(0);
+    expect(state.inserted).toHaveLength(0);
+  });
+
+  it('deletes the player\'s import-count rows from before last month', async () => {
+    await post({ kind: 'text', text: 'Bench 4x6-8' });
+    expect(state.pruned).toHaveLength(1);
+    expect(state.pruned[0]).toMatchObject({ user: 'player-1' });
   });
 
   it('reads a screenshot', async () => {

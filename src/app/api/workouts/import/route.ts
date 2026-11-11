@@ -16,6 +16,7 @@ import {
   exerciseCount,
   IMAGE_TYPES,
   importMonthStartIso,
+  importRetentionCutoffIso,
   MAX_IMAGE_BYTES,
   MAX_IMPORT_TEXT,
   monthlyImportLimit,
@@ -73,11 +74,24 @@ export async function POST(request: Request) {
     return Response.json({ error: 'Reading routines is not switched on yet (SUPABASE_SERVICE_ROLE_KEY is missing).' }, { status: 503 });
   }
 
+  // The AI coaching switch is what parents and the privacy policy describe as
+  // the way to stop sending anything to the AI, so it covers import too
+  const supabase = await createClient();
+  const { data: profile } = await supabase.from('profiles').select('ai_coaching_enabled').eq('id', user.id).maybeSingle();
+  if (profile?.ai_coaching_enabled === false) {
+    return Response.json(
+      { error: 'AI is switched off in your settings, so routines can only be imported from a CSV file.', aiOff: true },
+      { status: 403 }
+    );
+  }
+
   const input = readInput(await request.json().catch(() => null));
   if ('error' in input) return Response.json({ error: input.error }, { status: 400 });
 
+  // Rows from before last month no longer count toward anything: not kept
+  await admin.from('routine_imports').delete().eq('user_id', user.id).lt('created_at', importRetentionCutoffIso());
+
   // The allowance: rows this calendar month (UTC), read with the player's own access
-  const supabase = await createClient();
   const [{ data: sub }, { count, error: countError }] = await Promise.all([
     supabase.from('subscriptions').select('plan_type, founding_pro_until').eq('user_id', user.id).maybeSingle(),
     supabase

@@ -7,7 +7,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ClipboardPaste, FileSpreadsheet, ImageIcon, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, ClipboardPaste, FileSpreadsheet, ImageIcon, Plus, Trash2, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
@@ -41,6 +41,10 @@ interface EditableRoutine {
   name: string;
   exercises: Array<{ key: string; name: string; sets: string; reps: string; notes: string | null; exerciseId: string | null }>;
 }
+
+/** Said under the paste box and the screenshot picker. */
+const SENT_NOTE =
+  "Sent to our AI provider only to read the exercises. Your name and account are not sent. Deadeye doesn't keep it, and the provider deletes it within 30 days.";
 
 let keyCounter = 0;
 const nextKey = () => `k${++keyCounter}`;
@@ -102,6 +106,8 @@ export default function ImportRoutinesPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [library, setLibrary] = useState<LibraryName[]>([]);
   const [remaining, setRemaining] = useState<{ left: number; limit: number } | null>(null);
+  // AI coaching switched off in Settings: only CSV import, which never leaves the phone
+  const [aiOff, setAiOff] = useState(false);
 
   // The preview
   const [source, setSource] = useState<ImportSource | null>(null);
@@ -122,7 +128,7 @@ export default function ImportRoutinesPage() {
         return;
       }
       setUserId(user.id);
-      const [{ data: lib }, { data: sub }, { count }] = await Promise.all([
+      const [{ data: lib }, { data: sub }, { count }, { data: profile }] = await Promise.all([
         supabase.from('exercise_library').select('id, name'),
         supabase.from('subscriptions').select('plan_type, founding_pro_until').eq('user_id', user.id).maybeSingle(),
         supabase
@@ -130,8 +136,13 @@ export default function ImportRoutinesPage() {
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id)
           .gte('created_at', importMonthStartIso()),
+        supabase.from('profiles').select('ai_coaching_enabled').eq('id', user.id).maybeSingle(),
       ]);
       setLibrary((lib || []) as LibraryName[]);
+      if (profile?.ai_coaching_enabled === false) {
+        setAiOff(true);
+        setTab('csv');
+      }
       // The server has the last word (owners count as unlimited there too) and
       // sends the real figure back with each read
       const limit = monthlyImportLimit(hasPro(sub));
@@ -161,8 +172,12 @@ export default function ImportRoutinesPage() {
         body: JSON.stringify(body),
       });
       const json = (await res.json().catch(() => null)) as
-        | { program?: ImportedProgram; remaining?: number; limit?: number; error?: string }
+        | { program?: ImportedProgram; remaining?: number; limit?: number; error?: string; aiOff?: boolean }
         | null;
+      if (json?.aiOff) {
+        setAiOff(true);
+        setTab('csv');
+      }
       if (!res.ok || !json?.program) {
         setError(json?.error || 'The routine could not be read. Please try again.');
         if (res.status === 402) setRemaining((r) => (r ? { ...r, left: 0 } : r));
@@ -283,7 +298,7 @@ export default function ImportRoutinesPage() {
           name: r.name,
           exercises: r.exercises
             .filter((e) => e.name.trim())
-            .map((e) => ({ name: e.name, sets: Number(e.sets) || 3, reps: e.reps || null, notes: e.notes, exerciseId: null })),
+            .map((e) => ({ name: e.name, sets: Number(e.sets) || 3, reps: e.reps || null, notes: e.notes?.trim() || null, exerciseId: null })),
         })),
       },
       library
@@ -296,6 +311,23 @@ export default function ImportRoutinesPage() {
     }
     router.push('/workouts');
     router.refresh();
+  }
+
+  function chooseTab(id: Tab) {
+    if (aiOff && id !== 'csv') return;
+    setTab(id);
+    setError(null);
+  }
+
+  /** Arrow keys move between the tabs, as a tab list should (WAI-ARIA tabs pattern). */
+  function moveTab(e: React.KeyboardEvent) {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const usable = TABS.filter((t) => !(aiOff && t.id !== 'csv')).map((t) => t.id);
+    const at = usable.indexOf(tab);
+    const next = usable[(at + (e.key === 'ArrowRight' ? 1 : -1) + usable.length) % usable.length];
+    e.preventDefault();
+    chooseTab(next);
+    document.getElementById(`import-tab-${next}`)?.focus();
   }
 
   // ---------------------------------------------------------------------------
@@ -318,20 +350,27 @@ export default function ImportRoutinesPage() {
           </div>
         </div>
 
-        <div role="tablist" aria-label="Where the routine comes from" className="grid grid-cols-3 gap-1 rounded-xl bg-zinc-900 p-1">
+        <div
+          role="tablist"
+          aria-label="Where the routine comes from"
+          onKeyDown={moveTab}
+          className="grid grid-cols-3 gap-1 rounded-xl bg-zinc-900 p-1"
+        >
           {TABS.map((t) => {
             const Icon = t.icon;
+            const off = aiOff && t.id !== 'csv';
             return (
               <button
                 key={t.id}
+                id={`import-tab-${t.id}`}
                 type="button"
                 role="tab"
                 aria-selected={tab === t.id}
-                onClick={() => {
-                  setTab(t.id);
-                  setError(null);
-                }}
-                className={`flex h-11 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold ${
+                aria-controls="import-panel"
+                tabIndex={tab === t.id ? 0 : -1}
+                disabled={off}
+                onClick={() => chooseTab(t.id)}
+                className={`flex h-11 items-center justify-center gap-1.5 rounded-lg text-sm font-semibold disabled:opacity-50 ${
                   tab === t.id ? 'bg-zinc-700 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
@@ -341,7 +380,21 @@ export default function ImportRoutinesPage() {
           })}
         </div>
 
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-3">
+        <div
+          id="import-panel"
+          role="tabpanel"
+          aria-labelledby={`import-tab-${tab}`}
+          className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4 space-y-3"
+        >
+          {aiOff && (
+            <p className="text-sm text-zinc-400">
+              AI coaching is switched off in{' '}
+              <Link href="/settings#ai-coaching" className="font-semibold text-zinc-200 underline">
+                Settings
+              </Link>
+              , so routines can only be imported from a CSV file. Pasting and screenshots use AI to read the routine.
+            </p>
+          )}
           {tab === 'text' && (
             <>
               <label htmlFor="routine-text" className="block text-sm text-zinc-300">
@@ -357,8 +410,8 @@ export default function ImportRoutinesPage() {
                 className="w-full rounded-xl border border-zinc-700/80 bg-zinc-950/60 px-3.5 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500"
               />
               <p className="text-sm text-zinc-500">
-                {text.length.toLocaleString('en-IE')} / {MAX_IMPORT_TEXT.toLocaleString('en-IE')} characters. Only the routine is sent to be
-                read, nothing about you, and it is not kept.
+                {text.length.toLocaleString('en-IE')} / {MAX_IMPORT_TEXT.toLocaleString('en-IE')} characters. Leave out names and phone
+                numbers. {SENT_NOTE}
               </p>
               <Button className="w-full" onClick={readText} isLoading={busy} disabled={remaining?.left === 0}>
                 Read routine
@@ -384,7 +437,9 @@ export default function ImportRoutinesPage() {
                 // eslint-disable-next-line @next/next/no-img-element -- a local picture before upload
                 <img src={imagePreview} alt="The screenshot you chose" className="max-h-72 w-full rounded-xl object-contain bg-zinc-950/60" />
               )}
-              <p className="text-sm text-zinc-500">Only the picture is sent to be read, nothing about you, and it is not kept.</p>
+              <p className="text-sm text-zinc-500">
+                Crop out your name, photo and anyone else&apos;s details before you choose it. {SENT_NOTE}
+              </p>
               <Button className="w-full" onClick={readImage} isLoading={busy} disabled={!imageFile || remaining?.left === 0}>
                 Read screenshot
               </Button>
@@ -433,7 +488,7 @@ export default function ImportRoutinesPage() {
             <div>
               <h2 className="text-lg font-bold text-white">Check before saving</h2>
               <p className="text-sm text-zinc-400">
-                Fix anything that was read wrong. Exercises marked &ldquo;new&rdquo; are not in the Deadeye list yet and are kept by name.
+                {source === 'csv' ? 'Read from your file.' : 'Read by AI.'} Check it and fix anything it got wrong. Exercises marked &ldquo;new&rdquo; are not in the Deadeye list yet and are kept by name.
               </p>
               {csvNote && <p className="mt-1 text-sm text-zinc-400">{csvNote}</p>}
             </div>
@@ -528,7 +583,25 @@ export default function ImportRoutinesPage() {
                               </span>
                             )}
                           </div>
-                          {e.notes && <p className="text-sm text-zinc-500">Note: {e.notes}</p>}
+                          {e.notes !== null && (
+                            <div className="flex items-center gap-2">
+                              <input
+                                value={e.notes}
+                                maxLength={200}
+                                onChange={(ev) => updateExercise(r.key, e.key, { notes: ev.target.value })}
+                                aria-label={`Note for ${e.name || `exercise ${ei + 1}`}`}
+                                className="h-10 min-w-0 flex-1 rounded-lg bg-zinc-800 px-3 text-sm text-zinc-300"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => updateExercise(r.key, e.key, { notes: null })}
+                                aria-label={`Remove the note for ${e.name || `exercise ${ei + 1}`}`}
+                                className="h-10 w-10 flex flex-shrink-0 items-center justify-center rounded-lg text-zinc-500 hover:text-red-400"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

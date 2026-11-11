@@ -56,6 +56,16 @@ export function importMonthStartIso(now: Date = new Date()): string {
   return `${creditMonth(now)}T00:00:00.000Z`;
 }
 
+/**
+ * Import-count rows older than this are no longer needed (they only count
+ * toward this month) and are deleted: the start of last month, so a row is
+ * kept for at most about two months.
+ */
+export function importRetentionCutoffIso(now: Date = new Date()): string {
+  const lastMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 1, 1));
+  return lastMonth.toISOString();
+}
+
 export function monthlyImportLimit(unlimited: boolean): number {
   return unlimited ? PRO_MONTHLY_ROUTINE_IMPORTS : FREE_MONTHLY_ROUTINE_IMPORTS;
 }

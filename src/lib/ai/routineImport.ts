@@ -30,6 +30,7 @@ Rules:
 - "3x10", "3 x 10", "3 sets of 10" and "10, 10, 10" all mean sets 3, reps "10". "4 x 6-8" means sets 4, reps "6-8".
 - For a logged workout with weights per set, count the sets and give the reps range done (e.g. "8-10"); put the top weight in notes.
 - At most 14 routines and 30 exercises per routine.
+- Never copy people's names, usernames, handles, phone numbers or email addresses into any field; leave them out.
 - If the input has no gym routine in it, return {"name": "", "routines": []}.`;
 
 export function routineImportUserPrompt(kind: 'text' | 'image', text?: string): string {

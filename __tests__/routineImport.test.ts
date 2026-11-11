@@ -8,6 +8,7 @@ import {
   applyLibraryMatches,
   exerciseKey,
   importMonthStartIso,
+  importRetentionCutoffIso,
   matchExercise,
   MAX_EXERCISES,
   MAX_ROUTINES,
@@ -136,6 +137,10 @@ describe('the monthly allowance', () => {
   });
   it('starts on the 1st of the month, UTC', () => {
     expect(importMonthStartIso(new Date('2026-11-30T23:30:00Z'))).toBe('2026-11-01T00:00:00.000Z');
+  });
+  it('keeps count rows from the start of last month, across a new year', () => {
+    expect(importRetentionCutoffIso(new Date('2026-11-11T10:00:00Z'))).toBe('2026-10-01T00:00:00.000Z');
+    expect(importRetentionCutoffIso(new Date('2027-01-05T10:00:00Z'))).toBe('2026-12-01T00:00:00.000Z');
   });
 });
 
