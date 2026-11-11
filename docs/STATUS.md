@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (routine import merged, PR #88)
+Last updated: 2026-11-11 (S20 closed: routine import live)
 
 ## Rules
 
@@ -47,11 +47,11 @@ Last updated: 2026-11-11 (routine import merged, PR #88)
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
-| S20 | Routine import live: PR #88 merged (2f5f682), migration 00058 run by the founder. Anthropic's terms checked 11 Nov: its Data Processing Addendum covers all submitted data including screenshots, with EU Standard Contractual Clauses for the transfer (DPIA action 7). Left: confirm the AI_API_KEY in Vercel is from an Anthropic Console account (Commercial Terms) and save a copy of the DPA; optional safety re-review of the fixes. | Founder | 2026-11-11 | 2026-11-11: merged; CI green |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
 
+- 2026-11-11 · **Gym routine import live** (paste, screenshot, CSV; 10 free AI reads a month): PR #88 merged (2f5f682), migration 00058 run by the founder, Anthropic terms checked (PR #89, DPIA action 7); founder confirmed the API key is Anthropic's and saved the DPA. Closes S20. An optional safety re-review of the fixes has not run.
 - 2026-11-11 · Overclaiming wording gone everywhere: homepage meta (#80, earlier); site-wide meta in `layout.tsx`, `public/manifest.json`, the welcome page and the Play Store short description in PR fix/overclaim-wording. Live check after merge: `/login` meta says "counts your makes and misses".
 - 2026-11-11 · Status file and SessionStart hook live: PR #85 merged (4809180). The 9 Nov HQ redesign / hub worker handoff reached main with PR #81 (its open items are in S3, S7, S11, S19).
 - 2026-11-11 · Agents to professional level: playbooks, briefs, exams, guard hooks, trade tools, video-editor upgrade. PR #84 merged (b676120). Canva, Figma, Ahrefs, Adobe connected; Sentry and Similarweb skipped (S15).
