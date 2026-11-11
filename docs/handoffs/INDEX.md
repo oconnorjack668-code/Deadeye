@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-11 · planner-ty-timetable · Personal planner synced across devices; TY timetable doc; Opera browser connected → [handoff](2026-11-11-planner-ty-timetable.md)
 - 2026-11-11 · routine-import · Gym routine import live (paste, screenshot, CSV); safety reviewed twice · open: 1 → [handoff](2026-11-11-routine-import.md)
 - 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)
 - 2026-11-11 · marketing-video-editor · Video-editor agent merged; Tuesday video v4 ready; marketing week plan · open: 7 → [handoff](2026-11-11-marketing-video-editor.md)
@@ -33,4 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-22 · marketing-agent · Marketing and social agent; skills for every agent, failures reported · open: 2 → [handoff](2026-10-22-marketing-agent.md)
 - 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
 - 2026-10-22 · follow-founder · Follow the founder; founder posts on followers dashboards · open: 4 → [handoff](2026-10-22-follow-founder.md)
-- 2026-10-22 · founder-badge · Founder badge on card and leaderboard; no Add friend on founder · open: 3 → [handoff](2026-10-22-founder-badge.md)
