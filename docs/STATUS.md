@@ -47,7 +47,7 @@ Last updated: 2026-11-11 (after #86 merged and checked live)
 | S15 | Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
-| S20 | Merge the docs PR with the 11 Nov status follow-ups handoff. | Founder | 2026-11-11 | 2026-11-11: open |
+| S20 | Merge PR #87 (the 11 Nov status follow-ups handoff). | Founder (`merge 87`) | 2026-11-11 | 2026-11-11: open |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
