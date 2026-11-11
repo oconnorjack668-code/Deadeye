@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-11 · routine-import · Gym routine import live (paste, screenshot, CSV); safety reviewed twice · open: 1 → [handoff](2026-11-11-routine-import.md)
 - 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)
 - 2026-11-11 · marketing-video-editor · Video-editor agent merged; Tuesday video v4 ready; marketing week plan · open: 7 → [handoff](2026-11-11-marketing-video-editor.md)
 - 2026-11-09 · hq-redesign-worker · Deadeye HQ redesign, chat, hub worker; E4 shipped and checked live · open: 3 → [handoff](2026-11-09-hq-redesign-worker.md)
@@ -33,6 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
 - 2026-10-22 · follow-founder · Follow the founder; founder posts on followers dashboards · open: 4 → [handoff](2026-10-22-follow-founder.md)
 - 2026-10-22 · founder-badge · Founder badge on card and leaderboard; no Add friend on founder · open: 3 → [handoff](2026-10-22-founder-badge.md)
-- 2026-10-22 · icon-and-photos · Deadeye favicon; profile photos on leaderboard and top bar · open: 3 → [handoff](2026-10-22-icon-and-photos.md)
-- 2026-10-22 · tester-reset · Tester logins can reset to a brand-new player from Settings, live · open: none → [handoff](2026-10-22-tester-reset.md)
-- 2026-10-22 · agent-os-first-loop · First weekly loop: report, fresh counts, E1 shipped and checked live · open: 2 → [handoff](2026-10-22-agent-os-first-loop.md)
