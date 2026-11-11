@@ -526,7 +526,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open: a handoff notes page (PR #81, docs only). Its checks passed.",
+      "detail": "2 open, both docs or agent notes only (PR #81 handoff, PR #82 video-editor agent). Checks passed on both.",
       "name": "Code changes",
       "status": "ok"
     }
@@ -558,6 +558,11 @@
     }
   ],
   "log": [
+    {
+      "at": "2026-11-11T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date, 2 open pull requests (docs only, checks green). Nothing needs you.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-10T08:10:00Z",
       "text": "Morning check: 0 errors in 24h, live site up to date, 1 open pull request (docs only, checks green). Nothing needs you.",
@@ -658,7 +663,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-10T08:10:00Z",
+  "updatedAt": "2026-11-11T08:10:00Z",
   "updatedBy": "Morning check",
   "version": 1
 }
