@@ -2,6 +2,9 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+**What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
+
+- 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)
 - 2026-11-11 · marketing-video-editor · Video-editor agent merged; Tuesday video v4 ready; marketing week plan · open: 7 → [handoff](2026-11-11-marketing-video-editor.md)
 - 2026-11-09 · agent-hub-routines · Deadeye Bench hub; weekly run pushes again; 4 new routines; proxy fix · open: 3 → [handoff](2026-11-09-agent-hub-routines.md)
 - 2026-11-09 · e4-dashboard-reminder · Reminders card on dashboard for zero-session players; reminder_set marker · open: 2 → [handoff](2026-11-09-e4-dashboard-reminder.md)

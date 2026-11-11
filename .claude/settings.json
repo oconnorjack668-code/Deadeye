@@ -6,6 +6,20 @@
       "Write(**/.env.local)"
     ]
   },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-status.mjs\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  },
   "extraKnownMarketplaces": {
     "knowledge-work-plugins": {
       "source": {
