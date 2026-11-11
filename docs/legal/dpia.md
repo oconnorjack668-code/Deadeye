@@ -96,9 +96,8 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
    Contractual Clauses (Modules 2 and 3) and the UK addendum; the DPA is part
    of Anthropic's Commercial Terms, which apply to API keys from the Anthropic
    Console. It does not name a data location (processing is in the US through
-   its listed subprocessors). Left to do: confirm the AI_API_KEY in Vercel is
-   from a Console account under the Commercial Terms, and keep a copy of the
-   DPA (action 4). Parents who approved
+   its listed subprocessors). Done 2026-11-11: the founder confirmed the
+   AI_API_KEY comes from Anthropic and saved a copy of the DPA. Parents who approved
    before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
    no under-16 had signed up, so every parent approval is given on the
    updated parent page, which names routine import.
