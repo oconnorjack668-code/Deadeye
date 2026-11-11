@@ -95,14 +95,14 @@ switch (mode) {
   }
   case 'readonly': {
     const name = tool.split('__').pop() || '';
-    if (/(^|_)(create|update|delete|remove|resolve|assign|mute|ignore|send|post|publish|share|trash|deploy|promote|rollback|edit|write|set|add|apply|execute)(_|$)/i.test(name)) {
+    if (/(^|[-_])(create|update|delete|remove|resolve|assign|mute|ignore|send|post|publish|share|trash|deploy|promote|rollback|edit|write|set|add|apply|execute)([-_]|$)/i.test(name)) {
       block(`${tool} changes something; this agent's access to it is read-only.`);
     }
     break;
   }
   case 'nopublish': {
     const name = tool.split('__').pop() || '';
-    if (/(^|_)(publish|share|send|post|invite|delete|remove|trash|export_to|schedule)(_|$)/i.test(name)) {
+    if (/(^|[-_])(publish|share|send|post|invite|delete|remove|trash|export_to|schedule)([-_]|$)/i.test(name)) {
       block(`${tool} publishes, shares, sends or deletes; this agent only drafts. The founder does that step.`);
     }
     break;
