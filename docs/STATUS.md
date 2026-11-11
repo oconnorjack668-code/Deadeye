@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (planner/TY timetable session: no Deadeye items changed; Opera browser connected)
+Last updated: 2026-11-11 (new agents: designer, player-outreach, qa-tester; S22 closed)
 
 ## Rules
 
@@ -37,7 +37,7 @@ Last updated: 2026-11-11 (planner/TY timetable session: no Deadeye items changed
 | S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`); then the Play Store. | Founder | 2026-11-09 | 2026-11-09 |
 | S5 | Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). | Founder | 2026-11-11 | 2026-11-11 |
 | S6 | Send the promo's numbers per platform (profile visits, link taps, post dates) into `docs/agent-os/marketing/results.md`. | Founder | 2026-11-11 | 2026-11-11 |
-| S8 | Tracker visuals: flame beside the count, not over it; MAKE/MISS beside the rim; no underline on the export end card. | Builder | 2026-11-11 | 2026-11-11 |
+| S8 | Tracker visuals: flame beside the count, not over it; MAKE/MISS beside the rim; no underline on the export end card. Designer mocks it up first (S25), builder builds. | Designer, then builder | 2026-11-11 | 2026-11-11 |
 | S9 | `docs/brand/promo-video/PLAN.md` says 150 drills; the app has 168 (`DRILL_COUNT`). | Marketing | 2026-11-11 | 2026-11-11 |
 | S10 | New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. | Founder | 2026-11-11 | 2026-11-11 |
 | S11 | Getting players in: no new signups since 2026-10-24 (as of 9 Nov). Wexford Blazers trial by 16 Nov (`docs/agent-os/clubs/pipeline.md`), first social posts, E0 (message 5 players). | Founder + agents | 2026-11-09 | unconfirmed since 2026-11-09 |
@@ -48,10 +48,14 @@ Last updated: 2026-11-11 (planner/TY timetable session: no Deadeye items changed
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S21 | US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. | Founder decides (legal advice) | 2026-11-11 | 2026-11-11: raised by the safety re-review |
-| S22 | Merge PR #93 (docs only: 11 Nov planner / TY timetable handoff and this STATUS update). | Founder | 2026-11-11 | 2026-11-11: open |
+| S23 | Merge the new-agents pull request (designer, player-outreach, qa-tester; weekly TikTok trend scan). Docs and agent files only, no app code. | Founder | 2026-11-11 | 2026-11-11: PR opened |
+| S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
+| S25 | First runs of the new agents after S23 merges: designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-11 |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
+
+- 2026-11-11 · PR #93 (planner / TY timetable handoff) merged: `a0404f2` on main. S22 closed.
 
 - 2026-11-11 · Opera connected to Claude in Chrome beside Chrome: Opera for everyday Deadeye work, Chrome keeps the tester account for signed-in tests. Confirmed with switch_browser; device ids in Claude memory `test-live-in-chrome`.
 - 2026-11-11 · **Gym routine import live** (paste, screenshot, CSV; 10 free AI reads a month): PR #88 merged (2f5f682), migration 00058 run by the founder, Anthropic terms checked (PR #89, DPIA action 7); founder confirmed the API key is Anthropic's and saved the DPA. Closes S20. Safety re-review 11 Nov: earlier fixes confirmed; its one block (count rows only deleted on the player's next import) and smaller items fixed in PR #91 (47ec091), daily clean-up in `cron/reminders`.

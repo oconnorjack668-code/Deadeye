@@ -138,7 +138,7 @@
       "role": "Finds communities, adult creators, events and partners that bring in players, and drafts what you send. Never contacts anyone.",
       "schedule": "Mondays",
       "skills": "new",
-      "sources": 0
+      "sources": 53
     },
     {
       "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
@@ -152,7 +152,7 @@
       "role": "Tests the live app like a new player on a phone, and reports what is broken before players find it.",
       "schedule": "Mondays (signed-out in the cloud), full run in a local session",
       "skills": "new",
-      "sources": 0
+      "sources": 51
     }
   ],
   "backlog": [
