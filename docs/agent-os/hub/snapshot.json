@@ -97,6 +97,20 @@
       "schedule": "Mondays, and the 1st of the month",
       "skills": "fixed",
       "sources": 32
+    },
+    {
+      "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
+      "id": "video-editor",
+      "lastRun": "2026-11-10T12:14:00Z",
+      "lessons": 15,
+      "name": "Video editor",
+      "num": 8,
+      "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
+      "researched": "2026-11-10",
+      "role": "Cuts marketing's scripts and the founder's footage into finished TikTok and Reels videos. Never posts.",
+      "schedule": "On request, local only",
+      "skills": "fixed",
+      "sources": 55
     }
   ],
   "backlog": [

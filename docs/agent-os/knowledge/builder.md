@@ -69,6 +69,14 @@ in brackets).
   `scrollIntoView`. **Rule:** keep route constants unexported; stub missing
   DOM APIs. (2026-10-19-activation-logging-reports)
 
+
+## Lessons from results
+
+What the outcome of earlier work taught (see "Results review" in the agent
+file). Newest first, each with the date, what happened, and the rule.
+
+- None yet.
+
 ## Checklist before pushing
 
 - [ ] `npm ci` (no junction), `npx next typegen`, `npx tsc --noEmit`.
@@ -90,110 +98,7 @@ in brackets).
 - [ ] Signed-in or worker behaviour checked live with the tester session, or
       listed as unchecked in the handoff. Own paths staged; handoff written.
 
-## What the research says
+## Research
 
-### Next.js 16 (read `node_modules/next/dist/docs/` first)
-
-- **`middleware` is now `proxy.ts`, Node.js runtime only, for optimistic
-  checks, not authorization;** real checks go "as close as possible to your
-  data source". Deadeye: proxy refreshes the session and redirects; pages,
-  actions and RLS decide. [Next auth guide (local 02-guides/authentication.md)](https://nextjs.org/docs/app/guides/authentication), 2025, official.
-- **Turbopack is the default for dev and build; `next build` no longer lints;
-  browser floor is Safari 16.4 / Chrome 111.** [Next.js 16 blog](https://nextjs.org/blog/next-16), 2025, official.
-- **`next typegen` makes `PageProps`/`LayoutProps` without a build;**
-  `params`, `searchParams`, `cookies()`, `headers()` are async only.
-  [Next 16 upgrade guide (local)](https://nextjs.org/docs/app/guides/upgrading/version-16), 2025, official.
-- **Caching is opt-in.** Deadeye has no `cacheComponents`, so `fetch` is not
-  cached by default. If `use cache` comes in: `revalidateTag(tag, 'max')`,
-  `updateTag` for read-your-writes. Never cache a response that sets cookies.
-  [Caching, previous model (local)](https://nextjs.org/docs/app/guides/caching-without-cache-components), 2025, official.
-
-### React and the React Compiler
-
-- **Deadeye lints with the compiler's rules but does not compile with it:** no
-  `reactCompiler: true`, no `babel-plugin-react-compiler`; the errors come from
-  eslint-plugin-react-hooks 7. Enabling it is stable but slows builds (Babel).
-  [reactCompiler config (local)](https://nextjs.org/docs/app/api-reference/config/next-config-js/reactCompiler), 2025, official.
-- **The compiler skips code that breaks the Rules of React;** `"use no memo"`
-  isolates a suspect component while debugging; React 19.2's `useEffectEvent`
-  moves non-reactive logic out of effects, a cleaner fix for effect bail-outs.
-  [React: compiler debugging](https://react.dev/learn/react-compiler/debugging), 2025, official.
-- **Render is pure and idempotent; side effects in handlers or effects; never
-  mutate props, state or hook values; hooks at top level.** Keep existing
-  `useMemo`/`useCallback`. [Rules of React](https://react.dev/reference/rules), [Compiler intro](https://react.dev/learn/react-compiler/introduction), 2025, official.
-
-### Supabase: RLS and auth
-
-- **Server code protects pages with `getClaims()`; never trust `getSession()`
-  (cookies can be forged).** Proxy must return the response carrying refreshed
-  cookies; refreshing in two places can revoke the session. Deadeye's
-  `src/lib/supabase/middleware.ts` already uses `getClaims`.
-  [Supabase SSR for Next.js](https://supabase.com/docs/guides/auth/server-side/nextjs), 2025, official.
-- **RLS on every exposed table; `to authenticated`; `(select auth.uid())`;
-  index policy columns; no `user_metadata` in policies; `security definer`
-  functions pin `search_path = ''` outside exposed schemas; views use
-  `security_invoker = true`.** Check cost with `explain analyze` ("Rows Removed
-  by Filter" = missing index). [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [RLS performance](https://supabase.com/docs/guides/database/postgres/row-level-security-performance), 2025, official.
-- **RLS is tested with pgTAP (`supabase test db`).** Deadeye's PGlite checks
-  run as superuser and skip RLS (2026-10-21 handoff): policies are untested.
-  [Supabase testing](https://supabase.com/docs/guides/database/testing), 2025, official.
-
-### Testing
-
-- **Query as a user would:** `getByRole`, `getByLabelText`, text; `getByTestId`
-  last. [Testing Library queries](https://testing-library.com/docs/queries/about/), current, official.
-- **Mostly integration tests, few mocks, no implementation details;** pure
-  logic (`rimFinder.ts`, `overlayTimeline.ts`) gets unit tests.
-  [Kent C. Dodds, Write tests](https://kentcdodds.com/blog/write-tests), 2019, practitioner.
-- **Vitest cannot render async Server Components:** test their logic as
-  functions and the page end to end or live. [Next Vitest guide (local)](https://nextjs.org/docs/app/guides/testing/vitest), 2025, official.
-
-### Performance on low-end phones
-
-- **Core Web Vitals at the 75th percentile, mobile separate:** LCP ≤ 2.5s,
-  INP ≤ 200ms, CLS ≤ 0.1. [web.dev Web Vitals](https://web.dev/articles/vitals), 2024, official.
-- **INP covers every tap in the visit.** It is input delay + handler + paint;
-  long tasks during load are the usual cause. Do only the visual update in the
-  handler, defer the rest, don't read layout after writing styles, keep the DOM
-  small. [web.dev INP](https://web.dev/articles/inp), [optimize INP](https://web.dev/articles/optimize-inp), 2024, official.
-- **Test against a ~$250 Android (Galaxy A24 4G class) on 9 Mbps / 100ms;** a
-  3s load allows about 0.3–0.6 MiB of JS. The 36 MB model and CDN runtimes
-  stay off first load, fetched on demand.
-  [Performance Inequality Gap 2026](https://infrequently.org/2025/11/performance-inequality-gap-2026/), 2025, practitioner (stated method).
-- **Hidden tabs get no `requestAnimationFrame`; timers fire at most once a
-  second:** tracking or export behind another app stalls; pause and say so.
-  [Chrome background tabs](https://developer.chrome.com/blog/background_tabs), 2017, official, dated.
-
-### Camera, video and workers on phones
-
-- **`getUserMedia` needs HTTPS; its prompt may never settle; `exact`
-  constraints fail with `OverconstrainedError` without asking,** so request
-  `facingMode: 'environment'` as a preference. Name `NotAllowedError`,
-  `NotFoundError`, `NotReadableError` (camera busy) separately; stop tracks
-  before switching or leaving. [MDN getUserMedia](https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia), 2025, official.
-- **iPhone plays inline only with `playsinline`; autoplay needs muted, and
-  unmuting without a tap pauses.** [WebKit video policies](https://webkit.org/blog/6784/new-video-policies-for-ios/), 2016, official, dated (still current).
-- **Safari's MediaRecorder writes MP4 (H.264/AAC), Chrome's WebM:** pick with
-  `isTypeSupported`, as `pickRecordingType` does. [WebKit MediaRecorder](https://webkit.org/blog/11353/mediarecorder-api/), 2020, official, dated.
-- **`requestVideoFrameCallback` fires only when a frame reaches the compositor,
-  Baseline since Oct 2024:** feature-detect, fall back to rAF. [MDN rVFC](https://developer.mozilla.org/en-US/docs/Web/API/HTMLVideoElement/requestVideoFrameCallback), 2024, official.
-- **Home-screen iOS web apps have a history of camera trouble,** including
-  the prompt returning each launch. Test the camera from the home-screen icon
-  on a real iPhone. [WebKit bug 215884](https://bugs.webkit.org/show_bug.cgi?id=215884), 2021, practitioner (bug report).
-
-### Accessibility
-
-- **WCAG 2.2 AA: targets 24×24 CSS px (2.5.8), 44×44 (2.5.5) advised for
-  important controls; Deadeye's `h-11` exceeds AA.** Text 4.5:1, large text
-  (24px, or 18.5px bold) 3:1, controls 3:1 (1.4.11), no rounding (4.49 fails).
-  [W3C target size](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html), [W3C contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html), 2023, official.
-
-## Open questions
-
-- Turn on `reactCompiler: true`? Measure build time and ShotTracker re-renders.
-- Why did the bundled hoop-finder worker fail on Vercel when the tracker's runs?
-- Real INP/LCP from players' phones: Speed Insights, or `web-vitals` events?
-- Does camera permission persist across launches of the iOS home-screen app?
-- pgTAP RLS tests for tables holding children's data: who runs them, when?
-- WebGL in workers on the oldest supported iPhones (Safari 16.4): only bug
-  threads found, no release notes.
+Findings with their sources are in `findings/builder.md`. Search it when a
+task needs evidence; add new findings there, not here.

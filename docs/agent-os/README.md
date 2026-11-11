@@ -65,6 +65,28 @@ founder corrects it, and researches its field again when the file is more
 than 30 days old. `knowledge/README.md` has the rules and which sources
 count.
 
+To work like a professional in its field (founder's ask, 2026-11-11), each
+agent also has:
+
+- **A playbook skill** (`.claude/skills/<agent>-playbook/`): the method,
+  the named standards it works to, its trade tools and a quality bar, with
+  gold-standard examples in `examples.md`. Repo skills load in cloud runs
+  too.
+- **Research findings** in `knowledge/findings/<agent>.md`, searched when a
+  task needs them, so the knowledge file stays short enough to read every
+  time.
+- **Its own memory** (`memory: project`, in `.claude/agent-memory/<agent>/`)
+  for working notes between runs.
+- **A results review**: before new work it checks how its earlier work
+  turned out and writes the lesson under "Lessons from results".
+- **A peer reviewer** (the agent-os skill's Peer review table).
+- **An exam** (`exams/`): run with `/agent-os exam <agent>` after any change
+  to the agent, to show the change helped.
+- **Guard hooks** (`.claude/hooks/guard.mjs`): the harness blocks an agent
+  writing outside its area, pushing to `main`, force-pushing, touching
+  `.env.local`, or using a read-only tool to change something; the builder
+  cannot push until tsc, lint and tests pass.
+
 ## Marketing
 
 **marketing** (`.claude/agents/marketing.md`) runs on its own with
@@ -73,6 +95,26 @@ calendar and founder posts, in `docs/agent-os/marketing/`. It aims content at
 the same goal: a new player logging a first session. It only drafts. Every
 post, message, ad and payment is the founder's, and no under-18 player is
 shown or named without a parent's written consent.
+
+## Video
+
+**video-editor** (`.claude/agents/video-editor.md`, `/agent-os video`) turns
+marketing's scripts and the founder's footage into finished TikTok and Reels
+videos with HyperFrames and ffmpeg (founder's ask, 2026-11-10: marketing keeps
+what makes a good video and the research; the editor has the craft and the
+video skills). Every version is a new file kept for the founder to compare;
+footage and videos stay out of git in the founder's recordings folder, and
+the edit log goes in `docs/agent-os/video/`. Before the founder sees a cut,
+the lead runs the critic panel (`video/critic-panel.md`): six teen-player
+viewers who find every flaw, then the editor fixes what the footage allows.
+It runs locally only, since cloud sessions cannot reach the footage.
+
+Its method is the `video-editor-playbook` skill, its look
+`docs/brand/video-style.md`, its research `knowledge/findings/video-editor.md`,
+its exam `exams/video-editor.md`. Before the founder sees a cut, marketing
+checks claims and script fit, and safety-reviewer checks anyone who may be
+under 18, as well as the critic panel. Strong reference videos go in
+`video/references.md`.
 
 ## Permissions
 
@@ -87,6 +129,24 @@ One exception to the database rule (founder, 2026-11-01): in a session the
 founder is in, Claude may run `docs/check-migrations.sql` through the Supabase
 connection in `.mcp.json`. It reads only table, column, function and index
 names, never rows. Anything else, a migration included, stays founder only.
+On the same terms, safety-reviewer may run Supabase's security advisors
+(`get_advisors`), which return names and settings, never rows.
+
+Read-only tools (founder, 2026-11-11), each listed in the agent's `tools:`
+line and nowhere else:
+
+| Agent | Tool | Only |
+| --- | --- | --- |
+| support-triage | Sentry; Vercel runtime errors and logs, deployments | Read. Never resolve, assign or mute. Copy no user id, email or name from a log or event. Sentry has no data until the app sends errors to it. |
+| release-checker | Vercel deployments, build logs, runtime errors and logs; Chrome on preview links | Read. Never redeploy, promote, roll back or change env vars. Preview: tester account only, change nothing. |
+| activation-analyst | Vercel Web Analytics (page views, events) | Aggregates only. |
+| builder | Chrome on localhost | Tester account only. |
+| marketing | Canva, Figma, Ahrefs, Similarweb | Drafts and research. Never publish or share. |
+| club-growth | Gmail (drafts only, no recipient), Google Calendar (read free times), Google Drive (create and read its own docs), Canva | Never send, read the inbox, create events or share files. |
+| video-editor | Canva, Adobe, Figma | Drafts. Never publish or share. |
+
+Each needs the founder's one-time sign-in. An agent whose tool is not
+connected says so and carries on without it.
 
 GitHub enforces the main line: with branch protection on `main` (pull
 request required, `checks` must pass, no force pushes), nothing reaches the
@@ -97,6 +157,9 @@ live app without a pull request and green checks, whoever pushes.
 - `backlog.md`: the experiments, ranked. The single source of truth for what gets built.
 - `data/`: weekly counts and paraphrased player notes, added by the founder.
 - `reports/`: one activation report per week, written by the analyst.
+- `exams/`: each agent's exam and the results log.
+- `knowledge/findings/`: each agent's research, with sources.
+- `video/`: the video editor's edit logs, the critic panel and the craft playbook.
 
 ## Clubs
 

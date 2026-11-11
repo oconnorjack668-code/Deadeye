@@ -9,6 +9,7 @@ founder's corrections, so the same mistake is not made twice.
 | File | Agent | Field |
 | --- | --- | --- |
 | `marketing.md` | marketing | Sports and basketball ads, short video, social, youth audiences |
+| `video-editor.md` | video-editor | Short-form and sports video editing, sports advertising, sound, platform specs (research in `findings/video-editor.md`, method in the `video-editor-playbook` skill, craft in `../video/playbook.md`) |
 | `club-growth.md` | club-growth | Selling to clubs and volunteer coaches, trials, youth sport in Ireland |
 | `activation-analyst.md` | activation-analyst | Onboarding and activation in consumer, fitness and sports apps |
 | `support-triage.md` | support-triage | Triage, crash grouping, browser and phone failure patterns |
@@ -18,20 +19,34 @@ founder's corrections, so the same mistake is not made twice.
 
 ## What each file holds
 
+Each agent has two files (split on 2026-11-11, when every file had reached
+the old 200-line cap and new lessons were pushing out old ones):
+
+**`<agent>.md`, the rules, read before every task:**
+
 1. **Lessons from the founder.** Every correction the founder makes, written
    as a rule: what went wrong, the rule that prevents it, the date. Newest
    first. These win over research: the founder knows the audience.
-2. **Checklist.** The checks the agent runs on its own work before the
+2. **Lessons from results.** What the outcome of the agent's earlier work
+   taught (its "Results review"): a bet that failed, a draft that got no
+   reply, a release that needed a fix.
+3. **Checklist.** The checks the agent runs on its own work before the
    founder sees it, built from the lessons and the research. Done means every
    box is ticked or a failed box is named in the reply.
-3. **What the research says.** Findings that change what the agent does,
+
+Keep it under 200 lines, so it can always be read in full.
+
+**`findings/<agent>.md`, the research, searched when a task needs it:**
+
+1. **What the research says.** Findings that change what the agent does,
    each with its source link, the year, how strong the evidence is, and one
-   line on what it means for Deadeye.
-4. **Open questions.** What the agent still does not know and would research
+   line on what it means for Deadeye, under `###` topic headings.
+2. **Open questions.** What the agent still does not know and would research
    next.
 
-Keep each file under 200 lines. When a better source replaces a weaker one,
-replace the old line rather than adding beside it.
+No line cap. When a better source replaces a weaker one, replace the old
+line rather than adding beside it. The method and standards an agent works
+to live in its playbook skill (`.claude/skills/<agent>-playbook/`), not here.
 
 ## Sources
 
@@ -61,7 +76,7 @@ words with a link; never copy an article or someone's creative work.
   caught it.
 - **Every month, or new ground:** if `Last researched` is more than 30 days
   old, or the task is a kind you have no findings for, research first (aim
-  for 5 to 10 good sources) and update the file.
+  for 5 to 10 good sources) and add them to `findings/<agent>.md`; update the date in `<agent>.md`.
 
 The privacy rules in `docs/agent-os/README.md` still apply: no player names,
 quotes that could identify a player, or per-player data in these files.
