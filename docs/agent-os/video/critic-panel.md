@@ -80,6 +80,9 @@ app change]. Return: swipe point, top 5 flaws, top 5 fixes.
 
 ## After the panel
 
+- The panel is one of three reviews. Marketing (claims, script fit) and, when
+  anyone in shot may be under 18, safety-reviewer also pass the cut before the
+  founder sees it (`.claude/agents/video-editor.md`, "Peer review").
 - A critic's suggestion is checked like any other claim: wording against the
   live code (`git show origin/main:src/app/page.tsx`), links against the
   founder's accounts (TikTok has no bio link), numbers against the footage.

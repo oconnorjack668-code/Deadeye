@@ -1,158 +1,149 @@
 # Video editor knowledge
 
-Last researched: 2026-11-10 (about 55 sources; full findings, craft playbook and
-ffmpeg recipe in `docs/agent-os/video/playbook.md`)
+Last researched: 2026-11-11 (findings file; about 55 sources from 2026-11-10)
 
-Read `README.md` in this folder for how this file works. What a video should
-say, and the marketing research, live in `marketing.md`; read its lessons too.
+Rules only (how it works: `README.md`). Research: `findings/video-editor.md`.
+Method: the `video-editor-playbook` skill. Craft and ffmpeg: `../video/playbook.md`.
+Look: `docs/brand/video-style.md`. What a video says is marketing's.
 
-## Lessons from the founder and the critic panel
+## Lessons from the founder
 
-Newest first. Seeded from the first tracker video (v1 to v4, 9-10 Nov 2026;
-edit log `docs/agent-os/video/2026-11-10-caught-fire.md`).
+Newest first; they win over research. Includes critic-panel findings the
+founder told us to apply and the video lessons first kept in `marketing.md`.
 
-- 2026-11-10 · The founder: the marketing agent "doesn't make the best videos"; a
-  separate editor with the video skills should cut them. **Rule:** use
-  HyperFrames for captions, motion, punch-ins, end cards and mixing; plain ffmpeg
-  trims alone are not a finished video.
+- 2026-11-11 · The founder doesn't like the videos so far: a small free voice
+  (Kokoro), hand-timed captions that drifted, no music, a hand-built rim line
+  past the hoop, darkened patches, many rounds of fixes. **Rule:** follow the
+  playbook: a real voice first, or a synthetic one the founder picked (Kokoro
+  only if chosen); captions from the voice track's transcript; registry effects
+  before hand-built ones; a planned music bed; one finished, checked cut.
+- 2026-11-10 · The founder: the marketing agent "doesn't make the best videos";
+  a separate editor with the video skills should cut them. **Rule:** use
+  HyperFrames for captions, motion, punch-ins, end cards and mixing; plain
+  ffmpeg trims alone are not a finished video.
 - 2026-11-10 · Six critics: five swiped before the payoff at 8.5s. **Rule:** cold
-  open on the best real moment; every clip starts at the action; no beat repeats
-  another; target 9 to 15s unless the script needs more.
-- 2026-11-10 · Six of six: the ball was never seen going in (the app's MAKE banner
-  sits over the rim). **Rule:** hold or slow 0.2 to 0.4s so the ball is seen in
-  the net before the banner covers it; end a make on the ball in the net, before
-  the tracking ring wanders.
-- 2026-11-10 · The footage filled 41% of the screen. **Rule:** crop the footage
-  band so the action fills y 270 to 1250 or more; leave out the HUD clock, dot
-  row, wordmark and status chip by not cropping them in, never by covering them.
-- 2026-11-10 · Swishes landed 0.4 to 0.5s before the net; ticks were lost under
-  the hum; the silent cut was -21 LUFS. **Rule:** every hit on its contact frame
-  (0 to 1 frame late, never early), measured on the built picture, not the plan;
-  master both versions to about -14 LUFS, true peak -1.5 dBTP.
-- 2026-11-10 · "10/31" read as a date, "32%" invited mockery, the end card had
+  open on the best real moment; every clip starts at the action; no beat
+  repeats another; 9 to 15s unless the script needs more.
+- 2026-11-10 · Six of six: the ball was never seen going in (the MAKE banner sits
+  over the rim). **Rule:** hold or slow 0.2 to 0.4s so the ball is seen in the
+  net before the banner covers it; end a make on the ball in the net.
+- 2026-11-10 · The footage filled 41% of the screen. **Rule:** crop so the action
+  fills y 270 to 1250 or more; leave out the HUD clock, dot row, wordmark and
+  status chip by not cropping them in, never by covering them.
+- 2026-11-10 · Swishes landed 0.4 to 0.5s early; ticks were lost under the hum;
+  the silent cut was -21 LUFS. **Rule:** every hit on its contact frame (0 to 1
+  frame late, never early), measured on the built picture; master every
+  version to about -14 LUFS, true peak -1.5 dBTP.
+- 2026-11-10 · "10/31" read as a date, "32%" invited mockery, the end card ran at
   ~50 characters a second. **Rule:** write "10 of 31 made"; lead the end card
   with the viewer's action; at most three short lines at 17 characters a second.
-- 2026-11-10 · "Calls my shots" is hoops slang for announcing a shot; "Put the
-  phone down" read as anti-phone. A voice saying "my" didn't sound like the
-  shooter. **Rule:** check every line as a teen player would hear it; a synthetic
-  voice never says "my".
-- 2026-11-09 · The founder dislikes the streak flame (it covers the count) and the
-  MAKE/MISS look. **Rule:** never make the flame or the banners the hero; the
-  flame is drawn only in the HUD, so a crop without the HUD avoids it.
-- 2026-11-09 · End card: the logo, the app's colours, no orange underline under
-  DEADEYE. **Rule:** `public/logo.png` on zinc-950, white, zinc grey, orange only
-  for the one action.
+- 2026-11-10 · "Calls my shots" is hoops slang for announcing a shot; "Put the phone
+  down" read as anti-phone; a voice saying "my" didn't sound like the shooter.
+  **Rule:** check every line as a teen player would hear it; a synthetic voice
+  never says "my".
+- 2026-11-09 · On the first tracker cut, the founder wanted the logo on the end
+  card, no orange underline under DEADEYE, and far, low footage bigger.
+  **Rule:** end cards carry the red logo (`public/logo.png`) on zinc-950, white
+  numbers, zinc grey, orange only for the one action, no underline; zoom far
+  footage so the shot and hoop fill the frame, keeping the app's count readable.
+- 2026-11-09 · A teen critique of the second cut (founder: apply all fixes).
+  **Rules:** no digital silence (room tone, a tick on each count change); frame
+  one moves; the voice never narrates an event before it happens; a crop keeps
+  the app's MAKE/MISS words whole; end on the viewer's action, numbers small.
+- 2026-11-09 · The founder thinks the streak flame (it covers the count) and the
+  MAKE/MISS look are unpolished. **Rule:** until the tracker redesign ships,
+  never make them the hero; lean on the real shot, the ball going in, the
+  numbers and the slow-mo replay. The flame is HUD-only: crop the HUD out.
 - 2026-11-09 · The founder chooses between versions. **Rule:** every version is a
-  new file; never overwrite one; list them side by side in the edit log.
-- 2026-11-09 · TikTok has no bio link. **Rule:** end cards and TikTok captions
-  show the address; "link in bio" is for Instagram only.
-- 2026-11-09 · Founder: an AI voice is allowed, "whatever is best". **Rule:** make
-  the silent cut the main version (every critic disliked the voice); a voice
-  version is an option with the AI label on.
-- 2026-11-09 · Landing wording had changed on main while the worktree was 27
-  commits behind. **Rule:** check on-screen wording with
-  `git show origin/main:src/app/page.tsx`.
-- 2026-10-21 · The rim line ran onto the bracket. **Rule:** check every overlay at
-  full size on stills, including fast frames.
+  new file, listed side by side in the edit log. TikTok has no bio link: end
+  cards and TikTok captions show the address; "link in bio" is Instagram only.
+- 2026-11-09 · Founder: an AI voice is allowed, "whatever is best". **Rule:** decide
+  on the evidence; the silent cut was main last time (every critic disliked
+  the voice); any synthetic voice is short, word for word with the captions,
+  AI label on.
+- 2026-11-09 · Landing wording changed on main while a worktree was 27 commits
+  behind. **Rule:** check wording with `git show origin/main:src/app/page.tsx`.
+- 2026-11-07 · The first promo took too many rounds of small fixes. **Rule:** check
+  the whole video frame by frame against the checklist; show a finished cut.
+- 2026-10-21 · The rim line ran past the ring onto the bracket. **Rule:** every
+  overlay is checked at full size on stills, flash, shake and zoom frames too.
 - 2026-10-20 · Captions drifted from the voice; darkened patches hid footage.
-  **Rule:** one voice clip per phrase; never darken or blur a block.
+  **Rules:** captions follow the voice word for word; never darken or blur a
+  block of footage.
+- 2026-10-20 · Shown side by side, the founder preferred the first promo's look
+  to a new 32s build. **Rule:** before rebuilding a whole video, show one short
+  sample of the new look next to the current one.
+- 2026-10-20 · "Can you not add X" meant "add X". **Rule:** when a request could be
+  read two ways, say which reading you took.
 
-## Technical lessons
+## Lessons from results
 
-- A saved tracker video with slow-mo replays does not share the source clip's
-  timestamps: find every moment on stills of the file you are cutting.
-- The app's export is full colour range; convert every segment to limited (tv)
-  range before joining, or blacks turn grey.
-- Slowed and held pieces come out up to 0.2s longer than planned (frame
-  rounding): measure the built segments and re-time sounds and voice to them.
-- Two-pass loudnorm falls back to dynamic mode on a peaky effects mix and misses
-  -14 LUFS: check `normalization_type`; if not `linear`, set the gain by hand
-  and limit (v4 silent: +16.4 dB, alimiter 0.66).
-- `grep -c` exits 1 when it counts zero; guard it (`|| true`) under `set -e`.
-- The app's MISS call comes about 0.7s after the rim hit: keep it at real time
-  rather than speeding it up, so the video doesn't misstate how fast it calls.
-- 1.98x on the 1080-wide export band is the softness limit; past 2x it shows.
-- The founder's laptop is Windows on ARM (Snapdragon); kokoro-js prints a cpuinfo
-  warning but works.
+How posted videos did, as rules. Before each video, read
+`docs/agent-os/marketing/results.md` and add a dated line when a result says
+something about the edit (hook, length, voice, captions, music). Under about
+1,000 views it is a "hint", not a rule; compare within one platform only.
 
-## Checklist before the founder sees a cut
+- None yet: the first promo (results 2026-11-09) has views and likes but no
+  retention, link taps or post dates, so nothing about the edit can be read.
 
-- [ ] Frame 0 moves: the player mid-action with the overlay visible; Deadeye is
-      named in text before 3s.
-- [ ] Payoff first (the best real make), each clip starts at the release, no
-      dead time, no repeated beat.
-- [ ] The ball is seen in or through the net before each MAKE banner; banners
-      whole; no flame; the tracking ring isn't wandering under a MAKE.
+## Checklist before the founder sees a video
+
+Done means every box is ticked or a failed box is named in the hand-off.
+
+Story and claims
+- [ ] Frame 0 moves: the player mid-action with the overlay visible; Deadeye
+      named in text or voice before 3s; the proposition clear by 3s.
+- [ ] Payoff first; each clip starts at the action; no dead time or repeated
+      beat; the ball seen in the net before each MAKE banner; no flame.
 - [ ] Every number is the app's own from this footage; claims checked in the
-      live code; no "every shot", "never misses", "100%".
-- [ ] Text inside x 140-940, y 270-1250 (stricter than Meta's x 65-1015,
-      y 269-1248) and inside TikTok's zone for the caption length.
-- [ ] Captions: 2 lines at most, 42 characters a line, 17 characters a second
-      for text read on its own; stroke or plate keeps 4.5:1 contrast on the
-      worst frame.
-- [ ] No more than 3 flashes or 3 saturated-red flashes in any second (a red
-      MISS tint must not strobe).
-- [ ] Every sound 0 to 1 frame after its event, never early (measured on the
-      built picture); the swish is the loudest hit; room tone, no silence.
-- [ ] Voice never runs ahead of its event or over a hit; no "my" in a
-      synthetic voice; AI label noted.
-- [ ] Loudness about -14 LUFS (±1), true peak -1.5 dBTP or lower, short-term
-      max within about 5 LU of integrated.
-- [ ] `scdet` cuts match the beat sheet; `blackdetect`, `freezedetect` and
-      `silencedetect` find nothing unplanned.
-- [ ] No slow motion from too few real frames; no punch-in past the pixel
-      budget (check a 100% still).
-- [ ] Delivery: h264 High, yuv420p, BT.709, tv range, constant 30 fps, AAC 48 kHz
-      stereo, `+faststart`; any HDR source tone-mapped to SDR first.
-- [ ] End card: logo, the action, the address in orange, at most three lines;
-      the last frame leads back into the first if it loops.
-- [ ] Faces: every recognisable person listed for consent; nothing blurred.
-- [ ] Every version is a new file; the edit log lists them with paths.
-- [ ] The founder still watches once at full speed with sound on and once with
-      sound off: emotion and story can't be measured.
+      live code and by marketing; no "every shot", "never misses", "100%".
+- [ ] Three openings (first 3s) on the same body, each a different hook.
 
-## What the research says (short; sources in the playbook)
+Picture
+- [ ] Cuts land on action (release, ball in flight); J or L cut wherever a voice
+      line or a sound spans a cut.
+- [ ] Colour matches from shot to shot (`measure look` against neighbours); any
+      grade shown to the founder as a graded and ungraded still first.
+- [ ] No darkened, blurred or patched areas; nothing covers footage to hide it.
+- [ ] Every overlay, effect and caption checked on stills at full size at each
+      change and at fast frames (flash, shake, zoom, whip): it lands on the real
+      object and stops where the object stops.
+- [ ] A registry effect was searched for before anything was hand-built; any
+      hand-built overlay is named in the hand-off with the reason.
+- [ ] At most 3 flashes (or 3 red flashes) a second; no slow motion from too
+      few real frames; no punch-in past the pixel budget (100% still).
 
-- Hook: TikTok wants the proposition in 3s and the hook in 6s; much of an ad's
-  brand effect lands in the first 3s. Cold open on proof, name the app early.
-- Pace: high-performing talking TikToks cut about every 2 to 3s; the fastest
-  pace lowered intent to finish. Vary shot lengths and hold the payoff longest.
-- Cuts: a third of cuts made on motion go unseen, mostly thanks to continuous
-  sound. Cut on action with one sound bed to hide a cut; change the sound to
-  make one felt.
-- Slow motion makes a shot look more skilled; show real speed first, then the
-  replay, to stay honest.
-- Sync: early audio is noticed at about 45 ms, late at about 125 ms (EBU R37:
-  40 early, 60 late). Never early.
-- Captions: 17 characters a second (Netflix children's limit), 42 a line, two
-  lines; TikTok's "5 to 10 words a second" only for words also spoken.
-- Authentic beats half-polished: user-made videos beat agency videos at low
-  production quality; UGC-style TikToks out-scored brand ones on attention.
-  Polish the sound, framing and legibility, keep the phone-camera look.
-- Sports ads: emotion wins long term (IPA); underdog-and-effort stories raise
-  intent (Paharia 2011); the great spots each rely on one device.
-- Sports social: Gen Z watches highlights as much as live sport; House of
-  Highlights and Overtime won with raw clips of young athletes.
-- Show the app working early with real output (Apple, Google Play rules);
-  a phone on a tripod plus the live overlay is a proven way to show a tracker.
-- Delivery: upload a near-lossless master (CRF 16 to 18, YouTube's spec as the
-  house spec); platforms publish no loudness target, -14 LUFS is consensus.
+Text
+- [ ] All text inside x 140-940, y 270-1250 of 1080x1920 and inside TikTok's
+      zone for the caption length.
+- [ ] Spoken captions: timed from the final voice track's word timestamps,
+      changing with the words, clear of each cut by 2 frames.
+- [ ] Read-alone text: at most 17 characters a second, at least 1s on screen,
+      2 lines of 42 characters at most; 4.5:1 contrast on the worst frame.
 
-## Tools
+Sound
+- [ ] Voice: a real voice, or the synthetic voice the founder picked from
+      samples (never Kokoro unless chosen); never ahead of its event or over a
+      hit; no "my" in a synthetic voice; AI label noted.
+- [ ] Every hit 0 to 1 frame after its event, never early (`hyperframes audio`
+      onsets on the built file); room tone, no digital silence.
+- [ ] Music: a bed with a recorded licence for both platforms, carved under the
+      voice; otherwise none baked in, and the hand-off says which kind of track
+      the founder adds in the app, its tempo and its volume.
+- [ ] Loudness -14 LUFS (±1) integrated, true peak -1.5 dBTP or lower (never
+      above -1), loudest 3s within about 5 LU of integrated.
 
-Ranked options (voice, analytics, video understanding, Resolve) are in
-`docs/agent-os/video/tools.md`; nothing there is installed. Never send footage
-that shows under-18s to an outside AI service without a DPIA update and consent
-naming it; prefer the tracker's own event log and local ffmpeg filmstrips.
-
-## Open questions
-
-- Cut rate for sports montages: the only benchmark covers talking heads.
-- Word-by-word against phrase captions; teen reading speed in fast video.
-- Real TikTok and Instagram loudness normalisation and re-encode bitrates.
-- Whether seamless loops raise rewatches; whether grading gym footage helps.
-- Same-age amateur players against pros for teen audiences.
-- AI label for a generic TTS narrator: platform rules unclear; labelling cut
-  trust by about 27% in one industry test. Founder decision.
-- Read only in summaries so far: ITU-R BT.1359, EBU R37, Murch's percentages,
-  AES TD1008, the current ASAI children's section.
+Delivery and review
+- [ ] h264 High, yuv420p, BT.709, tv range, constant 30 fps, AAC 48 kHz stereo,
+      `+faststart`; HDR tone-mapped first; `scdet`, `blackdetect`,
+      `freezedetect` and `silencedetect` find nothing unplanned.
+- [ ] Square or 4:5 variants rechecked caption by caption, never assumed.
+- [ ] End card: red logo, the action, the address in orange, three lines at
+      most; the last frame leads back into the first if it loops.
+- [ ] Faces: every recognisable person listed; consent on record for any
+      possible under-18, or the shot is out (never blurred).
+- [ ] After the last change: the whole cut read as a 4 fps strip at phone size
+      with measured audio; a person asked to watch it at real speed on a
+      phone, with sound and without (the editor can't watch video).
+- [ ] Peer review done (marketing; safety-reviewer if anyone may be under 18;
+      critic panel for a new piece); every version a new file in the edit log.
