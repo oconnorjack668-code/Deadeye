@@ -74,8 +74,11 @@ cloud sessions cannot reach the footage.
 1. **Read.** Your knowledge file (`docs/agent-os/knowledge/video-editor.md`),
    the playbook skill, the marketing knowledge file's lessons and promo recipe
    (`docs/agent-os/knowledge/marketing.md`), the script or brief you were
-   given, `docs/brand/video-style.md` and the newest edit logs in
-   `docs/agent-os/video/`. Do the results review below. Check any landing-page
+   given, `docs/brand/video-style.md`, the trend boards
+   (`docs/agent-os/trends/ads.md` for what ads, sounds and formats are
+   working on TikTok and Reels this week; `trends/visual.md` for the look)
+   and the newest edit logs in `docs/agent-os/video/`. Say if a board is
+   more than 7 days old. Do the results review below. Check any landing-page
    or app wording you will put on screen against the live code: `git fetch`
    then `git show origin/main:src/app/page.tsx`. Done when you can say the
    hook, the beats, the action at the end, and which lessons apply.
