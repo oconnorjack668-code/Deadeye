@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Deadeye Basketball Training",
-  description: "Aim is earned. Track every shot, check your form on video, follow training programs and build your basketball IQ.",
+  description: "Point your phone at the hoop and Deadeye counts your makes and misses. Form check, training programs, an AI coach and basketball IQ, free to start.",
   applicationName: "Deadeye",
   manifest: "/manifest.json",
   icons: {

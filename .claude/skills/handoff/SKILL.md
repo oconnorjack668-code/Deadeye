@@ -46,7 +46,10 @@ Done when you hold the fact, or STATUS and the index show no session covers it.
    - Each open item this session checked but did not finish: update its
      "Last checked" cell with the date and what was seen.
    - Each new open item: a new row with the next unused `S<n>` id, an owner
-     (founder, a named agent, or "founder decides"), today's date.
+     (founder, a named agent, or "founder decides"), today's date. Name
+     every place it applies and which are already done, checked where
+     people see it (live site; grep for every copy), so a part-done item
+     never reads as a finished one raised again.
    - Delete "Recently done" lines older than 21 days. Update the
      `Last updated` line.
 2. Collect this session's facts: commits (`git log --oneline`), files

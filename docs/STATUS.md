@@ -19,6 +19,12 @@ Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
   and how it was confirmed (PR merged, commit, query, live check). Keep
   "Recently done" to the last 21 days; older lines are deleted (git keeps
   them).
+- **Say exactly what is done and what is not.** An item names every place
+  it applies and which are already fixed ("homepage fixed in #80; login,
+  signup, privacy still old"). Check it where people see it (the live site,
+  every copy of the text: grep the repo, `public/`, `docs/`), not one file.
+  Founder, 2026-11-11: S7 read as if finished work was being raised again
+  because it did not say the homepage was already fixed.
 - Every open item has an id (`S<n>`, never reused), an owner, the date it
   was opened and when it was last checked and how.
 
@@ -27,11 +33,10 @@ Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
 | Id | What | Owner | Since | Last checked |
 | --- | --- | --- | --- | --- |
 | S1 | Sign the DPIA (`docs/legal/dpia.md`, section 7) with the account holder, then its 6 open actions. Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions). | Founder | 2026-11-07 | 2026-11-11: file still says DRAFT |
-| S2 | Hoop model credits: three dataset links in `ml/rim-detector/ATTRIBUTION.md` still "to confirm", but rim-finding shipped 3 Nov. CC BY needs the credit. Founder sends the Roboflow links; then add them. | Founder, then builder | 2026-11-03 | 2026-11-11: still "to confirm" |
+| S2 | Hoop model credits (`ml/rim-detector/ATTRIBUTION.md`): rim-finding shipped 3 Nov, CC BY needs the credit. Done: ballllls. Needed from the founder: confirm X-Basket is `universe.roboflow.com/x-qfelz/x-basket-2` (found by search; name says "2"); the page links for basketball-computer-vision (235 images, CC0) and Basketball Shot Tracking (311 images, CC BY 4.0), not found by search. | Founder, then builder | 2026-11-03 | 2026-11-11: 1 found, 2 missing |
 | S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`); then the Play Store. | Founder | 2026-11-09 | 2026-11-09 |
 | S5 | Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). | Founder | 2026-11-11 | 2026-11-11 |
 | S6 | Send the promo's numbers per platform (profile visits, link taps, post dates) into `docs/agent-os/marketing/results.md`. | Founder | 2026-11-11 | 2026-11-11 |
-| S7 | Overclaiming wording still in the app: site meta description "Track every shot" (`src/app/layout.tsx:21`) and the welcome page "Deadeye calls every make and miss" (`src/app/(app)/welcome/WelcomeClient.tsx:49`). Use "count makes and misses", as the landing page does (PR #80). | Builder | 2026-11-09 | 2026-11-11: both still there |
 | S8 | Tracker visuals: flame beside the count, not over it; MAKE/MISS beside the rim; no underline on the export end card. | Builder | 2026-11-11 | 2026-11-11 |
 | S9 | `docs/brand/promo-video/PLAN.md` says 150 drills; the app has 168 (`DRILL_COUNT`). | Marketing | 2026-11-11 | 2026-11-11 |
 | S10 | New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. | Founder | 2026-11-11 | 2026-11-11 |
@@ -46,6 +51,7 @@ Last updated: 2026-11-11 (after merging #85; #81 conflict resolved)
 
 ## Recently done (do not raise again)
 
+- 2026-11-11 · Overclaiming wording gone everywhere: homepage meta (#80, earlier); site-wide meta in `layout.tsx`, `public/manifest.json`, the welcome page and the Play Store short description in PR fix/overclaim-wording. Live check after merge: `/login` meta says "counts your makes and misses".
 - 2026-11-11 · Status file and SessionStart hook live: PR #85 merged (4809180). The 9 Nov HQ redesign / hub worker handoff reached main with PR #81 (its open items are in S3, S7, S11, S19).
 - 2026-11-11 · Agents to professional level: playbooks, briefs, exams, guard hooks, trade tools, video-editor upgrade. PR #84 merged (b676120). Canva, Figma, Ahrefs, Adobe connected; Sentry and Similarweb skipped (S15).
 - 2026-11-11 · Old hand-made `.codex/agents/*.toml` removed from the main checkout; generated ones in sync (`node scripts/sync-codex-agents.mjs --check`).
