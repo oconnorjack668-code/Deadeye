@@ -43,7 +43,10 @@ export function WhatParentsAgreeTo({ child }: { child: string }) {
       <h2 className="text-base font-bold text-white">The AI coach</h2>
       <p>
         When {child} asks for AI feedback, the numbers from that session (never videos) are sent to{' '}
-        {ai ? `our AI provider, ${ai},` : 'our AI provider'} to write the feedback. It can be switched off in Settings.
+        {ai ? `our AI provider, ${ai},` : 'our AI provider'} to write the feedback. If {child} imports a gym routine by
+        pasting it or adding a screenshot, only that text or picture is sent, to read the exercises out of it. Nothing
+        about {child}&apos;s account is sent with it, and the provider deletes it within 30 days (longer only if it is flagged for misuse). Both can be switched off
+        in Settings (AI coaching).
       </p>
 
       <h2 className="text-base font-bold text-white">You stay in control</h2>

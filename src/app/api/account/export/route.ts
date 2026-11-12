@@ -19,6 +19,9 @@ const USER_TABLES = [
   'workout_sets',
   'workout_routines',
   'routine_exercises',
+  // Imported programs, and when an import was read by the AI (00058)
+  'user_programs',
+  'routine_imports',
   'exercise_favorites',
   'exercise_library',
   'performance_tests',

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Trash2 } from 'lucide-react';
 
-export function DeleteRoutineButton({ routineId, name }: { routineId: string; name: string }) {
+export function DeleteRoutineButton({ routineId, name, programId = null }: { routineId: string; name: string; programId?: string | null }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
 
@@ -14,12 +14,23 @@ export function DeleteRoutineButton({ routineId, name }: { routineId: string; na
     setBusy(true);
     // Loaded on tap so the workouts list doesn't ship the Supabase library up front
     const { createClient } = await import('@/lib/supabase/client');
-    const { error } = await createClient().from('workout_routines').delete().eq('id', routineId);
-    setBusy(false);
+    const supabase = createClient();
+    const { error } = await supabase.from('workout_routines').delete().eq('id', routineId);
     if (error) {
+      setBusy(false);
       window.alert(`Could not delete the routine: ${error.message}`);
       return;
     }
+    // The last routine of an imported program takes the program with it, so
+    // an empty program (its name) is not kept where the player can't see it
+    if (programId) {
+      const { count } = await supabase
+        .from('workout_routines')
+        .select('id', { count: 'exact', head: true })
+        .eq('program_id', programId);
+      if (count === 0) await supabase.from('user_programs').delete().eq('id', programId);
+    }
+    setBusy(false);
     router.refresh();
   }
 

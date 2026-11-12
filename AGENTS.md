@@ -31,18 +31,27 @@ instead.
 - Keep durable project decisions in repository documentation, not only in an
   agent conversation. `CLAUDE.md` imports this file, so these rules apply to
   both agents.
-- Session handoffs: before picking up earlier work, read
-  `docs/handoffs/INDEX.md`; when a session ends, write one, following
-  `.claude/skills/handoff/SKILL.md`.
+- Status and handoffs: **read `docs/STATUS.md` first** in every session (it
+  is what is open now and recently done, and it wins over old handoffs and
+  memory notes; Claude Code gets it automatically at session start, Codex
+  must open it). For history, `docs/handoffs/INDEX.md`. When a session
+  ends, update STATUS and write a handoff, following
+  `.claude/skills/handoff/SKILL.md`. Never tell the founder an item is open
+  or broken from an old handoff without checking it is still true.
 - Agent OS: activation work (the weekly funnel loop, its backlog, its agents
   and their permissions) runs from `docs/agent-os/README.md`. Read it before
   taking a backlog item.
 - UI work: read `docs/design.md` (colours, spacing, components, what to
-  avoid) before adding or changing a screen.
+  avoid) before adding or changing a screen. The designer agent
+  (`.claude/agents/designer.md`) owns the look: its mockups in
+  `docs/agent-os/design/` and the trend board `docs/agent-os/trends/visual.md`.
 - Promo videos, social posts and anything else marketing: read
   `docs/agent-os/knowledge/marketing.md` first (the founder's past
-  corrections and the checklist), whichever agent does the work. Each Agent
-  OS agent keeps its own file in `docs/agent-os/knowledge/`.
+  corrections and the checklist), whichever agent does the work. Cutting or
+  re-cutting a video also means `docs/agent-os/knowledge/video-editor.md`,
+  `docs/agent-os/video/playbook.md` (the video editor's craft rules), the
+  `video-editor-playbook` skill and `docs/brand/video-style.md`.
+  Each Agent OS agent keeps its own file in `docs/agent-os/knowledge/`.
 - Never read, print, commit, or modify `.env.local`. Use `.env.example` for
   configuration requirements.
 - Before handing work over, run the smallest relevant verification, report the

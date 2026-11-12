@@ -97,6 +97,62 @@
       "schedule": "Mondays, and the 1st of the month",
       "skills": "fixed",
       "sources": 32
+    },
+    {
+      "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
+      "id": "video-editor",
+      "lastRun": "2026-11-10T12:14:00Z",
+      "lessons": 15,
+      "name": "Video editor",
+      "num": 8,
+      "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
+      "researched": "2026-11-10",
+      "role": "Cuts marketing's scripts and the founder's footage into finished TikTok and Reels videos. Never posts.",
+      "schedule": "On request, local only",
+      "skills": "fixed",
+      "sources": 55
+    },
+    {
+      "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
+      "id": "designer",
+      "lastRun": null,
+      "lessons": 1,
+      "name": "Designer",
+      "num": 9,
+      "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
+      "researched": "2026-11-11",
+      "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
+      "schedule": "On request, and before any screen change is built",
+      "skills": "new",
+      "sources": 70
+    },
+    {
+      "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
+      "id": "player-outreach",
+      "lastRun": null,
+      "lessons": 0,
+      "name": "Player outreach",
+      "num": 10,
+      "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
+      "researched": "2026-11-11",
+      "role": "Finds communities, adult creators, events and partners that bring in players, and drafts what you send. Never contacts anyone.",
+      "schedule": "Mondays",
+      "skills": "new",
+      "sources": 53
+    },
+    {
+      "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
+      "id": "qa-tester",
+      "lastRun": null,
+      "lessons": 0,
+      "name": "QA tester",
+      "num": 11,
+      "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
+      "researched": "2026-11-11",
+      "role": "Tests the live app like a new player on a phone, and reports what is broken before players find it.",
+      "schedule": "Mondays (signed-out in the cloud), full run in a local session",
+      "skills": "new",
+      "sources": 51
     }
   ],
   "backlog": [
@@ -279,6 +335,15 @@
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/80",
       "title": "Merge PR #80: landing demo says \"makes and misses\"",
       "words": "merge 80"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS (copy and credits links only, head d936be0); typegen, tsc, eslint pass; no migrations, no env vars.",
+      "id": "merge-86",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
+      "title": "Merge PR #86: overclaim wording fixed site-wide",
+      "words": "merge 86"
     }
   ],
   "clubs": {
@@ -511,12 +576,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (landing demo copy, 9 Nov) is running.",
+      "detail": "Live and up to date: the latest version (new agents, PR #94, 11 Nov) is running.",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "0 errors in the last 24 hours. 0 problem or crash reports open (9 Nov counts).",
+      "detail": "0 errors in the last 24 hours (checked 12 Nov). 0 problem or crash reports open (9 Nov counts).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -526,9 +591,9 @@
       "status": "warn"
     },
     {
-      "detail": "2 open, both docs or agent notes only (PR #81 handoff, PR #82 video-editor agent). Checks passed on both.",
+      "detail": "1 open: PR #87 (handoff notes, docs only). Checks passed, but it now clashes with newer changes on main and needs updating before it can merge.",
       "name": "Code changes",
-      "status": "ok"
+      "status": "warn"
     }
   ],
   "learn": [
@@ -558,6 +623,21 @@
     }
   ],
   "log": [
+    {
+      "at": "2026-11-12T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 1 open pull request (#87, docs only, checks green, clashes with main). Nothing urgent.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-11T11:00:00Z",
+      "text": "PR 86 re-checked at d936be0 (credits links added): safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-11T10:40:00Z",
+      "text": "PR 86 checked: safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-11T08:10:00Z",
       "text": "Morning check: 0 errors in 24h, live site up to date, 2 open pull requests (docs only, checks green). Nothing needs you.",
@@ -642,11 +722,6 @@
       "at": "2026-11-07T16:28:00Z",
       "text": "Training reminders working again.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-10-24T12:00:00Z",
-      "text": "Last new player joined.",
-      "tone": "warn"
     }
   ],
   "scoreboard": {
@@ -663,7 +738,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-11T08:10:00Z",
+  "updatedAt": "2026-11-12T08:10:00Z",
   "updatedBy": "Morning check",
   "version": 1
 }

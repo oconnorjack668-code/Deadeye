@@ -374,7 +374,7 @@ export function SettingsClient({
       <Section icon={Sparkles} title="AI coaching" id="ai-coaching">
         <Toggle
           label="AI coaching"
-          hint="Off hides Coach everywhere and stops your weekly report being written. Your sessions, stats and video all keep working exactly as they do now - this only turns off the commentary on top of them."
+          hint="Off hides Coach everywhere and stops your weekly report being written. Your sessions, stats and video all keep working exactly as they do now - this only turns off the commentary on top of them. It also stops routines being read from pasted text or screenshots (CSV import still works)."
           checked={s.ai_coaching_enabled}
           onChange={(v) => void save({ ai_coaching_enabled: v })}
         />

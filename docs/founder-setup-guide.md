@@ -75,10 +75,9 @@ offline first, and turn reminders back on."
    deadeye.ie; sign up as a 14-year-old with your own email as the parent and
    confirm the parent email arrives.
 
-While you're in Vercel, the **push keys** for training reminders are
-missing (they fail every day): run `npx web-push generate-vapid-keys`, add
-`NEXT_PUBLIC_VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` (Sensitive), redeploy
-once for both. Never change the pair after players subscribe.
+The **push keys** for training reminders (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`,
+`VAPID_PRIVATE_KEY`) are DONE: added in Vercel on 2026-11-07, reminders run
+fine since. Nothing to do. Never change the pair after players subscribe.
 
 ## Part 4: register the business and open Stripe (parent, about 1 hour)
 

@@ -5,10 +5,37 @@ import { createClient } from '@/lib/supabase/server';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
-import { Plus, Dumbbell, BookOpen, Award, ListChecks, ChevronRight, Apple } from 'lucide-react';
+import { Plus, Dumbbell, BookOpen, Award, ListChecks, ChevronRight, Apple, Download } from 'lucide-react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { DeleteRoutineButton } from './DeleteRoutineButton';
+import { DeleteProgramButton } from './DeleteProgramButton';
+
+interface Routine {
+  id: string;
+  name: string;
+  program_id?: string | null;
+  day_order: number;
+  routine_exercises: Array<{ exercise_name: string; display_order: number }>;
+}
+
+function RoutineRow({ routine }: { routine: Routine }) {
+  const names = [...routine.routine_exercises].sort((a, b) => a.display_order - b.display_order).map((x) => x.exercise_name);
+  return (
+    <div className="flex items-center justify-between gap-3 py-3">
+      <div className="min-w-0">
+        <div className="font-semibold text-white">{routine.name}</div>
+        <div className="text-xs text-zinc-500 truncate">{names.join(', ') || 'No exercises'}</div>
+      </div>
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <DeleteRoutineButton routineId={routine.id} name={routine.name} programId={routine.program_id ?? null} />
+        <Link href={`/workouts/new?routine=${routine.id}`}>
+          <Button variant="secondary" size="sm">Start</Button>
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -20,7 +47,7 @@ export default async function WorkoutsPage() {
   const user = await requireUser();
   const supabase = await createClient();
 
-  const [{ data: workouts }, { data: routines }] = (await Promise.all([
+  const [{ data: workouts }, { data: routinesWithDays, error: routinesError }, { data: programs }] = (await Promise.all([
     supabase
       .from('workouts')
       .select('id, workout_type, workout_date, duration_minutes, rpe, workout_sets(count)')
@@ -30,9 +57,10 @@ export default async function WorkoutsPage() {
       .limit(15),
     supabase
       .from('workout_routines')
-      .select('id, name, routine_exercises(exercise_name, display_order)')
+      .select('id, name, program_id, day_order, routine_exercises(exercise_name, display_order)')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false }),
+    supabase.from('user_programs').select('id, name').eq('user_id', user.id).order('created_at', { ascending: false }),
   ])) as [
     {
       data: Array<{
@@ -44,8 +72,33 @@ export default async function WorkoutsPage() {
         workout_sets: Array<{ count: number }>;
       }> | null;
     },
-    { data: Array<{ id: string; name: string; routine_exercises: Array<{ exercise_name: string; display_order: number }> }> | null },
+    { data: Routine[] | null; error: unknown },
+    // null before migration 00058 is run: every routine then shows on its own
+    { data: Array<{ id: string; name: string }> | null },
   ];
+
+  // Before migration 00058 the program columns are missing and that query fails;
+  // ask again without them so the routines still show
+  const routines: Routine[] | null = routinesError
+    ? (((
+        await supabase
+          .from('workout_routines')
+          .select('id, name, routine_exercises(exercise_name, display_order)')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+      ).data || []) as unknown as Array<Omit<Routine, 'day_order'>>).map((r) => ({ ...r, day_order: 0 }))
+    : routinesWithDays;
+
+  // Imported programs keep their routines together, in day order; a routine
+  // whose program is not found shows on its own rather than disappearing
+  const programList = (programs || [])
+    .map((p) => ({
+      ...p,
+      routines: (routines || []).filter((r) => r.program_id === p.id).sort((a, b) => a.day_order - b.day_order),
+    }))
+    .filter((p) => p.routines.length > 0);
+  const inProgram = new Set(programList.flatMap((p) => p.routines.map((r) => r.id)));
+  const singleRoutines = (routines || []).filter((r) => !inProgram.has(r.id));
 
   return (
     <div className="flex-1 overflow-auto">
@@ -107,37 +160,52 @@ export default async function WorkoutsPage() {
         </Link>
 
         {/* Routines */}
-        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-3">
-          <ListChecks className="h-5 w-5 text-emerald-400" /> My routines
-        </h2>
-        {routines && routines.length > 0 ? (
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <ListChecks className="h-5 w-5 text-emerald-400" /> My routines
+          </h2>
+          <Link href="/workouts/import">
+            <Button variant="secondary" size="sm">
+              <Download className="h-4 w-4" /> Import
+            </Button>
+          </Link>
+        </div>
+        {programList.length > 0 || singleRoutines.length > 0 ? (
           <div className="space-y-2 mb-8">
-            {routines.map((r) => {
-              const names = [...r.routine_exercises]
-                .sort((a, b) => a.display_order - b.display_order)
-                .map((x) => x.exercise_name);
-              return (
-                <Card key={r.id} className="border-zinc-800 bg-zinc-900/70">
-                  <CardContent className="p-4 flex items-center justify-between gap-3">
+            {programList.map((p) => (
+              <Card key={p.id} className="border-zinc-800 bg-zinc-900/70">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="font-semibold text-white">{r.name}</div>
-                      <div className="text-xs text-zinc-500 truncate">{names.join(', ') || 'No exercises'}</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Program</div>
+                      <div className="font-semibold text-white truncate">{p.name}</div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <DeleteRoutineButton routineId={r.id} name={r.name} />
-                      <Link href={`/workouts/new?routine=${r.id}`}>
-                        <Button variant="secondary" size="sm">Start</Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    <DeleteProgramButton programId={p.id} name={p.name} />
+                  </div>
+                  <div className="mt-2 divide-y divide-zinc-800">
+                    {p.routines.map((r) => (
+                      <RoutineRow key={r.id} routine={r} />
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            {singleRoutines.map((r) => (
+              <Card key={r.id} className="border-zinc-800 bg-zinc-900/70">
+                <CardContent className="px-4 py-1">
+                  <RoutineRow routine={r} />
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : (
           <div className="mb-8 rounded-2xl border border-dashed border-zinc-700 p-5">
             <p className="text-sm text-zinc-400">
-              Finish a workout, save it as a routine, and start it again here with one tap.
+              Finish a workout, save it as a routine, and start it again here with one tap. Or{' '}
+              <Link href="/workouts/import" className="font-semibold text-zinc-200 underline">
+                import your routines
+              </Link>{' '}
+              from another gym app.
             </p>
           </div>
         )}

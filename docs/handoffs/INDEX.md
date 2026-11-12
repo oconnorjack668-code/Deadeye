@@ -2,6 +2,14 @@
 
 One line per session, newest first. Open a handoff only when its line matches the task; `.claude/skills/handoff/SKILL.md` has the format. Older lines live in `archive.md`.
 
+**What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
+
+- 2026-11-11 · new-agents · Designer, player-outreach and QA tester agents; weekly TikTok trend scan → [handoff](2026-11-11-new-agents.md)
+- 2026-11-11 · planner-ty-timetable · Personal planner synced across devices; TY timetable doc; Opera browser connected → [handoff](2026-11-11-planner-ty-timetable.md)
+- 2026-11-11 · routine-import · Gym routine import live (paste, screenshot, CSV); safety reviewed twice · open: 1 → [handoff](2026-11-11-routine-import.md)
+- 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)
+- 2026-11-11 · marketing-video-editor · Video-editor agent merged; Tuesday video v4 ready; marketing week plan · open: 7 → [handoff](2026-11-11-marketing-video-editor.md)
+- 2026-11-09 · hq-redesign-worker · Deadeye HQ redesign, chat, hub worker; E4 shipped and checked live · open: 3 → [handoff](2026-11-09-hq-redesign-worker.md)
 - 2026-11-09 · agent-hub-routines · Deadeye Bench hub; weekly run pushes again; 4 new routines; proxy fix · open: 3 → [handoff](2026-11-09-agent-hub-routines.md)
 - 2026-11-09 · e4-dashboard-reminder · Reminders card on dashboard for zero-session players; reminder_set marker · open: 2 → [handoff](2026-11-09-e4-dashboard-reminder.md)
 - 2026-11-09 · agent-learning-safety · Agents learn from research; streak opt-in under 18; AI safeguards; DPIA draft · open: 4 → [handoff](2026-11-09-agent-learning-safety.md)
@@ -27,8 +35,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-22 · marketing-agent · Marketing and social agent; skills for every agent, failures reported · open: 2 → [handoff](2026-10-22-marketing-agent.md)
 - 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
 - 2026-10-22 · follow-founder · Follow the founder; founder posts on followers dashboards · open: 4 → [handoff](2026-10-22-follow-founder.md)
-- 2026-10-22 · founder-badge · Founder badge on card and leaderboard; no Add friend on founder · open: 3 → [handoff](2026-10-22-founder-badge.md)
-- 2026-10-22 · icon-and-photos · Deadeye favicon; profile photos on leaderboard and top bar · open: 3 → [handoff](2026-10-22-icon-and-photos.md)
-- 2026-10-22 · tester-reset · Tester logins can reset to a brand-new player from Settings, live · open: none → [handoff](2026-10-22-tester-reset.md)
-- 2026-10-22 · agent-os-first-loop · First weekly loop: report, fresh counts, E1 shipped and checked live · open: 2 → [handoff](2026-10-22-agent-os-first-loop.md)
-- 2026-10-22 · agent-os · Agent OS v1: activation analyst leads a weekly build loop · open: 4 → [handoff](2026-10-22-agent-os.md)

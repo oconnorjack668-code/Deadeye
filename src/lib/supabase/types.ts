@@ -1790,9 +1790,41 @@ export interface Database {
         Relationships: [];
       };
       workout_routines: {
-        Row: { id: string; user_id: string; name: string; notes: string | null; created_at: string; updated_at: string };
-        Insert: { id?: string; user_id: string; name: string; notes?: string | null; created_at?: string; updated_at?: string };
-        Update: { name?: string; notes?: string | null; updated_at?: string };
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+          // Added by 00058_routine_import.sql
+          program_id: string | null;
+          day_order: number;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          notes?: string | null;
+          created_at?: string;
+          updated_at?: string;
+          program_id?: string | null;
+          day_order?: number;
+        };
+        Update: { name?: string; notes?: string | null; updated_at?: string; program_id?: string | null; day_order?: number };
+        Relationships: [];
+      };
+      // 00058_routine_import.sql
+      user_programs: {
+        Row: { id: string; user_id: string; name: string; source: 'text' | 'image' | 'csv' | null; created_at: string };
+        Insert: { id?: string; user_id: string; name: string; source?: 'text' | 'image' | 'csv' | null; created_at?: string };
+        Update: { name?: string };
+        Relationships: [];
+      };
+      routine_imports: {
+        Row: { id: string; user_id: string; source: 'text' | 'image'; created_at: string };
+        Insert: { id?: string; user_id: string; source: 'text' | 'image'; created_at?: string };
+        Update: never;
         Relationships: [];
       };
       routine_exercises: {
@@ -1804,6 +1836,9 @@ export interface Database {
           exercise_name: string;
           target_sets: number;
           display_order: number;
+          // Added by 00058_routine_import.sql
+          target_reps: string | null;
+          notes: string | null;
         };
         Insert: {
           id?: string;
@@ -1813,8 +1848,10 @@ export interface Database {
           exercise_name: string;
           target_sets?: number;
           display_order?: number;
+          target_reps?: string | null;
+          notes?: string | null;
         };
-        Update: { target_sets?: number; display_order?: number };
+        Update: { target_sets?: number; display_order?: number; target_reps?: string | null; notes?: string | null };
         Relationships: [];
       };
       exercise_favorites: {
