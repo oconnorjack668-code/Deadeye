@@ -208,6 +208,23 @@
   ],
   "calls": [
     {
+      "id": "mkt-weekend",
+      "kind": "approve",
+      "agent": "marketing",
+      "title": "Weekend posts, Fri 13 to Sun 15",
+      "detail": "Fri: a screen video of logging a session without a court, plus a founder post in the app. Sat: one question from the IQ section as a Story quiz. Sun: a screen video of \"Find the hoop for me\" at an empty hoop. No people in any of them, so no consent is needed. Full drafts in docs/agent-os/marketing/2026-11-12-weekend.md.",
+      "onApprove": "Marketing writes each post in full, ready for you to record and post yourself.",
+      "due": "2026-11-13"
+    },
+    {
+      "id": "mkt-next-ideas",
+      "kind": "approve",
+      "agent": "marketing",
+      "title": "Next week's first two video ideas",
+      "detail": "1. A 60-second makes challenge, filmed from behind by you or an adult, with the phone on a bag and nobody else in the hall. 2. The promo with three openings, once you pick A, B or C and the clip with a face is cleared or cut.",
+      "onApprove": "Marketing scripts both for Monday's plan and hands them to the video editor."
+    },
+    {
       "agent": "marketing",
       "detail": "The same 24.5-second promo with three different first 3 seconds. A: the live count ticking. B: the first make, 1/1. C: \"Do you count your makes in your head?\". Pick one before approving.",
       "id": "mkt-openings",
@@ -219,30 +236,6 @@
         "C"
       ],
       "title": "Pick the promo opening to test first"
-    },
-    {
-      "agent": "marketing",
-      "detail": "Mon promo, Tue Story poll, Wed \"log it in 20 seconds\", Thu 5-spot challenge (needs filming), Fri promo with a second opening, Sat IQ question, Sun round-up. Full plan under Clubs and content.",
-      "id": "mkt-week",
-      "kind": "approve",
-      "onApprove": "Marketing writes every post in full, ready for you to copy and post yourself.",
-      "title": "This week's posting calendar"
-    },
-    {
-      "agent": "marketing",
-      "detail": "1. You can log a session without a court in about 20 seconds. 2. This week's 5-spot challenge. Remove \"I read every one\" if that isn't true.",
-      "id": "mkt-founder-posts",
-      "kind": "approve",
-      "onApprove": "Marketing finalises both posts for you to paste into Owner tools, Founder posts.",
-      "title": "Two founder posts for players in the app"
-    },
-    {
-      "agent": "marketing",
-      "detail": "The demo paragraph still says \"every\", which the tracker can't promise. It should say \"counts your makes and misses\".",
-      "id": "mkt-landing-every",
-      "kind": "approve",
-      "onApprove": "The builder makes the one-line fix and it comes back here as code ready to go live.",
-      "title": "Fix \"count every make and miss\" on the landing page"
     },
     {
       "agent": "marketing",
@@ -435,42 +428,22 @@
   "film": {
     "days": [
       {
-        "day": "Mon 9",
-        "post": "Promo, opening A",
-        "where": "TikTok 17:00 · Reel 18:00"
-      },
-      {
-        "day": "Tue 10",
-        "post": "Demo on a phone, poll: do you count your makes?",
-        "where": "IG Story 18:00"
-      },
-      {
-        "day": "Wed 11",
-        "post": "Log it in 20 seconds, no court",
+        "day": "Fri 13",
+        "post": "Log it before you forget (screen video) + founder post",
         "where": "TikTok 17:00 · Reel 17:30"
       },
       {
-        "day": "Thu 12",
-        "post": "5-spot challenge (needs filming)",
-        "where": "TikTok 17:30 · Reel 18:00"
-      },
-      {
-        "day": "Fri 13",
-        "post": "Promo, opening B or C",
-        "where": "TikTok 17:00 · Reel 18:00"
-      },
-      {
         "day": "Sat 14",
-        "post": "Film IQ: one question",
-        "where": "IG Story"
+        "post": "One IQ question, quiz sticker",
+        "where": "IG Story 12:00"
       },
       {
         "day": "Sun 15",
-        "post": "Challenge round-up, counts only",
-        "where": "IG Story 17:00"
+        "post": "Find the hoop for me (screen video, empty hoop); IQ answer",
+        "where": "TikTok 11:00 · Reel 12:00 · Story 17:00"
       }
     ],
-    "experiment": "One promo, three openings. Keep the opening with the best 6-second hold once each has about 1,000 views."
+    "experiment": "Paused until the promo opening is picked: one promo, three openings, keep the one with the best 6-second hold once each has about 1,000 views."
   },
   "funnel": {
     "history": [
@@ -624,6 +597,11 @@
   ],
   "log": [
     {
+      "at": "2026-11-12T10:11:23Z",
+      "text": "Marketing mid-week: weekend posts drafted (screen videos and a Story, no people). Landing fix closed. Last week's calendar and founder posts replaced by the weekend call. No new post numbers yet.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-12T08:10:00Z",
       "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 1 open pull request (#87, docs only, checks green, clashes with main). Nothing urgent.",
       "tone": "ok"
@@ -717,11 +695,6 @@
       "at": "2026-11-09T09:05:00Z",
       "text": "This week's first agent run couldn't save to GitHub; fixed and re-run at 12:14.",
       "tone": "bad"
-    },
-    {
-      "at": "2026-11-07T16:28:00Z",
-      "text": "Training reminders working again.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -738,7 +711,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-12T08:10:00Z",
-  "updatedBy": "Morning check",
+  "updatedAt": "2026-11-12T10:11:23Z",
+  "updatedBy": "Marketing mid-week",
   "version": 1
 }

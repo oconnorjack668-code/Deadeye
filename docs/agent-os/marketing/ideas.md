@@ -3,7 +3,7 @@
 The marketing agent's running list, newest first. Status: `idea` · `approved` · `posted` · `dropped`.
 The founder approves and posts; the agent never does.
 
-Drafts: [2026-11-09-plan.md](2026-11-09-plan.md) (the founder's week) and [2026-11-09-plan-weekly-run.md](2026-11-09-plan-weekly-run.md) (the scheduled run, same day), and [2026-11-09-scripts.md](2026-11-09-scripts.md)
+Drafts: [2026-11-12-weekend.md](2026-11-12-weekend.md) (weekend 13 to 15 Nov, mid-week run); [2026-11-09-plan.md](2026-11-09-plan.md) (the founder's week) and [2026-11-09-plan-weekly-run.md](2026-11-09-plan-weekly-run.md) (the scheduled run, same day), and [2026-11-09-scripts.md](2026-11-09-scripts.md)
 for the 9 Nov items; [2026-10-23-first-promo.md](2026-10-23-first-promo.md) for the older ones.
 Results: [results.md](results.md).
 
