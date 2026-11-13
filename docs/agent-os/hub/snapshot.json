@@ -26,21 +26,21 @@
       "role": "Builds the NEXT experiment on its own branch, with tests.",
       "schedule": "Mondays, after the analyst",
       "skills": "fixed",
-      "sources": 23
+      "sources": 27
     },
     {
       "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds.",
       "id": "safety-reviewer",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 0,
+      "lessons": 1,
       "name": "Safety reviewer",
       "num": 3,
       "output": "E4: PASS with three non-blocking notes.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-11",
       "role": "Checks every branch for under-18s, parents, personal data and messages.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 19
+      "sources": 28
     },
     {
       "ask": "Ask the release checker for the after-deploy checklist for PR #74.",
@@ -54,7 +54,7 @@
       "role": "Types, lint, tests, migrations, env vars, and your step-by-step checklist.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 16
+      "sources": 18
     },
     {
       "ask": "Ask support triage to check last night's live errors in Vercel.",
@@ -74,15 +74,15 @@
       "ask": "Ask marketing to script the 5-spot challenge video shot by shot.",
       "id": "marketing",
       "lastRun": "2026-11-09T12:16:00Z",
-      "lessons": 8,
+      "lessons": 6,
       "name": "Marketing",
       "num": 6,
       "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-09",
       "role": "TikTok and Instagram ideas, scripts and posts. Drafts only.",
       "schedule": "Mondays, and Thursdays 10:00",
       "skills": "fixed",
-      "sources": 33
+      "sources": 50
     },
     {
       "ask": "Ask club growth to prep me for a call with the Wexford Blazers coach.",
@@ -102,21 +102,21 @@
       "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
       "id": "video-editor",
       "lastRun": "2026-11-10T12:14:00Z",
-      "lessons": 15,
+      "lessons": 19,
       "name": "Video editor",
       "num": 8,
       "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
-      "researched": "2026-11-10",
+      "researched": "2026-11-11",
       "role": "Cuts marketing's scripts and the founder's footage into finished TikTok and Reels videos. Never posts.",
       "schedule": "On request, local only",
       "skills": "fixed",
-      "sources": 55
+      "sources": 84
     },
     {
       "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
       "id": "designer",
       "lastRun": null,
-      "lessons": 1,
+      "lessons": 2,
       "name": "Designer",
       "num": 9,
       "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
@@ -124,13 +124,13 @@
       "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
       "schedule": "On request, and before any screen change is built",
       "skills": "new",
-      "sources": 70
+      "sources": 68
     },
     {
       "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
       "id": "player-outreach",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 1,
       "name": "Player outreach",
       "num": 10,
       "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
@@ -144,7 +144,7 @@
       "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
       "id": "qa-tester",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 1,
       "name": "QA tester",
       "num": 11,
       "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
@@ -571,31 +571,48 @@
   ],
   "learn": [
     {
-      "agent": "marketing",
-      "date": "2026-11-07",
-      "latest": "Check the whole video yourself, frame by frame where things move, before the founder sees it. Show a finished cut, not a draft to proofread.",
-      "lessons": 8
+      "agent": "designer",
+      "date": "2026-11-13",
+      "latest": "Review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from stills at one size.",
+      "lessons": 2
     },
     {
-      "agent": "builder",
-      "date": "2026-11-03",
-      "latest": "Build locally with Turbopack (plain next build), never --webpack; run any worker on the live site before calling it done.",
-      "lessons": 13
+      "agent": "video-editor",
+      "date": "2026-11-11",
+      "latest": "Follow the playbook: a real voice first, or a synthetic one the founder picked; captions from the voice track's transcript; registry effects before hand-built ones; a planned music bed; one finished, checked cut.",
+      "lessons": 19
+    },
+    {
+      "agent": "safety-reviewer",
+      "date": "2026-11-11",
+      "latest": "When I ask for a retention, I say it must run on a schedule, not on the player's next use.",
+      "lessons": 1
+    },
+    {
+      "agent": "player-outreach",
+      "date": "2026-11-11",
+      "latest": "The job is players who log a first session; a route is kept or dropped on that, not on visits.",
+      "lessons": 1
+    },
+    {
+      "agent": "marketing",
+      "date": "2026-11-09",
+      "latest": "Until the redesign ships, never make the flame or MAKE/MISS banners the hero; lean on the real shot, the ball going in, the numbers and the slow-mo replay.",
+      "lessons": 6
     },
     {
       "agent": "release-checker",
       "date": "2026-11-07",
-      "latest": "Every variable in .env.example that the changed code reads must be confirmed in Vercel Production by name.",
+      "latest": "Every variable in .env.example that the changed code reads must be confirmed as set in Vercel Production, by name, before merge.",
       "lessons": 9
-    },
-    {
-      "agent": "support-triage",
-      "date": "2026-11-07",
-      "latest": "Silent failures (cron, push, email) never arrive as reports. Read /admin/cron-runs and the counts too.",
-      "lessons": 7
     }
   ],
   "log": [
+    {
+      "at": "2026-11-13T16:30:00Z",
+      "text": "Learning digest: 26 new lessons this week (video editor 15, marketing 3, designer 2, release checker 2, support triage 2, player outreach 1, safety reviewer 1). No research due.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-13T08:10:00Z",
       "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 2 open pull requests, checks green: #95 (agent runs) ready, #87 clashes with main. Nothing urgent.",
@@ -690,11 +707,6 @@
       "at": "2026-11-09T14:14:00Z",
       "text": "Morning check: no errors, live site up to date, no urgent problems.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:32:00Z",
-      "text": "PR #73 merged and live: sign-in fix.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -711,7 +723,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-13T08:10:00Z",
-  "updatedBy": "Morning check",
+  "updatedAt": "2026-11-13T16:30:00Z",
+  "updatedBy": "Learning digest",
   "version": 1
 }
