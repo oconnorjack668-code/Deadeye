@@ -5,7 +5,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { AICoachError, assertAiEnabled, refundCredit, reserveCredit } from '@/lib/ai/service';
-import { needsSupportLine, SUPPORT_LINE } from '@/lib/ai/safety';
 import { isStaff } from '@/lib/coachSide';
 import type { Database } from '@/lib/supabase/types';
 import { buildCatalogue, buildFocusPrompt, namesForRefs, parseFocusPlan, FOCUS_PROMPT_VERSION, MAX_FOCUS_TEXT, type FocusAiPlan } from './ai';
@@ -23,8 +22,6 @@ export interface FocusRequest {
 export interface SavedFocusPlan {
   id: string;
   plan: FocusAiPlan;
-  /** Childline and other help lines, when the description suggests distress */
-  support?: string;
 }
 
 /** What is stored in ai_reports.output_content. summary + recommendations keep /ai-coach's report card readable. */
@@ -116,7 +113,10 @@ export async function generateFocusPlan(userId: string, req: FocusRequest): Prom
     .insert({
       user_id: userId,
       report_type: 'development_plan',
-      input_data: { text: req.text, weaknessIds, mode: req.mode, teamId: req.teamId ?? null, evidence: evidence.map((e) => e.reason) } as unknown as Json,
+      // What they wrote is used to make the plan and not kept: nothing reads it
+      // back, and a teenager's description of their game can hold health or
+      // distress details (safety review, 13 Nov 2026)
+      input_data: { weaknessIds, mode: req.mode, teamId: req.teamId ?? null, evidence: evidence.map((e) => e.reason) } as unknown as Json,
       provider: ai.provider.name,
       model: ai.config.model,
       prompt_version: FOCUS_PROMPT_VERSION,
@@ -131,7 +131,9 @@ export async function generateFocusPlan(userId: string, req: FocusRequest): Prom
     throw new AICoachError('Could not save the plan.', 500);
   }
 
-  return { id: report.id, plan, support: needsSupportLine(req.text) ? SUPPORT_LINE : undefined };
+  // The support line is shown in the browser from the text itself, so it
+  // appears whether or not the AI plan succeeds (FocusFinder.tsx)
+  return { id: report.id, plan };
 }
 
 /** A saved plan of the player's own (RLS), or null. */

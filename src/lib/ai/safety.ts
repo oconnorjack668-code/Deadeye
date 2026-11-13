@@ -33,6 +33,16 @@ export function needsSupportLine(message: string): boolean {
   return SIGNALS.some((re) => re.test(message));
 }
 
+/**
+ * Pain, injury or illness words in a player's description of their game.
+ * Focus Finder answers weaknesses with skill drills, so when the "weakness"
+ * may be an injury it says to get it checked first. "chest" alone would catch
+ * a chest pass, so only "chest pain" counts.
+ */
+export function mentionsPain(text: string): boolean {
+  return /\b(pain(ful)?|hurts?|hurting|injur\w*|sore|aches?|aching|dizz\w*|chest pains?|sprain\w*|swollen|limp(ing)?)\b/i.test(text);
+}
+
 /** The reply with the support line added once, at the end, when the message calls for it. */
 export function withSupportLine(message: string, reply: string): string {
   if (!needsSupportLine(message) || reply.includes('1800 66 66 66')) return reply;

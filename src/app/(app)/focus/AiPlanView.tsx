@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { BookOpen, CalendarDays, Film, Lock, Sparkles, Target, TrendingUp, X } from 'lucide-react';
-import { Alert } from '@/components/ui/Alert';
 import { Badge } from '@/components/ui/Badge';
 import type { FocusAiPlan } from '@/lib/focus/ai';
 import type { FocusDrill, FocusGuide, FocusLesson } from '@/lib/focus/plan';
@@ -27,14 +26,12 @@ export function AiPlanView({
   drillsById,
   lessonsById,
   guidesBySlug,
-  support,
   onClose,
 }: {
   plan: FocusAiPlan;
   drillsById: Map<string, FocusDrill>;
   lessonsById: Map<string, FocusLesson>;
   guidesBySlug: Map<string, FocusGuide>;
-  support: string | null;
   onClose: () => void;
 }) {
   const film = plan.film.map((f) => ({ ...f, lesson: lessonsById.get(f.lessonId) })).filter((f) => f.lesson);
@@ -54,12 +51,6 @@ export function AiPlanView({
           <X className="h-5 w-5" />
         </button>
       </div>
-
-      {support && (
-        <Alert variant="warning" title="You are not on your own">
-          {support}
-        </Alert>
-      )}
 
       {plan.focus.length > 0 && (
         <ul className="space-y-1">
@@ -166,7 +157,7 @@ export function AiPlanView({
         </p>
       )}
 
-      <p className="text-xs text-zinc-500">
+      <p className="text-xs text-zinc-400">
         Saved. It is also in{' '}
         <Link href="/ai-coach" className="underline">
           AI Coach

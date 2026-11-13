@@ -14,6 +14,7 @@ import { buildFocusPlan, focusLink, subSkillLabel, type FocusContent, type Focus
 import type { DataSignal } from '@/lib/focus/signals';
 import type { FocusAiPlan } from '@/lib/focus/ai';
 import { MAX_FOCUS_TEXT } from '@/lib/focus/ai';
+import { mentionsPain, needsSupportLine, SUPPORT_LINE } from '@/lib/ai/safety';
 import { AiPlanView } from './AiPlanView';
 
 export interface CoachTeam {
@@ -63,7 +64,6 @@ export function FocusFinder(props: {
   signals: DataSignal[];
   teams: CoachTeam[];
   initialIds: string[];
-  initialText: string;
   initialMode: FocusMode;
   initialTeamId: string | null;
   fromCoach: boolean;
@@ -71,13 +71,15 @@ export function FocusFinder(props: {
   savedPlan: { id: string; plan: FocusAiPlan } | null;
   recentPlans: Array<{ id: string; createdAt: string; summary: string }>;
   aiBlocked: string | null;
+  /** The company AI requests go to, for the notice by the button (null when AI is off) */
+  aiCompany: string | null;
   reportsLeft: number | null;
   myId: string;
 }) {
   const { content, signals, teams } = props;
   const router = useRouter();
 
-  const [text, setText] = useState(props.initialText);
+  const [text, setText] = useState('');
   const [manual, setManual] = useState<string[]>(props.initialIds);
   const [dismissed, setDismissed] = useState<string[]>([]);
   const [mode, setMode] = useState<FocusMode>(props.initialMode);
@@ -85,7 +87,6 @@ export function FocusFinder(props: {
   const [limitHint, setLimitHint] = useState(false);
 
   const [ai, setAi] = useState(props.savedPlan);
-  const [support, setSupport] = useState<string | null>(null);
   const [aiBusy, setAiBusy] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
@@ -127,20 +128,18 @@ export function FocusFinder(props: {
   async function makeAiPlan() {
     setAiBusy(true);
     setAiError(null);
-    setSupport(null);
     try {
       const res = await fetch('/api/focus/plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, weaknessIds: selected, mode, teamId: mode === 'team' ? teamId : null }),
       });
-      const body = (await res.json().catch(() => null)) as { id?: string; plan?: FocusAiPlan; support?: string; error?: string } | null;
+      const body = (await res.json().catch(() => null)) as { id?: string; plan?: FocusAiPlan; error?: string } | null;
       if (!res.ok || !body?.id || !body.plan) {
         setAiError(body?.error || 'Could not make the plan. Please try again.');
         return;
       }
       setAi({ id: body.id, plan: body.plan });
-      setSupport(body.support ?? null);
       router.replace(`/focus?plan=${body.id}`, { scroll: false });
     } catch {
       setAiError('No connection. Check your signal and try again.');
@@ -243,6 +242,21 @@ export function FocusFinder(props: {
           }
           className="w-full rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2 text-base text-white placeholder:text-zinc-500 focus:border-orange-500 focus:outline-none"
         />
+        <p className="text-sm text-zinc-400">Leave out names, yours or anyone else&apos;s.</p>
+
+        {/* From the words themselves, in the browser: the help line must not
+            depend on an AI plan succeeding, or on asking for one at all
+            (safety review, 13 Nov 2026). safety.ts has no server imports. */}
+        {needsSupportLine(text) && (
+          <Alert variant="warning" title="You are not on your own">
+            {SUPPORT_LINE}
+          </Alert>
+        )}
+        {mentionsPain(text) && (
+          <Alert variant="info" title="If something hurts">
+            Stop and see a doctor or physio before you train it. These drills are for skills, never for playing through pain.
+          </Alert>
+        )}
 
         {selected.length > 0 ? (
           <div>
@@ -314,7 +328,6 @@ export function FocusFinder(props: {
           drillsById={drillsById}
           lessonsById={lessonsById}
           guidesBySlug={guidesBySlug}
-          support={support}
           onClose={() => {
             setAi(null);
             router.replace('/focus', { scroll: false });
@@ -482,9 +495,10 @@ export function FocusFinder(props: {
                 >
                   <Sparkles className="mr-2 h-5 w-5" /> {ai ? 'Make a new week plan with AI' : 'Make it a week plan with AI'}
                 </Button>
-                <p className="text-sm text-zinc-500">
+                <p className="text-sm text-zinc-400">
                   Deadeye Coach reads {mode === 'team' ? 'what you wrote' : 'what you wrote and your logged numbers'}, then picks and orders these drills and lessons
-                  into a week, saying why each one fits. It only uses what is in the app.{' '}
+                  into a week, saying why each one fits. It only uses what is in the app. What you wrote goes to{' '}
+                  {props.aiCompany ?? 'our AI provider'}, which deletes it within 30 days; Deadeye keeps the plan, not your words.{' '}
                   {props.reportsLeft === null
                     ? 'Unlimited on your plan.'
                     : props.reportsLeft === 0

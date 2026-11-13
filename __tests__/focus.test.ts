@@ -303,7 +303,7 @@ describe('dataSignals', () => {
     });
     expect(signals).toEqual([
       { weaknessId: 'pnr_reads', source: 'iq', reason: 'Daily IQ on Pick & Roll Reads: 1 of 3 right' },
-      { weaknessId: 'reading_defense', source: 'film', reason: 'Your coach called 2 of 3 reads in your film the wrong read' },
+      { weaknessId: 'reading_defense', source: 'film', reason: 'Your coach saw a better option on 2 of your 3 film reads. Film study helps with this.' },
     ]);
   });
 

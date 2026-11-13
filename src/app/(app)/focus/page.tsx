@@ -21,7 +21,8 @@ import { FocusFinder, type CoachTeam } from './FocusFinder';
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Focus Finder - Deadeye' };
 
-type Search = { w?: string; q?: string; plan?: string; from?: string; team?: string; mode?: string };
+// No ?q= text prefill: a crafted link could put words in a child's box (safety review, 13 Nov 2026)
+type Search = { w?: string; plan?: string; from?: string; team?: string; mode?: string };
 
 export default async function FocusPage({ searchParams }: { searchParams: Promise<Search> }) {
   const user = await requireUser();
@@ -72,7 +73,7 @@ export default async function FocusPage({ searchParams }: { searchParams: Promis
           signals={signals}
           teams={teams}
           initialIds={saved ? saved.weaknessIds : cleanWeaknessIds(params.w)}
-          initialText={typeof params.q === 'string' ? params.q.slice(0, 600) : ''}
+          aiCompany={aiProviderCompany()}
           initialMode={teams.length ? (saved?.mode ?? startMode) : 'player'}
           initialTeamId={teams.find((t) => t.id === params.team)?.id ?? teams[0]?.id ?? null}
           fromCoach={params.from === 'coach'}

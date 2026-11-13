@@ -45,8 +45,11 @@ export function WhatParentsAgreeTo({ child }: { child: string }) {
         When {child} asks for AI feedback, the numbers from that session (never videos) are sent to{' '}
         {ai ? `our AI provider, ${ai},` : 'our AI provider'} to write the feedback. If {child} imports a gym routine by
         pasting it or adding a screenshot, only that text or picture is sent, to read the exercises out of it. Nothing
-        about {child}&apos;s account is sent with it, and the provider deletes it within 30 days (longer only if it is flagged for misuse). Both can be switched off
-        in Settings (AI coaching).
+        about {child}&apos;s account is sent with it, and the provider deletes it within 30 days (longer only if it is flagged for misuse).
+        If {child} asks Focus Finder for an AI week plan, what they wrote about their game, the weaknesses they picked,
+        their position and level, the goals they picked at setup, and their make rates, daily IQ scores and how many of
+        their film reads a coach marked wrong are sent too, never their name. Deadeye keeps the plan, not what they
+        wrote. All of these can be switched off in Settings (AI coaching).
       </p>
 
       <h2 className="text-base font-bold text-white">You stay in control</h2>

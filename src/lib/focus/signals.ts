@@ -137,7 +137,8 @@ function filmSignals(verdicts: Array<string | null>): DataSignal[] {
     {
       weaknessId: 'reading_defense',
       source: 'film',
-      reason: `Your coach called ${wrong} of ${judged} reads in your film the wrong read`,
+      // Kind to a 13 year old: a different read, not a failure (safety review, 13 Nov 2026)
+      reason: `Your coach saw a better option on ${wrong} of your ${judged} film reads. Film study helps with this.`,
     },
   ];
 }
