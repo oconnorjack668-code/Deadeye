@@ -51,10 +51,11 @@ Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
 | S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
 | S26 | Merge PR #96 (docs only: 13 Nov handoff, S23 closed). | Founder | 2026-11-13 | 2026-11-13: open |
 | S25 | First runs of the new agents (on main since 11 Nov): designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-13: not run yet |
-| S27 | Drill and exercise demo videos: migration `00059` (PR from branch `worktree-drill-demo-videos`) fills 165 of 168 drills and all 167 exercises, each id checked live. Merge PR #100, then run it in the Supabase SQL editor. No good video found (they keep the YouTube search link): lane-line-touches, game-winner-countdown, spacing-drive-and-drift. About 100 picks are close matches rather than exact; swap any in Owner tools. | Founder | 2026-11-13 | 2026-11-13: 00059 written, not run |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
+
+- 2026-11-13 · Drill and exercise demo videos: migration `00059` (PR #100) run on the live database 13 Nov. Query after: 165 of 168 drills and all 167 exercises have a video. No good match, so they keep the YouTube search link: game-winner-countdown, lane-line-touches, spacing-drive-and-drift. Swap any weak pick in Owner tools. S27 closed.
 
 - 2026-11-11 · New agents on main: designer, player-outreach, qa-tester and the weekly TikTok trend scan. PR #94 merged 11 Nov (`82e08bb`) with green checks, pinned to the reviewed commit. S23 closed.
 
