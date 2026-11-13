@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
+Last updated: 2026-11-13 (Film and Plays plan written: S27, S28)
 
 ## Rules
 
@@ -51,6 +51,8 @@ Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
 | S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
 | S26 | Merge PR #96 (docs only: 13 Nov handoff, S23 closed). | Founder | 2026-11-13 | 2026-11-13: open |
 | S25 | First runs of the new agents (on main since 11 Nov): designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-13: not run yet |
+| S27 | Privacy page says Deadeye uses only login cookies (`src/app/privacy/page.tsx:261`), but IQ lessons load a YouTube player as they scroll into view (`src/app/(app)/study/[id]/page.tsx:143`), which stores data on the device even in youtube-nocookie mode. Name YouTube/Google on the privacy page and make lesson videos tap-to-load (phase F0 in `docs/plans/film-and-plays.md`). Found by the safety-reviewer. | Builder + founder | 2026-11-13 | 2026-11-13: checked in code |
+| S28 | Film and Plays plan (`docs/plans/film-and-plays.md`): founder to answer the 6 decisions in section 11 (where it lives, Plays or Film first, what coaches see, Free limits, timing, who approves clips), then name a phase to build. | Founder | 2026-11-13 | 2026-11-13: plan written |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
