@@ -129,7 +129,8 @@ export default function PrivacyPage() {
             <li>
               If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
               example &quot;A friend or teammate&quot;), saved with your account so we know which places bring players who stick with
-              it. It is only ever counted together with other players. Deleting your account deletes it.
+              it. We only use it as counts by answer; in anything we publish, answers from fewer than 5 players are added
+              together. Deleting your account deletes it.
             </li>
           </ul>
         </section>
@@ -154,7 +155,8 @@ export default function PrivacyPage() {
             </li>
             <li>
               Crash reports, problem reports you send, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
-              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly and knowing where new
+              players hear about us.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>

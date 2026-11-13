@@ -94,6 +94,12 @@ file). Newest first, each with the date, what happened, and the rule.
       account is deleted. A value that came from a user (URL parameter,
       user_metadata, form text) reaches a committed file only if it matches a
       fixed list in code; any count under 5 is grouped ("smaller routes").
+      The under-5 rule covers every column of a public table, weekly columns
+      included, not only the totals (PR #97 re-review, N1).
+- [ ] **Outreach drafts tell the truth about the app.** What a draft says
+      (video stays on the phone, nothing collected, parent approval) is checked
+      against the code and the privacy page before it passes (PR #97 re-review,
+      O1: the FDYS draft missed coach uploads).
 - [ ] **user_metadata is the player's to write.** Anyone can set it at sign-up
       with the public key, and any signed-in player can change it later
       (`auth.updateUser`). Never trust it for access, for anything published,
