@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-11 (new agents: designer, player-outreach, qa-tester; S22 closed)
+Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
 
 ## Rules
 
@@ -48,12 +48,13 @@ Last updated: 2026-11-11 (new agents: designer, player-outreach, qa-tester; S22 
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S21 | US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. | Founder decides (legal advice) | 2026-11-11 | 2026-11-11: raised by the safety re-review |
-| S23 | Merge PR #94, the new-agents pull request (designer, player-outreach, qa-tester; weekly TikTok trend scan). Docs and agent files only, no app code. | Founder | 2026-11-11 | 2026-11-11: PR opened |
 | S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
-| S25 | First runs of the new agents after S23 merges: designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-11 |
+| S25 | First runs of the new agents (on main since 11 Nov): designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-13: not run yet |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
+
+- 2026-11-11 · New agents on main: designer, player-outreach, qa-tester and the weekly TikTok trend scan. PR #94 merged 11 Nov (`82e08bb`) with green checks, pinned to the reviewed commit. S23 closed.
 
 - 2026-11-11 · PR #93 (planner / TY timetable handoff) merged: `a0404f2` on main. S22 closed.
 
