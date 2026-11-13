@@ -223,9 +223,9 @@ export function buildFocusPlan(weaknessIds: string[], content: FocusContent, opt
 
   return {
     weaknesses: weaknesses.map((w) => w.id),
-    drills: roundRobin(drillLists, (d) => d.id, MAX_DRILLS, (d, w) => `Works on ${subSkillLabel(d.sub_skill)} for "${w.label}"`),
-    film: roundRobin(lessonLists, (l) => l.id, MAX_FILM, (l, w) => `${l.topicTitle}: shows what "${w.label}" looks like done well`),
-    guides: roundRobin(guideLists, (g) => g.slug, MAX_GUIDES, (_g, w) => `Off-court help with "${w.label}"`),
+    drills: roundRobin(drillLists, (d) => d.id, MAX_DRILLS, (_d, w) => `For "${w.label}"`),
+    film: roundRobin(lessonLists, (l) => l.id, MAX_FILM, (_l, w) => `For "${w.label}"`),
+    guides: roundRobin(guideLists, (g) => g.slug, MAX_GUIDES, (_g, w) => `For "${w.label}"`),
     ownFilm: weaknesses.some((w) => w.ownFilm),
   };
 }

@@ -25,14 +25,11 @@ export interface CoachTeam {
 
 const MAX_PICKS = 6;
 
-const SOURCE_LABEL: Record<DataSignal['source'], string> = {
-  shots: 'Your shots',
-  iq: 'Your IQ answers',
-  film: 'Your film',
-  setup: 'Your setup',
-};
 
 const label = (id: string) => weaknessById(id)?.label ?? id;
+
+/** "For: Free throws · Weak hand", every weakness an item works on, so a shared item says so */
+const forText = (ids: string[]) => `For: ${ids.map(label).join(' · ')}`;
 
 function Chip({ selected, onClick, children }: { selected: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -267,7 +264,7 @@ export function FocusFinder(props: {
       {/* 2. Suggestions from the player's own log */}
       {mode === 'player' && suggestions.length > 0 && (
         <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-          <SectionLabel icon={BarChart3}>From your own numbers</SectionLabel>
+          <SectionLabel icon={BarChart3}>Suggested for you</SectionLabel>
           <ul className="space-y-2">
             {suggestions.map((s) => {
               const on = selected.includes(s.weaknessId);
@@ -275,10 +272,8 @@ export function FocusFinder(props: {
                 <li key={s.weaknessId} className="flex items-center justify-between gap-3 rounded-xl bg-zinc-950/60 p-3">
                   <div className="min-w-0">
                     <div className="text-sm font-semibold text-white">{label(s.weaknessId)}</div>
-                    <div className="text-sm text-zinc-400">
-                      <span className="text-zinc-500">{SOURCE_LABEL[s.source]}: </span>
-                      {s.reason}
-                    </div>
+                    {/* Each reason already says where it came from: logged shots, daily IQ, coach verdicts or setup */}
+                    <div className="text-sm text-zinc-400">{s.reason}</div>
                   </div>
                   <Button type="button" size="sm" variant={on ? 'secondary' : 'outline'} onClick={() => toggle(s.weaknessId)} aria-pressed={on}>
                     {on ? 'Added' : 'Add'}
@@ -340,7 +335,7 @@ export function FocusFinder(props: {
               <SectionLabel icon={Film}>Film and IQ</SectionLabel>
               <p className="mb-2 text-sm text-zinc-500">Watch the clip, then take its quiz to check you can read it.</p>
               <ul className="space-y-2">
-                {plan.film.map(({ item: l, reason }) => (
+                {plan.film.map(({ item: l, for: ids }) => (
                   <li key={l.id} className="rounded-xl bg-zinc-950/60 p-3">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
@@ -356,7 +351,7 @@ export function FocusFinder(props: {
                         </Badge>
                       )}
                     </div>
-                    <p className="mt-1 text-sm text-zinc-500">{reason}</p>
+                    <p className="mt-1 text-sm text-zinc-500">{forText(ids)}</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <Link
                         href={`/study/${l.topicId}#lesson-${l.id}`}
@@ -383,7 +378,7 @@ export function FocusFinder(props: {
             <div>
               <SectionLabel icon={Target}>Drills</SectionLabel>
               <ul className="space-y-2">
-                {plan.drills.map(({ item: d, reason }) => (
+                {plan.drills.map(({ item: d, for: ids }) => (
                   <li key={d.id}>
                     <Link href={`/drills/${d.slug}`} className="block rounded-xl bg-zinc-950/60 p-3 hover:bg-zinc-900">
                       <div className="flex items-start justify-between gap-2">
@@ -398,7 +393,7 @@ export function FocusFinder(props: {
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-sm text-zinc-500">{reason}</p>
+                      <p className="mt-1 text-sm text-zinc-500">{forText(ids)}</p>
                     </Link>
                   </li>
                 ))}
@@ -410,14 +405,14 @@ export function FocusFinder(props: {
             <div>
               <SectionLabel icon={BookOpen}>Read</SectionLabel>
               <ul className="space-y-2">
-                {plan.guides.map(({ item: g, reason }) => (
+                {plan.guides.map(({ item: g, for: ids }) => (
                   <li key={g.slug}>
                     <Link href={`/guides/${g.slug}`} className="block rounded-xl bg-zinc-950/60 p-3 hover:bg-zinc-900">
                       <div className="flex items-start justify-between gap-2">
                         <span className="font-semibold text-white">{g.title}</span>
                         <span className="flex-shrink-0 text-sm text-zinc-400 tabular-nums">{g.readingMinutes} min</span>
                       </div>
-                      <p className="mt-1 text-sm text-zinc-500">{reason}</p>
+                      <p className="mt-1 text-sm text-zinc-500">{forText(ids)}</p>
                     </Link>
                   </li>
                 ))}

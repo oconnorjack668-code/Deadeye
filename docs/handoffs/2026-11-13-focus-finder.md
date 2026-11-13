@@ -29,7 +29,14 @@ An optional AI week plan costs 1 AI report. A coach can send the plan to a team 
 
 ## Status changes
 - Closed: none
-- Opened: S28 (S1 note added)
+- Opened: S28, S29 (S1 note added)
+
+## Preview check (signed in as the tester)
+- `/focus` loads; free text matched live into chips; film, drills (solo only, spread across weaknesses,
+  demo videos first), guides and the own-film nudge all from live content; AI shows "not switched on"
+  (no AI key on previews). Watch opens `/study/<topic>#lesson-<id>` at the right card.
+- Fixed after: suggestions heading said "numbers" for setup-only picks; item reasons were clunky.
+- Found S29: 5 lesson videos are dead on YouTube. Not checked: phone width (window resize did not apply).
 
 ## Gotchas
 - New worktrees have no `.next/types`, so `tsc` reports `LayoutProps` missing: run `npx next typegen` first.
