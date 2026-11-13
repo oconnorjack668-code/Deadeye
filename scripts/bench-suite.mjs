@@ -19,7 +19,7 @@
 // are made into its variants/ folder once and reused, and reports go to
 // out/<label>/. DEADEYE_BENCH_FFMPEG points at ffmpeg when it is not on PATH.
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -63,10 +63,14 @@ function makeVariant(clip, variant) {
   const dst = path.join(dir, 'variants', `${clip.id}-${variant.id}.mp4`);
   if (existsSync(dst)) return dst;
   process.stdout.write(`  making ${path.basename(dst)}... `);
-  const r = spawnSync(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-vf', variant.vf, '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', dst], {
+  // Written under another name and renamed when complete: a run stopped
+  // mid-encode otherwise leaves a truncated file that every later run reuses
+  const part = dst.replace(/\.mp4$/, '.part.mp4');
+  const r = spawnSync(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-y', '-i', src, '-vf', variant.vf, '-an', '-c:v', 'libx264', '-preset', 'veryfast', '-crf', '18', '-pix_fmt', 'yuv420p', part], {
     stdio: ['ignore', 'inherit', 'inherit'],
   });
   if (r.status !== 0) throw new Error(`ffmpeg failed on ${dst}`);
+  renameSync(part, dst);
   console.log('done');
   return dst;
 }
@@ -94,6 +98,12 @@ function parse(text) {
 const rows = [];
 for (const clip of suite.clips) {
   if (onlyClips.length && !onlyClips.includes(clip.id)) continue;
+  // A hold-out clip measures the tracker on footage it was never tuned on, so
+  // it only runs when named: a routine run must not let it be looked at
+  if (clip.holdout && !onlyClips.includes(clip.id)) {
+    console.log(`skipping ${clip.id}: hold-out, runs only when named`);
+    continue;
+  }
   if (!existsSync(path.join(dir, clip.file))) {
     console.log(`skipping ${clip.id}: ${clip.file} is not in ${dir}`);
     continue;

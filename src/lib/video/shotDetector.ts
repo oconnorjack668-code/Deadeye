@@ -264,6 +264,21 @@ export const LATE_MS = 1200;
  */
 export const OFF_THE_SIDE = 1.45;
 
+/**
+ * How far below the rim line, in rim widths, a ball's centre can be while it
+ * sits on the ring. A ball is about 0.53 rim widths across, so on the ring its
+ * centre can show up to a radius, about 0.27, below the line.
+ *
+ * Only used for the frame that places a crossing, which is not taken as the
+ * ball seen under the ring when it is this close to the line. One was, a
+ * quarter of a rim below it, on a ball landing on the ring; with the net
+ * shaking from the hit it was called a sure make (4 Nov clip4, 88.1s). A
+ * dead-centre make on a 15 fps phone was first seen 0.499 below, and without
+ * that sighting was called a miss (clip2, 53.8s). Set between the two, the
+ * only two cases measured.
+ */
+const ON_RING = 0.35;
+
 /** How far below the rim line, in rim widths, a sighting says where the ball went. */
 const BELOW_FROM = 0.25;
 const BELOW_TO = 1.5;
@@ -651,7 +666,13 @@ export class ShotDetector {
       // Inside the ring on screen. That is necessary for a make, not proof of
       // one: see CONFIRM_MS.
       this.pending = { t: at, margin, side: this.signedSide(crossX), confident, inside: 0, outside: 0, first: null, order: [] };
-      return this.confirm(obs);
+      // When this frame and the one before it just straddle the line, and this
+      // one could be a ball sitting on the ring (ON_RING), it placed the
+      // crossing and is not also the ball seen under the ring. A ball that
+      // went out of sight above the ring and reappears under it has come
+      // through, and always counts.
+      const straddled = obs.t - prev.t <= TUNED_FRAME_MS * this.pace * 1.5 && depth < ON_RING;
+      return this.confirm(obs, straddled);
     }
 
     if (side > APPROACH_WIDTHS * 2 + 2) return this.miss(obs.t, this.netStill(this.nearAt ?? this.armedAt ?? obs.t, obs.t));
@@ -705,10 +726,10 @@ export class ShotDetector {
   }
 
   /** Gathers what happened after a crossing inside the ring, and calls it once it can. */
-  private confirm(obs: BallObservation): DetectedShot | null {
+  private confirm(obs: BallObservation, placedCrossing = false): DetectedShot | null {
     const p = this.pending!;
 
-    if (obs.ball) {
+    if (obs.ball && !placedCrossing) {
       const depth = this.depth(obs.ball.x, obs.ball.y);
       const side = this.side(obs.ball.x);
       this.lastSeen = obs.t;
@@ -900,8 +921,22 @@ export class ShotDetector {
     p.first = inside === outside ? p.order[0] : inside > outside ? 'inside' : 'outside';
   }
 
-  /** A miss, timed at the ring when the ball got there. */
-  private miss(t: number, confident: boolean): DetectedShot {
+  /**
+   * A miss, timed at the ring when the ball got there - or nothing, when it
+   * never got there.
+   *
+   * A shot starts on two sightings above the rim, the second lower, and that
+   * is also what a pass across the picture, a ball going up beside the ring
+   * or someone walking past the lens can look like for a frame. Every call
+   * with no shot behind it on the 4 Nov clips was one of those, timed out as
+   * a miss without the ball ever coming near the ring. A shot that never
+   * reached the ring is dropped rather than called.
+   */
+  private miss(t: number, confident: boolean): DetectedShot | null {
+    if (this.pending === null && this.nearAt === null && this.touchedAt === null) {
+      this.reset(t);
+      return null;
+    }
     return this.decide(t, false, confident, undefined, this.touchedAt ?? this.nearAt ?? undefined);
   }
 
@@ -927,6 +962,15 @@ export class ShotDetector {
       ...(this.touchedAt !== null ? { touchedRim: true } : {}),
     };
     this.shots.push(shot);
+    // The pause after a call is for the ball bouncing about the ring. One that
+    // never got there has nothing to bounce off, and pausing then can only
+    // miss the next shot.
+    this.reset(reached ? t + COOLDOWN_MS : t);
+    return shot;
+  }
+
+  /** Forgets the shot being followed, ignoring anything until `cooldownUntil`. */
+  private reset(cooldownUntil: number) {
     this.armedAt = null;
     this.lastAbove = null;
     this.approach = null;
@@ -939,10 +983,6 @@ export class ShotDetector {
     this.swingFrames = 0;
     this.lateNet = null;
     this.ballId = null;
-    // The pause after a call is for the ball bouncing about the ring. One that
-    // never got there has nothing to bounce off, and pausing then can only
-    // miss the next shot.
-    this.cooldownUntil = reached ? t + COOLDOWN_MS : t;
-    return shot;
+    this.cooldownUntil = cooldownUntil;
   }
 }

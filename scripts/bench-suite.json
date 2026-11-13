@@ -1,5 +1,5 @@
 {
-  "_about": "Labelled clips for scripts/bench-suite.mjs. Files live outside the repo in DEADEYE_BENCH_DIR. Times in seconds. Clip 1's attempts come from the tracker's own calls on it (10 of 10 right, matching its labelled makes); clip 2's were labelled frame by frame.",
+  "_about": "Labelled clips for scripts/bench-suite.mjs. Files live outside the repo in DEADEYE_BENCH_DIR. Times in seconds. Clip 1's attempts come from the tracker's own calls on it (10 of 10 right, matching its labelled makes); clip 2's were labelled frame by frame. A clip with \"holdout\": true runs only when named.",
   "clips": [
     {
       "id": "clip1",
@@ -16,6 +16,31 @@
       "rim": [0.3574, 0.4479, 0.4037, 0.4479],
       "makes": [23.6, 43.55, 49.4, 53.8, 90.45, 98.25, 109.3, 128.9, 136.8, 154.75],
       "attempts": [5.25, 10.45, 15.65, 23.6, 28.5, 39.4, 43.55, 49.4, 53.8, 58.0, 62.9, 66.55, 71.6, 78.05, 84.9, 90.45, 95.2, 98.25, 101.9, 109.3, 112.7, 116.7, 121.5, 128.9, 132.5, 136.8, 140.4, 144.8, 149.15, 154.75, 158.4]
+    },
+    {
+      "id": "clip3",
+      "file": "clip3.mp4",
+      "note": "2:32, 4 Nov, far and side-on to a wall hoop, smallest rim yet (2.3% of the width), steady, even light, one player who walks past the lens. Cut from 20261104_172123.mp4 at 21.009s (keyframe, stream copy) to 172.5s. 17 attempts, labelled frame by frame",
+      "rim": [0.4775, 0.4568, 0.501, 0.4565],
+      "makes": [7.6, 13.8, 30.05, 57.9, 84.75, 106.0, 123.1, 131.9],
+      "attempts": [2.2, 7.6, 13.8, 21.5, 30.05, 38.25, 46.4, 57.9, 65.6, 74.2, 84.75, 97.8, 106.0, 123.1, 131.9, 141.4, 149.0]
+    },
+    {
+      "id": "clip4",
+      "file": "clip4.mp4",
+      "note": "2:46, 4 Nov, low and close, rim near the left edge, same hoop as clip3, two players with passes past the lens, many shots off the backboard. Cut from 20261104_172532.mp4 at 11.014s to 177.5s. 24 attempts, labelled frame by frame",
+      "rim": [0.1231, 0.4826, 0.1696, 0.485],
+      "makes": [30.8, 58.55, 64.9, 125.7],
+      "attempts": [2.6, 13.4, 19.1, 25.3, 30.8, 36.6, 43.7, 58.55, 64.9, 73.5, 81.0, 88.1, 95.1, 101.0, 108.4, 114.5, 120.2, 125.7, 132.9, 139.3, 147.5, 152.2, 158.4, 163.85]
+    },
+    {
+      "id": "clip5",
+      "file": "clip5.mp4",
+      "holdout": true,
+      "note": "HOLD-OUT: never tune on it; run it once, by name, at the end. Chosen 7 Nov as least like clip1/clip2: very low angle, rim in the top-left corner, two bright light streaks across the picture, two players passing. 3:12, cut from 20261104_172910.mp4 at 31.002s to 223.5s. 29 attempts, labelled frame by frame without running the tracker on it",
+      "rim": [0.1188, 0.3102, 0.1764, 0.3148],
+      "makes": [9.75, 20.4, 26.3, 66.75, 71.95, 81.15, 86.0, 92.85, 101.85, 106.9, 133.2, 138.9, 166.8, 172.75, 178.8, 183.1],
+      "attempts": [3.2, 9.75, 15.4, 20.4, 26.3, 32.0, 38.8, 59.2, 66.75, 71.95, 76.8, 81.15, 86.0, 92.85, 99.2, 101.85, 106.9, 114.4, 125.2, 133.2, 138.9, 147.1, 151.5, 161.3, 166.8, 172.75, 178.8, 183.1, 190.05]
     }
   ],
   "variants": [

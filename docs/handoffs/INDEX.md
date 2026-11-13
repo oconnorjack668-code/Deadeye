@@ -14,6 +14,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-09 · agent-hub-routines · Deadeye Bench hub; weekly run pushes again; 4 new routines; proxy fix · open: 3 → [handoff](2026-11-09-agent-hub-routines.md)
 - 2026-11-09 · e4-dashboard-reminder · Reminders card on dashboard for zero-session players; reminder_set marker · open: 2 → [handoff](2026-11-09-e4-dashboard-reminder.md)
 - 2026-11-09 · agent-learning-safety · Agents learn from research; streak opt-in under 18; AI safeguards; DPIA draft · open: 4 → [handoff](2026-11-09-agent-learning-safety.md)
+- 2026-11-09 · new-clips-labelled · New clips labelled; rattle-out fix; phantom calls 24→7 · open: 4 → [handoff](2026-11-09-new-clips-labelled.md)
 - 2026-11-07 · new-test-footage · Crash reports closed; push keys added 7 Nov (done); plan for 3 new clips · open: 1 → [handoff](2026-11-07-new-test-footage.md)
 - 2026-11-03 · rim-finder · Find the hoop for me shipped; live hang fixed (plain worker); checked live · open: 3 → [handoff](2026-11-03-rim-finder.md)
 - 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 3 → [handoff](2026-11-03-tracker-accuracy-bench.md)
