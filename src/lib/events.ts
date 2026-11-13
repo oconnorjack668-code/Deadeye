@@ -27,6 +27,8 @@ export const EVENT_NAMES = [
   'log_finish_opened',
   /** Saved their training days, or turned reminders on, on a reminders card */
   'reminder_set',
+  /** Opened a play from the plays library on the IQ tab */
+  'play_opened',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];
