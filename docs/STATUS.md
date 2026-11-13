@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
+Last updated: 2026-11-13 (PR #97: outreach routes, build id, first outreach plan; S26 closed, S27-S29 opened)
 
 ## Rules
 
@@ -48,12 +48,16 @@ Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
 | S16 | `.agents/skills/agent-os/` in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. | Founder decides | 2026-11-11 | 2026-11-11 |
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S21 | US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. | Founder decides (legal advice) | 2026-11-11 | 2026-11-11: raised by the safety re-review |
-| S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
-| S26 | Merge PR #96 (docs only: 13 Nov handoff, S23 closed). | Founder | 2026-11-13 | 2026-11-13: open |
-| S25 | First runs of the new agents (on main since 11 Nov): designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-13: not run yet |
+| S24 | QA tester's questions. Build id: built in PR #97 (Settings line + `<meta name="deadeye-build">`, seen on its preview), live once #97 merges. Funnel and weekly counts: tester left out (`TEST_ACCOUNT_EMAILS` set in Vercel for all three environments; `funnel-server.ts` excludes it). Leaderboard: tester not on it (its "Show me on the public leaderboard" switch is off, QA 13 Nov; profiles private by default). Fake camera: not in the extension's Chrome; needs a separate Chrome profile launched with flags or headless Chromium, so camera tests stay "needs a real device". Only the build id is left, and it lands with #97. | Lead | 2026-11-11 | 2026-11-13: all answered; build id waits on #97 |
+| S25 | First runs of the new agents. Done: player-outreach plan `docs/agent-os/outreach/2026-11-13-outreach.md`; qa-tester run `docs/agent-os/qa/2026-11-13-qa.md` (10 of 10 tested steps passed on `e330a94`, 2 P3s: slow sample-clip load, Today's 32px nested buttons; leave the Chrome window restored next run). Both in PR #97. Left: designer on S8 (own session); exams join S12. | Lead | 2026-11-11 | 2026-11-13: outreach and QA done |
+| S27 | PR #97 (`?ref=` routes counted by 1st session, build id, outreach plan): safety review BLOCKED `9a908b1`; B1 to B4 fixed in `201b000`. **B5, founder decides:** EDPB 2/2023 reads a code in a link as within ePrivacy 5(3). Option A: drop `?ref` for an optional "Where did you hear about Deadeye?" choice at sign-up. Option B: legal advice and an accepted low risk in the DPIA. Then re-review and merge. | Founder decides | 2026-11-13 | 2026-11-13: draft PR open |
+| S28 | Safety fix-soon items from the #97 review: F1 clear `signup_ref` after 12 months (daily job); F2 DPIA rows (route code, R8 public counts file, new ePrivacy risk; part of S1); F4 the `markFromDemo` localStorage mark already on main (`src/lib/events.ts`) has no consent. | Builder / founder (DPIA) | 2026-11-13 | 2026-11-13 |
+| S29 | Trend board `docs/agent-os/trends/ads.md` still says "never": marketing's 13 Nov scan finished but the write was blocked, because this session loaded the main checkout's older `marketing.md` guard (no `trends/ads.md` path). The text is in this session's transcript. Fix: pull main locally and rerun marketing's trend scan in a new session, or the founder approves pasting it. TikTok Creative Center and Meta Ad Library don't load for agents; 10 minutes in a browser fills the gap. | Founder decides | 2026-11-13 | 2026-11-13 |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
+
+- 2026-11-13 · PR #96 (13 Nov handoff) merged: `e330a94` on main. S26 closed.
 
 - 2026-11-11 · New agents on main: designer, player-outreach, qa-tester and the weekly TikTok trend scan. PR #94 merged 11 Nov (`82e08bb`) with green checks, pinned to the reviewed commit. S23 closed.
 

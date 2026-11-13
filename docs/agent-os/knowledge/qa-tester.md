@@ -60,10 +60,21 @@ first, each with the date, what happened, and the rule.
 ## Open questions (for the founder or builder)
 
 - Is there a visible build id in the app, so a run can prove which build it tested?
-- Is the tester account left out of funnel counts and leaderboards?
+  Answer 2026-11-13: not live yet (PR #97 adds it to Settings); until then take the build
+  from Vercel `list_deployments`.
+- Is the tester account left out of funnel counts and leaderboards? Answer 2026-11-13
+  (qa run `qa/2026-11-13-qa.md`): yes. Funnel: it is on `TEST_ACCOUNT_EMAILS` (Settings
+  shows "Tester: start again as a new player"). Leaderboard: its "Show me on the public
+  leaderboard" switch is off and `leaderboard_page()` shows only public profiles to others.
 - Can the browser extension's Chrome be launched with fake-camera flags, or is that only a
-  local headless Chromium run?
+  local headless Chromium run? Answer 2026-11-13: not the extension's Chrome; the flags
+  only work at launch for the whole profile. Use a separate Chrome shortcut with its own
+  profile and the flags, or headless Chromium on a local Turbopack build. Until then camera
+  steps are "needs a real device".
 - Which real phones does the founder have for "needs a real device" checks?
+- New 2026-11-13: in the founder's Chrome, `resize_window` did nothing (window minimised).
+  Phone size was emulated with a 390x844 same-origin iframe; screenshots and timers fail
+  while minimised. Ask the founder to leave the Chrome window restored for QA runs.
 
 ## Research
 
