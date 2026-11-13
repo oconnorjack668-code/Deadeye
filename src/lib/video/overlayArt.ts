@@ -34,6 +34,38 @@ function rimEnds(rim: Rim, w: number, h: number): [[number, number], [number, nu
   ];
 }
 
+/** Gap between the rim's end and the make/miss call, as a share of the picture's width. */
+const CALL_GAP = 0.03;
+/**
+ * Where the make/miss call goes: beside the rim, on its right if the word fits
+ * there, else on its left, so the word is read where the ball went and never
+ * covers the hoop. `need` is the call's width (the word, or the "check this
+ * one" pill if wider, plus a margin) and `maxX` how far right text may reach
+ * (a 9:16 video keeps it inside the TikTok/Reels safe zone), both as shares of
+ * the picture's width. `x` is the call's edge nearest the rim and `y` the
+ * rim's height there, both fractions of the picture; the caller keeps the word
+ * clear of the score, the status pills and the dots, which it can measure.
+ * Null with no rim, or no room either side: then the call is centred.
+ * Shared by the live HUD and the saved video so they put it in one place.
+ */
+export function callSpot(
+  rim: Rim | null,
+  need: number,
+  maxX = 1
+): { side: 'left' | 'right'; x: number; y: number } | null {
+  if (!rim) return null;
+  const left = rim.x - rim.width / 2;
+  const right = rim.x + rim.width / 2;
+  const roomLeft = left - CALL_GAP;
+  const roomRight = maxX - right - CALL_GAP;
+  // The right first: the score and its banners fill the top left, and on the
+  // right there is only the small "Ball tracked" pill
+  const side = roomRight >= need ? 'right' : roomLeft >= need ? 'left' : null;
+  if (!side) return null;
+  const edge = side === 'right' ? right : left;
+  return { side, x: side === 'right' ? right + CALL_GAP : left - CALL_GAP, y: rimYAt(rim, edge) };
+}
+
 /**
  * The rim line the tracking is measured against: the span between the two
  * taps, following the rim's tilt. It takes the colour of a call for a moment
@@ -199,7 +231,7 @@ function pill(ctx: Ctx, x: number, y: number, h: number, text: string, bg: strin
 /**
  * The HUD for a saved video, laid out as TrackerHud lays it out on the phone:
  * the score top left, whether the ball is tracked top right, the last calls
- * bottom left, a make or miss across the middle. The buttons and the amber
+ * bottom left, a make or miss beside the rim (callSpot). The buttons and the amber
  * warnings are left out - they are for the player at the time, not for anyone
  * watching afterwards. `t` drives the flame; `family` is the page's font.
  *
@@ -215,14 +247,22 @@ export function drawHud(
   s: OverlayState,
   t: number,
   family: string,
-  { area, replay = false }: { area?: Rect; replay?: boolean } = {}
+  { area, picture, replay = false }: { area?: Rect; picture?: Rect; replay?: boolean } = {}
 ) {
   const a = area ?? { x: 0, y: 0, w: canvasW, h: canvasH };
+  // Where the footage sits, for placing the call beside the rim (the HUD's area unless a vertical video sets it)
+  const pic = picture ?? a;
   const w = a.w;
   const h = a.h;
   const u = hudUnit(w, h);
   const font = (px: number, weight: number) => `${weight} ${px * u}px ${family}`;
   const heat = heatLevel(s.streak);
+  // Furthest right anything is drawn, in HUD pixels. A 9:16 video keeps it
+  // inside the TikTok/Reels safe zone (x up to 1015 of 1080), clear of their buttons.
+  const vertical = canvasH > canvasW;
+  const safeRight = vertical ? Math.min(w - 12 * u, (canvasW * SAFE_RIGHT) / VERTICAL.w - a.x) : w - 12 * u;
+  // Right edge and bottom of the score row (count, % and flame), for keeping the call off it
+  let scoreRow = { right: 0, bottom: 0 };
   ctx.save();
   ctx.translate(a.x, a.y);
 
@@ -246,8 +286,6 @@ export function drawHud(
   ctx.font = font(48, 900);
   const makesText = String(s.makes);
   const makesW = ctx.measureText(makesText).width;
-  // Sized as StreakFlame is behind the live score: 1.7 times the digits, base just under them
-  if (heat) drawFlame(ctx, left + makesW / 2, base + 6 * u, Math.max(makesW * 1.7 * 0.9, 58 * u), 82 * u * 0.85, t, heat);
   ctx.shadowColor = 'rgba(0,0,0,0.6)';
   ctx.shadowBlur = 8 * u;
   ctx.fillStyle = '#ffffff';
@@ -259,8 +297,15 @@ export function drawHud(
   const attemptsW = ctx.measureText(attemptsText).width;
   ctx.font = font(24, 900);
   ctx.fillStyle = '#fb923c';
-  ctx.fillText(`${pct(s.makes, s.attempts)}%`, left + makesW + attemptsW + 8 * u, base - 3 * u);
+  const pctText = `${pct(s.makes, s.attempts)}%`;
+  const pctX = left + makesW + attemptsW + 8 * u;
+  ctx.fillText(pctText, pctX, base - 3 * u);
   ctx.shadowBlur = 0;
+  // On a hot streak a flame stands beside the score, never over the numbers.
+  // Sized as StreakFlame is on the live HUD (40 x 48, after the %)
+  const pctRight = pctX + ctx.measureText(pctText).width;
+  if (heat) drawFlame(ctx, pctRight + 6 * u + 20 * u, base + 1 * u, 36 * u, 41 * u, t, heat);
+  scoreRow = { right: heat ? pctRight + 6 * u + 40 * u : pctRight, bottom: base + 4 * u };
 
   // Clock, and the streak once it is hot
   ctx.font = font(14, 600);
@@ -278,7 +323,7 @@ export function drawHud(
   ctx.font = font(12, 700);
   pill(
     ctx,
-    w - 12 * u,
+    safeRight,
     12 * u,
     24 * u,
     s.ballInView ? 'Ball tracked' : 'Watching the hoop',
@@ -326,8 +371,8 @@ export function drawHud(
   if (s.banner) drawBanner(ctx, s.banner.label, s.banner.age, u, family);
   }
 
-  drawMark(ctx, w, h, u, family);
-  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family);
+  drawMark(ctx, w, h, u, family, safeRight);
+  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family, callAt(ctx, s, { a, pic, h, u, safeRight, family, scoreRow }));
   ctx.restore();
 }
 
@@ -419,8 +464,8 @@ export function drawBackdrop(ctx: Ctx, source: CanvasImageSource, srcW: number, 
   ctx.restore();
 }
 
-/** The Deadeye name in the corner, where the full-screen button sits live. */
-export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: string) {
+/** The Deadeye name in the corner, where the full-screen button sits live. `right` is where it ends (default 12u in from the edge). */
+export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: string, right = w - 12 * u) {
   ctx.save();
   ctx.font = `900 ${15 * u}px ${family}`;
   ctx.textAlign = 'right';
@@ -428,13 +473,10 @@ export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: stri
   ctx.shadowColor = 'rgba(0,0,0,0.7)';
   ctx.shadowBlur = 6 * u;
   ctx.fillStyle = 'rgba(255,255,255,0.92)';
-  const x = w - 12 * u;
+  const x = right;
   const y = h - 14 * u;
+  // No underline: the brand never puts one under DEADEYE (docs/brand/video-style.md)
   ctx.fillText('DEADEYE', x, y);
-  const tw = ctx.measureText('DEADEYE').width;
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = ORANGE;
-  ctx.fillRect(x - tw, y + 3 * u, tw * 0.35, 2.5 * u);
   ctx.restore();
 }
 
@@ -447,7 +489,99 @@ export function flashCurve(age: number): { opacity: number; scale: number } {
   return { opacity, scale: 1 };
 }
 
-function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string) {
+/** The make/miss word's size beside the rim, in the picture's own unit (hudUnit of the picture). */
+const CALL_WORD = 48;
+/** Right edge of the TikTok/Reels safe zone in a 1080-wide vertical frame (docs/brand/video-style.md). */
+const SAFE_RIGHT = 1015;
+
+/**
+ * Where a saved video draws the call beside the rim, or null to centre it.
+ * Sized to the picture, not the HUD's area: in 9:16 the picture is a band
+ * across the middle and the word is sized to that band. The word's middle is
+ * kept below the "Ball tracked" pill and above the dots and the name.
+ */
+function callAt(
+  ctx: Ctx,
+  s: OverlayState,
+  {
+    a,
+    pic,
+    h,
+    u,
+    safeRight,
+    family,
+    scoreRow,
+  }: { a: Rect; pic: Rect; h: number; u: number; safeRight: number; family: string; scoreRow: { right: number; bottom: number } }
+): CallAt | null {
+  if (!s.flash || !s.rim) return null;
+  const cu = hudUnit(pic.w, pic.h);
+  ctx.save();
+  ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
+  const wordW = ctx.measureText(s.flash.made ? 'MAKE' : 'MISS').width;
+  const streakLine = hasStreakLine(s.flash);
+  ctx.font = `900 ${STREAK_LINE * cu}px ${family}`;
+  const streakW = streakLine ? ctx.measureText(streakText(s.flash)).width : 0;
+  const width = Math.max(wordW, streakW, s.flash.confident ? 0 : checkPillWidth(ctx, cu, family)) + 12 * cu;
+  ctx.restore();
+  const spot = callSpot(s.rim, width / pic.w, (safeRight + a.x - pic.x) / pic.w);
+  if (!spot) return null;
+  const half = CALL_WORD * 0.42 * cu;
+  const below = half + (streakLine ? 6 * cu + STREAK_LINE * cu : 0) + (s.flash.confident ? 0 : 8 * cu + 20 * cu);
+  const x = pic.x - a.x + spot.x * pic.w;
+  // Below the status pill, and below the score row too if the call would reach it
+  const callLeft = spot.side === 'right' ? x : x - width;
+  const clearRow = callLeft < scoreRow.right + 12 * u ? scoreRow.bottom + 12 * u + half : 0;
+  const top = Math.max(36 * u + 8 * u + half, clearRow);
+  const bottom = h - 34 * u - below;
+  const y = Math.min(Math.max(pic.y - a.y + spot.y * pic.h, top), Math.max(top, bottom));
+  return { side: spot.side, x, y, u: cu };
+}
+
+/** "N in a row" under a make on a streak, beside the rim as well as centred (founder, 13 Nov). */
+const STREAK_LINE = 22;
+function hasStreakLine(f: NonNullable<OverlayState['flash']>): boolean {
+  return f.made && f.streak >= 3;
+}
+function streakText(f: NonNullable<OverlayState['flash']>): string {
+  return `${f.streak} IN A ROW`;
+}
+
+/** "Check this one" under a call the tracker is unsure of: its pill, `x` at its left edge, `y` its top. */
+function checkPill(ctx: Ctx, x: number, y: number, u: number, family: string) {
+  ctx.font = `800 ${12 * u}px ${family}`;
+  const label = 'CHECK THIS ONE';
+  const tw = ctx.measureText(label).width + 20 * u;
+  ctx.fillStyle = 'rgba(245,158,11,0.9)';
+  ctx.beginPath();
+  ctx.roundRect(x, y, tw, 20 * u, 10 * u);
+  ctx.fill();
+  ctx.fillStyle = '#09090b';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + tw / 2, y + 10.5 * u);
+}
+
+function checkPillWidth(ctx: Ctx, u: number, family: string): number {
+  ctx.font = `800 ${12 * u}px ${family}`;
+  return ctx.measureText('CHECK THIS ONE').width + 20 * u;
+}
+
+/** Where a call beside the rim is drawn, in HUD pixels: `x` the edge nearest the rim, `y` the word's middle, `u` the picture's unit. */
+interface CallAt {
+  side: 'left' | 'right';
+  x: number;
+  y: number;
+  u: number;
+}
+
+/**
+ * The make/miss call: a tint over the whole frame, which reads from the arc,
+ * and the word. Beside the rim (`at`) the word has "N in a row" under it on a
+ * streak and "check this one" when the tracker is unsure, but no count: the
+ * score is already on the HUD (founder's choices, 13 Nov). Centred, when there
+ * is no room beside the rim, it keeps the count as well.
+ */
+function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string, at: CallAt | null = null) {
   const { opacity, scale } = flashCurve(f.age);
   if (opacity <= 0) return;
   ctx.save();
@@ -458,6 +592,37 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   ctx.fillStyle = f.made ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.restore();
+  const word = f.made ? 'MAKE' : 'MISS';
+  const colour = f.made ? '#6ee7b7' : '#fca5a5';
+
+  if (at) {
+    const cu = at.u;
+    ctx.translate(at.x, at.y);
+    ctx.scale(scale, scale);
+    ctx.textAlign = at.side === 'right' ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 12 * cu;
+    ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
+    ctx.fillStyle = colour;
+    ctx.fillText(word, 0, 0);
+    let below = CALL_WORD * 0.42 * cu;
+    if (hasStreakLine(f)) {
+      ctx.font = `900 ${STREAK_LINE * cu}px ${family}`;
+      ctx.fillStyle = '#fdba74';
+      ctx.textBaseline = 'top';
+      ctx.fillText(streakText(f), 0, below + 6 * cu);
+      below += 6 * cu + STREAK_LINE * cu;
+    }
+    ctx.shadowBlur = 0;
+    if (!f.confident) {
+      const tw = checkPillWidth(ctx, cu, family);
+      checkPill(ctx, at.side === 'right' ? 0 : -tw, below + 8 * cu, cu, family);
+    }
+    ctx.restore();
+    return;
+  }
+
   ctx.translate(w / 2, h / 2);
   ctx.scale(scale, scale);
   ctx.textAlign = 'center';
@@ -465,8 +630,8 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 12 * u;
   ctx.font = `900 ${60 * u}px ${family}`;
-  ctx.fillStyle = f.made ? '#6ee7b7' : '#fca5a5';
-  ctx.fillText(f.made ? 'MAKE' : 'MISS', 0, 0);
+  ctx.fillStyle = colour;
+  ctx.fillText(word, 0, 0);
   ctx.font = `900 ${24 * u}px ${family}`;
   ctx.fillStyle = '#ffffff';
   ctx.fillText(`${f.makes}/${f.attempts}`, 0, 32 * u);
@@ -474,18 +639,9 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   if (f.made && f.streak >= 3) {
     ctx.font = `900 ${16 * u}px ${family}`;
     ctx.fillStyle = '#fdba74';
-    ctx.fillText(`${f.streak} IN A ROW`, 0, 58 * u);
+    ctx.fillText(streakText(f), 0, 58 * u);
   } else if (!f.confident) {
-    ctx.font = `800 ${12 * u}px ${family}`;
-    const label = 'CHECK THIS ONE';
-    const tw = ctx.measureText(label).width + 20 * u;
-    ctx.fillStyle = 'rgba(245,158,11,0.9)';
-    ctx.beginPath();
-    ctx.roundRect(-tw / 2, 42 * u, tw, 20 * u, 10 * u);
-    ctx.fill();
-    ctx.fillStyle = '#09090b';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, 0, 52.5 * u);
+    checkPill(ctx, -checkPillWidth(ctx, u, family) / 2, 42 * u, u, family);
   }
   ctx.restore();
 }
@@ -498,8 +654,13 @@ export interface EndCardStats {
   personalBest?: boolean;
 }
 
-/** The last seconds of a saved video: the session's numbers on the app's own background. `p` 0..1 fades it in. */
-export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats, p: number, family: string) {
+/**
+ * The last seconds of a saved video: the session's numbers on the app's own
+ * background, signed with the red logo and the name (no underline, no orange:
+ * docs/brand/video-style.md). `logo` is public/logo.png, left out if it did
+ * not load. `p` 0..1 fades it in.
+ */
+export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats, p: number, family: string, logo?: CanvasImageSource | null) {
   const u = hudUnit(w, h);
   ctx.save();
   ctx.globalAlpha = Math.min(1, p * 3);
@@ -524,18 +685,23 @@ export function drawEndCard(ctx: Ctx, w: number, h: number, stats: EndCardStats,
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 ${64 * u}px ${family}`;
   ctx.fillText(`${stats.makes}/${stats.attempts}`, w / 2, cy - 4 * u);
-  ctx.fillStyle = '#fb923c';
-  ctx.font = `900 ${28 * u}px ${family}`;
+  ctx.fillStyle = '#d4d4d8';
+  ctx.font = `800 ${26 * u}px ${family}`;
   const line = stats.bestRun >= 2 ? `${pct(stats.makes, stats.attempts)}%  ·  best run ${stats.bestRun}` : `${pct(stats.makes, stats.attempts)}%`;
   ctx.fillText(line, w / 2, cy + 36 * u);
   ctx.fillStyle = '#a1a1aa';
   ctx.font = `600 ${14 * u}px ${family}`;
   ctx.fillText('Tracked live by', w / 2, cy + 78 * u);
+  // The logo and the name side by side, centred together
   ctx.fillStyle = '#ffffff';
   ctx.font = `900 ${26 * u}px ${family}`;
-  ctx.fillText('DEADEYE', w / 2, cy + 108 * u);
-  const tw = ctx.measureText('DEADEYE').width;
-  ctx.fillStyle = ORANGE;
-  ctx.fillRect(w / 2 - tw / 2, cy + 114 * u, tw * 0.35, 3 * u);
+  const nameW = ctx.measureText('DEADEYE').width;
+  const size = logo ? 34 * u : 0;
+  const gap = logo ? 10 * u : 0;
+  const startX = w / 2 - (size + gap + nameW) / 2;
+  const rowY = cy + 108 * u;
+  if (logo) ctx.drawImage(logo, startX, rowY - 26 * u, size, size);
+  ctx.textAlign = 'left';
+  ctx.fillText('DEADEYE', startX + size + gap, rowY);
   ctx.restore();
 }

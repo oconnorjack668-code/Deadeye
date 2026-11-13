@@ -2,7 +2,7 @@
 
 Kept by marketing; read by the video-editor, designer and player-outreach. See `README.md`. Each line: format · hook · length · sound · why it works · source and date · **Take** (what Deadeye does with it). Formats only: never lift footage, audio or a creator's exact idea.
 
-Last refreshed: 2026-11-13 (marketing's scan, written in by the lead with the founder's go-ahead; the agent's own write was blocked, STATUS S29)
+Last refreshed: 2026-11-13 (marketing's scan, written in by the lead with the founder's go-ahead; the agent's own write was blocked, STATUS S32)
 
 **Gaps this week (2026-11-13).** TikTok Creative Center needs a TikTok for Business login: in a browser, Top Ads (UK, 30 days) showed 4 unrelated ads then "Log in to access all Top Ads", and Trends redirects to a login-only "TikTok One Creative Suite". So no Top Ads, rising sounds or hashtag counts are below, and no numbers are made up. Meta Ad Library does load in a browser (see Rival apps). To fill the TikTok gap the founder logs in to Creative Center (free business account) and pastes Trend Discovery (UK, 7 days, Sports).
 
