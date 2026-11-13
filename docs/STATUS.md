@@ -49,6 +49,7 @@ Last updated: 2026-11-13 (PR #94 merged: new agents on main; S23 closed)
 | S19 | Read the C4 parent-consent draft (backlog `C4`: parents of 16 and 17 year olds can see coach posts). | Founder | 2026-11-09 | 2026-11-11: still `idea` in the backlog |
 | S21 | US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. | Founder decides (legal advice) | 2026-11-11 | 2026-11-11: raised by the safety re-review |
 | S24 | QA tester's questions: show a build id in the app (so a test run can prove which build it checked), and confirm the tester account is left out of funnel counts and leaderboards. | Founder decides / builder | 2026-11-11 | 2026-11-11: raised by qa-tester research |
+| S26 | Merge PR #96 (docs only: 13 Nov handoff, S23 closed). | Founder | 2026-11-13 | 2026-11-13: open |
 | S25 | First runs of the new agents (on main since 11 Nov): designer on S8 (tracker visuals), player-outreach (E0 message, routes, `?ref=` tracking is not recorded by the app yet), qa-tester (`/agent-os qa` in a local session). Their exams join S12. | Lead | 2026-11-11 | 2026-11-13: not run yet |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 

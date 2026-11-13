@@ -26,7 +26,7 @@ only: nothing changed for players, no migration.
 
 ## Status changes
 - Closed: S23
-- Opened: none (S24, S25 still open)
+- Opened: S26 (merge this handoff, PR #96); S24, S25 still open
 
 ## Gotchas
 - `checks` was still running when the merge was asked for; `gh pr checks 94 --watch`
