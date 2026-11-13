@@ -182,6 +182,14 @@ export default function PrivacyPage() {
               range, height, position, strong hand, playing level, goals and recent training numbers, so the advice fits
               you. It never receives your name, email address or photo.
             </li>
+            <li>
+              When you ask Focus Finder for an AI week plan, {ai === 'Our AI provider' ? 'it' : ai} receives what you wrote
+              about the weaknesses, the ones you picked, your position and playing level, and the numbers behind any
+              suggestion (your make rates by area of the court, how many daily IQ questions you got right in a section,
+              how many of your film reads your coach called wrong). For a coach planning for a team, it receives the
+              team&apos;s age group, level and number of players, never the players&apos; names. The free Focus Finder
+              list sends nothing anywhere.
+            </li>
             <li>Stripe processes Pro payments.</li>
             {emailConfigured() && (
               <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>
