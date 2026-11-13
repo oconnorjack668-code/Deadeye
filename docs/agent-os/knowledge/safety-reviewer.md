@@ -100,6 +100,14 @@ file). Newest first, each with the date, what happened, and the rule.
       (video stays on the phone, nothing collected, parent approval) is checked
       against the code and the privacy page before it passes (PR #97 re-review,
       O1: the FDYS draft missed coach uploads).
+- [ ] **A weekly public file leaks the weekly split by subtraction.** The
+      under-5 rule applies to the change between two published files too, not
+      only to each file. PR #97 accepted the residual for fixed answer labels
+      (low risk, no identity); anything more sensitive is rounded or held
+      back until it grows by 5.
+- [ ] **Retention jobs report their failures.** A job that keeps a privacy
+      page promise ("cleared after X") logs or returns what it could not do,
+      so the promise cannot quietly stop being true (PR #97 follow-up).
 - [ ] **user_metadata is the player's to write.** Anyone can set it at sign-up
       with the public key, and any signed-in player can change it later
       (`auth.updateUser`). Never trust it for access, for anything published,

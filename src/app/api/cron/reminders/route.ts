@@ -78,9 +78,9 @@ async function run(request: Request) {
 
   // Housekeeping: the optional "Where did you hear about Deadeye?" answer is
   // cleared 12 months after sign-up, as the privacy policy says
-  const heardFromCleared = await clearExpiredHeardFrom(admin).catch((err) => {
+  const heardFrom = await clearExpiredHeardFrom(admin).catch((err) => {
     console.error('Sign-up answer clean-up failed', err);
-    return 0;
+    return { cleared: 0, failed: -1 };
   });
 
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
@@ -90,7 +90,7 @@ async function run(request: Request) {
     return 0;
   });
 
-  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed, heardFromCleared }, { status: 503 });
+  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed, heardFrom }, { status: 503 });
 
   const { data: prefs, error } = await admin
     .from('notification_preferences')
@@ -158,7 +158,7 @@ async function run(request: Request) {
     return 0;
   });
 
-  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, heardFromCleared, foundingReminders });
+  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, heardFrom, foundingReminders });
 }
 
 export const GET = withCronLog('reminders', run);

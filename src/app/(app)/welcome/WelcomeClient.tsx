@@ -30,6 +30,14 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
 
   useEffect(() => {
     track('welcome_seen');
+    // Tidy up the old landing-demo mark (removed 13 Nov 2026, PR #97) on
+    // devices that still hold it; nothing reads it any more. Safe to delete
+    // this line from mid-2027.
+    try {
+      localStorage.removeItem('deadeye-from-demo');
+    } catch {
+      // Storage blocked: there is nothing to remove
+    }
   }, []);
 
   /** The answer to "Are you at a court right now?", recorded so a stall here shows in the funnel */

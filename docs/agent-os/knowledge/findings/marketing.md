@@ -108,7 +108,8 @@ Each needs our own data (searched 2026-11-09, nothing reliable found).
 - Which hooks hold best for our clips? Per post: TikTok retention at 2s
   and 6s, Instagram skip rate; compare the three openings of one video.
 - Does demo-first beat asking for a session? Per post: link taps per 1,000
-  views; per week: `signup_from_demo` and first sessions within 7 days.
+  views; per week: sign-ups answering TikTok, Instagram or YouTube at sign-up (`signup_from_demo` was removed
+  on 13 Nov 2026) and first sessions within 7 days.
 - How far do Irish 13 to 17s trust brand posts? Read Growing Up in Ireland
   and Ofcom's 2025 report directly (blocked to automated fetching).
 - Do girls respond to girl-led clips? Compare like rate, sends and link taps

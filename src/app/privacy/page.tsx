@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 11, 2026';
+const LAST_UPDATED = 'November 13, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -267,7 +267,8 @@ export default function PrivacyPage() {
           </p>
           <p>
             Deadeye only uses the cookies needed to keep you logged in. The app also keeps a few things on your device so
-            it works for you (unsent drafts, offline saves and your settings); nothing on your device is used to track
+            it works for you (for example unsent drafts, offline saves, your settings and invite links you followed); nothing
+            on your device is used to track
             you or count visits. Data is stored on servers that may be outside the
             EU; our providers use the EU&apos;s standard contractual clauses to protect it.
           </p>

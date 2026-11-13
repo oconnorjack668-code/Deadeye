@@ -82,12 +82,31 @@ describe('clearExpiredHeardFrom', () => {
         },
       },
     };
-    const cleared = await clearExpiredHeardFrom(admin as never, new Date('2027-12-01T00:00:00Z'));
-    expect(cleared).toBe(2);
+    const result = await clearExpiredHeardFrom(admin as never, new Date('2027-12-01T00:00:00Z'));
+    expect(result).toEqual({ cleared: 2, failed: 0 });
     expect(admin.auth.admin.listUsers).toHaveBeenCalledTimes(2);
     expect(updates).toEqual([
       ['due-1', { user_metadata: { heard_from: null } }],
       ['due-2', { user_metadata: { heard_from: null } }],
     ]);
+  });
+
+  it('counts and logs accounts it could not clear', async () => {
+    const users = [
+      { id: 'a', created_at: '2026-01-01T00:00:00Z', user_metadata: { heard_from: 'friend' } },
+      { id: 'b', created_at: '2026-01-01T00:00:00Z', user_metadata: { heard_from: 'tiktok' } },
+    ];
+    const admin = {
+      auth: {
+        admin: {
+          listUsers: async () => ({ data: { users }, error: null }),
+          updateUserById: async (id: string) => ({ data: {}, error: id === 'b' ? { message: 'down' } : null }),
+        },
+      },
+    };
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    expect(await clearExpiredHeardFrom(admin as never, new Date('2027-12-01T00:00:00Z'))).toEqual({ cleared: 1, failed: 1 });
+    expect(logged).toHaveBeenCalledWith('Sign-up answer clean-up: 1 of 2 accounts could not be cleared');
+    logged.mockRestore();
   });
 });
