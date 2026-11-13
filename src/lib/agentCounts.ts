@@ -2,7 +2,8 @@
 // The weekly counts file the Agent OS reads (docs/agent-os/data/), written by
 // api/cron/agent-counts every Monday so the founder no longer pastes it.
 // Counts only: no names, emails, ids or report text ever go in it.
-import type { Funnel } from '@/lib/funnel';
+import type { Funnel, RouteRow } from '@/lib/funnel';
+import { heardFromLabel } from '@/lib/heardFrom';
 import { clubById } from '@/lib/clubs';
 import { LEAGUE_NOT_LISTED } from '@/lib/leagues';
 
@@ -101,6 +102,39 @@ function homeClubCounts(rows: Array<{ user_id: string; club_id: string }>, exclu
   return { playersWithClub: real.length, bigClubs };
 }
 
+/**
+ * The counts file sits in a public repo: an answer only a few players gave
+ * could point to who they are (five friends get the E0 message), so smaller
+ * answers are added together (safety review, 2026-11-13). All-time numbers
+ * only: a 7-day column would show 1 to 4 new players for an answer, so the
+ * weekly split stays on /admin/funnel (re-review N1).
+ */
+export const ROUTE_GROUP_MIN = 5;
+
+interface PublicRouteRow {
+  label: string;
+  joined: number;
+  firstSession: number;
+}
+
+export function publicRoutes(everyone: RouteRow[]): PublicRouteRow[] {
+  const rows: PublicRouteRow[] = [];
+  const small: PublicRouteRow = { label: `Other answers (under ${ROUTE_GROUP_MIN} each)`, joined: 0, firstSession: 0 };
+  let none: PublicRouteRow | null = null;
+  for (const r of everyone) {
+    const row = { label: heardFromLabel(r.route), joined: r.joined, firstSession: r.firstSession };
+    if (r.route === null) none = row;
+    else if (r.joined >= ROUTE_GROUP_MIN) rows.push(row);
+    else {
+      small.joined += row.joined;
+      small.firstSession += row.firstSession;
+    }
+  }
+  if (small.joined > 0) rows.push(small);
+  if (none) rows.push(none);
+  return rows;
+}
+
 function pct(count: number, of: number): string {
   return of > 0 ? ` (${Math.round((count / of) * 100)}%)` : '';
 }
@@ -120,6 +154,22 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
       lines.push(`| ${step.label} | ${step.count}${pct(step.count, everyone.joined)} | ${w}${pct(w, week.joined)} |`);
     });
   });
+  lines.push(
+    '',
+    '## Where they heard about Deadeye',
+    '',
+    'The optional question at sign-up (asked from 2026-11-13; older players',
+    'show as "Didn\'t say"). Judge a route on 1st sessions; under about 30',
+    'players it is a hint. This file is public, so answers with fewer than',
+    `${ROUTE_GROUP_MIN} players joined are added together and only all-time numbers are`,
+    'shown; `/admin/funnel` has every answer and the 7-day split.',
+    '',
+    '| Answer | Joined | 1st session |',
+    '| --- | --- | --- |'
+  );
+  for (const r of publicRoutes(everyone.routes)) {
+    lines.push(`| ${r.label} | ${r.joined} | ${r.firstSession} |`);
+  }
   lines.push('');
   if (everyone.biggestDrop) {
     lines.push(`Biggest drop (everyone): ${everyone.biggestDrop.from} to ${everyone.biggestDrop.to}, ${everyone.biggestDrop.lost} lost.`, '');

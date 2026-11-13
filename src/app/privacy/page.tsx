@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 11, 2026';
+const LAST_UPDATED = 'November 13, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -126,6 +126,13 @@ export default function PrivacyPage() {
               only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
               anyone. Deleting your account deletes them straight away.
             </li>
+            <li>
+              If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
+              example &quot;A friend or teammate&quot;), saved with your account so we know which places bring players who stick with
+              it. We only use it as counts by answer; in anything we publish, answers from fewer than 5 players are added
+              together. It is cleared 12 months after you join, you can clear it yourself in Settings → Privacy, and
+              deleting your account deletes it.
+            </li>
           </ul>
         </section>
 
@@ -148,8 +155,9 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
-              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly and knowing where new
+              players hear about us.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>
@@ -258,7 +266,10 @@ export default function PrivacyPage() {
             Data Protection Commission (dataprotection.ie).
           </p>
           <p>
-            Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the
+            Deadeye only uses the cookies needed to keep you logged in. The app also keeps a few things on your device so
+            it works for you (for example unsent drafts, offline saves, your settings and invite links you followed); nothing
+            on your device is used to track
+            you or count visits. Data is stored on servers that may be outside the
             EU; our providers use the EU&apos;s standard contractual clauses to protect it.
           </p>
         </section>

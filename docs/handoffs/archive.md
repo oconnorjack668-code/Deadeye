@@ -2,6 +2,10 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-10-22 · agent-automation · Monday auto-run, counts job, support-triage, PRs, merge on founder word · open: 2 → [handoff](2026-10-22-agent-automation.md)
+- 2026-10-22 · marketing-agent · Marketing and social agent; skills for every agent, failures reported · open: 2 → [handoff](2026-10-22-marketing-agent.md)
+- 2026-10-22 · app-search · Search from the top bar: actions, sections, settings and content · open: 2 → [handoff](2026-10-22-app-search.md)
+- 2026-10-22 · follow-founder · Follow the founder; founder posts on followers dashboards · open: 4 → [handoff](2026-10-22-follow-founder.md)
 - 2026-10-22 · founder-badge · Founder badge on card and leaderboard; no Add friend on founder · open: 3 → [handoff](2026-10-22-founder-badge.md)
 - 2026-10-22 · icon-and-photos · Deadeye favicon; profile photos on leaderboard and top bar · open: 3 → [handoff](2026-10-22-icon-and-photos.md)
 - 2026-10-22 · tester-reset · Tester logins can reset to a brand-new player from Settings, live · open: none → [handoff](2026-10-22-tester-reset.md)

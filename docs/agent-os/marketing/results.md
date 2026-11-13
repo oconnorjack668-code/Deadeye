@@ -24,4 +24,5 @@ not a result. Each weekly plan sets its baseline from the rows here.
 ## The 23 Oct experiment (demo-first call to action)
 
 Not readable yet. It needs the posting date and the link taps, then the next weekly counts after that
-date (`signup_from_demo`, first sessions of players who joined in the window).
+date (`signup_from_demo`, first sessions of players who joined in the window). `signup_from_demo` was
+removed on 13 Nov 2026 (PR #97, it needed ePrivacy consent); later tests read the sign-up answer instead.
