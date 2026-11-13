@@ -55,6 +55,7 @@ Last updated: 2026-11-13 (PR #99: tracker visuals, S8 closed, S27 opened)
 
 ## Recently done (do not raise again)
 
+- 2026-11-13 · Drill and exercise demo videos: migration `00059` (PR #100) run on the live database 13 Nov. Query after: 165 of 168 drills and all 167 exercises have a video. No good match, so they keep the YouTube search link: game-winner-countdown, lane-line-touches, spacing-drive-and-drift. Swap any weak pick in Owner tools.
 - 2026-11-13 · S8 tracker visuals: flame beside the score, MAKE/MISS beside the rim with "N in a row" under it, saved-video end card with the red logo and no underline. Designer reviewed, founder signed off on the before/after page and said merge. PR #99. The phone check is S27.
 - 2026-11-11 · New agents on main: designer, player-outreach, qa-tester and the weekly TikTok trend scan. PR #94 merged 11 Nov (`82e08bb`) with green checks, pinned to the reviewed commit. S23 closed.
 
