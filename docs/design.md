@@ -109,9 +109,11 @@ content, no combined hover transforms. Respect `prefers-reduced-motion`.
 One exception, chosen by the founder on 2 Nov 2026: the shot tracker's **streak flame**. At 3
 makes in a row a flame stands beside the score, after the %, never over the numbers
 (`StreakFlame`; founder, 11 Nov), and a pill reads "Heating up · 3" (orange) and from 5
-"On fire · 5" (red). The MAKE/MISS call stands alone beside the rim, with "check this one" when the
-tracker is unsure: the score and the streak are already on the overlay (founder, 13 Nov). Only
-when there is no room beside the rim is it centred, with the count and "3 in a row" under it.
+"On fire · 5" (red). The MAKE/MISS call sits beside the rim, with "3 in a row" under a make on a
+streak and "check this one" when the tracker is unsure, but no count: the score is already on the
+overlay (founder, 13 Nov). On a small picture where the stack would cover a warning or the
+full-screen button, "3 in a row" is left out (the pill still says it). Only when there is no room
+beside the rim is the call centred, with the count under it as well.
 It lives only on the overlay over the video, which is the tracker's own broadcast-style
 space and is also what a saved tracker video shows (`src/lib/video/overlayArt.ts` draws both).
 Don't spread it to cards or the dashboard. The flame holds still for reduced motion.

@@ -518,12 +518,15 @@ function callAt(
   ctx.save();
   ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
   const wordW = ctx.measureText(s.flash.made ? 'MAKE' : 'MISS').width;
-  const width = Math.max(wordW, s.flash.confident ? 0 : checkPillWidth(ctx, cu, family)) + 12 * cu;
+  const streakLine = hasStreakLine(s.flash);
+  ctx.font = `900 ${STREAK_LINE * cu}px ${family}`;
+  const streakW = streakLine ? ctx.measureText(streakText(s.flash)).width : 0;
+  const width = Math.max(wordW, streakW, s.flash.confident ? 0 : checkPillWidth(ctx, cu, family)) + 12 * cu;
   ctx.restore();
   const spot = callSpot(s.rim, width / pic.w, (safeRight + a.x - pic.x) / pic.w);
   if (!spot) return null;
   const half = CALL_WORD * 0.42 * cu;
-  const below = s.flash.confident ? half : half + 8 * cu + 20 * cu;
+  const below = half + (streakLine ? 6 * cu + STREAK_LINE * cu : 0) + (s.flash.confident ? 0 : 8 * cu + 20 * cu);
   const x = pic.x - a.x + spot.x * pic.w;
   // Below the status pill, and below the score row too if the call would reach it
   const callLeft = spot.side === 'right' ? x : x - width;
@@ -532,6 +535,15 @@ function callAt(
   const bottom = h - 34 * u - below;
   const y = Math.min(Math.max(pic.y - a.y + spot.y * pic.h, top), Math.max(top, bottom));
   return { side: spot.side, x, y, u: cu };
+}
+
+/** "N in a row" under a make on a streak, beside the rim as well as centred (founder, 13 Nov). */
+const STREAK_LINE = 22;
+function hasStreakLine(f: NonNullable<OverlayState['flash']>): boolean {
+  return f.made && f.streak >= 3;
+}
+function streakText(f: NonNullable<OverlayState['flash']>): string {
+  return `${f.streak} IN A ROW`;
 }
 
 /** "Check this one" under a call the tracker is unsure of: its pill, `x` at its left edge, `y` its top. */
@@ -564,10 +576,10 @@ interface CallAt {
 
 /**
  * The make/miss call: a tint over the whole frame, which reads from the arc,
- * and the word. Beside the rim (`at`) the word stands alone, with "check this
- * one" under it when the tracker is unsure: the score and the streak are
- * already on the HUD (founder's choice, 13 Nov). Centred, when there is no
- * room beside the rim, it keeps the count and "N in a row" under it.
+ * and the word. Beside the rim (`at`) the word has "N in a row" under it on a
+ * streak and "check this one" when the tracker is unsure, but no count: the
+ * score is already on the HUD (founder's choices, 13 Nov). Centred, when there
+ * is no room beside the rim, it keeps the count as well.
  */
 function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string, at: CallAt | null = null) {
   const { opacity, scale } = flashCurve(f.age);
@@ -594,10 +606,18 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
     ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
     ctx.fillStyle = colour;
     ctx.fillText(word, 0, 0);
+    let below = CALL_WORD * 0.42 * cu;
+    if (hasStreakLine(f)) {
+      ctx.font = `900 ${STREAK_LINE * cu}px ${family}`;
+      ctx.fillStyle = '#fdba74';
+      ctx.textBaseline = 'top';
+      ctx.fillText(streakText(f), 0, below + 6 * cu);
+      below += 6 * cu + STREAK_LINE * cu;
+    }
     ctx.shadowBlur = 0;
     if (!f.confident) {
       const tw = checkPillWidth(ctx, cu, family);
-      checkPill(ctx, at.side === 'right' ? 0 : -tw, CALL_WORD * 0.42 * cu + 8 * cu, cu, family);
+      checkPill(ctx, at.side === 'right' ? 0 : -tw, below + 8 * cu, cu, family);
     }
     ctx.restore();
     return;
@@ -619,7 +639,7 @@ function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['
   if (f.made && f.streak >= 3) {
     ctx.font = `900 ${16 * u}px ${family}`;
     ctx.fillStyle = '#fdba74';
-    ctx.fillText(`${f.streak} IN A ROW`, 0, 58 * u);
+    ctx.fillText(streakText(f), 0, 58 * u);
   } else if (!f.confident) {
     checkPill(ctx, -checkPillWidth(ctx, u, family) / 2, 42 * u, u, family);
   }

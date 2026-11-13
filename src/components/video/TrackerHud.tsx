@@ -81,34 +81,39 @@ export function TrackerHud({
   // tests, where nothing has a size) a typical inline call is assumed.
   const boxRef = useRef<HTMLDivElement>(null);
   const probeRef = useRef<HTMLDivElement>(null);
-  const [boxW, setBoxW] = useState(0);
+  const [boxSize, setBoxSize] = useState({ w: 0, h: 0 });
+  const boxW = boxSize.w;
   const scoreRowRef = useRef<HTMLDivElement>(null);
-  const [probe, setProbe] = useState<{ w: number; h: number; wordH: number; rowRight: number; rowBottom: number } | null>(null);
+  const [probe, setProbe] = useState<{ w: number; h: number; wordH: number; streakH: number; rowRight: number; rowBottom: number } | null>(null);
   useEffect(() => {
     const el = boxRef.current;
     if (!el || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => setBoxW(el.clientWidth));
+    const read = () => setBoxSize((b) => (b.w === el.clientWidth && b.h === el.clientHeight ? b : { w: el.clientWidth, h: el.clientHeight }));
+    const ro = new ResizeObserver(read);
     ro.observe(el);
-    setBoxW(el.clientWidth);
+    read();
     return () => ro.disconnect();
   }, []);
   const flashId = flash?.id;
   const flashMade = flash?.made;
   const flashSure = flash?.confident;
+  const flashStreak = flash?.streak;
   useLayoutEffect(() => {
     const el = probeRef.current;
     const word = el?.querySelector<HTMLElement>('[data-call-word]');
     const box = boxRef.current?.getBoundingClientRect();
     const row = scoreRowRef.current?.getBoundingClientRect();
     if (!el || !word || !el.offsetWidth || !box || !row) return;
-    const next = { w: el.offsetWidth, h: el.offsetHeight, wordH: word.offsetHeight, rowRight: row.right - box.left, rowBottom: row.bottom - box.top };
+    const streakEl = el.querySelector<HTMLElement>('[data-call-streak]');
+    // The streak line with the gap above it (mt-1)
+    const streakH = streakEl ? streakEl.offsetHeight + 4 : 0;
+    const next = { w: el.offsetWidth, h: el.offsetHeight, wordH: word.offsetHeight, streakH, rowRight: row.right - box.left, rowBottom: row.bottom - box.top };
     setProbe((p) => (p && (Object.keys(next) as Array<keyof typeof next>).every((k) => p[k] === next[k]) ? p : next));
-  }, [flashId, flashMade, flashSure, theatre, boxW, heat, makes, attempts]);
+  }, [flashId, flashMade, flashSure, flashStreak, theatre, boxW, heat, makes, attempts]);
   const CALL_MARGIN = 12;
   const need = probe && boxW ? (probe.w + CALL_MARGIN) / boxW : 0.22;
   const spot = flash ? callSpot(rim, need) : null;
   const wordHalf = probe ? probe.wordH / 2 : theatre ? 24 : 15;
-  const stackH = probe ? probe.h : wordHalf * 2;
   // Bottom of the status pills top right: one calm pill, or a stack of warnings
   const statusBottomRem = issues.length === 0 ? 2.25 : 0.75 + issues.length * 2 + (issues.length - 1) * 0.375;
   // If the call would reach the score row (the count, the % and the flame),
@@ -119,6 +124,16 @@ export function TrackerHud({
     const callLeft = spot.side === 'right' ? x : x - probe.w;
     if (callLeft < probe.rowRight + CALL_MARGIN) rowClearPx = probe.rowBottom + CALL_MARGIN + wordHalf;
   }
+  // On a small picture the whole stack may not fit between the pills and the
+  // full-screen button. Then "N in a row" is left out (the "Heating up" pill
+  // still says it); the word, "check this one" and the warnings matter more.
+  let compact = false;
+  if (spot && probe && probe.streakH && boxSize.h) {
+    const minPx = Math.max(statusBottomRem * 16 + 8 + wordHalf, rowClearPx);
+    const maxPx = boxSize.h - 56 - (probe.h - wordHalf);
+    compact = minPx > maxPx;
+  }
+  const stackH = probe ? probe.h - (compact ? probe.streakH : 0) : wordHalf * 2;
 
   return (
     <>
@@ -225,7 +240,7 @@ export function TrackerHud({
 
       {/* Confirmation a shot registered, read from the arc rather than up
           close: a tinted wash of the whole frame carries at a distance, and
-          the word stands alone beside the rim (callSpot), where the ball went,
+          the word stands beside the rim (callSpot), where the ball went,
           leaving the hoop clear. Centred, with the count, when there is no
           room beside it. */}
       {flash && (
@@ -248,7 +263,7 @@ export function TrackerHud({
                 ...(spot.side === 'right' ? { left: `${spot.x * 100}%` } : { right: `${(1 - spot.x) * 100}%` }),
               }}
             >
-              <CallBeside flash={flash} theatre={theatre} />
+              <CallBeside flash={flash} theatre={theatre} compact={compact} />
             </div>
           ) : (
             <>
@@ -279,12 +294,12 @@ export function TrackerHud({
 }
 
 /**
- * The call beside the rim: the word alone, and "check this one" when the
- * tracker is unsure. The score and the streak are already on the HUD
- * (founder's choice, 13 Nov). Smaller in the inline view, where the picture is
- * a phone's width.
+ * The call beside the rim: the word, "N in a row" under a make on a streak of
+ * 3 or more, and "check this one" when the tracker is unsure. No count: the
+ * score is already on the HUD (founder's choices, 13 Nov). Smaller in the
+ * inline view, where the picture is a phone's width.
  */
-function CallBeside({ flash, theatre }: { flash: ShotFlash; theatre: boolean }) {
+function CallBeside({ flash, theatre, compact = false }: { flash: ShotFlash; theatre: boolean; compact?: boolean }) {
   return (
     <>
       <span
@@ -295,6 +310,11 @@ function CallBeside({ flash, theatre }: { flash: ShotFlash; theatre: boolean }) 
       >
         {flash.made ? 'Make' : 'Miss'}
       </span>
+      {flash.made && flash.streak >= 3 && !compact && (
+        <span data-call-streak className="mt-1 flex items-center gap-1 whitespace-nowrap text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+          <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+        </span>
+      )}
       {!flash.confident && (
         <span className="mt-2 block whitespace-nowrap rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
       )}

@@ -319,6 +319,22 @@ describe('TrackerHud on a streak', () => {
     expect(stack.textContent).toBe('Make');
   });
 
+  it('says "N in a row" under a make on a streak beside the rim, without the count', () => {
+    render(
+      <TrackerHud
+        {...base}
+        streak={{ current: 4, best: 4, coldRun: 0 }}
+        flash={{ id: 4, made: true, confident: true, makes: 4, attempts: 5, streak: 4 }}
+        rim={{ x: 0.35, y: 0.45, width: 0.12 }}
+      />
+    );
+    const word = screen.getAllByText('Make').find((el) => !el.closest('[aria-hidden="true"]')) as HTMLElement;
+    const stack = word.parentElement as HTMLElement;
+    expect(stack.style.left).not.toBe('');
+    expect(stack.textContent).toMatch(/4 in a row/i);
+    expect(stack.textContent).not.toMatch(/4\/5/);
+  });
+
   it('keeps "check this one" beside the rim', () => {
     render(
       <TrackerHud
