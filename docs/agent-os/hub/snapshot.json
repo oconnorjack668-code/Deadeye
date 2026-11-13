@@ -26,21 +26,21 @@
       "role": "Builds the NEXT experiment on its own branch, with tests.",
       "schedule": "Mondays, after the analyst",
       "skills": "fixed",
-      "sources": 23
+      "sources": 27
     },
     {
       "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds.",
       "id": "safety-reviewer",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 0,
+      "lessons": 1,
       "name": "Safety reviewer",
       "num": 3,
       "output": "E4: PASS with three non-blocking notes.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-11",
       "role": "Checks every branch for under-18s, parents, personal data and messages.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 19
+      "sources": 28
     },
     {
       "ask": "Ask the release checker for the after-deploy checklist for PR #74.",
@@ -54,7 +54,7 @@
       "role": "Types, lint, tests, migrations, env vars, and your step-by-step checklist.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 16
+      "sources": 18
     },
     {
       "ask": "Ask support triage to check last night's live errors in Vercel.",
@@ -74,15 +74,15 @@
       "ask": "Ask marketing to script the 5-spot challenge video shot by shot.",
       "id": "marketing",
       "lastRun": "2026-11-09T12:16:00Z",
-      "lessons": 8,
+      "lessons": 6,
       "name": "Marketing",
       "num": 6,
       "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-09",
       "role": "TikTok and Instagram ideas, scripts and posts. Drafts only.",
       "schedule": "Mondays, and Thursdays 10:00",
       "skills": "fixed",
-      "sources": 33
+      "sources": 50
     },
     {
       "ask": "Ask club growth to prep me for a call with the Wexford Blazers coach.",
@@ -102,21 +102,21 @@
       "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
       "id": "video-editor",
       "lastRun": "2026-11-10T12:14:00Z",
-      "lessons": 15,
+      "lessons": 19,
       "name": "Video editor",
       "num": 8,
       "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
-      "researched": "2026-11-10",
+      "researched": "2026-11-11",
       "role": "Cuts marketing's scripts and the founder's footage into finished TikTok and Reels videos. Never posts.",
       "schedule": "On request, local only",
       "skills": "fixed",
-      "sources": 55
+      "sources": 84
     },
     {
       "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
       "id": "designer",
       "lastRun": null,
-      "lessons": 1,
+      "lessons": 2,
       "name": "Designer",
       "num": 9,
       "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
@@ -124,13 +124,13 @@
       "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
       "schedule": "On request, and before any screen change is built",
       "skills": "new",
-      "sources": 70
+      "sources": 68
     },
     {
       "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
       "id": "player-outreach",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 1,
       "name": "Player outreach",
       "num": 10,
       "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
@@ -144,7 +144,7 @@
       "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
       "id": "qa-tester",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 1,
       "name": "QA tester",
       "num": 11,
       "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
@@ -208,21 +208,21 @@
   ],
   "calls": [
     {
-      "agent": "builder",
-      "detail": "The reminders card shows Mon/Wed/Fri as suggested days until you switch reminders on, says what is still missing after each change, and only counts reminders that can actually arrive. The automatic check passed: safety OK, all 1,029 tests pass, no database changes.",
-      "id": "pr-77",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/77",
-      "onApprove": "Claude merges it the next time you chat (if the checks are still green) and it goes live about a minute later. To do it straight away, tell Claude \"merge 77\".",
-      "title": "E4 follow-ups are ready to go live"
+      "agent": "marketing",
+      "detail": "Fri: a screen video of logging a session without a court, plus a founder post in the app. Sat: one question from the IQ section as a Story quiz. Sun: a screen video of \"Find the hoop for me\" at an empty hoop. No people in any of them, so no consent is needed. Full drafts in docs/agent-os/marketing/2026-11-12-weekend.md.",
+      "due": "2026-11-13",
+      "id": "mkt-weekend",
+      "kind": "approve",
+      "onApprove": "Marketing writes each post in full, ready for you to record and post yourself.",
+      "title": "Weekend posts, Fri 13 to Sun 15"
     },
     {
-      "agent": "release-checker",
-      "detail": "The tester account already has a session, so the new reminders card is hidden for it (correctly). In the app: Settings, Reset to a new player, type RESET and the tester password. Claude isn't allowed to type passwords.",
-      "id": "e4-live",
-      "kind": "task",
-      "onApprove": "It moves to In progress. After the reset, tell Claude \"check E4 live\" and it tests the card in Chrome.",
-      "title": "Reset the tester account so Claude can check E4 live"
+      "agent": "marketing",
+      "detail": "1. A 60-second makes challenge, filmed from behind by you or an adult, with the phone on a bag and nobody else in the hall. 2. The promo with three openings, once you pick A, B or C and the clip with a face is cleared or cut.",
+      "id": "mkt-next-ideas",
+      "kind": "approve",
+      "onApprove": "Marketing scripts both for Monday's plan and hands them to the video editor.",
+      "title": "Next week's first two video ideas"
     },
     {
       "agent": "marketing",
@@ -236,30 +236,6 @@
         "C"
       ],
       "title": "Pick the promo opening to test first"
-    },
-    {
-      "agent": "marketing",
-      "detail": "Mon promo, Tue Story poll, Wed \"log it in 20 seconds\", Thu 5-spot challenge (needs filming), Fri promo with a second opening, Sat IQ question, Sun round-up. Full plan under Clubs and content.",
-      "id": "mkt-week",
-      "kind": "approve",
-      "onApprove": "Marketing writes every post in full, ready for you to copy and post yourself.",
-      "title": "This week's posting calendar"
-    },
-    {
-      "agent": "marketing",
-      "detail": "1. You can log a session without a court in about 20 seconds. 2. This week's 5-spot challenge. Remove \"I read every one\" if that isn't true.",
-      "id": "mkt-founder-posts",
-      "kind": "approve",
-      "onApprove": "Marketing finalises both posts for you to paste into Owner tools, Founder posts.",
-      "title": "Two founder posts for players in the app"
-    },
-    {
-      "agent": "marketing",
-      "detail": "The demo paragraph still says \"every\", which the tracker can't promise. It should say \"counts your makes and misses\".",
-      "id": "mkt-landing-every",
-      "kind": "approve",
-      "onApprove": "The builder makes the one-line fix and it comes back here as code ready to go live.",
-      "title": "Fix \"count every make and miss\" on the landing page"
     },
     {
       "agent": "marketing",
@@ -304,7 +280,7 @@
     },
     {
       "agent": "safety-reviewer",
-      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that.",
+      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that. Google Play's data safety form asks the same questions, so this comes before the Play Store.",
       "id": "dpia",
       "kind": "task",
       "onApprove": "It moves to In progress until it's signed.",
@@ -312,12 +288,55 @@
     },
     {
       "agent": "release-checker",
-      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan.",
+      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan. The Play Store app waits for the domain.",
       "due": "2027-01-08",
       "id": "billing",
       "kind": "task",
       "onApprove": "Claude walks you through deadeye.ie step by step the next time you chat.",
       "title": "Set up deadeye.ie, email and Stripe payments"
+    },
+    {
+      "agent": "marketing",
+      "detail": "The ready-made listing in docs/play-store/README.md says \"Track every shot\" (the tracker can't promise every shot) and uses emoji. It should follow the same rules as your posts.",
+      "id": "play-listing",
+      "kind": "approve",
+      "onApprove": "Marketing rewrites the listing and it comes back here for you to check before the Play Store step.",
+      "title": "Fix the Google Play listing words"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Do this once deadeye.ie is live and the data protection assessment is signed. The app wraps the website, so site updates reach it automatically. Your parent opens the Google Play developer account ($25, once). The App Store waits until iPhone players ask for it.",
+      "id": "play-store",
+      "kind": "task",
+      "onApprove": "Once deadeye.ie is live, Claude builds the Android app on the new address and walks you through Play Console, following docs/play-store/README.md.",
+      "title": "Publish Deadeye on Google Play (after the domain)"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS (founder-only page, no player data); tsc and typegen pass, no migrations or env vars. Two small notes in the PR comment.",
+      "id": "merge-79",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/79",
+      "title": "Merge PR 79: hub chat that acts on tasks, live progress",
+      "words": "merge 79"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS; typegen, tsc, eslint pass; no migrations, no env vars.",
+      "id": "merge-80",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/80",
+      "title": "Merge PR #80: landing demo says \"makes and misses\"",
+      "words": "merge 80"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS (copy and credits links only, head d936be0); typegen, tsc, eslint pass; no migrations, no env vars.",
+      "id": "merge-86",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
+      "title": "Merge PR #86: overclaim wording fixed site-wide",
+      "words": "merge 86"
     }
   ],
   "clubs": {
@@ -360,10 +379,6 @@
       "label": "Work with one agent for a whole session"
     },
     {
-      "cmd": "check E4 live",
-      "label": "Have Claude test E4 on the live site (after the reset)"
-    },
-    {
       "cmd": "/handoff",
       "label": "Wrap up a session and write the handoff"
     }
@@ -395,6 +410,11 @@
       "title": "Founding club offer closes"
     },
     {
+      "date": "2026-12-31",
+      "detail": "After deadeye.ie is live and the assessment is signed",
+      "title": "Aim: Deadeye on Google Play"
+    },
+    {
       "date": "2027-01-08",
       "detail": "Founding members' free Pro starts ending from about 20 Jan",
       "title": "Stripe Pro payments live"
@@ -408,42 +428,22 @@
   "film": {
     "days": [
       {
-        "day": "Mon 9",
-        "post": "Promo, opening A",
-        "where": "TikTok 17:00 · Reel 18:00"
-      },
-      {
-        "day": "Tue 10",
-        "post": "Demo on a phone, poll: do you count your makes?",
-        "where": "IG Story 18:00"
-      },
-      {
-        "day": "Wed 11",
-        "post": "Log it in 20 seconds, no court",
+        "day": "Fri 13",
+        "post": "Log it before you forget (screen video) + founder post",
         "where": "TikTok 17:00 · Reel 17:30"
       },
       {
-        "day": "Thu 12",
-        "post": "5-spot challenge (needs filming)",
-        "where": "TikTok 17:30 · Reel 18:00"
-      },
-      {
-        "day": "Fri 13",
-        "post": "Promo, opening B or C",
-        "where": "TikTok 17:00 · Reel 18:00"
-      },
-      {
         "day": "Sat 14",
-        "post": "Film IQ: one question",
-        "where": "IG Story"
+        "post": "One IQ question, quiz sticker",
+        "where": "IG Story 12:00"
       },
       {
         "day": "Sun 15",
-        "post": "Challenge round-up, counts only",
-        "where": "IG Story 17:00"
+        "post": "Find the hoop for me (screen video, empty hoop); IQ answer",
+        "where": "TikTok 11:00 · Reel 12:00 · Story 17:00"
       }
     ],
-    "experiment": "One promo, three openings. Keep the opening with the best 6-second hold once each has about 1,000 views."
+    "experiment": "Paused until the promo opening is picked: one promo, three openings, keep the one with the best 6-second hold once each has about 1,000 views."
   },
   "funnel": {
     "history": [
@@ -549,12 +549,12 @@
       "status": "ok"
     },
     {
-      "detail": "Running E4 (PR #74). Deploy ready.",
+      "detail": "Live and up to date: the latest version (new agents, PR #94, 11 Nov) is running (checked 13 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "0 errors in the last 24 hours. 0 problem or crash reports open.",
+      "detail": "0 errors in the last 24 hours (checked 13 Nov; Vercel keeps about an hour of detail). 0 problem or crash reports open (9 Nov counts).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -564,46 +564,138 @@
       "status": "warn"
     },
     {
-      "detail": "1 open (#77), checks passed. Every agent pull request is checked automatically.",
+      "detail": "2 open, checks green on both. PR #95 (agent scheduled runs, docs only) is up to date with main. PR #87 (handoff notes, docs only) clashes with newer changes on main and needs updating before it can merge.",
       "name": "Code changes",
-      "status": "ok"
+      "status": "warn"
     }
   ],
   "learn": [
     {
-      "agent": "marketing",
-      "date": "2026-11-07",
-      "latest": "Check the whole video yourself, frame by frame where things move, before the founder sees it. Show a finished cut, not a draft to proofread.",
-      "lessons": 8
+      "agent": "designer",
+      "date": "2026-11-13",
+      "latest": "Review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from stills at one size.",
+      "lessons": 2
     },
     {
-      "agent": "builder",
-      "date": "2026-11-03",
-      "latest": "Build locally with Turbopack (plain next build), never --webpack; run any worker on the live site before calling it done.",
-      "lessons": 13
+      "agent": "video-editor",
+      "date": "2026-11-11",
+      "latest": "Follow the playbook: a real voice first, or a synthetic one the founder picked; captions from the voice track's transcript; registry effects before hand-built ones; a planned music bed; one finished, checked cut.",
+      "lessons": 19
+    },
+    {
+      "agent": "safety-reviewer",
+      "date": "2026-11-11",
+      "latest": "When I ask for a retention, I say it must run on a schedule, not on the player's next use.",
+      "lessons": 1
+    },
+    {
+      "agent": "player-outreach",
+      "date": "2026-11-11",
+      "latest": "The job is players who log a first session; a route is kept or dropped on that, not on visits.",
+      "lessons": 1
+    },
+    {
+      "agent": "marketing",
+      "date": "2026-11-09",
+      "latest": "Until the redesign ships, never make the flame or MAKE/MISS banners the hero; lean on the real shot, the ball going in, the numbers and the slow-mo replay.",
+      "lessons": 6
     },
     {
       "agent": "release-checker",
       "date": "2026-11-07",
-      "latest": "Every variable in .env.example that the changed code reads must be confirmed in Vercel Production by name.",
+      "latest": "Every variable in .env.example that the changed code reads must be confirmed as set in Vercel Production, by name, before merge.",
       "lessons": 9
-    },
-    {
-      "agent": "support-triage",
-      "date": "2026-11-07",
-      "latest": "Silent failures (cron, push, email) never arrive as reports. Read /admin/cron-runs and the counts too.",
-      "lessons": 7
     }
   ],
   "log": [
     {
+      "at": "2026-11-13T16:30:00Z",
+      "text": "Learning digest: 26 new lessons this week (video editor 15, marketing 3, designer 2, release checker 2, support triage 2, player outreach 1, safety reviewer 1). No research due.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-13T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 2 open pull requests, checks green: #95 (agent runs) ready, #87 clashes with main. Nothing urgent.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-12T10:11:23Z",
+      "text": "Marketing mid-week: weekend posts drafted (screen videos and a Story, no people). Landing fix closed. Last week's calendar and founder posts replaced by the weekend call. No new post numbers yet.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-12T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 1 open pull request (#87, docs only, checks green, clashes with main). Nothing urgent.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-11T11:00:00Z",
+      "text": "PR 86 re-checked at d936be0 (credits links added): safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-11T10:40:00Z",
+      "text": "PR 86 checked: safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-11T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date, 2 open pull requests (docs only, checks green). Nothing needs you.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-10T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date, 1 open pull request (docs only, checks green). Nothing needs you.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:40:00Z",
+      "text": "PR check ran on PR #80 (landing demo copy): safety passed, checks passed.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T16:00:00Z",
+      "text": "PR 79 checked: safety PASS, types pass, no migrations or env vars. Ready for merge 79.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T16:08:00Z",
+      "text": "Landing page fix ready as PR #80, waiting for your go-ahead to go live. The welcome page also says \"calls every make and miss\"; left for you.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T16:15:00Z",
+      "text": "Parent consent wording for 16 and 17 year olds drafted for you to edit: docs/agent-os/clubs/2026-11-09-parent-consent-16-17.md. Nothing sent.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:28:00Z",
+      "text": "E4 checked live on the reset tester account: reminders card shows, suggested days, all three messages right, no console errors.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:25:00Z",
+      "text": "PR #77 (E4 follow-ups) and PR #78 (hub redesign) merged. Hub pinned to your claude.ai sidebar.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:20:00Z",
+      "text": "PR check re-ran on PR #78 after it was brought up to date: safety passed.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-09T15:10:00Z",
+      "text": "PR check ran on PR #78 (hub redesign): safety passed.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-09T14:58:00Z",
-      "text": "PR check ran on PR #77 (E4 follow-ups): safety PASS, tsc, eslint and tests pass, comment posted.",
+      "text": "PR check ran on PR #77: safety passed, all checks green.",
       "tone": "ok"
     },
     {
       "at": "2026-11-09T14:42:00Z",
-      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog are on main.",
+      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog.",
       "tone": "ok"
     },
     {
@@ -612,49 +704,9 @@
       "tone": "ok"
     },
     {
-      "at": "2026-11-09T14:34:00Z",
-      "text": "PR check ran itself on PR #74's new commits: safety PASS, tsc, eslint and tests pass, comment posted.",
-      "tone": "ok"
-    },
-    {
       "at": "2026-11-09T14:14:00Z",
-      "text": "Morning check: 0 runtime errors in 24h, production READY on newest main commit, 3 open PRs none red. No P1.",
+      "text": "Morning check: no errors, live site up to date, no urgent problems.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:55:00Z",
-      "text": "Plugin check: campaign-plan, draft-outreach, metrics-review and analyze all load in the cloud.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:32:00Z",
-      "text": "PR #73 merged and live: sign-in cookies kept on redirects.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:28:00Z",
-      "text": "Weekly re-run finished: PR #74 (E4) and PR #75 (report and plans) opened.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T09:05:00Z",
-      "text": "Weekly run could not push (403): this week's first run was lost.",
-      "tone": "bad"
-    },
-    {
-      "at": "2026-11-09T08:43:00Z",
-      "text": "Counts job saved this week's funnel.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-07T16:28:00Z",
-      "text": "Training reminders work again (push keys added).",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-10-24T12:00:00Z",
-      "text": "Last new player joined.",
-      "tone": "warn"
     }
   ],
   "scoreboard": {
@@ -671,7 +723,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-11T19:30:00Z",
-  "updatedBy": "Claude (new agents)",
+  "updatedAt": "2026-11-13T16:30:00Z",
+  "updatedBy": "Learning digest",
   "version": 1
 }
