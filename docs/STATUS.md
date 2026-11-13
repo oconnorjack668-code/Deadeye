@@ -57,6 +57,7 @@ Last updated: 2026-11-13 (PR #99 merged, S8 closed, S27 opened; PR #97 finished 
 
 ## Recently done (do not raise again)
 
+- 2026-11-13 · Drill and exercise demo videos: migration `00059` (PR #100) run on the live database 13 Nov. Query after: 165 of 168 drills and all 167 exercises have a video. No good match, so they keep the YouTube search link: game-winner-countdown, lane-line-touches, spacing-drive-and-drift. Swap any weak pick in Owner tools.
 - 2026-11-13 · S31 closed: the #97 safety fix-soon items built on the PR #97 branch (`e6e4ccf` plus the follow-up commit): `heard_from` cleared 12 months after sign-up by the daily job (failures logged and returned), Settings → Privacy "Clear my answer", `deadeye-from-demo` mark and `signup_from_demo` step removed (old marks tidied on the welcome screen), public counts all-time only, DPIA row and R8, privacy page updated (13 Nov). Safety follow-up review: PASS. Live once #97 merges (S30).
 - 2026-11-13 · S8 tracker visuals: flame beside the score, MAKE/MISS beside the rim with "N in a row" under it, saved-video end card with the red logo and no underline. Designer reviewed, founder signed off on the before/after page and said merge. PR #99. The phone check is S27.
 - 2026-11-13 · PR #96 (13 Nov handoff) merged: `e330a94` on main. S26 closed.
