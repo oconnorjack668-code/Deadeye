@@ -3,6 +3,7 @@
 // Joining and sessions come from the tables they already live in; the welcome
 // and tracker steps come from app_events (00045).
 import React from 'react';
+import { heardFromLabel } from '@/lib/heardFrom';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
@@ -88,15 +89,15 @@ export default async function FunnelPage({ searchParams }: { searchParams: Promi
             ))}
 
             <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-              <h2 className="text-sm font-bold text-white">By route</h2>
+              <h2 className="text-sm font-bold text-white">Where they heard about Deadeye</h2>
               <p className="mb-3 text-xs text-zinc-500">
-                From the ?ref= on the link they first came in by (docs/agent-os/outreach/routes.md). Judge a route on 1st sessions;
-                under about 30 players it is a hint, not a result.
+                The optional question at sign-up (asked from 13 Nov 2026). Judge a route on 1st sessions; under about 30 players
+                it is a hint, not a result.
               </p>
               <table className="w-full text-sm tabular-nums">
                 <thead>
                   <tr className="text-left text-xs text-zinc-500">
-                    <th className="pb-2 font-medium">Route</th>
+                    <th className="pb-2 font-medium">Answer</th>
                     <th className="pb-2 text-right font-medium">Joined</th>
                     <th className="pb-2 text-right font-medium">Set up</th>
                     <th className="pb-2 text-right font-medium">1st session</th>
@@ -105,7 +106,7 @@ export default async function FunnelPage({ searchParams }: { searchParams: Promi
                 <tbody>
                   {result.funnel.routes.map((r) => (
                     <tr key={r.route ?? 'none'} className="border-t border-zinc-800">
-                      <td className="py-2 text-zinc-300">{r.route ?? 'No route'}</td>
+                      <td className="py-2 text-zinc-300">{heardFromLabel(r.route)}</td>
                       <td className="py-2 text-right text-white">{r.joined}</td>
                       <td className="py-2 text-right text-white">{r.setup}</td>
                       <td className="py-2 text-right font-bold text-white">{r.firstSession}</td>

@@ -78,13 +78,13 @@ describe('buildFunnel', () => {
     expect(buildFunnel([], [], []).biggestDrop).toBeNull();
   });
 
-  it('counts players by the route they signed up from, judged on 1st sessions, no route last', () => {
+  it('counts players by where they heard about Deadeye, judged on 1st sessions, no answer last', () => {
     const f = buildFunnel(
       [
-        { id: 'a', setupDone: true, ref: 'friends' },
-        { id: 'b', setupDone: false, ref: 'friends' },
-        { id: 'c', setupDone: true, ref: null },
-        { id: 'd', setupDone: true, ref: 'reddit-irl' },
+        { id: 'a', setupDone: true, heardFrom: 'friend' },
+        { id: 'b', setupDone: false, heardFrom: 'friend' },
+        { id: 'c', setupDone: true, heardFrom: null },
+        { id: 'd', setupDone: true, heardFrom: 'tiktok' },
         { id: 'e', setupDone: true },
       ],
       [],
@@ -95,8 +95,8 @@ describe('buildFunnel', () => {
       ]
     );
     expect(f.routes).toEqual([
-      { route: 'friends', joined: 2, setup: 1, firstSession: 1 },
-      { route: 'reddit-irl', joined: 1, setup: 1, firstSession: 0 },
+      { route: 'friend', joined: 2, setup: 1, firstSession: 1 },
+      { route: 'tiktok', joined: 1, setup: 1, firstSession: 0 },
       { route: null, joined: 2, setup: 2, firstSession: 1 },
     ]);
   });

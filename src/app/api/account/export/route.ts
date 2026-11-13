@@ -123,8 +123,8 @@ export async function GET() {
       id: user.id,
       email: user.email,
       created_at: authUser.data?.user?.created_at ?? null,
-      // The outreach link code they signed up from, if any (src/lib/signupRef.ts)
-      signup_ref: authUser.data?.user?.user_metadata?.signup_ref ?? null,
+      // Their optional sign-up answer to "Where did you hear about Deadeye?" (src/lib/heardFrom.ts)
+      heard_from: authUser.data?.user?.user_metadata?.heard_from ?? null,
     },
     profile: profile.data || null,
     data,

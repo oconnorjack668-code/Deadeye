@@ -3,6 +3,7 @@
 // api/cron/agent-counts every Monday so the founder no longer pastes it.
 // Counts only: no names, emails, ids or report text ever go in it.
 import type { Funnel, RouteRow } from '@/lib/funnel';
+import { heardFromLabel } from '@/lib/heardFrom';
 import { clubById } from '@/lib/clubs';
 import { LEAGUE_NOT_LISTED } from '@/lib/leagues';
 
@@ -102,9 +103,9 @@ function homeClubCounts(rows: Array<{ user_id: string; club_id: string }>, exclu
 }
 
 /**
- * The counts file sits in a public repo: a route that brought only a few
- * players could point to who they are (five friends get the E0 message), so
- * smaller routes are added together (safety review, 2026-11-13).
+ * The counts file sits in a public repo: an answer only a few players gave
+ * could point to who they are (five friends get the E0 message), so smaller
+ * answers are added together (safety review, 2026-11-13).
  */
 export const ROUTE_GROUP_MIN = 5;
 
@@ -119,11 +120,11 @@ interface PublicRouteRow {
 export function publicRoutes(everyone: RouteRow[], week: RouteRow[]): PublicRouteRow[] {
   const weekOf = new Map(week.map((r) => [r.route, r]));
   const rows: PublicRouteRow[] = [];
-  const small: PublicRouteRow = { label: `smaller routes (under ${ROUTE_GROUP_MIN} each)`, joined: 0, firstSession: 0, weekJoined: 0, weekFirstSession: 0 };
+  const small: PublicRouteRow = { label: `Other answers (under ${ROUTE_GROUP_MIN} each)`, joined: 0, firstSession: 0, weekJoined: 0, weekFirstSession: 0 };
   let none: PublicRouteRow | null = null;
   for (const r of everyone) {
     const w = weekOf.get(r.route);
-    const row = { label: r.route ?? 'no route', joined: r.joined, firstSession: r.firstSession, weekJoined: w?.joined ?? 0, weekFirstSession: w?.firstSession ?? 0 };
+    const row = { label: heardFromLabel(r.route), joined: r.joined, firstSession: r.firstSession, weekJoined: w?.joined ?? 0, weekFirstSession: w?.firstSession ?? 0 };
     if (r.route === null) none = row;
     else if (r.joined >= ROUTE_GROUP_MIN) rows.push(row);
     else {
@@ -159,15 +160,14 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
   });
   lines.push(
     '',
-    '## By route',
+    '## Where they heard about Deadeye',
     '',
-    'From the `?ref=` on the link a player first came in by (recorded from',
-    '2026-11-13; older players show as "no route"). Judge a route on 1st',
-    'sessions; under about 30 players it is a hint. This file is public, so',
-    `routes with fewer than ${ROUTE_GROUP_MIN} players joined are added together;`,
-    '`/admin/funnel` has every route.',
+    'The optional question at sign-up (asked from 2026-11-13; older players',
+    'show as "Didn\'t say"). Judge a route on 1st sessions; under about 30',
+    'players it is a hint. This file is public, so answers with fewer than',
+    `${ROUTE_GROUP_MIN} players joined are added together; \`/admin/funnel\` has them all.`,
     '',
-    '| Route | Joined (all) | 1st session (all) | Joined in 7 days | 1st session in 7 days |',
+    '| Answer | Joined (all) | 1st session (all) | Joined in 7 days | 1st session in 7 days |',
     '| --- | --- | --- | --- | --- |'
   );
   for (const r of publicRoutes(everyone.routes, week.routes)) {

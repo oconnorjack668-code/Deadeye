@@ -19,7 +19,7 @@ const ShotTracker = dynamic(() => import('@/components/video/ShotTracker').then(
   ),
 });
 
-export function LandingDemo({ signedIn, signupHref = '/signup' }: { signedIn: boolean; signupHref?: string }) {
+export function LandingDemo({ signedIn }: { signedIn: boolean }) {
   // Under the verdict, not below the shot list: on a phone the list pushes
   // anything after it a long scroll away
   const cta = (
@@ -29,7 +29,7 @@ export function LandingDemo({ signedIn, signupHref = '/signup' }: { signedIn: bo
         Prop your phone up at any court, tap the two sides of the rim, and shoot. It&apos;s free to start.
       </p>
       <Link
-        href={signedIn ? '/video' : signupHref}
+        href={signedIn ? '/video' : '/signup'}
         onClick={signedIn ? undefined : markFromDemo}
         className="mt-3 flex h-12 items-center justify-center rounded-xl bg-orange-600 font-semibold text-white hover:bg-orange-500"
       >

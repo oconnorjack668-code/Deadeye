@@ -19,7 +19,7 @@ export const LANDING_SECTIONS = [
   { id: 'faq', label: 'FAQ' },
 ] as const;
 
-export function LandingHeader({ signedIn = false, signupHref = '/signup' }: { signedIn?: boolean; signupHref?: string }) {
+export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
   const [active, setActive] = useState<string | null>(null);
 
   // The section nearest the top of the screen is the one being read. Watched
@@ -75,7 +75,7 @@ export function LandingHeader({ signedIn = false, signupHref = '/signup' }: { si
               <Link href="/login" className="rounded-lg px-3 py-1.5 text-sm text-zinc-300 hover:text-white">
                 Log in
               </Link>
-              <Link href={signupHref} className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500">
+              <Link href="/signup" className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500">
                 Start free
               </Link>
             </>
