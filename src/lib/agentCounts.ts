@@ -2,7 +2,7 @@
 // The weekly counts file the Agent OS reads (docs/agent-os/data/), written by
 // api/cron/agent-counts every Monday so the founder no longer pastes it.
 // Counts only: no names, emails, ids or report text ever go in it.
-import type { Funnel } from '@/lib/funnel';
+import type { Funnel, RouteRow } from '@/lib/funnel';
 import { clubById } from '@/lib/clubs';
 import { LEAGUE_NOT_LISTED } from '@/lib/leagues';
 
@@ -101,6 +101,43 @@ function homeClubCounts(rows: Array<{ user_id: string; club_id: string }>, exclu
   return { playersWithClub: real.length, bigClubs };
 }
 
+/**
+ * The counts file sits in a public repo: a route that brought only a few
+ * players could point to who they are (five friends get the E0 message), so
+ * smaller routes are added together (safety review, 2026-11-13).
+ */
+export const ROUTE_GROUP_MIN = 5;
+
+interface PublicRouteRow {
+  label: string;
+  joined: number;
+  firstSession: number;
+  weekJoined: number;
+  weekFirstSession: number;
+}
+
+export function publicRoutes(everyone: RouteRow[], week: RouteRow[]): PublicRouteRow[] {
+  const weekOf = new Map(week.map((r) => [r.route, r]));
+  const rows: PublicRouteRow[] = [];
+  const small: PublicRouteRow = { label: `smaller routes (under ${ROUTE_GROUP_MIN} each)`, joined: 0, firstSession: 0, weekJoined: 0, weekFirstSession: 0 };
+  let none: PublicRouteRow | null = null;
+  for (const r of everyone) {
+    const w = weekOf.get(r.route);
+    const row = { label: r.route ?? 'no route', joined: r.joined, firstSession: r.firstSession, weekJoined: w?.joined ?? 0, weekFirstSession: w?.firstSession ?? 0 };
+    if (r.route === null) none = row;
+    else if (r.joined >= ROUTE_GROUP_MIN) rows.push(row);
+    else {
+      small.joined += row.joined;
+      small.firstSession += row.firstSession;
+      small.weekJoined += row.weekJoined;
+      small.weekFirstSession += row.weekFirstSession;
+    }
+  }
+  if (small.joined > 0) rows.push(small);
+  if (none) rows.push(none);
+  return rows;
+}
+
 function pct(count: number, of: number): string {
   return of > 0 ? ` (${Math.round((count / of) * 100)}%)` : '';
 }
@@ -126,15 +163,15 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
     '',
     'From the `?ref=` on the link a player first came in by (recorded from',
     '2026-11-13; older players show as "no route"). Judge a route on 1st',
-    'sessions; under about 30 players it is a hint.',
+    'sessions; under about 30 players it is a hint. This file is public, so',
+    `routes with fewer than ${ROUTE_GROUP_MIN} players joined are added together;`,
+    '`/admin/funnel` has every route.',
     '',
     '| Route | Joined (all) | 1st session (all) | Joined in 7 days | 1st session in 7 days |',
     '| --- | --- | --- | --- | --- |'
   );
-  const weekRoutes = new Map(week.routes.map((r) => [r.route, r]));
-  for (const r of everyone.routes) {
-    const w = weekRoutes.get(r.route);
-    lines.push(`| ${r.route ?? 'no route'} | ${r.joined} | ${r.firstSession} | ${w?.joined ?? 0} | ${w?.firstSession ?? 0} |`);
+  for (const r of publicRoutes(everyone.routes, week.routes)) {
+    lines.push(`| ${r.label} | ${r.joined} | ${r.firstSession} | ${r.weekJoined} | ${r.weekFirstSession} |`);
   }
   lines.push('');
   if (everyone.biggestDrop) {

@@ -562,7 +562,7 @@ export function SettingsClient({
           <div>
             <p className="text-sm text-zinc-500">Deadeye Basketball Training · version {version}</p>
             {/* Which build is running, so a problem report or a test run can name it (src/lib/build.ts) */}
-            <p className="mt-0.5 font-mono text-xs text-zinc-600" data-testid="build-id">Build {buildLabel()}</p>
+            <p className="mt-0.5 font-mono text-xs text-zinc-500" data-testid="build-id">Build {buildLabel()}</p>
           </div>
         </Row>
       </Section>

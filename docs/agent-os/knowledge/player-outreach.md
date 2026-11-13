@@ -56,8 +56,21 @@ first, each with the date, what happened, and the rule.
 - [ ] Zero from a small number is not proof of zero (rule of three: 0 of 30 could still be up
       to about 10%).
 - [ ] One or two routes run for several weeks before adding more.
-- [ ] Optional "how did you hear about us?" with fixed answers suggested to the builder (`G`
-      item), alongside `?ref=` capture, which the app does not record yet (2026-11-11).
+- [ ] `?ref=` is saved at sign-up and counted by route (joined, 1st session) at `/admin/funnel`
+      and in the weekly counts file once PR #97 merges (2026-11-13); check it is merged before
+      reading route numbers. Links go to `/` or `/signup` only, with a plain code (`a-z0-9-_`,
+      max 40). Radio, print and word of mouth show as "no route".
+- [ ] Optional "how did you hear about us?" with fixed answers could still catch the "no
+      route" players; suggest it to the lead, not as a ref-capture item.
+
+### Before drafting
+
+- [ ] Trend board (`trends/ads.md`) read; if over 7 days old or "never", say so in the plan.
+- [ ] Clubs, schools and academies (and their adult or social teams) are club-growth's; check
+      `clubs/pipeline.md` before adding a route.
+- [ ] The founder is under 18 (`docs/launch-checklist.md`): any press, interview or email to an
+      organisation copies in a parent, and a parent agrees before the founder's name or photo
+      appears anywhere.
 
 ## Research
 

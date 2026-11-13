@@ -39,7 +39,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 
-import { clubCounts, countsFile, countsPath } from '@/lib/agentCounts';
+import { clubCounts, countsFile, countsPath, publicRoutes } from '@/lib/agentCounts';
 import { GET } from '@/app/api/cron/agent-counts/route';
 
 const fetchMock = vi.fn();
@@ -70,16 +70,40 @@ describe('countsFile', () => {
     expect(file).not.toMatch(/@|[0-9a-f]{8}-[0-9a-f]{4}/);
   });
 
-  it('splits joins and 1st sessions by outreach route, both windows side by side', () => {
+  it('splits joins and 1st sessions by route, adding small routes together so nobody can be picked out', () => {
     const file = countsFile('2026-10-26', funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
     expect(file).toContain('## By route');
-    expect(file).toContain('| friends | 3 | 1 | 3 | 0 |');
+    expect(file).not.toContain('| friends |');
+    expect(file).toContain('| smaller routes (under 5 each) | 3 | 1 | 3 | 0 |');
     expect(file).toContain('| no route | 21 | 1 | 14 | 0 |');
   });
 
   it('dates the file by Irish time', () => {
     // 23:30 UTC on Sunday is 00:30 on Monday in Dublin in summer
     expect(countsPath(new Date('2026-07-26T23:30:00Z'))).toEqual({ date: '2026-07-27', path: 'docs/agent-os/data/2026-07-27-funnel.md' });
+  });
+});
+
+describe('publicRoutes', () => {
+  it('names routes with 5 or more players, sums the rest, and keeps "no route" last', () => {
+    expect(
+      publicRoutes(
+        [
+          { route: 'friends', joined: 7, setup: 6, firstSession: 4 },
+          { route: 'fdys', joined: 2, setup: 2, firstSession: 1 },
+          { route: 'wexford-press', joined: 1, setup: 0, firstSession: 0 },
+          { route: null, joined: 9, setup: 5, firstSession: 3 },
+        ],
+        [
+          { route: 'friends', joined: 2, setup: 2, firstSession: 1 },
+          { route: 'fdys', joined: 1, setup: 1, firstSession: 1 },
+        ]
+      )
+    ).toEqual([
+      { label: 'friends', joined: 7, firstSession: 4, weekJoined: 2, weekFirstSession: 1 },
+      { label: 'smaller routes (under 5 each)', joined: 3, firstSession: 1, weekJoined: 1, weekFirstSession: 1 },
+      { label: 'no route', joined: 9, firstSession: 3, weekJoined: 0, weekFirstSession: 0 },
+    ]);
   });
 });
 

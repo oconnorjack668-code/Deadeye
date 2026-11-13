@@ -129,7 +129,7 @@ export default function PrivacyPage() {
             <li>
               If you signed up from one of our links, the short code in that link for where it was shared (for example
               &quot;friends&quot;), saved with your account so we know which places bring players who stick with it. It names a
-              place, never a person, and nothing is stored on your device for it. Deleting your account deletes it.
+              place, never a person, and is only ever counted together with other players. Deleting your account deletes it.
             </li>
           </ul>
         </section>
@@ -153,7 +153,7 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
+              Crash reports, problem reports you send, the app steps above, the link code above, measuring and improving the shot tracker,
               and keeping the service secure rely on our legitimate interest in Deadeye working properly.
             </li>
             <li>Payment records are kept because tax law requires it.</li>

@@ -21,7 +21,7 @@ win over this file. Gold-standard drafts: `examples.md` in this folder.
 | Safeguarding | No direct messages to young people the founder does not know. Adults (coaches, parents, organisers, adult creators) are the bridge. |
 | Ad disclosure | Any paid or gifted creator post is labelled as an ad: ASAI code and CCPC guidance in Ireland, ASA/CAP in the UK. |
 | Direct marketing law | Email only to organisations' published contact addresses or people who asked; Irish ePrivacy rules (S.I. 336/2011) and GDPR. |
-| Children's data | Track routes, never people (`?ref=<route>`). No cash rewards to children. Irish DPC Fundamentals. |
+| Children's data | Track routes, never people (`?ref=<route>`). A code names a route type or public community, never a person, handle, school or youth team, and must be in `ROUTES` (`src/lib/signupRef.ts`) before its link is shared. No cash rewards to children. Irish DPC Fundamentals. |
 | One route at a time | Two or three tries a week, each measurable, kept or dropped on evidence. |
 
 ## Route types

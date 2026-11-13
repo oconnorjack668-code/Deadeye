@@ -119,7 +119,13 @@ export async function GET() {
   const body = {
     exported_at: new Date().toISOString(),
     app: 'Deadeye Basketball Training',
-    account: { id: user.id, email: user.email, created_at: authUser.data?.user?.created_at ?? null },
+    account: {
+      id: user.id,
+      email: user.email,
+      created_at: authUser.data?.user?.created_at ?? null,
+      // The outreach link code they signed up from, if any (src/lib/signupRef.ts)
+      signup_ref: authUser.data?.user?.user_metadata?.signup_ref ?? null,
+    },
     profile: profile.data || null,
     data,
     note: 'Uploaded video and profile-photo files are not included in this file. They stay in your account until you delete them.',

@@ -1,8 +1,8 @@
-Skills: all 5 loaded (2026-11-11 re-review run)
+Skills: all 5 loaded (2026-11-13 review of PR #97, ref tracking and build id)
 
 # Safety reviewer knowledge
 
-Last researched: 2026-11-11
+Last researched: 2026-11-13 (attribution links, ePrivacy, small numbers)
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -89,6 +89,24 @@ file). Newest first, each with the date, what happened, and the rule.
       processor keeps something (parent page, screen line) carries the same
       exceptions as the privacy policy ("longer only if flagged"), and a model
       or provider can't be switched by an env var without re-checking that wording.
+- [ ] **The repo is public.** Anything a cron or agent commits (weekly counts,
+      data notes, reports) is world-readable and stays in git history after an
+      account is deleted. A value that came from a user (URL parameter,
+      user_metadata, form text) reaches a committed file only if it matches a
+      fixed list in code; any count under 5 is grouped ("smaller routes").
+- [ ] **user_metadata is the player's to write.** Anyone can set it at sign-up
+      with the public key, and any signed-in player can change it later
+      (`auth.updateUser`). Never trust it for access, for anything published,
+      or as proof of where a player came from.
+- [ ] **Tracking links are in ePrivacy too.** EDPB 2/2023 (paras 49-51) puts a
+      code in a URL that says where a visitor came from inside Art 5(3), the
+      same as a cookie. Moving a tracker from localStorage into the address does
+      not remove the consent question. Prefer asking the player (a choice they
+      make on the form) over reading a code from the link.
+- [ ] **Auth metadata in the export.** A branch that saves something in
+      user_metadata or app_metadata must add it to the `account` block of
+      `src/app/api/account/export/route.ts`; the export does not copy metadata
+      by itself.
 - [ ] **DPIA.** A new kind of processing (new data type, recipient, upload,
       AI use, public surface) is named in the verdict as needing the DPIA
       updated.
