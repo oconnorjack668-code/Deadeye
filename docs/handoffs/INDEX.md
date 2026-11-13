@@ -4,6 +4,8 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-13 · new-agents-merged · PR #94 merged: designer, outreach and QA agents on main → [handoff](2026-11-13-new-agents-merged.md)
+- 2026-11-11 · new-agents · Designer, player-outreach and QA tester agents; weekly TikTok trend scan → [handoff](2026-11-11-new-agents.md)
 - 2026-11-11 · planner-ty-timetable · Personal planner synced across devices; TY timetable doc; Opera browser connected → [handoff](2026-11-11-planner-ty-timetable.md)
 - 2026-11-11 · routine-import · Gym routine import live (paste, screenshot, CSV); safety reviewed twice · open: 1 → [handoff](2026-11-11-routine-import.md)
 - 2026-11-11 · agent-upgrades-and-status · Agents to professional level (#84); STATUS.md loaded into every chat → [handoff](2026-11-11-agent-upgrades-and-status.md)

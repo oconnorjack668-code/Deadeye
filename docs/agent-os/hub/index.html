@@ -334,7 +334,7 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
   const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
   const PAGES = [["home", "Home"], ["todo", "To-do"], ["growth", "Growth"], ["agents", "Agents"], ["outreach", "Clubs and content"], ["ask", "Chat"]];
   const BAR = ["home", "todo", "growth", "agents", "ask"];
-  const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", founder: "You" };
+  const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", "video-editor": "Video editor", designer: "Designer", "player-outreach": "Player outreach", "qa-tester": "QA tester", founder: "You" };
   const STATUS = { approved: ["In progress", "info"], done: ["Done", "good"], later: ["Later", "neutral"] };
   let snap = null, decisions = {}, progress = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
   const PSTATE = { queued: ["Queued", "neutral"], working: ["Working on it", "info"], done: ["Finished", "good"], blocked: ["Blocked", "bad"] };

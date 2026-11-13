@@ -42,7 +42,9 @@ instead.
   and their permissions) runs from `docs/agent-os/README.md`. Read it before
   taking a backlog item.
 - UI work: read `docs/design.md` (colours, spacing, components, what to
-  avoid) before adding or changing a screen.
+  avoid) before adding or changing a screen. The designer agent
+  (`.claude/agents/designer.md`) owns the look: its mockups in
+  `docs/agent-os/design/` and the trend board `docs/agent-os/trends/visual.md`.
 - Promo videos, social posts and anything else marketing: read
   `docs/agent-os/knowledge/marketing.md` first (the founder's past
   corrections and the checklist), whichever agent does the work. Cutting or
