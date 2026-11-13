@@ -11,10 +11,10 @@
 -- It checks the tables, columns, functions and indexes each migration creates.
 -- It does not check policies, grants or data, so these migrations, which only
 -- change those, cannot be told apart from not being run:
---   00008, 00009, 00012, 00029, 00030, 00040
+--   00008, 00009, 00012, 00029, 00030, 00040, 00059
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00058, 58 files, 271 things). Do not edit it by
+-- (00001 to 00059, 59 files, 271 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
