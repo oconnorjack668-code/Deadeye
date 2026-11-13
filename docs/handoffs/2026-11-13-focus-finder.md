@@ -29,19 +29,19 @@ An optional AI week plan costs 1 AI report. A coach can send the plan to a team 
 
 ## Status changes
 - Closed: none
-- Opened: S28, S29 (S1 note added)
+- Opened: S34, S35 (S1 note added; first numbered S28, S29 on the branch, renumbered at the merge with main because main had moved to S30-S33)
 
 ## Preview check (signed in as the tester)
 - `/focus` loads; free text matched live into chips; film, drills (solo only, spread across weaknesses,
   demo videos first), guides and the own-film nudge all from live content; AI shows "not switched on"
   (no AI key on previews). Watch opens `/study/<topic>#lesson-<id>` at the right card.
 - Fixed after: suggestions heading said "numbers" for setup-only picks; item reasons were clunky.
-- Found S29: 5 lesson videos are dead on YouTube. Not checked: phone width (window resize did not apply).
+- Found S35: 5 lesson videos are dead on YouTube. Not checked: phone width (window resize did not apply).
 
 ## Safety review (safety-reviewer agent, 13 Nov)
 - BLOCK on 3, all fixed: parent page (`src/app/parents/WhatParentsAgreeTo.tsx`) now names Focus Finder;
   free text no longer stored in `ai_reports.input_data`; Childline line shown in the browser from the text.
-- Fix-soon items done too; left for later in S28 (delete one plan, radiogroup arrow keys).
+- Fix-soon items done too; left for later in S34 (delete one plan, radiogroup arrow keys).
 - Reviewer's two new checklist lines added to `docs/agent-os/knowledge/safety-reviewer.md`.
 - DPIA additions listed on S1.
 

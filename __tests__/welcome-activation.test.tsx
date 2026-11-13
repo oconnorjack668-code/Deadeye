@@ -10,7 +10,6 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 const tracked = vi.hoisted(() => [] as string[]);
 vi.mock('@/lib/events', () => ({
   track: (name: string) => tracked.push(name),
-  trackIfFromDemo: () => undefined,
 }));
 vi.mock('@/app/(app)/profile/RemindersCard', () => ({ RemindersCard: () => <div>reminders</div> }));
 // The tracker is not under test: a stand-in that finishes the sample when pressed

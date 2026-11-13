@@ -1,3 +1,5 @@
+Skills: all 5 loaded (2026-11-13 review of PR #97)
+
 # Safety reviewer findings
 
 Research for the safety-reviewer agent: what the evidence says, each finding with its
@@ -180,6 +182,53 @@ when a better source arrives, rather than adding beside it.
   crop out names and faces and tell the model not to copy them.
   [EDPB Opinion 28/2024](https://edpb.europa.eu/system/files/2024-12/edpb_opinion_202428_ai-models_en.pdf), 2024, regulator.
 
+### Attribution links, ePrivacy and published counts
+
+- EDPB Guidelines 2/2023 on the technical scope of Art 5(3) ePrivacy
+  (final v2.0, adopted 7 Oct 2024), s.3.1 "URL and pixel tracking", paras
+  49-51: a tracking link is a URL with something added that is not needed to
+  load the page, "very commonly used ... to identify the origin of their
+  inbound source of traffic" (the affiliate example names a partner, not the
+  visitor). Distributing the link counts as storage "at the very least
+  through the caching mechanism", and collecting the code counts as gaining
+  access, so Art 5(3) applies. Para 40: the guidelines do not cover the
+  exemptions. **For Deadeye:** `?ref=` route codes are tracking links on the
+  EDPB's reading. Carrying the code in the address instead of localStorage
+  does not take it outside Reg. 5 of S.I. 336/2011. Counting where players
+  come from is not "strictly necessary", so on this reading it needs consent,
+  or the player should give the answer themselves (a choice on the sign-up
+  form) **(legal advice)** on whether a non-unique, first-party code is a
+  risk the founder can accept.
+  [EDPB 2/2023 v2](https://edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf), 2024, regulator.
+- Irish DPC cookie guidance (April 2020): analytics cookies are not strictly
+  necessary and need GDPR-standard consent; no pre-ticked boxes; first-party
+  analytics are "low risk" and unlikely to be an enforcement priority, but
+  the consent rule still applies. **For Deadeye:** first-party route counts
+  are low priority for the DPC but not exempt. The existing
+  `markFromDemo` localStorage mark (`src/lib/events.ts`) is analytics
+  storage with no consent. Law-firm summaries of the DPC note:
+  [Hunton](https://www.hunton.com/privacy-and-cybersecurity-law-blog/irish-dpc-publishes-new-cookie-guidance), [Lewis Silkin](https://lewissilkin.com/en/insights/irish-dpc-new-guidance-on-cookies-and-similar-technologies), 2020, practitioner (of regulator guidance).
+  Re-check the DPC's own page before quoting it.
+- Supabase: `user_metadata` (`raw_user_meta_data`) can be written by the
+  signed-in user from the client (`updateUser({ data })`), so it is not a
+  safe place for anything trusted; `app_metadata` can only be set with the
+  service key. Supabase's own linter flags RLS that reads user_metadata.
+  **For Deadeye:** a value read from user_metadata may be anything the player
+  (or a script using the public key at sign-up) chose. Check it against a
+  fixed list before it is shown or published.
+  [Supabase splinter 0015](https://supabase.github.io/splinter/0015_rls_references_user_metadata), current, provider docs.
+- Small numbers: Revenue's Statistical Disclosure Control Protocol (Jan 2019,
+  built on CSO and ONS practice) treats any table cell under 10 as unsafe to
+  publish and prefers table redesign (grouping small categories) to
+  suppression. The ICO's anonymisation guidance (March 2025) asks whether a
+  "motivated intruder" with other knowledge could single someone out.
+  **For Deadeye:** a public counts file showing "friends | 1 | 0" lets the
+  five friends who got the message work out who joined and did not train.
+  Group routes under 5 (Revenue uses 10) in anything committed; exact numbers
+  stay on `/admin/funnel`, which only the owner can open.
+  [Revenue SDC protocol](https://revenue.ie/en/corporate/documents/statistics/about/statistical-disclosure-control.pdf), 2019, regulator (Irish public body);
+  [ICO anonymisation guidance summary](https://www.rpclegal.com/snapshots/data-protection/summer-2025/ico-publishes-new-guidance-on-anonymisation-and-pseudonymisation/), 2025, practitioner (of benchmark).
+
 ## Open questions
 
 - Does a new AI use need fresh consent from parents who approved before it
@@ -200,5 +249,9 @@ when a better source arrives, rather than adding beside it.
 - Does Children First apply to Deadeye, or only to clubs using it? **(legal advice)**
 - What happens to parent approval and under-16 data at 16?
 - Does Reg. 5 ePrivacy apply to a web push subscription? **(legal advice)**
+- Can a first-party `?ref=` route code that names a place (not a visitor)
+  be used without consent, given EDPB 2/2023 paras 49-51 and the DPC's "low
+  priority" line on first-party analytics? Asked by PR #97 (2026-11-13).
+  **(legal advice)**
 - Next research: AI Act Art. 5 (exploiting age), a DPC or EDPB text on push
   notifications, Sport Ireland's online safeguarding text.

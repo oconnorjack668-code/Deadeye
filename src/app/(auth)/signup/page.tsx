@@ -12,6 +12,8 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { AgeChoice, type AgeAnswer } from '@/components/AgeChoice';
+import { Select } from '@/components/ui/Select';
+import { HEARD_FROM, normaliseHeardFrom } from '@/lib/heardFrom';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -20,6 +22,7 @@ export default function SignUpPage() {
   const [password, setPassword] = useState('');
   const [age, setAge] = useState<AgeAnswer | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [heardFrom, setHeardFrom] = useState('');
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +63,8 @@ export default function SignUpPage() {
             display_name: displayName.trim(),
             // Read by the handle_new_user trigger into age_checks (00036)
             age_16_plus: age === '16-plus',
+            // Optional "Where did you hear about Deadeye?" answer (src/lib/heardFrom.ts)
+            heard_from: normaliseHeardFrom(heardFrom) ?? undefined,
           },
           emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
         },
@@ -154,6 +159,14 @@ export default function SignUpPage() {
               />
 
               <AgeChoice value={age} onChange={setAge} error={errors.age} />
+
+              <Select
+                id="heard-from"
+                label="Where did you hear about Deadeye? (optional)"
+                value={heardFrom}
+                onChange={(e) => setHeardFrom(e.target.value)}
+                options={[{ value: '', label: 'Choose one, or skip' }, ...HEARD_FROM]}
+              />
 
               <div>
                 <label className="flex items-start gap-2.5 text-sm text-zinc-300 cursor-pointer">

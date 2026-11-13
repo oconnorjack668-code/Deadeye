@@ -7,6 +7,8 @@ the accounts (the controller, `LEGAL_NAME`) have read it, corrected it and signe
 section 7. Review it every 6 months, and before any feature that adds a new kind
 of personal data, a new audience or a new processor.
 
+Updated 2026-11-13 (PR #97): the optional sign-up answer (section 1, R8).
+
 Why one is needed: the Data Protection Commission (DPC) lists large-scale or
 systematic processing of children's data among the kinds that require a DPIA,
 and its *Fundamentals for a Child-Oriented Approach to Data Processing* (2021)
@@ -31,6 +33,7 @@ Deadeye is for players from 13, so most users are under 18.
 | Reminder settings, push address | Player | Reminders | Consent (switched on by the player) | Until switched off |
 | Plan, founding offer dates, billing status | Player | Pro | Contract; legal obligation for payment records | Account life; Stripe keeps payment records |
 | Crash reports, problem reports, app steps | Player | Fixing bugs, finding where new players stall | Legitimate interest | 90 days |
+| Sign-up answer: where they heard about Deadeye (optional, one of 9 fixed answers, no free text) | Player, from 13 (before parent approval too) | Which outreach routes bring players who train; counts only | Legitimate interest (player can clear it in Settings) | 12 months after sign-up (daily job), or until cleared or the account is deleted |
 
 Processors: Supabase (database, files), Vercel (hosting), Anthropic (AI coach:
 receives profile and training numbers, never name, email, photo or video;
@@ -68,7 +71,7 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
 | R5 | The AI coach gives harmful advice (injury, diet, distress) | Medium | High | Safety rules in every AI prompt (`persona.ts`); a check that adds Childline, Text 50808, Samaritans and 112/999 under any reply to a message about self-harm, distress or abuse (`src/lib/ai/safety.ts`); players can switch AI off | Low-medium |
 | R6 | Engagement pressure on children (streaks, reminders) | Medium | Medium | Reminders off until the player turns them on; the "streak ends tonight" warning off by default for under-18s (00057); streak freezes; no leaderboard shaming copy | Low |
 | R7 | Data breach at a processor | Low | High | Reputable EU-capable processors; keys only in Vercel; service key never on previews | Low-medium |
-| R8 | Personal data in diagnostics or agent files | Low | Medium | Crash and problem reports kept 90 days; agents work from counts only; funnel steps first-party, once a day | Low |
+| R8 | Personal data in diagnostics or agent files | Low | Medium | Crash and problem reports kept 90 days; agents work from counts only; funnel steps first-party, once a day. The weekly counts file is in a public repo: sign-up answers appear only as fixed labels, all-time totals, with answers under 5 players added together; nothing is read from links or stored on the device to count visitors (ePrivacy 5(3); the old landing-demo mark was removed, PR #97) | Low |
 | R9 | Video of players (faces, other children in shot) | Medium | Medium | Analysis on the phone; upload optional; videos never sent to the AI provider. No consent step for other people in shot | Medium |
 | R10 | Marketing reaches or targets children unfairly | Medium | Medium | Marketing agent rules: no identifiable under-18s without written parent consent, ASAI code, no pressure, no money talk to under-16s | Low |
 | R11 | A screenshot or pasted message carries other people's details (names, faces, phone numbers, other children) or the player's own to the AI provider | Medium | Low-medium | Sent only when the player chooses; shrunk on the phone; no account id; not stored by Deadeye; provider deletes within 30 days; a line on the screen asks players to crop out names and faces; the model is told not to copy names or numbers; stops when AI is off | Low |

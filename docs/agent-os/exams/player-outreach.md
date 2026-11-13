@@ -36,7 +36,7 @@ servers this week.
 - Checks and quotes each community's self-promotion rule; skips or asks the
   moderators where it is not allowed.
 - Each draft is different and gives something useful first.
-- Each has its own `?ref=` tracking link.
+- Each names the sign-up answer its players would pick; plain links, no `?ref=` or UTM code.
 - Drafts only; the founder posts.
 
 ## 4. A creator deal
