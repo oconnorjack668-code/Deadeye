@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-13 (PR #99: tracker visuals, S8 closed, S27 opened)
+Last updated: 2026-11-13 (PR #103: Focus Finder, S28 opened, S1 note added)
 
 ## Rules
 
@@ -32,7 +32,8 @@ Last updated: 2026-11-13 (PR #99: tracker visuals, S8 closed, S27 opened)
 
 | Id | What | Owner | Since | Last checked |
 | --- | --- | --- | --- | --- |
-| S1 | Sign the DPIA (`docs/legal/dpia.md`, section 7) with the account holder, then its 7 open actions (action 7, routine import, is done apart from S21). Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions). | Founder | 2026-11-07 | 2026-11-11: file still says DRAFT |
+| S1 | Sign the DPIA (`docs/legal/dpia.md`, section 7) with the account holder, then its 7 open actions (action 7, routine import, is done apart from S21). Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions), and Focus Finder AI plans (PR #103: weakness text, position, level and make rates go to the AI provider; privacy policy already updated in that PR). | Founder | 2026-11-07 | 2026-11-13: file still says DRAFT |
+| S28 | Focus Finder (PR #103, draft): weakness to film, IQ and drills, AI week plan, coach "send to team". Next: safety review (safety-reviewer agent), then founder "merge 103". After merge, make one AI plan and send one test assignment on the live site with the tester account: previews have no service key, so the AI credit step cannot run there. | Lead, then founder | 2026-11-13 | 2026-11-13: PR open, tests green |
 | S2 | Hoop model credits (`ml/rim-detector/ATTRIBUTION.md`): rim-finding shipped 3 Nov, CC BY needs the credit. Done: ballllls, X-Basket, basketball-computer-vision (links added 11 Nov). Missing: the page link for Basketball Shot Tracking (311 images, CC BY 4.0, classes ball, rim, backboard; the Colab file was `Basketball Shot Tracking.coco.zip`). Not found by the founder or by web search. If it cannot be found, ask whether to drop that dataset and retrain. | Founder | 2026-11-03 | 2026-11-11: 3 of 4 linked |
 | S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`); then the Play Store. | Founder | 2026-11-09 | 2026-11-09 |
 | S5 | Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). | Founder | 2026-11-11 | 2026-11-11 |
