@@ -17,7 +17,10 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-13 · Tracker S8 review: the builder's 640 px stills looked right, but at 390 px inline
+  and in the 9:16 export the MAKE/MISS call clipped and covered the "Fix rim" and full-screen buttons.
+  Rule: review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from
+  stills at one size. Headless Chrome won't go below 512 px wide: pin a 390 px column instead.
 
 ## Checklist
 
@@ -36,6 +39,8 @@ Newest first, each with the date, what happened, and the rule.
 - [ ] MAKE/MISS and good/bad never shown by green and red alone: word, icon and lightness too.
 - [ ] Every state: first-time, empty, loading, error, success, offline.
 - [ ] Reduced motion: confetti, flames and count-ups become a fade.
+- [ ] Overlays checked in every state that adds elements (warnings, banners, unsure pill), so
+      nothing covers a button or runs off the frame; text sized from the picture, not the canvas.
 - [ ] Works at 360px; share frames inside the TikTok and Instagram safe zones
       (about x 65-1015, y 270-1500 of 1080x1920), tested under the real overlays when possible.
 

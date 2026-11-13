@@ -37,6 +37,18 @@ export interface ExportSegment {
   replay: boolean;
 }
 
+/** An image loaded and decoded, or null if it fails: a missing logo never stops a video being made. */
+async function loadImage(src: string): Promise<HTMLImageElement | null> {
+  try {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    return img;
+  } catch {
+    return null;
+  }
+}
+
 function clock(ms: number): string {
   const s = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -180,6 +192,8 @@ export function TrackerVideoExport({
       const pu = hudUnit(picture.w, picture.h);
       const scratch = document.createElement('canvas');
       const family = getComputedStyle(document.body).fontFamily || 'system-ui, sans-serif';
+      // The red logo for the end card; the card is signed with the name alone if it does not load
+      const logo = await loadImage('/logo.png');
 
       const stream = canvas.captureStream(30);
       const recorder = new MediaRecorder(stream, { mimeType: type.mimeType, videoBitsPerSecond: EXPORT_BITS_PER_SECOND });
@@ -208,7 +222,7 @@ export function TrackerVideoExport({
         if (s.rim) drawRim(ctx, picture.w, picture.h, s.rim, pu, s.tone);
         drawBall(ctx, picture.w, picture.h, s.trail, s.ball, pu, heatLevel(s.streak));
         ctx.restore();
-        drawHud(ctx, W, H, s, mediaMs, family, { area, replay });
+        drawHud(ctx, W, H, s, mediaMs, family, { area, picture, replay });
       };
 
       const seek = (ms: number) =>
@@ -265,7 +279,7 @@ export function TrackerVideoExport({
           const began = performance.now();
           const tick = () => {
             const p = (performance.now() - began) / END_CARD_MS;
-            drawEndCard(ctx, W, H, stats, Math.min(1, p), family);
+            drawEndCard(ctx, W, H, stats, Math.min(1, p), family, logo);
             setProgress((done + Math.min(1, p) * END_CARD_MS) / total);
             if (p < 1 && stopState() !== 'cancel') requestAnimationFrame(tick);
             else resolve();

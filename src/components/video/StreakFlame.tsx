@@ -5,7 +5,7 @@ import React, { useEffect, useRef } from 'react';
 import { drawFlame } from '@/lib/video/overlayArt';
 
 /**
- * The flame behind the score on a hot streak (3 makes in a row and up). Its
+ * The flame beside the score on a hot streak (3 makes in a row and up). Its
  * own small canvas and animation loop, which only exist while the streak
  * does, so a cold session costs nothing. Drawn by the same code as the flame
  * in a saved video. Holds still for reduced motion.
