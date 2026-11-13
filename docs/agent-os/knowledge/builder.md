@@ -1,6 +1,6 @@
 # Builder knowledge
 
-Last researched: 2026-11-07
+Last researched: 2026-11-13
 
 Read `README.md` in this folder for how this file works. Stack then: Next.js
 16.4.2, React 19.2.8, eslint-plugin-react-hooks 7.1.1, Vitest 5 + jsdom.
@@ -75,14 +75,22 @@ in brackets).
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-13 · The privacy page fell behind the code three times: catch-up
+  commits after review for the funnel steps (`3207e06`, 25 Oct) and the
+  tracker (`4f104e6`, 1 Nov), then S27, where lesson videos had loaded
+  YouTube's player with no mention of it. **Rule:** a change that sends data
+  to another company, or keeps something new, updates `src/app/privacy/page.tsx`
+  in the same branch, and says in the reply whether the parents' page and
+  DPIA need the founder. (Checklist: the "another company" line.)
 
 ## Checklist before pushing
 
 - [ ] `npm ci` (no junction), `npx next typegen`, `npx tsc --noEmit`.
 - [ ] `npx eslint <changed files>`: `next build` no longer lints, so this is
       the only place compiler and hooks errors show.
-- [ ] `npm test`; new tests query by role or label, not test id.
+- [ ] `npm test`; new tests query by role or label, not test id. jest-dom
+      matchers (`toHaveAttribute`, `toHaveFocus`) pass in Vitest but fail
+      `tsc`: use `getAttribute`, `textContent`, `document.activeElement`.
 - [ ] `npx next build` (Turbopack) when routes, workers, `public/` or config
       changed; a new `public/` file type is on the proxy skip list and test.
 - [ ] Server access checks use `getClaims()` (or `getUser()`), never
@@ -91,6 +99,9 @@ file). Newest first, each with the date, what happened, and the rule.
       `(select auth.uid())`, policy columns indexed, migration runs twice.
 - [ ] 390px wide, both themes, no sideways scroll, taps 44px (`h-11`),
       colours from `docs/design.md`.
+- [ ] Nothing loads from another company (iframe, image, font, script) before
+      the player asks for it; a YouTube video goes through `TapToLoadYouTube`;
+      the privacy page names whoever receives data.
 - [ ] Camera/video: `playsInline` + `muted`, tracks stopped on unmount, each
       `getUserMedia` error named, each stage has a time limit.
 - [ ] Heavy work (model, decode, export) in a worker or chunked; no tap

@@ -47,6 +47,41 @@ describe('youtubeEmbedUrl', () => {
   });
 });
 
+describe('youtubeEmbedUrl options', () => {
+  const id = 'dQw4w9WgXcQ';
+  const base = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ';
+
+  it('adds nothing when no option is set', () => {
+    expect(youtubeEmbedUrl(id, {})).toBe(base);
+  });
+
+  it('turns captions on and plays after the tap', () => {
+    const url = new URL(youtubeEmbedUrl(id, { captions: true, autoplay: true }));
+    expect(url.origin + url.pathname).toBe(base);
+    expect(url.searchParams.get('cc_load_policy')).toBe('1');
+    expect(url.searchParams.get('autoplay')).toBe('1');
+  });
+
+  it('starts and ends a clip at whole seconds', () => {
+    const url = new URL(youtubeEmbedUrl(id, { start: 42.9, end: 61.2 }));
+    expect(url.searchParams.get('start')).toBe('42');
+    expect(url.searchParams.get('end')).toBe('61');
+  });
+
+  it('leaves out a start or end that makes no sense', () => {
+    expect(youtubeEmbedUrl(id, { start: -5, end: Number.NaN })).toBe(base);
+    expect(youtubeEmbedUrl(id, { start: 0 })).toBe(base);
+    // An end at or before the start would play nothing
+    expect(youtubeEmbedUrl(id, { start: 30, end: 30 })).toBe(base + '?start=30');
+    expect(youtubeEmbedUrl(id, { start: 30, end: 10 })).toBe(base + '?start=30');
+  });
+
+  it('never leaves the no-cookie host, whatever the options', () => {
+    const url = new URL(youtubeEmbedUrl(id, { start: 5, end: 9, captions: true, autoplay: true }));
+    expect(url.hostname).toBe('www.youtube-nocookie.com');
+  });
+});
+
 describe('youtubeSearchUrl', () => {
   it('escapes the query', () => {
     expect(youtubeSearchUrl('pick & roll reads')).toContain('pick%20%26%20roll%20reads');

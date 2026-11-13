@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 11, 2026';
+const LAST_UPDATED = 'November 13, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -187,6 +187,10 @@ export default function PrivacyPage() {
               <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>
             )}
             <li>Your browser&apos;s push service (for example Google or Apple) delivers training reminders you turn on.</li>
+            <li>
+              YouTube, which is owned by Google, plays the lesson, drill and exercise videos, and only when you tap play.
+              What it receives is under <a className="text-orange-400 underline" href="#cookies-and-videos">Cookies and videos</a>.
+            </li>
           </ul>
         </section>
 
@@ -258,8 +262,29 @@ export default function PrivacyPage() {
             Data Protection Commission (dataprotection.ie).
           </p>
           <p>
-            Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the
-            EU; our providers use the EU&apos;s standard contractual clauses to protect it.
+            Data is stored on servers that may be outside the EU; our providers use the EU&apos;s standard contractual
+            clauses to protect it.
+          </p>
+        </section>
+
+        <section id="cookies-and-videos" className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
+          <p>Deadeye&apos;s own cookies are only there to keep you logged in.</p>
+          <p>
+            Lesson, drill and exercise videos play from YouTube, which is owned by Google. Nothing loads from YouTube
+            until you tap play on a video. When you do, YouTube receives your IP address (the number that identifies
+            your internet connection) and details about your phone or computer and its browser, and it may store data
+            on your device. What YouTube does with that is covered by{' '}
+            <a
+              className="text-orange-400 underline"
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Google&apos;s privacy policy
+            </a>
+            . If you would rather YouTube did not get this, do not tap play: the rest of the lesson or drill still
+            works.
           </p>
         </section>
 
