@@ -97,6 +97,25 @@ when a better source arrives, rather than adding beside it.
   the prompt returning each launch. Test the camera from the home-screen icon
   on a real iPhone. [WebKit bug 215884](https://bugs.webkit.org/show_bug.cgi?id=215884), 2021, practitioner (bug report).
 
+### Third-party embeds (YouTube)
+
+- **Load a third-party player only after the tap (the facade pattern), and
+  use the privacy-preserving host:** "load the interactive iframe only after
+  the user clicks". The guide's own example still fetches the thumbnail from
+  YouTube's image host, which tells YouTube about the visit before any tap.
+  Deadeye: `TapToLoadYouTube` shows no thumbnail and no preconnect, so the
+  first request to YouTube or Google is the player itself, after the tap.
+  [Modern Web Guidance, privacy guide](https://github.com/GoogleChrome/modern-web-guidance), 2026, official (Chrome team).
+- **Player parameters: `cc_load_policy=1` shows captions by default; `start`
+  and `end` are whole seconds, both counted from the start of the video;
+  `autoplay=1` starts data sharing as soon as the player loads; on iOS the
+  default is fullscreen unless `playsinline=1`; the player must be at least
+  200 by 200 px.** Deadeye: `youtubeEmbedUrl(id, { start, end, captions,
+  autoplay })` builds every address; autoplay only after the tap; the frame
+  has `min-h-[200px]` because 16:9 inside a card on a phone is about 180px
+  tall. Film (F3) will want `playsinline=1` so the question stays in view.
+  [YouTube embedded player parameters](https://developers.google.com/youtube/player_parameters), revised 2023, official.
+
 ### Accessibility
 
 - **WCAG 2.2 AA: targets 24×24 CSS px (2.5.8), 44×44 (2.5.5) advised for

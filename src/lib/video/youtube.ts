@@ -20,13 +20,41 @@ export function isRealYoutubeId(id: string | null | undefined): boolean {
   return YOUTUBE_ID.test(trimmed);
 }
 
+export interface YoutubeEmbedOptions {
+  /** Seconds into the video to start at (a film clip). */
+  start?: number;
+  /** Seconds into the video to stop at. Ignored unless it is after the start. */
+  end?: number;
+  /** Start playing at once. Only for a player the viewer has just tapped to load. */
+  autoplay?: boolean;
+  /** Show captions without the viewer having to switch them on. */
+  captions?: boolean;
+}
+
 /**
  * Privacy-enhanced embed: youtube-nocookie does not set tracking cookies until
  * the viewer actually plays something, which matters for an app whose users
- * start at 13.
+ * start at 13. Even so, the player itself sends the viewer's IP address and
+ * device details to YouTube as soon as it loads, so it is only ever put on a
+ * page by TapToLoadYouTube, after the viewer taps play.
  */
-export function youtubeEmbedUrl(id: string): string {
-  return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id.trim())}`;
+export function youtubeEmbedUrl(id: string, options: YoutubeEmbedOptions = {}): string {
+  const base = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id.trim())}`;
+  const params = new URLSearchParams();
+  if (options.autoplay) params.set('autoplay', '1');
+  if (options.captions) params.set('cc_load_policy', '1');
+  const start = wholeSeconds(options.start);
+  const end = wholeSeconds(options.end);
+  if (start > 0) params.set('start', String(start));
+  // An end at or before the start would play nothing
+  if (end > start) params.set('end', String(end));
+  const query = params.toString();
+  return query ? `${base}?${query}` : base;
+}
+
+/** YouTube takes whole seconds; anything that is not a time counts as 0 (unset). */
+function wholeSeconds(value: number | undefined): number {
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
 }
 
 export function youtubeSearchUrl(query: string): string {

@@ -8,7 +8,8 @@ import { Badge } from '@/components/ui/Badge';
 import { ArrowLeft, BookOpen, Play, CheckCircle2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { isRealYoutubeId, youtubeEmbedUrl, youtubeSearchUrl } from '@/lib/video/youtube';
+import { isRealYoutubeId, youtubeSearchUrl } from '@/lib/video/youtube';
+import { TapToLoadYouTube } from '@/components/video/TapToLoadYouTube';
 
 export const dynamic = 'force-dynamic';
 
@@ -136,22 +137,12 @@ export default async function StudyTopicPage({
                       </p>
                     )}
 
-                    {/* A curated lesson plays in place. One that was seeded with
-                        'placeholder' still falls back to a YouTube search, and
-                        says so rather than pretending to be a lesson video. */}
-                    {hasVideo && (
-                      <div className="overflow-hidden rounded-xl border border-zinc-800 bg-black">
-                        <iframe
-                          src={youtubeEmbedUrl(item.youtube_video_id)}
-                          title={item.title}
-                          loading="lazy"
-                          allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          referrerPolicy="strict-origin-when-cross-origin"
-                          allowFullScreen
-                          className="aspect-video w-full"
-                        />
-                      </div>
-                    )}
+                    {/* A curated lesson plays in place, once the player taps
+                        play: nothing loads from YouTube before that. One that
+                        was seeded with 'placeholder' still falls back to a
+                        YouTube search, and says so rather than pretending to
+                        be a lesson video. */}
+                    {hasVideo && <TapToLoadYouTube id={item.youtube_video_id} title={item.title} />}
 
                     <div className="flex flex-wrap gap-2">
                       {!hasVideo && (
