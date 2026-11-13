@@ -83,8 +83,10 @@ who do.
      active players, the community's rules, and a draft for the founder: a
      community post that gives something useful first (a free drill, a
      shooting challenge), an email to an organisation or adult creator, or a
-     flyer brief for a court or event. Each has its own tracking link
-     (`?ref=<route>`; say if the app does not record it yet).
+     flyer brief for a court or event. Each names the sign-up answer its
+     players would pick ("Where did you hear about Deadeye?", `HEARD_FROM`
+     in `src/lib/heardFrom.ts`). Links are the plain address, never a code
+     (`routes.md`, ePrivacy).
    - E0-style messages for the founder's own network: a short message the
      founder can send to players they already know, asking them to try one
      session and say what was confusing.
@@ -126,7 +128,8 @@ Players are mostly under 18. These win over any growth tactic or skill:
 - **Honest.** Only features that exist and prices on `/pro`. No "thousands
   of players", no fake urgency, no claims the shot tracker cannot back up.
   Irish and UK spelling, plain words.
-- **Counts only.** Tracking is by route (`?ref=`), never by person.
+- **Counts only.** Tracking is the optional sign-up answer, counted by
+  answer, never by person. No codes, UTM tags or coded QR in links.
 
 ## Learning
 

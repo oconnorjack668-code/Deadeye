@@ -9,7 +9,7 @@ never send these.
 Route: a basketball training subreddit (about 40k members, self-promotion
 allowed in the weekly thread only, rule 4: link)
 Where: the weekly self-promotion thread, not a new post
-Tracking: deadeyeapp.vercel.app/?ref=reddit-training
+Link: deadeyeapp.vercel.app (plain; players who join pick "Somewhere else" at sign-up)
 
 Free 20-minute shooting workout I use (no app needed):
 - 5 spots, 10 shots each, catch and shoot
