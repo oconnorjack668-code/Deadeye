@@ -310,40 +310,65 @@ describe('TrackerHud on a streak', () => {
         rim={{ x: 0.35, y: 0.45, width: 0.12 }}
       />
     );
-    const stack = screen.getByText('Make').parentElement as HTMLElement;
+    // The visible call, not the unseen copy kept for measuring
+    const word = screen.getAllByText('Make').find((el) => !el.closest('[aria-hidden="true"]')) as HTMLElement;
+    const stack = word.parentElement as HTMLElement;
     expect(parseFloat(stack.style.left)).toBeCloseTo(44, 5);
     expect(stack.getAttribute('style')).toContain('45%');
+    // Beside the rim the word stands alone: the score and streak are on the HUD already
+    expect(stack.textContent).toBe('Make');
   });
 
-  it('centres the call with no rim', () => {
+  it('keeps "check this one" beside the rim', () => {
+    render(
+      <TrackerHud
+        {...base}
+        streak={{ current: 0, best: 1, coldRun: 1 }}
+        flash={{ id: 2, made: false, confident: false, makes: 0, attempts: 1, streak: 0 }}
+        rim={{ x: 0.35, y: 0.45, width: 0.12 }}
+      />
+    );
+    const word = screen.getAllByText('Miss').find((el) => !el.closest('[aria-hidden="true"]')) as HTMLElement;
+    expect(word.parentElement!.textContent).toMatch(/check this one/i);
+  });
+
+  it('centres the call, with its count, when there is no rim', () => {
     render(<TrackerHud {...base} streak={{ current: 1, best: 1, coldRun: 0 }} flash={{ id: 1, made: false, confident: true, makes: 0, attempts: 1, streak: 0 }} />);
-    const stack = screen.getByText('Miss').parentElement as HTMLElement;
-    expect(stack.style.left).toBe('');
+    const word = screen.getByText('Miss');
+    expect((word.parentElement as HTMLElement).style.left).toBe('');
+    expect(screen.getByText('0/1')).toBeTruthy();
   });
 });
 
 describe('the make/miss call beside the rim', () => {
   it('goes right of the rim, away from the score, and left only when the right is full', () => {
-    const right = callSpot({ x: 0.6, y: 0.45, width: 0.12 });
+    const right = callSpot({ x: 0.6, y: 0.45, width: 0.12 }, 0.2);
     expect(right?.side).toBe('right');
     expect(right!.x).toBeGreaterThan(0.66);
-    const left = callSpot({ x: 0.82, y: 0.45, width: 0.12 });
+    const left = callSpot({ x: 0.82, y: 0.45, width: 0.12 }, 0.2);
     expect(left?.side).toBe('left');
     expect(left!.x).toBeLessThan(0.76);
   });
 
-  it('stays below the score and above the last calls', () => {
-    expect(callSpot({ x: 0.3, y: 0.05, width: 0.1 })!.y).toBe(0.28);
-    expect(callSpot({ x: 0.85, y: 0.05, width: 0.1 })!.y).toBe(0.4);
-    expect(callSpot({ x: 0.3, y: 0.95, width: 0.1 })!.y).toBe(0.75);
+  it('asks for as much room as the word needs', () => {
+    // 0.3 of the width left on the right: a narrow word fits there, a wide one goes left
+    expect(callSpot({ x: 0.64, y: 0.45, width: 0.06 }, 0.2)?.side).toBe('right');
+    expect(callSpot({ x: 0.64, y: 0.45, width: 0.06 }, 0.35)?.side).toBe('left');
+  });
+
+  it('keeps the word inside a safe zone short of the right edge', () => {
+    // A 9:16 video stops text at 1015 of 1080
+    const maxX = 1015 / 1080;
+    expect(callSpot({ x: 0.7, y: 0.45, width: 0.1 }, 0.17)?.side).toBe('right');
+    expect(callSpot({ x: 0.7, y: 0.45, width: 0.1 }, 0.17, maxX)?.side).toBe('left');
   });
 
   it('follows a tilted rim at the end it sits beside', () => {
-    expect(callSpot({ x: 0.3, y: 0.5, width: 0.2, tilt: 0.5 })!.y).toBeCloseTo(0.55, 5);
+    expect(callSpot({ x: 0.3, y: 0.5, width: 0.2, tilt: 0.5 }, 0.2)!.y).toBeCloseTo(0.55, 5);
   });
 
-  it('is centred with no rim, or a rim filling the width', () => {
-    expect(callSpot(null)).toBeNull();
-    expect(callSpot({ x: 0.5, y: 0.5, width: 0.6 })).toBeNull();
+  it('is centred with no rim, or no room either side', () => {
+    expect(callSpot(null, 0.2)).toBeNull();
+    expect(callSpot({ x: 0.5, y: 0.5, width: 0.6 }, 0.2)).toBeNull();
   });
 });

@@ -36,32 +36,34 @@ function rimEnds(rim: Rim, w: number, h: number): [[number, number], [number, nu
 
 /** Gap between the rim's end and the make/miss call, as a share of the picture's width. */
 const CALL_GAP = 0.03;
-/** Room the call needs beside the rim, as a share of the width; less on both sides and it goes in the middle. */
-const CALL_ROOM = 0.22;
-
 /**
- * Where the make/miss call goes: beside the rim, on its right unless there is
- * no room there, so the word is read where the ball went and never covers the hoop. `x` is
- * the call's edge nearest the rim and `y` its middle, both fractions of the
- * picture. The middle is kept below the score and the status pill, and above
- * the last-calls dots.
+ * Where the make/miss call goes: beside the rim, on its right if the word fits
+ * there, else on its left, so the word is read where the ball went and never
+ * covers the hoop. `need` is the call's width (the word, or the "check this
+ * one" pill if wider, plus a margin) and `maxX` how far right text may reach
+ * (a 9:16 video keeps it inside the TikTok/Reels safe zone), both as shares of
+ * the picture's width. `x` is the call's edge nearest the rim and `y` the
+ * rim's height there, both fractions of the picture; the caller keeps the word
+ * clear of the score, the status pills and the dots, which it can measure.
  * Null with no rim, or no room either side: then the call is centred.
  * Shared by the live HUD and the saved video so they put it in one place.
  */
-export function callSpot(rim: Rim | null): { side: 'left' | 'right'; x: number; y: number } | null {
+export function callSpot(
+  rim: Rim | null,
+  need: number,
+  maxX = 1
+): { side: 'left' | 'right'; x: number; y: number } | null {
   if (!rim) return null;
   const left = rim.x - rim.width / 2;
   const right = rim.x + rim.width / 2;
   const roomLeft = left - CALL_GAP;
-  const roomRight = 1 - right - CALL_GAP;
-  // The right if it fits: the score and its banners fill the top left, and on
-  // the right there is only the small "Ball tracked" pill
-  const side = roomRight >= CALL_ROOM ? 'right' : roomLeft >= CALL_ROOM ? 'left' : null;
+  const roomRight = maxX - right - CALL_GAP;
+  // The right first: the score and its banners fill the top left, and on the
+  // right there is only the small "Ball tracked" pill
+  const side = roomRight >= need ? 'right' : roomLeft >= need ? 'left' : null;
   if (!side) return null;
   const edge = side === 'right' ? right : left;
-  const top = side === 'right' ? 0.28 : 0.4;
-  const y = Math.min(0.75, Math.max(top, rimYAt(rim, edge)));
-  return { side, x: side === 'right' ? right + CALL_GAP : left - CALL_GAP, y };
+  return { side, x: side === 'right' ? right + CALL_GAP : left - CALL_GAP, y: rimYAt(rim, edge) };
 }
 
 /**
@@ -255,6 +257,12 @@ export function drawHud(
   const u = hudUnit(w, h);
   const font = (px: number, weight: number) => `${weight} ${px * u}px ${family}`;
   const heat = heatLevel(s.streak);
+  // Furthest right anything is drawn, in HUD pixels. A 9:16 video keeps it
+  // inside the TikTok/Reels safe zone (x up to 1015 of 1080), clear of their buttons.
+  const vertical = canvasH > canvasW;
+  const safeRight = vertical ? Math.min(w - 12 * u, (canvasW * SAFE_RIGHT) / VERTICAL.w - a.x) : w - 12 * u;
+  // Right edge and bottom of the score row (count, % and flame), for keeping the call off it
+  let scoreRow = { right: 0, bottom: 0 };
   ctx.save();
   ctx.translate(a.x, a.y);
 
@@ -295,10 +303,9 @@ export function drawHud(
   ctx.shadowBlur = 0;
   // On a hot streak a flame stands beside the score, never over the numbers.
   // Sized as StreakFlame is on the live HUD (40 x 48, after the %)
-  if (heat) {
-    const fx = pctX + ctx.measureText(pctText).width + 6 * u + 20 * u;
-    drawFlame(ctx, fx, base + 1 * u, 36 * u, 41 * u, t, heat);
-  }
+  const pctRight = pctX + ctx.measureText(pctText).width;
+  if (heat) drawFlame(ctx, pctRight + 6 * u + 20 * u, base + 1 * u, 36 * u, 41 * u, t, heat);
+  scoreRow = { right: heat ? pctRight + 6 * u + 40 * u : pctRight, bottom: base + 4 * u };
 
   // Clock, and the streak once it is hot
   ctx.font = font(14, 600);
@@ -316,7 +323,7 @@ export function drawHud(
   ctx.font = font(12, 700);
   pill(
     ctx,
-    w - 12 * u,
+    safeRight,
     12 * u,
     24 * u,
     s.ballInView ? 'Ball tracked' : 'Watching the hoop',
@@ -364,12 +371,8 @@ export function drawHud(
   if (s.banner) drawBanner(ctx, s.banner.label, s.banner.age, u, family);
   }
 
-  drawMark(ctx, w, h, u, family);
-  if (s.flash) {
-    const spot = callSpot(s.rim);
-    const at = spot ? { side: spot.side, x: pic.x - a.x + spot.x * pic.w, y: pic.y - a.y + spot.y * pic.h } : null;
-    drawFlash(ctx, w, h, s.flash, u, family, at);
-  }
+  drawMark(ctx, w, h, u, family, safeRight);
+  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family, callAt(ctx, s, { a, pic, h, u, safeRight, family, scoreRow }));
   ctx.restore();
 }
 
@@ -461,8 +464,8 @@ export function drawBackdrop(ctx: Ctx, source: CanvasImageSource, srcW: number, 
   ctx.restore();
 }
 
-/** The Deadeye name in the corner, where the full-screen button sits live. */
-export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: string) {
+/** The Deadeye name in the corner, where the full-screen button sits live. `right` is where it ends (default 12u in from the edge). */
+export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: string, right = w - 12 * u) {
   ctx.save();
   ctx.font = `900 ${15 * u}px ${family}`;
   ctx.textAlign = 'right';
@@ -470,7 +473,7 @@ export function drawMark(ctx: Ctx, w: number, h: number, u: number, family: stri
   ctx.shadowColor = 'rgba(0,0,0,0.7)';
   ctx.shadowBlur = 6 * u;
   ctx.fillStyle = 'rgba(255,255,255,0.92)';
-  const x = w - 12 * u;
+  const x = right;
   const y = h - 14 * u;
   // No underline: the brand never puts one under DEADEYE (docs/brand/video-style.md)
   ctx.fillText('DEADEYE', x, y);
@@ -486,20 +489,87 @@ export function flashCurve(age: number): { opacity: number; scale: number } {
   return { opacity, scale: 1 };
 }
 
+/** The make/miss word's size beside the rim, in the picture's own unit (hudUnit of the picture). */
+const CALL_WORD = 48;
+/** Right edge of the TikTok/Reels safe zone in a 1080-wide vertical frame (docs/brand/video-style.md). */
+const SAFE_RIGHT = 1015;
+
+/**
+ * Where a saved video draws the call beside the rim, or null to centre it.
+ * Sized to the picture, not the HUD's area: in 9:16 the picture is a band
+ * across the middle and the word is sized to that band. The word's middle is
+ * kept below the "Ball tracked" pill and above the dots and the name.
+ */
+function callAt(
+  ctx: Ctx,
+  s: OverlayState,
+  {
+    a,
+    pic,
+    h,
+    u,
+    safeRight,
+    family,
+    scoreRow,
+  }: { a: Rect; pic: Rect; h: number; u: number; safeRight: number; family: string; scoreRow: { right: number; bottom: number } }
+): CallAt | null {
+  if (!s.flash || !s.rim) return null;
+  const cu = hudUnit(pic.w, pic.h);
+  ctx.save();
+  ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
+  const wordW = ctx.measureText(s.flash.made ? 'MAKE' : 'MISS').width;
+  const width = Math.max(wordW, s.flash.confident ? 0 : checkPillWidth(ctx, cu, family)) + 12 * cu;
+  ctx.restore();
+  const spot = callSpot(s.rim, width / pic.w, (safeRight + a.x - pic.x) / pic.w);
+  if (!spot) return null;
+  const half = CALL_WORD * 0.42 * cu;
+  const below = s.flash.confident ? half : half + 8 * cu + 20 * cu;
+  const x = pic.x - a.x + spot.x * pic.w;
+  // Below the status pill, and below the score row too if the call would reach it
+  const callLeft = spot.side === 'right' ? x : x - width;
+  const clearRow = callLeft < scoreRow.right + 12 * u ? scoreRow.bottom + 12 * u + half : 0;
+  const top = Math.max(36 * u + 8 * u + half, clearRow);
+  const bottom = h - 34 * u - below;
+  const y = Math.min(Math.max(pic.y - a.y + spot.y * pic.h, top), Math.max(top, bottom));
+  return { side: spot.side, x, y, u: cu };
+}
+
+/** "Check this one" under a call the tracker is unsure of: its pill, `x` at its left edge, `y` its top. */
+function checkPill(ctx: Ctx, x: number, y: number, u: number, family: string) {
+  ctx.font = `800 ${12 * u}px ${family}`;
+  const label = 'CHECK THIS ONE';
+  const tw = ctx.measureText(label).width + 20 * u;
+  ctx.fillStyle = 'rgba(245,158,11,0.9)';
+  ctx.beginPath();
+  ctx.roundRect(x, y, tw, 20 * u, 10 * u);
+  ctx.fill();
+  ctx.fillStyle = '#09090b';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(label, x + tw / 2, y + 10.5 * u);
+}
+
+function checkPillWidth(ctx: Ctx, u: number, family: string): number {
+  ctx.font = `800 ${12 * u}px ${family}`;
+  return ctx.measureText('CHECK THIS ONE').width + 20 * u;
+}
+
+/** Where a call beside the rim is drawn, in HUD pixels: `x` the edge nearest the rim, `y` the word's middle, `u` the picture's unit. */
+interface CallAt {
+  side: 'left' | 'right';
+  x: number;
+  y: number;
+  u: number;
+}
+
 /**
  * The make/miss call: a tint over the whole frame, which reads from the arc,
- * and the word beside the rim (`at`, from callSpot, in HUD pixels), or in the
- * middle when there is no room beside it.
+ * and the word. Beside the rim (`at`) the word stands alone, with "check this
+ * one" under it when the tracker is unsure: the score and the streak are
+ * already on the HUD (founder's choice, 13 Nov). Centred, when there is no
+ * room beside the rim, it keeps the count and "N in a row" under it.
  */
-function drawFlash(
-  ctx: Ctx,
-  w: number,
-  h: number,
-  f: NonNullable<OverlayState['flash']>,
-  u: number,
-  family: string,
-  at: { side: 'left' | 'right'; x: number; y: number } | null = null
-) {
+function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string, at: CallAt | null = null) {
   const { opacity, scale } = flashCurve(f.age);
   if (opacity <= 0) return;
   ctx.save();
@@ -510,43 +580,48 @@ function drawFlash(
   ctx.fillStyle = f.made ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.2)';
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   ctx.restore();
-  // Beside the rim the stack is smaller and lined up on the rim's side; the
-  // word's middle sits level with the rim
-  const big = at ? 48 : 60;
-  const align: CanvasTextAlign = at ? (at.side === 'right' ? 'left' : 'right') : 'center';
-  if (at) ctx.translate(at.x, at.y + big * 0.35 * u);
-  else ctx.translate(w / 2, h / 2);
+  const word = f.made ? 'MAKE' : 'MISS';
+  const colour = f.made ? '#6ee7b7' : '#fca5a5';
+
+  if (at) {
+    const cu = at.u;
+    ctx.translate(at.x, at.y);
+    ctx.scale(scale, scale);
+    ctx.textAlign = at.side === 'right' ? 'left' : 'right';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0,0,0,0.9)';
+    ctx.shadowBlur = 12 * cu;
+    ctx.font = `900 ${CALL_WORD * cu}px ${family}`;
+    ctx.fillStyle = colour;
+    ctx.fillText(word, 0, 0);
+    ctx.shadowBlur = 0;
+    if (!f.confident) {
+      const tw = checkPillWidth(ctx, cu, family);
+      checkPill(ctx, at.side === 'right' ? 0 : -tw, CALL_WORD * 0.42 * cu + 8 * cu, cu, family);
+    }
+    ctx.restore();
+    return;
+  }
+
+  ctx.translate(w / 2, h / 2);
   ctx.scale(scale, scale);
-  ctx.textAlign = align;
+  ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
   ctx.shadowColor = 'rgba(0,0,0,0.9)';
   ctx.shadowBlur = 12 * u;
-  ctx.font = `900 ${big * u}px ${family}`;
-  ctx.fillStyle = f.made ? '#6ee7b7' : '#fca5a5';
-  ctx.fillText(f.made ? 'MAKE' : 'MISS', 0, 0);
-  const small = at ? 20 : 24;
-  ctx.font = `900 ${small * u}px ${family}`;
+  ctx.font = `900 ${60 * u}px ${family}`;
+  ctx.fillStyle = colour;
+  ctx.fillText(word, 0, 0);
+  ctx.font = `900 ${24 * u}px ${family}`;
   ctx.fillStyle = '#ffffff';
-  ctx.fillText(`${f.makes}/${f.attempts}`, 0, (small + 8) * u);
+  ctx.fillText(`${f.makes}/${f.attempts}`, 0, 32 * u);
   ctx.shadowBlur = 0;
-  const third = (small + 8) * u + 26 * u;
   if (f.made && f.streak >= 3) {
     ctx.font = `900 ${16 * u}px ${family}`;
     ctx.fillStyle = '#fdba74';
-    ctx.fillText(`${f.streak} IN A ROW`, 0, third);
+    ctx.fillText(`${f.streak} IN A ROW`, 0, 58 * u);
   } else if (!f.confident) {
-    ctx.font = `800 ${12 * u}px ${family}`;
-    const label = 'CHECK THIS ONE';
-    const tw = ctx.measureText(label).width + 20 * u;
-    const bx = align === 'left' ? 0 : align === 'right' ? -tw : -tw / 2;
-    ctx.fillStyle = 'rgba(245,158,11,0.9)';
-    ctx.beginPath();
-    ctx.roundRect(bx, third - 16 * u, tw, 20 * u, 10 * u);
-    ctx.fill();
-    ctx.fillStyle = '#09090b';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(label, bx + tw / 2, third - 5.5 * u);
+    checkPill(ctx, -checkPillWidth(ctx, u, family) / 2, 42 * u, u, family);
   }
   ctx.restore();
 }

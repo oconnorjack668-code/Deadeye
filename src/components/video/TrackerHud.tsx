@@ -1,7 +1,7 @@
 // src/components/video/TrackerHud.tsx
 'use client';
 
-import React from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Crosshair, Flame, Maximize2, Minimize2, Pause } from 'lucide-react';
 import { ISSUE_TEXT, type HealthReading } from '@/lib/video/liveHealth';
 import type { DrillProgress } from '@/lib/video/drillModes';
@@ -75,7 +75,50 @@ export function TrackerHud({
   const issues = health.issues;
   const heat = heatLevel(streak.current);
   const hotLabel = heatLabel(streak.current);
-  const spot = callSpot(rim);
+
+  // The call beside the rim is placed from measurements: the box's width and
+  // the call's own size (the unseen probe below). Before they exist (and in
+  // tests, where nothing has a size) a typical inline call is assumed.
+  const boxRef = useRef<HTMLDivElement>(null);
+  const probeRef = useRef<HTMLDivElement>(null);
+  const [boxW, setBoxW] = useState(0);
+  const scoreRowRef = useRef<HTMLDivElement>(null);
+  const [probe, setProbe] = useState<{ w: number; h: number; wordH: number; rowRight: number; rowBottom: number } | null>(null);
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setBoxW(el.clientWidth));
+    ro.observe(el);
+    setBoxW(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
+  const flashId = flash?.id;
+  const flashMade = flash?.made;
+  const flashSure = flash?.confident;
+  useLayoutEffect(() => {
+    const el = probeRef.current;
+    const word = el?.querySelector<HTMLElement>('[data-call-word]');
+    const box = boxRef.current?.getBoundingClientRect();
+    const row = scoreRowRef.current?.getBoundingClientRect();
+    if (!el || !word || !el.offsetWidth || !box || !row) return;
+    const next = { w: el.offsetWidth, h: el.offsetHeight, wordH: word.offsetHeight, rowRight: row.right - box.left, rowBottom: row.bottom - box.top };
+    setProbe((p) => (p && (Object.keys(next) as Array<keyof typeof next>).every((k) => p[k] === next[k]) ? p : next));
+  }, [flashId, flashMade, flashSure, theatre, boxW, heat, makes, attempts]);
+  const CALL_MARGIN = 12;
+  const need = probe && boxW ? (probe.w + CALL_MARGIN) / boxW : 0.22;
+  const spot = flash ? callSpot(rim, need) : null;
+  const wordHalf = probe ? probe.wordH / 2 : theatre ? 24 : 15;
+  const stackH = probe ? probe.h : wordHalf * 2;
+  // Bottom of the status pills top right: one calm pill, or a stack of warnings
+  const statusBottomRem = issues.length === 0 ? 2.25 : 0.75 + issues.length * 2 + (issues.length - 1) * 0.375;
+  // If the call would reach the score row (the count, the % and the flame),
+  // it drops below that row with a 12px gap rather than touching the flame
+  let rowClearPx = 0;
+  if (spot && probe && boxW) {
+    const x = spot.x * boxW;
+    const callLeft = spot.side === 'right' ? x : x - probe.w;
+    if (callLeft < probe.rowRight + CALL_MARGIN) rowClearPx = probe.rowBottom + CALL_MARGIN + wordHalf;
+  }
 
   return (
     <>
@@ -84,7 +127,7 @@ export function TrackerHud({
 
       {/* Primary readout: sized to be read from the three-point line */}
       <div className="pointer-events-none absolute left-3 top-2 text-white" aria-live="polite" aria-atomic="true">
-        <div className="flex items-end gap-2">
+        <div ref={scoreRowRef} className="flex items-end gap-2">
           <span className="text-5xl sm:text-6xl font-black leading-none tabular-nums drop-shadow-lg">
             {makes}
             <span className="text-3xl sm:text-4xl text-zinc-300">/{attempts}</span>
@@ -172,10 +215,19 @@ export function TrackerHud({
         {theatre ? <Minimize2 className="h-5 w-5" /> : <Maximize2 className="h-5 w-5" />}
       </button>
 
+      {/* For measuring: the HUD box, and an unseen copy of the call beside the rim */}
+      <div ref={boxRef} className="pointer-events-none invisible absolute inset-0" aria-hidden="true" />
+      {flash && rim && (
+        <div ref={probeRef} className="pointer-events-none invisible absolute left-0 top-0" aria-hidden="true">
+          <CallBeside flash={flash} theatre={theatre} />
+        </div>
+      )}
+
       {/* Confirmation a shot registered, read from the arc rather than up
           close: a tinted wash of the whole frame carries at a distance, and
-          the word stands beside the rim (callSpot), where the ball went,
-          leaving the hoop clear. Centred when there is no room beside it. */}
+          the word stands alone beside the rim (callSpot), where the ball went,
+          leaving the hoop clear. Centred, with the count, when there is no
+          room beside it. */}
       {flash && (
         <div
           key={flash.id}
@@ -184,32 +236,67 @@ export function TrackerHud({
           }`}
           style={spot ? { transformOrigin: `${spot.x * 100}% ${spot.y * 100}%` } : undefined}
         >
-          <div
-            className={spot ? `absolute flex -translate-y-1/2 flex-col ${spot.side === 'right' ? 'items-start text-left' : 'items-end text-right'}` : 'flex flex-col items-center'}
-            // The text keeps its size while the picture shrinks, so in the small
-            // inline view it is also held clear of the status pill and the dots
-            style={spot ? { top: `clamp(5.5rem, ${spot.y * 100}%, calc(100% - 4rem))`, ...(spot.side === 'right' ? { left: `${spot.x * 100}%` } : { right: `${(1 - spot.x) * 100}%` }) } : undefined}
-          >
-            <span
-              className={`font-black uppercase leading-none tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] ${
-                spot ? 'text-5xl sm:text-6xl' : 'text-6xl sm:text-7xl'
-              } ${flash.made ? 'text-emerald-300' : 'text-red-300'}`}
+          {spot ? (
+            <div
+              className={`absolute flex flex-col ${spot.side === 'right' ? 'items-start' : 'items-end'}`}
+              // The word's middle level with the rim, but below the status
+              // pills and above the dots and the full-screen button: the text
+              // keeps its size while the picture shrinks
+              style={{
+                top: `clamp(max(calc(${statusBottomRem + 0.5}rem + ${wordHalf}px), ${rowClearPx}px), ${spot.y * 100}%, calc(100% - 3.5rem - ${stackH - wordHalf}px))`,
+                transform: `translateY(-${wordHalf}px)`,
+                ...(spot.side === 'right' ? { left: `${spot.x * 100}%` } : { right: `${(1 - spot.x) * 100}%` }),
+              }}
             >
-              {flash.made ? 'Make' : 'Miss'}
-            </span>
-            <span className={`mt-1 font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] ${spot ? 'text-xl' : 'text-2xl'}`}>
-              {flash.makes}/{flash.attempts}
-            </span>
-            {flash.made && flash.streak >= 3 && (
-              <span className="mt-1 flex items-center gap-1 text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
-                <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+              <CallBeside flash={flash} theatre={theatre} />
+            </div>
+          ) : (
+            <>
+              <span
+                className={`text-6xl font-black uppercase tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-7xl ${
+                  flash.made ? 'text-emerald-300' : 'text-red-300'
+                }`}
+              >
+                {flash.made ? 'Make' : 'Miss'}
               </span>
-            )}
-            {!flash.confident && (
-              <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
-            )}
-          </div>
+              <span className="mt-1 text-2xl font-black tabular-nums text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                {flash.makes}/{flash.attempts}
+              </span>
+              {flash.made && flash.streak >= 3 && (
+                <span className="mt-1 flex items-center gap-1 text-base font-black uppercase tabular-nums text-orange-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                  <Flame className="h-4 w-4" aria-hidden="true" /> {flash.streak} in a row
+                </span>
+              )}
+              {!flash.confident && (
+                <span className="mt-1 rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
+              )}
+            </>
+          )}
         </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * The call beside the rim: the word alone, and "check this one" when the
+ * tracker is unsure. The score and the streak are already on the HUD
+ * (founder's choice, 13 Nov). Smaller in the inline view, where the picture is
+ * a phone's width.
+ */
+function CallBeside({ flash, theatre }: { flash: ShotFlash; theatre: boolean }) {
+  return (
+    <>
+      <span
+        data-call-word
+        className={`block whitespace-nowrap font-black uppercase leading-none tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] ${
+          theatre ? 'text-5xl sm:text-6xl' : 'text-3xl'
+        } ${flash.made ? 'text-emerald-300' : 'text-red-300'}`}
+      >
+        {flash.made ? 'Make' : 'Miss'}
+      </span>
+      {!flash.confident && (
+        <span className="mt-2 block whitespace-nowrap rounded-full bg-amber-500/90 px-2.5 py-0.5 text-xs font-bold uppercase text-zinc-950">check this one</span>
       )}
     </>
   );
