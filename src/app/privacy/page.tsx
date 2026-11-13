@@ -274,7 +274,8 @@ export default function PrivacyPage() {
             Lesson, drill and exercise videos play from YouTube, which is owned by Google. Nothing loads from YouTube
             until you tap play on a video. When you do, YouTube receives your IP address (the number that identifies
             your internet connection) and details about your phone or computer and its browser, and it may store data
-            on your device. What YouTube does with that is covered by{' '}
+            on your device. If you are signed in to YouTube or Google on the same browser, YouTube can link what you
+            watch to that account. What YouTube does with that is covered by{' '}
             <a
               className="text-orange-400 underline"
               href="https://policies.google.com/privacy"
