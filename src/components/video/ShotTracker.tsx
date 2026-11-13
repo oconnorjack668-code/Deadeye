@@ -1465,6 +1465,7 @@ export function ShotTracker({
                 onFixRim={fixRim}
                 canFixRim={moved !== null}
                 banner={banner}
+                rim={rim}
               />
             )}
           </div>
