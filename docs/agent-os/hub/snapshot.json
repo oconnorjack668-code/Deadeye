@@ -208,21 +208,21 @@
   ],
   "calls": [
     {
+      "agent": "marketing",
+      "detail": "Fri: a screen video of logging a session without a court, plus a founder post in the app. Sat: one question from the IQ section as a Story quiz. Sun: a screen video of \"Find the hoop for me\" at an empty hoop. No people in any of them, so no consent is needed. Full drafts in docs/agent-os/marketing/2026-11-12-weekend.md.",
+      "due": "2026-11-13",
       "id": "mkt-weekend",
       "kind": "approve",
-      "agent": "marketing",
-      "title": "Weekend posts, Fri 13 to Sun 15",
-      "detail": "Fri: a screen video of logging a session without a court, plus a founder post in the app. Sat: one question from the IQ section as a Story quiz. Sun: a screen video of \"Find the hoop for me\" at an empty hoop. No people in any of them, so no consent is needed. Full drafts in docs/agent-os/marketing/2026-11-12-weekend.md.",
       "onApprove": "Marketing writes each post in full, ready for you to record and post yourself.",
-      "due": "2026-11-13"
+      "title": "Weekend posts, Fri 13 to Sun 15"
     },
     {
+      "agent": "marketing",
+      "detail": "1. A 60-second makes challenge, filmed from behind by you or an adult, with the phone on a bag and nobody else in the hall. 2. The promo with three openings, once you pick A, B or C and the clip with a face is cleared or cut.",
       "id": "mkt-next-ideas",
       "kind": "approve",
-      "agent": "marketing",
-      "title": "Next week's first two video ideas",
-      "detail": "1. A 60-second makes challenge, filmed from behind by you or an adult, with the phone on a bag and nobody else in the hall. 2. The promo with three openings, once you pick A, B or C and the clip with a face is cleared or cut.",
-      "onApprove": "Marketing scripts both for Monday's plan and hands them to the video editor."
+      "onApprove": "Marketing scripts both for Monday's plan and hands them to the video editor.",
+      "title": "Next week's first two video ideas"
     },
     {
       "agent": "marketing",
@@ -549,12 +549,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (new agents, PR #94, 11 Nov) is running.",
+      "detail": "Live and up to date: the latest version (new agents, PR #94, 11 Nov) is running (checked 13 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "0 errors in the last 24 hours (checked 12 Nov). 0 problem or crash reports open (9 Nov counts).",
+      "detail": "0 errors in the last 24 hours (checked 13 Nov; Vercel keeps about an hour of detail). 0 problem or crash reports open (9 Nov counts).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -564,7 +564,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open: PR #87 (handoff notes, docs only). Checks passed, but it now clashes with newer changes on main and needs updating before it can merge.",
+      "detail": "2 open, checks green on both. PR #95 (agent scheduled runs, docs only) is up to date with main. PR #87 (handoff notes, docs only) clashes with newer changes on main and needs updating before it can merge.",
       "name": "Code changes",
       "status": "warn"
     }
@@ -596,6 +596,11 @@
     }
   ],
   "log": [
+    {
+      "at": "2026-11-13T08:10:00Z",
+      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 2 open pull requests, checks green: #95 (agent runs) ready, #87 clashes with main. Nothing urgent.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-12T10:11:23Z",
       "text": "Marketing mid-week: weekend posts drafted (screen videos and a Story, no people). Landing fix closed. Last week's calendar and founder posts replaced by the weekend call. No new post numbers yet.",
@@ -690,11 +695,6 @@
       "at": "2026-11-09T12:32:00Z",
       "text": "PR #73 merged and live: sign-in fix.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T09:05:00Z",
-      "text": "This week's first agent run couldn't save to GitHub; fixed and re-run at 12:14.",
-      "tone": "bad"
     }
   ],
   "scoreboard": {
@@ -711,7 +711,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-12T10:11:23Z",
-  "updatedBy": "Marketing mid-week",
+  "updatedAt": "2026-11-13T08:10:00Z",
+  "updatedBy": "Morning check",
   "version": 1
 }
