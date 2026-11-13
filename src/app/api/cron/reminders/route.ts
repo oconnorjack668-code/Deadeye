@@ -13,6 +13,7 @@ import { deleteAccount } from '@/lib/accountDeletion';
 import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 import { FOUNDING_REMINDER_DAYS } from '@/lib/founding';
 import { pruneOldRoutineImports } from '@/lib/routineImport';
+import { clearExpiredHeardFrom } from '@/lib/heardFrom-server';
 
 async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClient>): Promise<number> {
   const { data: waiting, error } = await admin
@@ -75,6 +76,13 @@ async function run(request: Request) {
     () => undefined
   );
 
+  // Housekeeping: the optional "Where did you hear about Deadeye?" answer is
+  // cleared 12 months after sign-up, as the privacy policy says
+  const heardFromCleared = await clearExpiredHeardFrom(admin).catch((err) => {
+    console.error('Sign-up answer clean-up failed', err);
+    return 0;
+  });
+
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
   // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)
   const removed = await removeUnapprovedAccounts(admin).catch((err) => {
@@ -82,7 +90,7 @@ async function run(request: Request) {
     return 0;
   });
 
-  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed }, { status: 503 });
+  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed, heardFromCleared }, { status: 503 });
 
   const { data: prefs, error } = await admin
     .from('notification_preferences')
@@ -150,7 +158,7 @@ async function run(request: Request) {
     return 0;
   });
 
-  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, foundingReminders });
+  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, heardFromCleared, foundingReminders });
 }
 
 export const GET = withCronLog('reminders', run);

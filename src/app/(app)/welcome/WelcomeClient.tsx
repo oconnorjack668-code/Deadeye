@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useEffect, useState, useSyncExternalStore } from 'react';
-import { track, trackIfFromDemo } from '@/lib/events';
+import { track } from '@/lib/events';
 import { clearInvite, pendingInvite } from '@/lib/friends';
 import { pendingTeamInvite, teamJoinPath } from '@/lib/coachSide';
 import { REMINDER_TIME_LABEL } from '@/lib/reminders';
@@ -30,7 +30,6 @@ export function WelcomeClient({ firstName }: { firstName: string | null }) {
 
   useEffect(() => {
     track('welcome_seen');
-    trackIfFromDemo();
   }, []);
 
   /** The answer to "Are you at a court right now?", recorded so a stall here shows in the funnel */

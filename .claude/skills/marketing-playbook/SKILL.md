@@ -35,8 +35,9 @@ this folder.
    "basketball training app"). Formats and hooks, never people's details.
 3. **Plan the week.** Ideas, each with pillar, hook, shot list, on-screen
    text, caption, hashtags, length, the feature shown, and the claim sources.
-   One test, with how it will be read (link clicks, `signup_from_demo`,
-   first sessions).
+   One test, with how it will be read (link clicks, sign-ups answering
+   TikTok, Instagram or YouTube at sign-up, first sessions; plain links, no
+   codes).
 4. **Brief the video-editor** with a beat-by-beat script for each approved
    idea (hook, captions, voice lines, end card, checked claims).
 5. **Visuals that are not video** (covers, carousels, story frames): draft

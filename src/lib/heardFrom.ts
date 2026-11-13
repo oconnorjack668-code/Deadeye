@@ -31,6 +31,27 @@ export function normaliseHeardFrom(value: unknown): HeardFrom | null {
   return HEARD_FROM.some((h) => h.value === v) ? (v as HeardFrom) : null;
 }
 
+/**
+ * Kept this long after sign-up, then cleared by the daily job (privacy page;
+ * safety re-review of PR #97, F1): by then it has done its job of judging
+ * outreach routes. Players can clear it sooner in Settings.
+ */
+export const HEARD_FROM_KEEP_DAYS = 365;
+
+interface AccountForRetention {
+  id: string;
+  created_at: string;
+  user_metadata?: Record<string, unknown> | null;
+}
+
+/** Accounts older than HEARD_FROM_KEEP_DAYS that still hold an answer (any value, listed or not) */
+export function heardFromToClear(users: AccountForRetention[], now = new Date()): string[] {
+  const cutoff = now.getTime() - HEARD_FROM_KEEP_DAYS * 86_400_000;
+  return users
+    .filter((u) => u.user_metadata?.heard_from != null && Date.parse(u.created_at) < cutoff)
+    .map((u) => u.id);
+}
+
 /** The answer as the player saw it, or "Didn't say" */
 export function heardFromLabel(value: string | null): string {
   return HEARD_FROM.find((h) => h.value === value)?.label ?? "Didn't say";

@@ -53,7 +53,6 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
   {
     title: 'Welcome',
     steps: [
-      { name: 'signup_from_demo', label: 'Signed up from the landing page demo' },
       { name: 'welcome_seen', label: 'Saw the welcome screen' },
       { name: 'welcome_court', label: 'Said they are at a court' },
       { name: 'welcome_later', label: 'Said not right now' },

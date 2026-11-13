@@ -15,6 +15,7 @@ import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Dat
 import { AppearancePicker } from '@/components/AppearancePicker';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 import { buildLabel } from '@/lib/build';
+import { heardFromLabel, type HeardFrom } from '@/lib/heardFrom';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -84,6 +85,7 @@ export function SettingsClient({
   version,
   coachSetUp = false,
   homeClub = null,
+  heardFrom = null,
 }: {
   email: string | null;
   plan: string;
@@ -98,6 +100,8 @@ export function SettingsClient({
   coachSetUp?: boolean;
   /** "Your club", built on the server; shown straight after Account */
   homeClub?: React.ReactNode;
+  /** The optional sign-up answer (src/lib/heardFrom.ts), already checked against the list */
+  heardFrom?: HeardFrom | null;
 }) {
   const router = useRouter();
   const [s, setS] = useState<Initial>(initial);
@@ -108,6 +112,8 @@ export function SettingsClient({
   const [newEmail, setNewEmail] = useState<string | null>(null);
   const [emailSentTo, setEmailSentTo] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
+  const [heardAnswer, setHeardAnswer] = useState<HeardFrom | null>(heardFrom);
+  const [clearingHeard, setClearingHeard] = useState(false);
   // Country names and time zones come from the phone's own lists, so they're filled in after
   // the page loads (the server's lists and time zone differ from the phone's)
   const onPhone = useSyncExternalStore(noSubscribe, () => true, () => false);
@@ -148,6 +154,20 @@ export function SettingsClient({
     setTimeout(() => setStatus(null), 1800);
     router.refresh();
     return true;
+  }
+
+  /** Removes the sign-up answer from the account (the player's right to object; re-review N2) */
+  async function clearHeardFrom() {
+    setClearingHeard(true);
+    setStatus(null);
+    const { error } = await createClient().auth.updateUser({ data: { heard_from: null } });
+    setClearingHeard(false);
+    if (error) {
+      setStatus({ tone: 'error', text: 'Could not clear your answer. Please try again.' });
+      return;
+    }
+    setHeardAnswer(null);
+    setStatus({ tone: 'ok', text: 'Answer cleared' });
   }
 
   async function saveName() {
@@ -370,6 +390,21 @@ export function SettingsClient({
             Your age is never shown to other players. It&apos;s only used to put you in the right age group on the leaderboard.
           </p>
         </Row>
+        {heardAnswer && (
+          <Row>
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-sm text-zinc-200">Where you heard about Deadeye: {heardFromLabel(heardAnswer)}</p>
+                <p className="mt-0.5 text-xs text-zinc-500">
+                  Your answer at sign-up. Only used as counts, and cleared 12 months after you joined.
+                </p>
+              </div>
+              <Button size="md" variant="secondary" className="shrink-0" onClick={() => void clearHeardFrom()} disabled={clearingHeard}>
+                {clearingHeard ? 'Clearing…' : 'Clear my answer'}
+              </Button>
+            </div>
+          </Row>
+        )}
       </Section>
 
       <Section icon={Sparkles} title="AI coaching" id="ai-coaching">
