@@ -39,7 +39,10 @@ win over this file. Gold-standard drafts: `examples.md` in this folder.
 ## Method
 
 1. **Read the numbers.** Arrivals and first sessions last week, by route
-   where the counts allow.
+   where the counts allow. Then read `docs/agent-os/trends/ads.md` (kept by
+   marketing, refreshed weekly): which formats, challenges and creator
+   types are working this week. It shapes which creators you approach and
+   the hook of each draft; flag it if it is over 7 days old.
 2. **Review routes.** Each `live` or `sent` route: what it brought; keep,
    change or drop. A route quiet for three weeks is `paused`.
 3. **Find routes.** Public sources only: community directories, search,

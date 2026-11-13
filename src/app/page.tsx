@@ -30,6 +30,7 @@ import { InstallGuide } from '@/components/InstallGuide';
 import { InAppBrowserNotice } from '@/components/InAppBrowserNotice';
 import { LandingHeader } from '@/components/LandingHeader';
 import { LandingDemo } from '@/components/LandingDemo';
+import { signupHref } from '@/lib/signupRef';
 import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
 import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
@@ -146,8 +147,11 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
   ];
 }
 
-export default async function Home() {
+export default async function Home({ searchParams }: PageProps<'/'>) {
   const signedIn = !!(await getCurrentUser());
+  // An outreach link's route (?ref=) goes on to the sign-up form (src/lib/signupRef.ts)
+  const { ref } = await searchParams;
+  const signup = signupHref(typeof ref === 'string' ? ref : null);
 
   const [{ monthly, yearly, founder }, offer] = await Promise.all([proPriceLabels(), getFoundingOffer()]);
   const proPrice = [monthly, yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
@@ -159,7 +163,7 @@ export default async function Home() {
   return (
     <div className="flex-1 bg-zinc-950 text-zinc-100">
       <StandaloneRedirect signedIn={signedIn} />
-      <LandingHeader signedIn={signedIn} />
+      <LandingHeader signedIn={signedIn} signupHref={signup} />
 
       <main>
         {/* Hero */}
@@ -178,7 +182,7 @@ export default async function Home() {
             </p>
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
               <Link
-                href={signedIn ? '/dashboard' : '/signup'}
+                href={signedIn ? '/dashboard' : signup}
                 className="flex h-12 items-center justify-center rounded-xl bg-orange-600 px-8 font-semibold text-white hover:bg-orange-500"
               >
                 {signedIn ? 'Open Deadeye' : 'Create a free account'}
@@ -275,7 +279,7 @@ export default async function Home() {
               This is the real tracker, running right here in your browser on a clip from a real session. Press play and
               watch it count makes and misses.
             </p>
-            <LandingDemo signedIn={signedIn} />
+            <LandingDemo signedIn={signedIn} signupHref={signup} />
           </div>
         </section>
 
@@ -510,7 +514,7 @@ export default async function Home() {
             <h2 className="text-3xl font-black tracking-tight text-white">Aim is earned</h2>
             <p className="mt-2 text-zinc-300">Start tracking your shots today. It&apos;s free.</p>
             <Link
-              href={signedIn ? '/dashboard' : '/signup'}
+              href={signedIn ? '/dashboard' : signup}
               className="mx-auto mt-6 flex h-12 max-w-xs items-center justify-center rounded-xl bg-orange-600 font-semibold text-white hover:bg-orange-500"
             >
               {signedIn ? 'Open Deadeye' : 'Create a free account'}

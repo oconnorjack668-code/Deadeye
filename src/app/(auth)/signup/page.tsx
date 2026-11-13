@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { AgeChoice, type AgeAnswer } from '@/components/AgeChoice';
+import { refFromSearch } from '@/lib/signupRef';
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -60,6 +61,8 @@ export default function SignUpPage() {
             display_name: displayName.trim(),
             // Read by the handle_new_user trigger into age_checks (00036)
             age_16_plus: age === '16-plus',
+            // The outreach route that brought them, if any (?ref=, src/lib/signupRef.ts)
+            signup_ref: refFromSearch(window.location.search) ?? undefined,
           },
           emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
         },

@@ -120,6 +120,22 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
       lines.push(`| ${step.label} | ${step.count}${pct(step.count, everyone.joined)} | ${w}${pct(w, week.joined)} |`);
     });
   });
+  lines.push(
+    '',
+    '## By route',
+    '',
+    'From the `?ref=` on the link a player first came in by (recorded from',
+    '2026-11-13; older players show as "no route"). Judge a route on 1st',
+    'sessions; under about 30 players it is a hint.',
+    '',
+    '| Route | Joined (all) | 1st session (all) | Joined in 7 days | 1st session in 7 days |',
+    '| --- | --- | --- | --- | --- |'
+  );
+  const weekRoutes = new Map(week.routes.map((r) => [r.route, r]));
+  for (const r of everyone.routes) {
+    const w = weekRoutes.get(r.route);
+    lines.push(`| ${r.route ?? 'no route'} | ${r.joined} | ${r.firstSession} | ${w?.joined ?? 0} | ${w?.firstSession ?? 0} |`);
+  }
   lines.push('');
   if (everyone.biggestDrop) {
     lines.push(`Biggest drop (everyone): ${everyone.biggestDrop.from} to ${everyone.biggestDrop.to}, ${everyone.biggestDrop.lost} lost.`, '');

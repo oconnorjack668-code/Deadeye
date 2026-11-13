@@ -18,6 +18,10 @@ const funnel = (joined: number, setup: number, first: number): Funnel => ({
     },
   ],
   biggestDrop: { from: 'Finished setup', to: 'Logged a 1st hoops session', lost: setup - first },
+  routes: [
+    { route: 'friends', joined: 3, setup: 3, firstSession: first > 0 ? 1 : 0 },
+    { route: null, joined: joined - 3, setup: setup - 3, firstSession: first > 0 ? first - 1 : 0 },
+  ],
 });
 
 vi.mock('@/lib/funnel-server', () => ({
@@ -64,6 +68,13 @@ describe('countsFile', () => {
     expect(file).toContain('Biggest drop (everyone): Finished setup to Logged a 1st hoops session, 16 lost.');
     expect(file).toContain('- Crash reports open: 3');
     expect(file).not.toMatch(/@|[0-9a-f]{8}-[0-9a-f]{4}/);
+  });
+
+  it('splits joins and 1st sessions by outreach route, both windows side by side', () => {
+    const file = countsFile('2026-10-26', funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('## By route');
+    expect(file).toContain('| friends | 3 | 1 | 3 | 0 |');
+    expect(file).toContain('| no route | 21 | 1 | 14 | 0 |');
   });
 
   it('dates the file by Irish time', () => {

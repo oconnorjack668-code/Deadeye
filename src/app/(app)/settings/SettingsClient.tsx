@@ -14,6 +14,7 @@ import { signOutOfThisPhone } from '@/lib/signOut';
 import { Check, ChevronRight, Crown, Globe, Lock, LogOut, Ruler, User, Bell, Database, Info, Pencil, Sparkles, Volume2, SunMoon } from 'lucide-react';
 import { AppearancePicker } from '@/components/AppearancePicker';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
+import { buildLabel } from '@/lib/build';
 
 type Role = 'player' | 'coach' | 'both';
 
@@ -558,7 +559,11 @@ export function SettingsClient({
           </a>
         )}
         <Row>
-          <p className="text-sm text-zinc-500">Deadeye Basketball Training · version {version}</p>
+          <div>
+            <p className="text-sm text-zinc-500">Deadeye Basketball Training · version {version}</p>
+            {/* Which build is running, so a problem report or a test run can name it (src/lib/build.ts) */}
+            <p className="mt-0.5 font-mono text-xs text-zinc-600" data-testid="build-id">Build {buildLabel()}</p>
+          </div>
         </Row>
       </Section>
 

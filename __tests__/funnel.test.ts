@@ -77,4 +77,27 @@ describe('buildFunnel', () => {
     expect(f.biggestDrop).toEqual({ from: 'Finished setup', to: 'Logged a 1st hoops session', lost: 2 });
     expect(buildFunnel([], [], []).biggestDrop).toBeNull();
   });
+
+  it('counts players by the route they signed up from, judged on 1st sessions, no route last', () => {
+    const f = buildFunnel(
+      [
+        { id: 'a', setupDone: true, ref: 'friends' },
+        { id: 'b', setupDone: false, ref: 'friends' },
+        { id: 'c', setupDone: true, ref: null },
+        { id: 'd', setupDone: true, ref: 'reddit-irl' },
+        { id: 'e', setupDone: true },
+      ],
+      [],
+      [
+        { user_id: 'a', verified_by_video: false },
+        { user_id: 'a', verified_by_video: false },
+        { user_id: 'c', verified_by_video: false },
+      ]
+    );
+    expect(f.routes).toEqual([
+      { route: 'friends', joined: 2, setup: 1, firstSession: 1 },
+      { route: 'reddit-irl', joined: 1, setup: 1, firstSession: 0 },
+      { route: null, joined: 2, setup: 2, firstSession: 1 },
+    ]);
+  });
 });

@@ -126,6 +126,11 @@ export default function PrivacyPage() {
               only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
               anyone. Deleting your account deletes them straight away.
             </li>
+            <li>
+              If you signed up from one of our links, the short code in that link for where it was shared (for example
+              &quot;friends&quot;), saved with your account so we know which places bring players who stick with it. It names a
+              place, never a person, and nothing is stored on your device for it. Deleting your account deletes it.
+            </li>
           </ul>
         </section>
 
