@@ -1860,6 +1860,49 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      // 00060_plays.sql. diagram is checked by parseDiagram (src/lib/plays/diagram.ts).
+      plays: {
+        Row: {
+          id: string;
+          owner_id: string | null;
+          title: string;
+          slug: string | null;
+          category: string;
+          min_age: string;
+          tags: string[];
+          description: string;
+          coaching_points: string[];
+          diagram: Json;
+          is_free: boolean;
+          copied_from: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id?: string | null;
+          title: string;
+          slug?: string | null;
+          category: string;
+          min_age: string;
+          tags?: string[];
+          description?: string;
+          coaching_points?: string[];
+          diagram: Json;
+          is_free?: boolean;
+          copied_from?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      play_saves: {
+        Row: { user_id: string; play_id: string; created_at: string };
+        Insert: { user_id: string; play_id: string; created_at?: string };
+        Update: never;
+        Relationships: [];
+      };
       // 00042_drill_favourites_and_demo_videos.sql
       drill_favorites: {
         Row: { user_id: string; drill_id: string; created_at: string };

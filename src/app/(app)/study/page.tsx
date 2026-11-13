@@ -9,6 +9,7 @@ import { HubGrid, HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { BookOpen, CheckCircle2, Play, ChevronRight, Brain } from 'lucide-react';
 import Link from 'next/link';
 import { DailyQuestion, type DailyQuestionView } from '@/components/study/DailyQuestion';
+import { IqTabs } from '@/components/study/IqTabs';
 import { pickDailyQuestion, daysUntilRepeat, type QuestionRef } from '@/lib/dailyIq';
 import { streaks } from '@/lib/achievements';
 import { userCalendarNow } from '@/lib/userTime';
@@ -131,6 +132,7 @@ export default async function StudyPage() {
     <div className="flex-1 overflow-auto">
       <div className={HUB_CONTAINER}>
         <PageHeader tone="iq" icon={BookOpen} title="Basketball IQ" subtitle="Lessons and quizzes to read the game" />
+        <IqTabs active="lessons" />
 
         {/* Today's question and the sections in the main column; progress and
             where to carry on beside them on a laptop, between them on a phone */}

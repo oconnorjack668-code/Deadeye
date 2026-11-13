@@ -8,6 +8,10 @@ import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, Calendar
 import type { AppMode } from '@/lib/supabase/types';
 import { shownMode } from '@/lib/coachSide';
 
+// Pages that live under the IQ hub (Lessons, Film, Plays) light up the IQ tab.
+// /film-questions is listed on its own: it does not start with /film/.
+export const IQ_PATHS = ['/study', '/film', '/plays', '/film-questions'];
+
 // Pages that live under the Train hub light up the Train tab
 const TRAIN_PATHS = ['/train', '/programs', '/drills', '/guides', '/style-match', '/video', '/ai-coach', '/leaderboard', '/achievements', '/goals'];
 
@@ -17,14 +21,14 @@ export const NAV_ITEMS = [
   { href: '/basketball', label: 'Hoops', icon: Target, match: ['/basketball'] },
   { href: '/workouts', label: 'Gym', icon: Dumbbell, match: ['/workouts'] },
   { href: '/train', label: 'Train', icon: CalendarCheck, match: TRAIN_PATHS },
-  { href: '/study', label: 'IQ', icon: BookOpen, match: ['/study'] },
+  { href: '/study', label: 'IQ', icon: BookOpen, match: IQ_PATHS },
 ];
 
 // Desktop top bar has room for the most-used hub pages too
 export const DESKTOP_NAV_ITEMS = [
   ...NAV_ITEMS.slice(0, 3),
   { href: '/train', label: 'Train', icon: CalendarCheck, match: ['/train', '/programs', '/drills', '/guides', '/style-match', '/video'] },
-  { href: '/study', label: 'IQ Study', icon: BookOpen, match: ['/study'] },
+  { href: '/study', label: 'IQ Study', icon: BookOpen, match: IQ_PATHS },
   { href: '/ai-coach', label: 'AI Coach', icon: Sparkles, match: ['/ai-coach'] },
   { href: '/leaderboard', label: 'Ranks', icon: Trophy, match: ['/leaderboard'] },
 ];

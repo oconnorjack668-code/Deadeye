@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00058, 58 files, 271 things). Do not edit it by
+-- (00001 to 00060, 59 files, 277 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -291,7 +291,13 @@ WITH expected(migration, kind, obj, col) AS (
     ('00058', 'column', 'workout_routines', 'day_order'),
     ('00058', 'index', 'idx_workout_routines_program', ''),
     ('00058', 'table', 'routine_imports', ''),
-    ('00058', 'index', 'idx_routine_imports_user', '')
+    ('00058', 'index', 'idx_routine_imports_user', ''),
+    ('00060', 'table', 'plays', ''),
+    ('00060', 'index', 'plays_library_slug_key', ''),
+    ('00060', 'index', 'plays_owner_id_idx', ''),
+    ('00060', 'index', 'plays_copied_from_idx', ''),
+    ('00060', 'table', 'play_saves', ''),
+    ('00060', 'index', 'play_saves_play_id_idx', '')
 ),
 checked AS (
   SELECT

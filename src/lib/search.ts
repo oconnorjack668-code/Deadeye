@@ -72,6 +72,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   { id: 'game-film', group: 'go', title: 'Game film', hint: 'Tag plays in your game videos', href: '/video?tab=film', keywords: ['film', 'game video', 'tag', 'plays'] },
   { id: 'clips', group: 'go', title: 'Saved clips', hint: 'Your saved videos', href: '/video?tab=clips', keywords: ['clips', 'videos', 'highlights', 'saved'] },
   { id: 'iq', group: 'go', title: 'Basketball IQ', hint: 'Lessons and quizzes on reads and rules', href: '/study', keywords: ['iq', 'study', 'lessons', 'quiz', 'rules', 'learn'] },
+  { id: 'plays', group: 'go', title: 'Plays', hint: 'Learn plays step by step, and your role in each', href: '/plays', keywords: ['plays', 'playbook', 'sets', 'motion', 'pick and roll', 'horns', 'out of bounds', 'press break'] },
   { id: 'film-questions', group: 'go', title: 'Film questions', hint: 'Was that the right read? Ask your coach', href: '/film-questions', keywords: ['film', 'question', 'read', 'coach'] },
   { id: 'ai-coach', group: 'go', title: 'AI Coach', hint: 'Reports on your sessions', href: '/ai-coach', keywords: ['coach', 'ai', 'reports', 'feedback'] },
   { id: 'games', group: 'go', title: 'Games', hint: 'Every game you have logged', href: '/games', keywords: ['games', 'matches', 'stats', 'box scores'] },
