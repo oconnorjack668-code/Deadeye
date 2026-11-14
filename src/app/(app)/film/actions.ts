@@ -3,13 +3,15 @@
 // note, and a coach's packs. Each checks who is asking and what they sent,
 // then writes with the user's own Supabase client, so row-level security and
 // the 00062 triggers (only coaches build packs, Pro clips need Pro) apply as
-// well.
+// well. The one exception is an attempt: it is marked here and written by the
+// server only (00065), so players cannot write their own score.
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { awaitingParentApproval, getCurrentUser, getHasPro, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/types';
 import { clipAccess } from '@/lib/film/access';
 import { filmLimitMessage, MAX_NOTE } from '@/lib/film/limits';
@@ -25,7 +27,12 @@ const PicksSchema = z.array(z.object({ key: z.string().max(12), pick: z.number()
 
 export type FilmAttemptResult = { ok: true; score: number; total: number } | { ok: false; error: string };
 
-/** Marks the picks on the server, from the clip as it is now, and keeps the attempt. */
+/**
+ * Marks the picks on the server, from the clip as it is now, and keeps the
+ * attempt. The clip is read with the player's own client, so row-level
+ * security decides whether they can open it; only then is the attempt written,
+ * with the server key, for this player and with the score worked out here.
+ */
 export async function submitFilmAttempt(clipId: string, picks: Array<{ key: string; pick: number }>): Promise<FilmAttemptResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: 'Please log in again.' };
@@ -48,7 +55,7 @@ export async function submitFilmAttempt(clipId: string, picks: Array<{ key: stri
 
   const { answers, score, total } = gradeFilm(clip.questions, parsed.data);
   if (answers.length !== total) return { ok: false, error: 'Answer every question first.' };
-  const { error } = await supabase
+  const { error } = await createAdminClient()
     .from('film_attempts')
     .insert({ user_id: user.id, clip_id: clip.id, score, total, answers: answers as unknown as Json });
   if (error) return { ok: false, error: 'Could not save your answers. Try again.' };

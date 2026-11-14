@@ -1,8 +1,9 @@
 // @vitest-environment node
 // __tests__/film-actions.test.ts
 // The film server actions: answers are marked on the server from the clip as
-// it is stored (a Pro clip only for Pro, or when the coach set it), notes are
-// capped and private, only coaches build packs, and the owner clip picker
+// it is stored (a Pro clip only for Pro, or when the coach set it) and written
+// with the server key, so players cannot write their own score (00065); notes
+// are capped and private, only coaches build packs, and the owner clip picker
 // refuses a video YouTube will not let other sites play.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { fakeClient, fakeState, type FakeState } from './support/supabaseFake';
@@ -56,14 +57,16 @@ afterEach(() => {
 });
 
 describe('submitFilmAttempt', () => {
-  it('marks the answers on the server and keeps the attempt with its score and total', async () => {
+  it('marks the answers on the server and keeps the attempt with the server key, for this player, with its score and total', async () => {
     db.state.tables.film_clips = [row(true)];
     const res = await submitFilmAttempt(CLIP, [
       { key: 'q1', pick: 0 },
       { key: 'q2', pick: 0 },
     ]);
     expect(res).toEqual({ ok: true, score: 1, total: 2 });
-    expect(db.state.writes).toEqual([
+    // never through the player own client: 00065 takes INSERT away from players
+    expect(db.state.writes).toEqual([]);
+    expect(db.admin.writes).toEqual([
       expect.objectContaining({
         table: 'film_attempts',
         op: 'insert',
@@ -91,6 +94,12 @@ describe('submitFilmAttempt', () => {
     auth.waiting = true;
     expect(await submitFilmAttempt(CLIP, [])).toEqual({ ok: false, error: 'Waiting for a parent.' });
     expect(db.state.writes).toEqual([]);
+    expect(db.admin.writes).toEqual([]);
+  });
+
+  it('writes nothing for a clip the player cannot read', async () => {
+    expect(await submitFilmAttempt(CLIP, [{ key: 'q1', pick: 0 }])).toEqual({ ok: false, error: 'That clip could not be found.' });
+    expect(db.admin.writes).toEqual([]);
   });
 });
 
