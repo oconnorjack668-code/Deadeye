@@ -22,7 +22,7 @@ scope.onmessage = (e) => {
       const result = pipeline.frame(new Uint8ClampedArray(msg.buffer), msg.px, msg.t);
       scope.postMessage({ type: 'frame', result });
     } else if (msg.type === 'finish') {
-      scope.postMessage({ type: 'finished', shot: pipeline?.finish() ?? null });
+      scope.postMessage({ type: 'finished', shots: pipeline?.finish() ?? [] });
     } else if (msg.type === 'reset-shift') {
       pipeline?.resetShift();
     }
