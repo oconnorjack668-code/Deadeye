@@ -109,7 +109,13 @@ describe('00061: quiz attempts', () => {
     expect(body).not.toMatch(/is_team_staff|is_team_member/);
     expect(body).toMatch(/m\.user_id = p_player AND m\.role = 'player'/);
     expect(body).toMatch(/a\.play_id = p_play/);
-    expect(body).toMatch(/p_completed_at >= a\.created_at/);
+    // since the play was set on the assignment, not when the row was made (safety review, 14 Nov)
+    expect(body).toMatch(/p_completed_at >= a\.item_set_at/);
+    expect(body).not.toMatch(/p_completed_at >= a\.created_at/);
+    // item_set_at moves whenever the play, clip or pack on an assignment changes
+    expect(sql).toMatch(/ADD COLUMN IF NOT EXISTS item_set_at timestamptz NOT NULL DEFAULT now\(\)/);
+    expect(sql).toMatch(/NEW\.play_id IS DISTINCT FROM OLD\.play_id/);
+    expect(sql).toMatch(/CREATE TRIGGER team_assignments_item_set_at/);
     expect(body).toMatch(/current_date <= COALESCE\(a\.due_date, a\.created_at::date\) \+ 90/);
   });
 
@@ -129,6 +135,9 @@ describe('00061: quiz attempts', () => {
     expect(body).toMatch(/GROUP BY 1, 2/);
     // Never a user id in what comes back
     expect(body.slice(body.lastIndexOf('SELECT e'))).not.toMatch(/user_id/);
+    // nothing until 3 players have answered, so 1 or 2 cannot give away a pick
+    expect(body).toMatch(/WHERE \(SELECT count\(\*\) FROM firsts\) >= 3/);
+    expect(body).toMatch(/ta\.item_set_at AS created_at/);
   });
 });
 

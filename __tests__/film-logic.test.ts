@@ -317,7 +317,7 @@ describe('the film player address and controls', () => {
   });
 
   it('leaves lesson videos as they were', () => {
-    expect(youtubeEmbedUrl('abcdefghijk')).toBe('https://www.youtube-nocookie.com/embed/abcdefghijk');
+    expect(youtubeEmbedUrl('abcdefghijk')).toBe('https://www.youtube-nocookie.com/embed/abcdefghijk?rel=0');
   });
 
   it('offers slower speeds the video allows, and says why a video will not play', () => {

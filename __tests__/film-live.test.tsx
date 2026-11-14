@@ -38,7 +38,7 @@ const CLIP = '00000000-0000-4000-8000-000000000001';
 beforeEach(() => {
   delete process.env.FILM_LIVE;
   auth.owner = false;
-  db.state = fakeState({});
+  db.state = fakeState();
 });
 afterEach(() => {
   cleanup();

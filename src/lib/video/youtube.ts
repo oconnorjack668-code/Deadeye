@@ -49,6 +49,9 @@ export function youtubeEmbedUrl(id: string, options: YoutubeEmbedOptions = {}): 
   const params = new URLSearchParams();
   if (options.autoplay) params.set('autoplay', '1');
   if (options.captions) params.set('cc_load_policy', '1');
+  // At the end, YouTube suggests only videos from the same channel, never
+  // whatever it would pick for a 13-year-old (safety review, 14 Nov)
+  params.set('rel', '0');
   const start = wholeSeconds(options.start);
   const end = wholeSeconds(options.end);
   if (start > 0) params.set('start', String(start));

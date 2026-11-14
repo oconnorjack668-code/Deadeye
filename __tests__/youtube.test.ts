@@ -39,11 +39,11 @@ describe('isRealYoutubeId', () => {
 
 describe('youtubeEmbedUrl', () => {
   it('uses the no-cookie host, since the audience starts at 13', () => {
-    expect(youtubeEmbedUrl('dQw4w9WgXcQ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(youtubeEmbedUrl('dQw4w9WgXcQ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0');
   });
 
   it('trims whitespace from the stored id', () => {
-    expect(youtubeEmbedUrl(' dQw4w9WgXcQ ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(youtubeEmbedUrl(' dQw4w9WgXcQ ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0');
   });
 });
 
@@ -51,8 +51,8 @@ describe('youtubeEmbedUrl options', () => {
   const id = 'dQw4w9WgXcQ';
   const base = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ';
 
-  it('adds nothing when no option is set', () => {
-    expect(youtubeEmbedUrl(id, {})).toBe(base);
+  it('only turns off other channels suggestions when no option is set', () => {
+    expect(youtubeEmbedUrl(id, {})).toBe(base + '?rel=0');
   });
 
   it('turns captions on and plays after the tap', () => {
@@ -69,11 +69,11 @@ describe('youtubeEmbedUrl options', () => {
   });
 
   it('leaves out a start or end that makes no sense', () => {
-    expect(youtubeEmbedUrl(id, { start: -5, end: Number.NaN })).toBe(base);
-    expect(youtubeEmbedUrl(id, { start: 0 })).toBe(base);
+    expect(youtubeEmbedUrl(id, { start: -5, end: Number.NaN })).toBe(base + '?rel=0');
+    expect(youtubeEmbedUrl(id, { start: 0 })).toBe(base + '?rel=0');
     // An end at or before the start would play nothing
-    expect(youtubeEmbedUrl(id, { start: 30, end: 30 })).toBe(base + '?start=30');
-    expect(youtubeEmbedUrl(id, { start: 30, end: 10 })).toBe(base + '?start=30');
+    expect(youtubeEmbedUrl(id, { start: 30, end: 30 })).toBe(base + '?rel=0&start=30');
+    expect(youtubeEmbedUrl(id, { start: 30, end: 10 })).toBe(base + '?rel=0&start=30');
   });
 
   it('never leaves the no-cookie host, whatever the options', () => {

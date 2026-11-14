@@ -223,10 +223,11 @@ export default function PrivacyPage() {
             If you join a team, its members (including coaches) can see your display name, last 7 days of training
             totals, streak and your game averages (points, rebounds, assists, FG%). Coaches can post assignments and
             see who completed them. When a head coach sets a play for the team, they see whether you took its quiz
-            and whether you passed, and how the team answered each question as totals, never which spots you picked,
-            until 90 days after the due date. The same goes for a film clip or pack a head coach sets: they see whether
-            you answered its questions and your score, and how the team answered each question as totals, never which
-            answers you picked. Assistant coaches and teammates do not see quiz or film results, and nobody but you sees
+            and whether you passed, and how the team answered each question as totals once 3 or more players have
+            answered, never which spots you picked, until 90 days after the due date. They only see results from after
+            the play was set. The same goes for a film clip or pack a head coach sets: they see whether you answered its
+            questions and your score, and how the team answered each question as totals once 3 or more have answered,
+            never which answers you picked. Assistant coaches and teammates do not see quiz or film results, and nobody but you sees
             your notes on clips. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any

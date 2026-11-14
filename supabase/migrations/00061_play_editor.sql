@@ -186,6 +186,37 @@ ALTER TABLE public.team_assignments ADD CONSTRAINT team_assignments_one_item
 
 CREATE INDEX IF NOT EXISTS team_assignments_play_id_idx ON public.team_assignments (play_id) WHERE play_id IS NOT NULL;
 
+-- When the play, clip or pack on an assignment was set. A head coach sees
+-- results only from this moment, so changing the item on an old assignment
+-- never shows attempts a player made on their own before it was set.
+ALTER TABLE public.team_assignments
+  ADD COLUMN IF NOT EXISTS item_set_at timestamptz NOT NULL DEFAULT now();
+
+CREATE OR REPLACE FUNCTION public.stamp_assignment_item()
+RETURNS trigger
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
+BEGIN
+  IF TG_OP = 'INSERT'
+     OR NEW.play_id IS DISTINCT FROM OLD.play_id
+     OR NEW.film_clip_id IS DISTINCT FROM OLD.film_clip_id
+     OR NEW.film_pack_id IS DISTINCT FROM OLD.film_pack_id THEN
+    NEW.item_set_at := now();
+  ELSE
+    NEW.item_set_at := OLD.item_set_at;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS team_assignments_item_set_at ON public.team_assignments;
+CREATE TRIGGER team_assignments_item_set_at
+  BEFORE INSERT OR UPDATE ON public.team_assignments
+  FOR EACH ROW EXECUTE FUNCTION public.stamp_assignment_item();
+
+REVOKE EXECUTE ON FUNCTION public.stamp_assignment_item() FROM PUBLIC, anon, authenticated;
+
 -- Same as 00047, and a play can only be set if the coach can read it
 DROP POLICY IF EXISTS "Coaches add assignments" ON public.team_assignments;
 CREATE POLICY "Coaches add assignments" ON public.team_assignments
@@ -288,8 +319,9 @@ CREATE POLICY "Players keep own quiz attempts" ON public.play_quiz_attempts
 
 -- Whether the signed-in user may see this attempt as a head coach: the play is
 -- set for a team they are head coach of, the player is a player on that team,
--- the attempt came after it was set, and it is no more than 90 days past the
--- due date (or the day it was set, with no due date).
+-- the attempt came after the play was set on it (item_set_at), and it is no
+-- more than 90 days past the due date (or the day it was set, with no due
+-- date).
 CREATE OR REPLACE FUNCTION public.coach_sees_play_attempt(p_play uuid, p_player uuid, p_completed_at timestamptz)
 RETURNS boolean
 LANGUAGE sql
@@ -303,7 +335,7 @@ AS $$
     JOIN public.team_members m ON m.team_id = a.team_id AND m.user_id = p_player AND m.role = 'player'
     WHERE a.play_id = p_play
       AND public.is_team_coach(a.team_id, auth.uid())
-      AND p_completed_at >= a.created_at
+      AND p_completed_at >= a.item_set_at
       AND current_date <= COALESCE(a.due_date, a.created_at::date) + 90
   );
 $$;
@@ -323,7 +355,9 @@ GRANT ALL ON public.play_quiz_attempts TO service_role;
 
 -- How a team answered each question of a play set for it, as totals: each
 -- player first attempt since it was set, counted by question and pick. Head
--- coaches only, inside the same 90 days. Never who picked what.
+-- coaches only, inside the same 90 days. Never who picked what: nothing comes
+-- back until at least 3 players have answered, so a total of 1 or 2 cannot
+-- give away one player pick.
 CREATE OR REPLACE FUNCTION public.play_assignment_split(p_assignment uuid)
 RETURNS TABLE (question_key text, pick text, players integer)
 LANGUAGE sql
@@ -332,7 +366,7 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
   WITH a AS (
-    SELECT ta.team_id, ta.play_id, ta.created_at
+    SELECT ta.team_id, ta.play_id, ta.item_set_at AS created_at
     FROM public.team_assignments ta
     WHERE ta.id = p_assignment
       AND ta.play_id IS NOT NULL
@@ -348,6 +382,7 @@ AS $$
   )
   SELECT e ->> 'key', e ->> 'pick', count(*)::int
   FROM firsts f, jsonb_array_elements(f.answers) e
+  WHERE (SELECT count(*) FROM firsts) >= 3
   GROUP BY 1, 2;
 $$;
 

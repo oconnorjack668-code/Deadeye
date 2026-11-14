@@ -17,7 +17,9 @@ export function AnswerSplit({ prompt, answered, picks }: { prompt: string; answe
     <div className="space-y-2">
       <p className="text-sm font-semibold text-white">{prompt}</p>
       {answered === 0 ? (
-        <p className="text-sm text-zinc-500">No answers yet.</p>
+        // The totals only come back once 3 players have answered (00061, 00062),
+        // so a total of 1 or 2 never shows one player pick
+        <p className="text-sm text-zinc-500">The team totals show once 3 players have answered.</p>
       ) : (
         <ul className="space-y-1.5">
           {picks.map((p) => (

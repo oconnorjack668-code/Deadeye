@@ -367,9 +367,10 @@ CREATE POLICY "Players delete own film attempts" ON public.film_attempts
 
 -- Whether the signed-in user may see this attempt as a head coach: the clip
 -- is set for a team they are head coach of, on its own or in a pack, the
--- player is a player on that team, the attempt came after it was set, and it
--- is no more than 90 days past the due date (or the day it was set, with no
--- due date).
+-- player is a player on that team, the attempt came after the clip was set
+-- (item_set_at from 00061, or later if the clip went into the pack after the
+-- pack was set), and it is no more than 90 days past the due date (or the day
+-- it was set, with no due date).
 CREATE OR REPLACE FUNCTION public.coach_sees_film_attempt(p_clip uuid, p_player uuid, p_completed_at timestamptz)
 RETURNS boolean
 LANGUAGE sql
@@ -382,11 +383,14 @@ AS $$
     FROM public.team_assignments a
     JOIN public.team_members m ON m.team_id = a.team_id AND m.user_id = p_player AND m.role = 'player'
     WHERE (
-        a.film_clip_id = p_clip
-        OR EXISTS (SELECT 1 FROM public.film_pack_clips pc WHERE pc.pack_id = a.film_pack_id AND pc.clip_id = p_clip)
+        (a.film_clip_id = p_clip AND p_completed_at >= a.item_set_at)
+        OR EXISTS (
+          SELECT 1 FROM public.film_pack_clips pc
+          WHERE pc.pack_id = a.film_pack_id AND pc.clip_id = p_clip
+            AND p_completed_at >= greatest(a.item_set_at, pc.created_at)
+        )
       )
       AND public.is_team_coach(a.team_id, auth.uid())
-      AND p_completed_at >= a.created_at
       AND current_date <= COALESCE(a.due_date, a.created_at::date) + 90
   );
 $$;
@@ -407,7 +411,8 @@ GRANT ALL ON public.film_attempts TO service_role;
 -- How a team answered each question of film set for it, as totals: each
 -- player first attempt on each clip since it was set, counted by clip,
 -- question and pick. Head coaches only, inside the same 90 days. Never who
--- picked what.
+-- picked what: a clip shows nothing until at least 3 players have answered
+-- it, so a total of 1 or 2 cannot give away one player pick.
 CREATE OR REPLACE FUNCTION public.film_assignment_split(p_assignment uuid)
 RETURNS TABLE (clip_id uuid, question_key text, pick text, players integer)
 LANGUAGE sql
@@ -416,28 +421,34 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
   WITH a AS (
-    SELECT ta.team_id, ta.film_clip_id, ta.film_pack_id, ta.created_at
+    SELECT ta.team_id, ta.film_clip_id, ta.film_pack_id, ta.item_set_at
     FROM public.team_assignments ta
     WHERE ta.id = p_assignment
       AND (ta.film_clip_id IS NOT NULL OR ta.film_pack_id IS NOT NULL)
       AND public.is_team_coach(ta.team_id, auth.uid())
       AND current_date <= COALESCE(ta.due_date, ta.created_at::date) + 90
   ),
+  -- each clip with the moment it was set for the team
   clips AS (
-    SELECT a.film_clip_id AS clip FROM a WHERE a.film_clip_id IS NOT NULL
+    SELECT a.film_clip_id AS clip, a.item_set_at AS set_at FROM a WHERE a.film_clip_id IS NOT NULL
     UNION
-    SELECT pc.clip_id FROM a JOIN public.film_pack_clips pc ON pc.pack_id = a.film_pack_id
+    SELECT pc.clip_id, greatest(a.item_set_at, pc.created_at) FROM a JOIN public.film_pack_clips pc ON pc.pack_id = a.film_pack_id
   ),
   firsts AS (
-    SELECT DISTINCT ON (f.user_id, f.clip_id) f.clip_id, f.answers
+    SELECT DISTINCT ON (f.user_id, f.clip_id) f.user_id, f.clip_id, f.answers
     FROM public.film_attempts f
-    JOIN clips ON clips.clip = f.clip_id
-    JOIN a ON f.completed_at >= a.created_at
+    JOIN clips ON clips.clip = f.clip_id AND f.completed_at >= clips.set_at
+    JOIN a ON true
     JOIN public.team_members m ON m.team_id = a.team_id AND m.user_id = f.user_id AND m.role = 'player'
     ORDER BY f.user_id, f.clip_id, f.completed_at ASC
+  ),
+  enough AS (
+    SELECT fi.clip_id FROM firsts fi GROUP BY fi.clip_id HAVING count(*) >= 3
   )
   SELECT fi.clip_id, e ->> 'key', e ->> 'pick', count(*)::int
-  FROM firsts fi, jsonb_array_elements(fi.answers) e
+  FROM firsts fi
+  JOIN enough USING (clip_id),
+  jsonb_array_elements(fi.answers) e
   GROUP BY 1, 2, 3;
 $$;
 

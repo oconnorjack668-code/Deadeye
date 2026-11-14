@@ -120,7 +120,10 @@ describe('00062: attempts', () => {
     expect(body).toMatch(/m\.user_id = p_player AND m\.role = 'player'/);
     expect(body).toMatch(/a\.film_clip_id = p_clip/);
     expect(body).toMatch(/pc\.pack_id = a\.film_pack_id AND pc\.clip_id = p_clip/);
-    expect(body).toMatch(/p_completed_at >= a\.created_at/);
+    // since the clip was set: item_set_at, or later if it went into the pack after (safety review, 14 Nov)
+    expect(body).toMatch(/p_completed_at >= a\.item_set_at/);
+    expect(body).toMatch(/p_completed_at >= greatest\(a\.item_set_at, pc\.created_at\)/);
+    expect(body).not.toMatch(/p_completed_at >= a\.created_at/);
     expect(body).toMatch(/current_date <= COALESCE\(a\.due_date, a\.created_at::date\) \+ 90/);
   });
 
@@ -137,6 +140,10 @@ describe('00062: attempts', () => {
     expect(body).toMatch(/current_date <= COALESCE\(ta\.due_date, ta\.created_at::date\) \+ 90/);
     expect(body).toMatch(/GROUP BY 1, 2, 3/);
     expect(body.slice(body.lastIndexOf('SELECT fi'))).not.toMatch(/user_id/);
+    // nothing for a clip until 3 players have answered it, and only since it was set
+    expect(body).toMatch(/HAVING count\(\*\) >= 3/);
+    expect(body).toMatch(/JOIN enough USING \(clip_id\)/);
+    expect(body).toMatch(/f\.completed_at >= clips\.set_at/);
   });
 });
 
