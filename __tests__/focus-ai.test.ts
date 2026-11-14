@@ -10,7 +10,7 @@ vi.mock('@/lib/auth', () => ({
   PARENT_APPROVAL_NEEDED: 'parent',
 }));
 
-import { buildCatalogue, buildFocusPrompt, parseFocusPlan, namesForRefs, MAX_FOCUS_TEXT } from '@/lib/focus/ai';
+import { buildCatalogue, buildFocusPrompt, parseFocusPlan, namesForRefs, withNames, MAX_FOCUS_TEXT } from '@/lib/focus/ai';
 import { buildFocusPlan, type FocusContent } from '@/lib/focus/plan';
 import { readFocusRequest } from '@/lib/focus/service';
 import { mentionsPain, needsSupportLine } from '@/lib/ai/safety';
@@ -152,6 +152,30 @@ describe('namesForRefs', () => {
     expect(namesForRefs('Day 1: L1, then D1 and D2. Read G1. D40 stays.', catalogue, content)).toBe(
       'Day 1: Closeouts and Help-Side Positioning, then Closeout Slides and Free Throw Ladder. Read Pre-Shot and Free-Throw Routines. D40 stays.'
     );
+  });
+});
+
+describe('withNames', () => {
+  it('turns refs into names in every text field, not only the week', () => {
+    const catalogue = buildCatalogue(content, 'player');
+    const plan = withNames(
+      {
+        summary: 'Start with L1.',
+        focus: [{ label: 'Closeouts', lookFor: 'Like in L1' }],
+        film: [{ lessonId: 'l-close', watchFor: 'the feet, then do D1' }],
+        drills: [{ drillId: 'd-solo', why: 'pairs with L1', dose: '3 x D1' }],
+        reads: [{ guideSlug: 'pre-shot-free-throw-routines', why: 'see G1' }],
+        week: ['Day 1: D2'],
+        measure: 'Your quiz scores on L1 and makes in D2',
+      },
+      catalogue,
+      content
+    );
+    const text = JSON.stringify(plan);
+    expect(text).not.toMatch(/\b[DLG]\d+\b/);
+    expect(plan.measure).toBe('Your quiz scores on Closeouts and Help-Side Positioning and makes in Free Throw Ladder');
+    // Ids are untouched
+    expect(plan.drills[0].drillId).toBe('d-solo');
   });
 });
 
