@@ -52,6 +52,11 @@ const USER_TABLES = [
   'play_saves',
   // Role quiz attempts on plays, with the answers picked (00061)
   'play_quiz_attempts',
+  // Film clips saved, private notes on clips, and the answers given on each
+  // clip (00062)
+  'film_saves',
+  'film_notes',
+  'film_attempts',
   // The parent consent record, which is about this account
   'age_checks',
   // The optional profile photo record and the cached player level (00043).
@@ -82,7 +87,7 @@ export async function GET() {
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
 
   const admin = createAdminClient();
-  const [authUser, friendships, filmQuestions, follows, founderPosts, clubNotices, ownPlays, playbookAdds, profile, ...tables] = await Promise.all([
+  const [authUser, friendships, filmQuestions, follows, founderPosts, clubNotices, ownPlays, playbookAdds, ownPacks, profile, ...tables] = await Promise.all([
     admin.auth.admin.getUserById(user.id),
     admin.from('friendships').select('*').or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`),
     // Keyed by player_id rather than user_id
@@ -98,6 +103,8 @@ export async function GET() {
     admin.from('plays').select('*').eq('owner_id', user.id),
     // Plays this account added to a team playbook (00061), keyed by added_by
     admin.from('team_playbook').select('*').eq('added_by', user.id),
+    // Film packs this account built as a coach (00062), keyed by owner_id, with their clips
+    admin.from('film_packs').select('*, film_pack_clips(clip_id, position)').eq('owner_id', user.id),
     admin.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     ...USER_TABLES.map((table) => admin.from(table).select('*').eq('user_id', user.id)),
   ]);
@@ -125,6 +132,7 @@ export async function GET() {
   data.club_notices = clubNotices.error ? { error: 'unavailable' } : clubNotices.data || [];
   data.plays = ownPlays.error ? { error: 'unavailable' } : ownPlays.data || [];
   data.team_playbook = playbookAdds.error ? { error: 'unavailable' } : playbookAdds.data || [];
+  data.film_packs = ownPacks.error ? { error: 'unavailable' } : ownPacks.data || [];
 
   const body = {
     exported_at: new Date().toISOString(),

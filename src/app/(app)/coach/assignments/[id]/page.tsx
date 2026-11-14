@@ -1,7 +1,8 @@
 // src/app/(app)/coach/assignments/[id]/page.tsx
 // Progress on a play set for a team, for its head coaches: each player not
 // started, done or knows it, and how the team split on each quiz question,
-// as totals. Never a player's own answers, nothing for teammates, and no
+// as totals. Film set for a team (a clip or a pack) shows the same way, in
+// FilmProgress.tsx. Never a player's own answers, nothing for teammates, and no
 // reminders that name anyone (plan sections 7 and 11). Assistant coaches,
 // who can be under 18, see that it was set, not who knows it.
 import React from 'react';
@@ -25,6 +26,8 @@ import {
 import { buildQuiz } from '@/lib/plays/quiz';
 import { PLAY_COLUMNS, toPlay, type PlayRow } from '@/lib/plays/rows';
 import { cn } from '@/lib/utils';
+import { AnswerSplit } from '@/components/coach/AnswerSplit';
+import { filmProgressView } from './FilmProgress';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,10 +50,13 @@ export default async function PlayProgressPage({ params }: { params: Promise<{ i
   const supabase = await createClient();
 
   const { data: assignment } = await supabase.from('team_assignments').select('*').eq('id', id).maybeSingle();
-  if (!assignment || !assignment.play_id) notFound();
+  if (!assignment) notFound();
+  const isFilm = !!(assignment.film_clip_id || assignment.film_pack_id);
+  if (!assignment.play_id && !isFilm) notFound();
   const { data: me } = await supabase.from('team_members').select('role').eq('team_id', assignment.team_id).eq('user_id', user.id).maybeSingle();
   if (me?.role !== 'coach' && me?.role !== 'assistant') notFound();
   const isHead = me.role === 'coach';
+  if (isFilm || !assignment.play_id) return filmProgressView({ supabase, assignment, isHead });
 
   const [{ data: playRow }, { data: team }, { data: roster }, { data: attempts }, { data: completions }, { data: split }] = await Promise.all([
     supabase.from('plays').select(PLAY_COLUMNS).eq('id', assignment.play_id).maybeSingle() as unknown as Promise<{ data: PlayRow | null }>,
@@ -134,34 +140,7 @@ export default async function PlayProgressPage({ params }: { params: Promise<{ i
                     <p className="mt-1 text-sm text-zinc-400">Each player&apos;s first try, as totals. Nobody&apos;s own answers are shown.</p>
                   </div>
                   {splits.map(({ question, answered, picks }) => (
-                    <div key={question.key} className="space-y-2">
-                      <p className="text-sm font-semibold text-white">{question.prompt}</p>
-                      {answered === 0 ? (
-                        <p className="text-sm text-zinc-500">No answers yet.</p>
-                      ) : (
-                        <ul className="space-y-1.5">
-                          {picks.map((p) => (
-                            <li key={p.pick}>
-                              <div className="flex items-baseline justify-between gap-3 text-sm">
-                                <span className={p.right ? 'font-semibold text-emerald-300' : 'text-zinc-300'}>
-                                  {p.label}
-                                  {p.right && ' (right answer)'}
-                                </span>
-                                <span className="tabular-nums text-zinc-400">
-                                  {p.players} of {answered}
-                                </span>
-                              </div>
-                              <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-zinc-800" aria-hidden>
-                                <div
-                                  className={cn('h-full rounded-full', p.right ? 'bg-emerald-500' : 'bg-zinc-500')}
-                                  style={{ width: `${Math.round((p.players / answered) * 100)}%` }}
-                                />
-                              </div>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    <AnswerSplit key={question.key} prompt={question.prompt} answered={answered} picks={picks} />
                   ))}
                 </section>
               )}

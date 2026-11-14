@@ -72,6 +72,16 @@ export function fakeClient(state: FakeState) {
           values = v;
           return q;
         },
+        // Recorded as an insert; the conflict target is not modelled
+        upsert(v: Row) {
+          op = 'insert';
+          values = v;
+          return q;
+        },
+        // Not modelled: a test puts in only the rows the filter would keep
+        or() {
+          return q;
+        },
         delete() {
           op = 'delete';
           return q;

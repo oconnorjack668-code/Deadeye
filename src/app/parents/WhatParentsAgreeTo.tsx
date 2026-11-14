@@ -38,6 +38,11 @@ export function WhatParentsAgreeTo({ child }: { child: string }) {
           Teams they join: the team&apos;s coaches see training totals and game averages. More detail, or a video clip,
           only if {child} chooses to share it with that coach.
         </li>
+        <li>
+          Plays and film clips a head coach sets for the team: that coach sees whether {child} did it and their score,
+          never which answers they picked. Notes {child} writes on a clip are only for them. Film clips and lesson videos
+          play from YouTube, and only when {child} taps play.
+        </li>
       </ul>
 
       <h2 className="text-base font-bold text-white">The AI coach</h2>

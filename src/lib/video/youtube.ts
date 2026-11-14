@@ -29,6 +29,12 @@ export interface YoutubeEmbedOptions {
   autoplay?: boolean;
   /** Show captions without the viewer having to switch them on. */
   captions?: boolean;
+  /**
+   * Let the film player control it through the IFrame API (pause at a
+   * question, seek back, speed), from this page's origin only. Also keeps it
+   * inline on iPhones, so the question below stays in view.
+   */
+  jsApiOrigin?: string;
 }
 
 /**
@@ -48,6 +54,11 @@ export function youtubeEmbedUrl(id: string, options: YoutubeEmbedOptions = {}): 
   if (start > 0) params.set('start', String(start));
   // An end at or before the start would play nothing
   if (end > start) params.set('end', String(end));
+  if (options.jsApiOrigin) {
+    params.set('enablejsapi', '1');
+    params.set('origin', options.jsApiOrigin);
+    params.set('playsinline', '1');
+  }
   const query = params.toString();
   return query ? `${base}?${query}` : base;
 }

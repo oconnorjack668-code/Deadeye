@@ -1625,7 +1625,7 @@ export interface Database {
           link: string | null;
           due_date: string | null;
           created_at: string;
-          // 00061_play_editor.sql: at most one is set; the film ones arrive in F3
+          // 00061_play_editor.sql: at most one is set; the film keys arrive in 00062
           play_id: string | null;
           film_clip_id: string | null;
           film_pack_id: string | null;
@@ -1934,6 +1934,104 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      // 00062_film.sql. questions is checked by parseFilmQuestions (src/lib/film/questions.ts).
+      film_clips: {
+        Row: {
+          id: string;
+          youtube_video_id: string;
+          start_s: number;
+          end_s: number;
+          title: string;
+          channel_name: string;
+          theme: string;
+          level: string;
+          questions: Json;
+          is_free: boolean;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        // Written by the server only (the owner tool)
+        Insert: {
+          id?: string;
+          youtube_video_id: string;
+          start_s: number;
+          end_s: number;
+          title: string;
+          channel_name: string;
+          theme: string;
+          level: string;
+          questions?: Json;
+          is_free?: boolean;
+          published_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          youtube_video_id?: string;
+          start_s?: number;
+          end_s?: number;
+          title?: string;
+          channel_name?: string;
+          theme?: string;
+          level?: string;
+          questions?: Json;
+          is_free?: boolean;
+          published_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      film_packs: {
+        Row: {
+          id: string;
+          owner_id: string | null;
+          slug: string | null;
+          title: string;
+          description: string;
+          is_free: boolean;
+          published_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        // A coach sends owner_id, title and description (00062 grants only these)
+        Insert: {
+          id?: string;
+          owner_id?: string | null;
+          slug?: string | null;
+          title: string;
+          description?: string;
+          is_free?: boolean;
+          published_at?: string | null;
+        };
+        Update: { title?: string; description?: string; is_free?: boolean; published_at?: string | null; updated_at?: string };
+        Relationships: [];
+      };
+      film_pack_clips: {
+        Row: { pack_id: string; clip_id: string; position: number; created_at: string };
+        Insert: { pack_id: string; clip_id: string; position?: number };
+        Update: { position?: number };
+        Relationships: [];
+      };
+      film_saves: {
+        Row: { user_id: string; clip_id: string; created_at: string };
+        Insert: { user_id: string; clip_id: string; created_at?: string };
+        Update: never;
+        Relationships: [];
+      };
+      film_notes: {
+        Row: { user_id: string; clip_id: string; body: string; updated_at: string };
+        Insert: { user_id: string; clip_id: string; body: string; updated_at?: string };
+        Update: { body?: string; updated_at?: string };
+        Relationships: [];
+      };
+      // answers is not readable by signed-in users (00062 grants the other columns only)
+      film_attempts: {
+        Row: { id: string; user_id: string; clip_id: string; score: number; total: number; completed_at: string };
+        Insert: { user_id: string; clip_id: string; score: number; total: number; answers: Json };
+        Update: never;
+        Relationships: [];
+      };
       // 00042_drill_favourites_and_demo_videos.sql
       drill_favorites: {
         Row: { user_id: string; drill_id: string; created_at: string };
@@ -2137,6 +2235,7 @@ export interface Database {
       delete_team: { Args: { p_team: string }; Returns: void };
       set_team_role: { Args: { p_team: string; p_user: string; p_role: string }; Returns: void };
       play_assignment_split: { Args: { p_assignment: string }; Returns: { question_key: string; pick: string; players: number }[] };
+      film_assignment_split: { Args: { p_assignment: string }; Returns: { clip_id: string; question_key: string; pick: string; players: number }[] };
       team_roster: {
         Args: { p_team: string };
         Returns: {
