@@ -389,6 +389,16 @@ const PACE_FRAMES = 15;
  * The call is made by the usual confirm step and is always marked unsure.
  */
 const SLOW_PACE = 1.5;
+/** The late net swing, as a multiple of NET_LATE, that a VANISHED_AT_RING shot needs to be a make. */
+const VANISHED_LATE = 3;
+
+// VANISHED_AT_RING (13 Nov 2026): on a slow phone, a shot that started and
+// reached the ring, then vanished, is judged by the net, as a lone sighting
+// is. Its crossing is usually never placed: at 10 frames a second the ball is
+// at the ring on one frame and in the net on the next, and on the 2:39 clip a
+// stray sighting a frame later, moving up, stopped its path being carried on
+// to the rim line. The make at 23.6s then timed out as a miss while the net
+// swung for a second. Always unsure, like the lone sighting.
 // Tried and left out (3 Nov 2026): widening "near the ring" for the lone
 // sighting by a frame's travel at 10 rim widths a second. On the first clip at
 // 10 fps a make's only sighting was 0.84 rim widths up, just outside NEAR; the
@@ -439,8 +449,9 @@ export class ShotDetector {
   private lastSeen = 0;
   private cooldownUntil = 0;
   private pending: Pending | null = null;
-  /** When the ball last reached the ring on this shot. */
+  /** When the ball last reached the ring on this shot, and where across. */
   private nearAt: number | null = null;
+  private nearX: number | null = null;
   /** When the ball was seen at the ring and then back above it: it hit the rim. */
   private touchedAt: number | null = null;
   /** The followed thing a shot started on, and when it was last seen: see sameBall. */
@@ -460,6 +471,8 @@ export class ShotDetector {
   private lone: Sighting | null = null;
   /** The shot being judged was started from `lone`. */
   private loneShot = false;
+  /** The shot being judged was opened by VANISHED_AT_RING. */
+  private vanished = false;
   /** Recent gaps between frames, ms, and how many tuned frames each is: see TUNED_FRAME_MS. */
   private frameGaps: number[] = [];
   private pace = 1;
@@ -606,7 +619,10 @@ export class ShotDetector {
         this.armedAt = first.t;
         this.lone = null;
       }
-      if (side <= TOUCH_SIDE && depth >= -NEAR) this.nearAt = obs.t;
+      if (side <= TOUCH_SIDE && depth >= -NEAR) {
+        this.nearAt = obs.t;
+        this.nearX = x;
+      }
       // Came down to the ring and is now going back up: it hit the rim. Only
       // the bounce is noted - the ball can still drop in on the way back down,
       // which is how a rattled-in shot goes.
@@ -688,6 +704,14 @@ export class ShotDetector {
     const crossX = this.hiddenCrossing();
     if (gone >= this.gapMs(HIDDEN_MS) && crossX !== null && this.netLog.length && this.side(crossX) <= MAKE_MARGIN) {
       this.pending = { t: this.lastAbove!.t, margin: this.side(crossX), side: this.signedSide(crossX), confident: false, inside: 0, outside: 0, first: null, order: [] };
+      return this.confirm(obs);
+    }
+    // A slow phone, the ball seen at the ring and then not again: the net
+    // says whether it went in. See VANISHED_AT_RING.
+    if (this.pace >= SLOW_PACE && gone >= this.gapMs(HIDDEN_MS) && this.nearAt !== null && this.nearX !== null && this.touchedAt === null && this.netLog.length) {
+      this.loneShot = true;
+      this.vanished = true;
+      this.pending = { t: this.nearAt, margin: this.side(this.nearX), confident: false, inside: 0, outside: 0, first: null, order: [] };
       return this.confirm(obs);
     }
     // Confident when nothing says it went in. A ball that reached the ring and
@@ -819,8 +843,10 @@ export class ShotDetector {
       if (p.first === null && moving >= this.frames(NET_FRAMES, 2)) {
         const swing = late();
         // Sure when the net is still swinging hard; a make, but worth a look,
-        // when it only just clears the bar
-        if (swing >= NET_LATE) return this.decide(obs.t, true, swing >= NET_LATE * 2, p.margin, p.t, p.side);
+        // when it only just clears the bar. A ball that only vanished at the
+        // ring needs three times the swing: at 10 frames a second a rim-out
+        // on the 2:39 clip summed 1.2 here and the makes 2.9 to 4.8.
+        if (swing >= NET_LATE * (this.vanished ? VANISHED_LATE : 1)) return this.decide(obs.t, true, swing >= NET_LATE * 2, p.margin, p.t, p.side);
         this.lateNet = swing;
         // The ring was hit and the ball has not been seen since. It may yet
         // drop in - a ball off the ring can go a metre up and still fall
@@ -951,6 +977,7 @@ export class ShotDetector {
     // call is never sure and has no margin, whatever the net did
     const lone = this.loneShot;
     this.loneShot = false;
+    this.vanished = false;
     this.lone = null;
     const shot: DetectedShot = {
       t: at ?? t,
@@ -977,6 +1004,7 @@ export class ShotDetector {
     this.beforeAbove = null;
     this.pending = null;
     this.nearAt = null;
+    this.nearX = null;
     this.touchedAt = null;
     this.deepest = null;
     this.stillFrames = 0;

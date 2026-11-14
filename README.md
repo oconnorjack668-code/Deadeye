@@ -262,6 +262,36 @@ Two changes from those clips (9 Nov 2026), measured over all 32 runs:
   misses, which are no longer called (15 to 13 of 31). Nothing was lost on any
   clip as filmed.
 
+Three changes on 13 Nov 2026, measured together over the same 32 runs:
+**535 to 595 right (81.6% to 90.7%)**, shots never called 63 to 16, calls with
+no shot 7 to 5. Every clip as filmed the same or better.
+
+- **Frames are held still before they are scored** (`stabilise.ts`). Measured
+  frame against frame, clip 1's phone sags 2.8 canvas pixels over 51 seconds
+  and clip 2's is knocked 2 pixels at 86s; both are under the camera
+  watcher's alarm, and on a wobbly mount every edge reads as moving. Each
+  frame is lined up with a reference picture of the crop and slid back, by
+  whole pixels only: sliding by fractions softens frames unevenly and lost
+  calls on clip 1's half-size and 15 fps versions. A still camera is passed
+  through untouched. `DEADEYE_BENCH_NOSTEADY=1` turns it off,
+  `DEADEYE_BENCH_STEADYTRACE` writes the slide per frame. Wobbly mount 56 to
+  65 of 82; it costs clip 4's (20 to 15), where the test video moves in steps
+  of just under a pixel and whole-pixel rounding leaves edges flickering.
+- **The ball's first sightings are no longer thrown away**
+  (`HOLD_FRAMES` in `trackerPipeline.ts`). The tracker only reports a ball
+  after following it for three frames, and at 10 fps that is the whole time it
+  is above the ring. The shot detector now runs two frames behind and is given
+  those sightings once the tracker settles it was the ball. On a slow phone
+  two far-apart sightings count as a ball in flight, and a followed ball
+  survives one missed frame (`ballTracker.ts`).
+- **On a slow phone, a ball that reached the ring and vanished is judged by
+  the net** (`VANISHED_AT_RING` in `shotDetector.ts`), needing three times the
+  usual late swing to be a make, and always marked unsure.
+
+10 fps went from 39 to 68 of 82, 15 fps from 71 to 77, small-dim-and-slow
+from 60 to 72. Four runs lost a call or more: clip 4 wobbly (5), clip 1 at
+15 fps, clip 3 hard, clip 4 dim (1 each).
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

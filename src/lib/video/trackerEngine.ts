@@ -31,7 +31,7 @@ export type ToWorker =
 
 export type FromWorker =
   | { type: 'frame'; result: PipelineFrame }
-  | { type: 'finished'; shot: DetectedShot | null }
+  | { type: 'finished'; shots: DetectedShot[] }
   | { type: 'failed'; message: string };
 
 export interface TrackerEngine {
@@ -41,8 +41,8 @@ export interface TrackerEngine {
   busy(): boolean;
   /** Hands over a frame's pixels. The array must not be used again afterwards. */
   push(pixels: Uint8ClampedArray, px: number, t: number): void;
-  /** Calls a shot still being judged, once every frame sent has been scored. */
-  finish(): Promise<DetectedShot | null>;
+  /** Calls what is still being judged, once every frame sent has been scored: the shots that decided, oldest first. */
+  finish(): Promise<DetectedShot[]>;
   resetShift(): void;
   dispose(): void;
 }
@@ -78,7 +78,7 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
 
   let inFlight = 0;
   let fallback: TrackerEngine | null = null;
-  let finishing: ((shot: DetectedShot | null) => void) | null = null;
+  let finishing: ((shots: DetectedShot[]) => void) | null = null;
 
   const fail = () => {
     if (fallback) return;
@@ -88,7 +88,7 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
     fallback = createInlineEngine(config, onFrame);
     onFallback?.();
     // A finish waiting on the worker will not be answered now
-    finishing?.(null);
+    finishing?.([]);
     finishing = null;
   };
 
@@ -98,7 +98,7 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       inFlight = Math.max(0, inFlight - 1);
       onFrame(msg.result);
     } else if (msg.type === 'finished') {
-      finishing?.(msg.shot);
+      finishing?.(msg.shots);
       finishing = null;
     } else if (msg.type === 'failed') {
       fail();
@@ -124,11 +124,11 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       return new Promise((resolve) => {
         const timer = setTimeout(() => {
           finishing = null;
-          resolve(null);
+          resolve([]);
         }, FINISH_TIMEOUT_MS);
-        finishing = (shot) => {
+        finishing = (shots) => {
           clearTimeout(timer);
-          resolve(shot);
+          resolve(shots);
         };
         worker!.postMessage({ type: 'finish' } satisfies ToWorker);
       });

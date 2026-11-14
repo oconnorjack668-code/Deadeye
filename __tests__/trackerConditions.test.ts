@@ -50,6 +50,38 @@ describe('a slow phone', () => {
   });
 });
 
+/**
+ * A shot on a slow phone that comes down to the ring and vanishes, with a
+ * stray sighting a frame later moving up, as at 23.6s on the 2:39 bench clip
+ * at 10 frames a second. The net moves on `netUntil`.
+ */
+function vanishes(netUntil: number): BallObservation[] {
+  const out: BallObservation[] = [];
+  let t = 0;
+  for (; t < 700; t += 100) out.push({ t, ball: null, net: 0 });
+  out.push({ t: 700, ball: { x: 0.53, y: 0.38 }, net: 0 });
+  out.push({ t: 800, ball: { x: 0.51, y: 0.444 }, net: 0 });
+  out.push({ t: 900, ball: { x: 0.4, y: 0.42 }, net: 0.15 });
+  for (t = 1000; t < 3500; t += 100) out.push({ t, ball: null, net: t < netUntil ? 0.25 : 0.01 });
+  return out;
+}
+
+describe('a slow phone, the ball vanishing at the ring', () => {
+  it('is a make, unsure, when the net is still swinging late', () => {
+    const shots = run(vanishes(2600));
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(true);
+    expect(shots[0].confident).toBe(false);
+    expect(shots[0].t).toBe(800);
+  });
+
+  it('is a miss when the net only shook from the ring', () => {
+    const shots = run(vanishes(1400));
+    expect(shots).toHaveLength(1);
+    expect(shots[0].made).toBe(false);
+  });
+});
+
 describe('contrast', () => {
   const picture = (values: number[]) => {
     const px = new Uint8ClampedArray(values.length * 4);

@@ -207,11 +207,18 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
           learn: learnColour,
           watchNet,
           netFrom: Number(process.env.DEADEYE_BENCH_NETFROM) || undefined,
+          // DEADEYE_BENCH_NOSTEADY=1 runs without lining frames up, to measure what it adds
+          steady: process.env.DEADEYE_BENCH_NOSTEADY !== '1',
         })
       : null;
     // Camera moves the watcher reported. On a tripod clip any is a false alarm.
     const moves: string[] = [];
     const lights: number[] = [];
+    // Frames slid back to hold the hoop still, and the furthest any was slid
+    let steadiedFrames = 0;
+    let steadiedMax = 0;
+    // DEADEYE_BENCH_STEADYTRACE writes the measured slide of every frame to a CSV
+    const steadyTrace: string[] | null = process.env.DEADEYE_BENCH_STEADYTRACE ? ['t_ms,dx,dy,ax,ay'] : null;
 
     // DEADEYE_BENCH_KNOCK="seconds,dx,dy" moves the picture that many canvas
     // pixels from that moment on, as a knocked tripod does, to check the
@@ -238,6 +245,11 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
       trackerMs += performance.now() - began;
       if (r.moved) moves.push(`${(videoMs / 1000).toFixed(1)}s (${r.moved.dx},${r.moved.dy} match ${r.moved.match.toFixed(2)} vs ${r.moved.still.toFixed(2)})`);
       if (r.light !== null) lights.push(r.light);
+      if (r.steadied && steadyTrace) steadyTrace.push(`${Math.round(videoMs)},${r.steadied.dx.toFixed(2)},${r.steadied.dy.toFixed(2)},${r.steadied.ax},${r.steadied.ay}`);
+      if (r.steadied?.applied) {
+        steadiedFrames++;
+        steadiedMax = Math.max(steadiedMax, Math.abs(r.steadied.dx), Math.abs(r.steadied.dy));
+      }
       if (!r.ready) return;
       // The third column is underNet: something ball-like under the net, which
       // counts as the ball seen under the ring after a crossing
@@ -373,6 +385,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
           : 'not used'
       }`,
       `camera moved    ${pipeline ? (moves.length ? moves.join(', ') : 'never') : 'not watched'}`,
+      `steadied        ${pipeline ? (steadiedFrames ? `${steadiedFrames} frames, up to ${steadiedMax.toFixed(1)}px` : 'never') : 'not used'}`,
       `light           ${lights.length ? `${Math.round(Math.min(...lights))} to ${Math.round(Math.max(...lights))}` : '-'}`,
       `frames          ${frames}`,
       `ball found in   ${framesWithBall} (${((framesWithBall / Math.max(frames, 1)) * 100).toFixed(1)}%)`,
@@ -403,6 +416,7 @@ describe.skipIf(!CLIP || !RIM)('motion tracker over a real clip', () => {
     // survives, and makes runs easy to keep and compare.
     if (process.env.DEADEYE_BENCH_OUT) writeFileSync(process.env.DEADEYE_BENCH_OUT, text, 'utf8');
     if (process.env.DEADEYE_BENCH_TRACE) writeFileSync(process.env.DEADEYE_BENCH_TRACE, trace.join('\n'), 'utf8');
+    if (steadyTrace && process.env.DEADEYE_BENCH_STEADYTRACE) writeFileSync(process.env.DEADEYE_BENCH_STEADYTRACE, steadyTrace.join('\n'), 'utf8');
     if (netTrace && process.env.DEADEYE_BENCH_NETTRACE) writeFileSync(process.env.DEADEYE_BENCH_NETTRACE, netTrace.join('\n'), 'utf8');
 
     expect(frames).toBeGreaterThan(0);
