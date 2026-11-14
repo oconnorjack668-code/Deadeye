@@ -108,6 +108,12 @@ export interface DecodeOptions {
   onFrame(pixels: Uint8ClampedArray, px: number, t: number): void;
   /** Where it has got to, now and then. */
   onProgress?(t: number, durationMs: number): void;
+  /**
+   * Each step reached the first time: reading, parsed, configured, decoding,
+   * first-frame, first-pixels. Where a run stalls says why, which an error
+   * cannot when nothing ever fails.
+   */
+  onStage?(stage: string): void;
   /** True once the run has been stopped: decoding ends at the next frame. */
   stopped(): boolean;
 }
@@ -175,6 +181,7 @@ export async function decodeClip(file: Blob, options: DecodeOptions): Promise<De
     ctx.drawImage(bitmap, 0, 0);
     bitmap.close();
     const pixels = ctx.getImageData(0, 0, px, px).data;
+    stage('first-pixels');
     if (last && isRepeat(pixels, last)) return;
     last = pixels;
     workload.scored(t);
@@ -190,7 +197,16 @@ export async function decodeClip(file: Blob, options: DecodeOptions): Promise<De
   mp4.onError = (_module: string, message: string) => {
     failure = `Could not read the clip: ${message}`;
   };
+  const reached = new Set<string>();
+  const stage = (name: string) => {
+    if (reached.has(name)) return;
+    reached.add(name);
+    options.onStage?.(name);
+  };
+  stage('reading');
+
   mp4.onReady = (info) => {
+    stage('parsed');
     const track = info.videoTracks[0];
     if (!track) {
       failure = 'No video in the clip';
@@ -212,6 +228,7 @@ export async function decodeClip(file: Blob, options: DecodeOptions): Promise<De
     const config: VideoDecoderConfig = { codec: track.codec, codedWidth: codedW, codedHeight: codedH, description: description(mp4, track.id) };
     decoder = new VideoDecoder({
       output: (frame) => {
+        stage('first-frame');
         waiting++;
         chain = chain.then(() => draw(frame)).catch((err) => void (failure ??= `Could not read a frame: ${String(err)}`)).finally(() => void waiting--);
       },
@@ -219,6 +236,7 @@ export async function decodeClip(file: Blob, options: DecodeOptions): Promise<De
     });
     try {
       decoder.configure(config);
+      stage(`configured ${track.codec}`);
     } catch (err) {
       failure = `This clip's format (${track.codec}) cannot be decoded here: ${String(err)}`;
       return;
@@ -228,6 +246,7 @@ export async function decodeClip(file: Blob, options: DecodeOptions): Promise<De
   };
   mp4.onSamples = (_id: number, _user: unknown, samples: Sample[]) => {
     if (!decoder || failure || decoder.state !== 'configured') return;
+    stage('decoding');
     for (const s of samples) {
       if (!s.data) continue;
       decoder.decode(new EncodedVideoChunk({ type: s.is_sync ? 'key' : 'delta', timestamp: (1e6 * s.cts) / s.timescale, duration: (1e6 * s.duration) / s.timescale, data: s.data }));

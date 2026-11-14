@@ -132,6 +132,16 @@ const DRILL_END_MS = 1500;
 /** Live camera: bitmaps that may be in the making at once (see scoreFrame). */
 const MAX_CAPTURES = 2;
 
+/**
+ * An upload being decoded that has scored no frame by now is given up on and
+ * played instead (clipDecoder.ts). On the live site in Chrome on the bench
+ * laptop (14 Nov 2026) decoding stalled without an error - no frame, no
+ * failure - while the same build on its preview decoded the same clip in
+ * under 8 seconds. Without this the player was left on "Checking every frame"
+ * for ever. A clip normally scores its first frame well inside a second.
+ */
+const DECODE_START_MS = 8000;
+
 const CALM: HealthReading = { ball: false, issues: [], fps: null };
 
 export function ShotTracker({
@@ -1056,32 +1066,50 @@ export function ShotTracker({
         cropSideRef.current = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight).side;
         minCanvasRef.current = CANVAS_LEVELS[0];
         const startedDecoding = performance.now();
+        let lastStage = 'sent';
+        let settled = false;
+        const failed = (message: string, frames: number) => {
+          if (settled || run !== runRef.current || stopRef.current) return;
+          settled = true;
+          clearTimeout(watchdog);
+          reportError(
+            'client',
+            new Error(
+              `Clip decoding failed after ${frames} frames, ${Math.round((performance.now() - startedDecoding) / 1000)}s, last step ${lastStage}: ${message}`
+            )
+          );
+          if (frames > 0) {
+            // Part way: call what was seen rather than start again
+            void finish();
+            return;
+          }
+          // Nothing was scored: play it instead, from the start. Disposing
+          // ends the worker, and a decode stalled in it with it.
+          decoder.dispose();
+          engine = null;
+          engineRef.current = null;
+          decodingRef.current = false;
+          setDecoding(false);
+          void playInstead();
+        };
+        // Given up on when nothing has been scored in time: see DECODE_START_MS
+        const watchdog = setTimeout(() => {
+          if (analysedRef.current === 0) failed(`no frame in ${DECODE_START_MS / 1000}s`, 0);
+        }, DECODE_START_MS);
         decoder.decodeFile(videoFile, CANVAS_LEVELS[0], {
           onProgress: (t, durationMs) => {
             if (run === runRef.current && durationMs > 0) setProgress(Math.min(1, t / durationMs));
           },
+          onStage: (stage) => {
+            lastStage = stage;
+          },
           onDone: () => {
-            if (run === runRef.current) void finish();
+            if (settled || run !== runRef.current) return;
+            settled = true;
+            clearTimeout(watchdog);
+            void finish();
           },
-          onFailed: (message, frames) => {
-            if (run !== runRef.current || stopRef.current) return;
-            reportError(
-              'client',
-              new Error(`Clip decoding failed after ${frames} frames, ${Math.round((performance.now() - startedDecoding) / 1000)}s: ${message}`)
-            );
-            if (frames > 0) {
-              // Part way: call what was seen rather than start again
-              void finish();
-              return;
-            }
-            // Nothing was scored: play it instead, from the start
-            decoder.dispose();
-            engine = null;
-            engineRef.current = null;
-            decodingRef.current = false;
-            setDecoding(false);
-            void playInstead();
-          },
+          onFailed: failed,
         });
         return;
       }

@@ -366,6 +366,15 @@ and is played instead, as before; one that fails part way is called on what
 was seen. Either is reported to `/admin/errors`. While decoding, the video
 stays paused, no ball is drawn over it, and calls make no sound.
 
+On the live site, in Chrome on the bench laptop, decoding stalled after the
+merge without any error, while the identical build on its preview decoded the
+same clip in under 8 seconds (14 Nov 2026; cause not yet known). So a decode
+that has scored no frame after 8 seconds (`DECODE_START_MS` in
+`ShotTracker.tsx`) is given up on and the clip is played instead, and the
+worker reports each step it reaches (`onStage` in `clipDecoder.ts`). The last
+step reached goes into the `/admin/errors` report, so a stall on a real phone
+says where it stopped.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player
