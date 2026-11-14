@@ -162,7 +162,11 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       inFlight = Math.max(0, inFlight - 1);
       onFrame(msg.result);
     } else if (msg.type === 'finished') {
-      finishing?.(msg.shots);
+      // A worker from an older build answers with one `shot` (see the worker
+      // note in public/sw.js): read either, so a stale worker cannot break
+      // the end of a run
+      const old = (msg as { shot?: DetectedShot | null }).shot;
+      finishing?.(Array.isArray(msg.shots) ? msg.shots : old ? [old] : []);
       finishing = null;
     } else if (msg.type === 'decode-progress') {
       decoding?.onProgress(msg.t, msg.durationMs);

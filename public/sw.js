@@ -12,7 +12,10 @@
 // and the localStorage keys hold a player's unsynced work, and renaming them
 // would strand it on every device that already has the app.
 // v5 precaches the make and miss sounds, so a session logged offline is not silent.
-const CACHE_NAME = 'hoopiq-v5';
+// v6 empties the cache of stale worker bootstraps (see the worker note in the
+// fetch handler): installed devices were running the tracker's worker from an
+// old build long after each deploy.
+const CACHE_NAME = 'hoopiq-v6';
 const PAGE_CACHE = 'hoopiq-pages-v1';
 // The hoop finder's model (36 MB), written by its worker (src/lib/video/
 // rimModel.ts). Kept across updates, or every update would download it again.
@@ -113,6 +116,19 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  // Worker scripts always come from the network, never this cache. A Turbopack
+  // worker is one small bootstrap file, turbopack-worker-<hash>.js, that keeps
+  // its name from build to build and reads the chunks to load from its own
+  // address (#params=...). The Cache API ignores that part when matching, so
+  // the bootstrap cached by one build was handed back to every later one with
+  // the first build's chunk list, and the worker ran that build's code. Found
+  // on the live site on 14 Nov 2026: the tracker's worker answered in the
+  // format from before #118 while the server had the new code, so decoding,
+  // the camera's bitmaps and the end of a run all failed; a fresh preview,
+  // with nothing cached, worked. Very likely the hoop finder's worker that
+  // "never ran" on the live site on 3 Nov too.
+  if (request.destination === 'worker' || request.destination === 'sharedworker' || url.pathname.includes('/turbopack-worker-')) return;
 
   // Session loggers: network first, keep the latest copy for offline use
   if (request.mode === 'navigate' && OFFLINE_PAGES.includes(url.pathname)) {
