@@ -5,6 +5,9 @@ One line per session, newest first. Open a handoff only when its line matches th
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
 - 2026-11-14 · tracker-accuracy-steady-slow · Bench 81.6% to 90.7%, hold-out 69% to 76%; steadier, slow phones (#108) → [handoff](2026-11-14-tracker-accuracy-steady-slow.md)
+- 2026-11-14 · film-and-plays-live · Plays live for all; Film built, closed until S1; #112 → [handoff](2026-11-14-film-and-plays-live.md)
+- 2026-11-14 · f3-film · Film tab built on exp/f3-film; 00062 not applied; live after S1 → [handoff](2026-11-14-f3-film.md)
+- 2026-11-14 · focus-finder-live · Focus Finder live and checked; ref fix; matcher, delete plan, team rename → [handoff](2026-11-14-focus-finder-live.md)
 - 2026-11-13 · focus-finder · Weakness to film, IQ and drills; AI week plan; coach send-to-team (#103) → [handoff](2026-11-13-focus-finder.md)
 - 2026-11-13 · finish-pr-97 · Option A built: sign-up question, plain outreach links; safety re-review passed → [handoff](2026-11-13-finish-pr-97.md)
 - 2026-11-13 · ref-tracking-build-id · Outreach routes counted, build id, first outreach plan; safety B5 open → [handoff](2026-11-13-ref-tracking-build-id.md)
@@ -33,6 +36,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
 - 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
 - 2026-10-23 · sample-rim-fix · Sample rim and start, camera black screen, Next.js patch, club card gap · open: 2 → [handoff](2026-10-23-sample-rim-fix.md)
-- 2026-10-22 · pricing-and-claude · Club pricing sheet and founding offer; AI on Claude; club picker · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)
-- 2026-10-22 · league-and-club-board · League picker for teams; club boards with founder approval · open: 2 → [handoff](2026-10-22-league-and-club-board.md)
-- 2026-10-22 · home-club · Players pick a home club; not-listed suggestions; opt-in card badge · open: 2 → [handoff](2026-10-22-home-club.md)

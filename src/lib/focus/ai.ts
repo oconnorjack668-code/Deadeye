@@ -208,3 +208,22 @@ export function namesForRefs(line: string, catalogue: Catalogue, content: FocusC
     return ref;
   });
 }
+
+/**
+ * The plan with every ref in its text turned into a name. The model uses refs
+ * anywhere, not only in the day lines: the first live plan (14 Nov 2026) said
+ * "your quiz scores on L4, L35 and L31" in its measure line.
+ */
+export function withNames(plan: FocusAiPlan, catalogue: Catalogue, content: FocusContent): FocusAiPlan {
+  const n = (text: string) => namesForRefs(text, catalogue, content);
+  return {
+    ...plan,
+    summary: n(plan.summary),
+    focus: plan.focus.map((f) => ({ label: n(f.label), lookFor: n(f.lookFor) })),
+    film: plan.film.map((f) => ({ ...f, watchFor: n(f.watchFor) })),
+    drills: plan.drills.map((d) => ({ ...d, why: n(d.why), dose: n(d.dose) })),
+    reads: plan.reads.map((r) => ({ ...r, why: n(r.why) })),
+    week: plan.week.map(n),
+    measure: n(plan.measure),
+  };
+}
