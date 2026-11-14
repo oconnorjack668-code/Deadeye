@@ -324,6 +324,21 @@ gets the smaller picture as before, and the live camera is unchanged. Runs
 that slowed are marked `slowed` in the saved quality, so `/admin/tracker` data
 can say how often it happens on real phones.
 
+The live camera reads its frames another way where the browser allows
+(`pushBitmap` in `trackerEngine.ts`): `createImageBitmap` has the graphics
+chip cut and shrink the hoop crop, and the tracker's worker reads it back, so
+the main thread no longer stops for about 11 ms a frame on the bench laptop
+to read the frame itself. Uploads keep the old way: a clip can show a frame
+twice, and spotting that needs the pixels on the main thread before the
+workload counts the frame. On Chromium's fake camera playing clip 1 at
+1080p, 20 seconds, two rounds: the main thread held 0.8-1.0 ms a frame
+against 15.6-16.3, no long tasks, and as many frames reached the tracker
+(25.1-25.5 a second against 25.5-25.6). Two bitmaps may be in the making at
+once, handed over in order; with one, about two frames a second fewer
+arrived. The pixels differ from the old way's by about 4 levels (the graphics
+chip converts the colours a little differently); clip 2 at half speed, where
+no frames are lost, called 30 of 31 both ways.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

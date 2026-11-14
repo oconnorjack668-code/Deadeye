@@ -10,7 +10,11 @@
 // picture at the full 30 frames a second.
 //
 // The main thread still draws each frame's hoop crop (only it can read the
-// video) and hands the pixels over without copying them. Frames are processed
+// video) and hands the pixels over without copying them. Or, where the
+// browser can (pushBitmap), it asks the graphics chip for the crop already
+// shrunk and hands that over, and the worker reads its pixels back: reading a
+// video frame back on the main thread took 11 ms of every 33 on the bench
+// laptop, six times the tracker's own work, and froze the screen while it did. Frames are processed
 // in order, as the tracker needs. When the worker falls behind, new frames are
 // not queued without end - the main thread simply does not send them, which
 // the workload sees as skipped frames and answers as it always has.
@@ -26,6 +30,7 @@ const FINISH_TIMEOUT_MS = 2000;
 export type ToWorker =
   | { type: 'start'; config: PipelineConfig }
   | { type: 'frame'; buffer: ArrayBuffer; px: number; t: number }
+  | { type: 'bitmap'; bitmap: ImageBitmap; px: number; t: number }
   | { type: 'finish' }
   | { type: 'reset-shift' };
 
@@ -41,6 +46,10 @@ export interface TrackerEngine {
   busy(): boolean;
   /** Hands over a frame's pixels. The array must not be used again afterwards. */
   push(pixels: Uint8ClampedArray, px: number, t: number): void;
+  /** Whether pushBitmap can be used: a worker is running and can read a bitmap back. */
+  takesBitmaps(): boolean;
+  /** Hands over a frame's hoop crop, already px square, as a bitmap the worker reads back. It is closed after use. */
+  pushBitmap(bitmap: ImageBitmap, px: number, t: number): void;
   /** Calls what is still being judged, once every frame sent has been scored: the shots that decided, oldest first. */
   finish(): Promise<DetectedShot[]>;
   resetShift(): void;
@@ -54,10 +63,26 @@ export function createInlineEngine(config: PipelineConfig, onFrame: (r: Pipeline
     inWorker: () => false,
     busy: () => false,
     push: (pixels, px, t) => onFrame(pipeline.frame(pixels, px, t)),
+    takesBitmaps: () => false,
+    pushBitmap: (bitmap) => bitmap.close(),
     finish: async () => pipeline.finish(),
     resetShift: () => pipeline.resetShift(),
     dispose: () => undefined,
   };
+}
+
+/**
+ * Whether this browser can crop and shrink a video frame into a bitmap and a
+ * worker can read it back: createImageBitmap, and OffscreenCanvas with a 2d
+ * context (Safari from 16.4). Checked here; a worker on a browser that has it
+ * here has it too.
+ */
+export function bitmapsWork(): boolean {
+  try {
+    return typeof createImageBitmap === 'function' && typeof OffscreenCanvas !== 'undefined' && new OffscreenCanvas(1, 1).getContext('2d') !== null;
+  } catch {
+    return false;
+  }
 }
 
 /**
@@ -118,6 +143,12 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       inFlight++;
       const buffer = pixels.buffer as ArrayBuffer;
       worker!.postMessage({ type: 'frame', buffer, px, t } satisfies ToWorker, [buffer]);
+    },
+    takesBitmaps: () => fallback === null && bitmapsWork(),
+    pushBitmap(bitmap, px, t) {
+      if (fallback) return fallback.pushBitmap(bitmap, px, t);
+      inFlight++;
+      worker!.postMessage({ type: 'bitmap', bitmap, px, t } satisfies ToWorker, [bitmap]);
     },
     finish() {
       if (fallback) return fallback.finish();
