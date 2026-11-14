@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-14 · tracker-accuracy-steady-slow · Bench 81.6% to 90.7%, hold-out 69% to 76%; steadier, slow phones (#108) → [handoff](2026-11-14-tracker-accuracy-steady-slow.md)
 - 2026-11-13 · focus-finder · Weakness to film, IQ and drills; AI week plan; coach send-to-team (#103) → [handoff](2026-11-13-focus-finder.md)
 - 2026-11-13 · finish-pr-97 · Option A built: sign-up question, plain outreach links; safety re-review passed → [handoff](2026-11-13-finish-pr-97.md)
 - 2026-11-13 · ref-tracking-build-id · Outreach routes counted, build id, first outreach plan; safety B5 open → [handoff](2026-11-13-ref-tracking-build-id.md)
