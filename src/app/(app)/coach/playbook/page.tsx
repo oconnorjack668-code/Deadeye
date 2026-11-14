@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ChevronRight, Pencil, Plus } from 'lucide-react';
 import { requireUser, getHasPro } from '@/lib/auth';
 import { filmOpenForMe } from '@/lib/film/live';
+import { PLAYS_NOT_OPEN, playsOpenForMe } from '@/lib/plays/live';
 import { createClient } from '@/lib/supabase/server';
 import { ProNote } from '@/components/ProGate';
 import { RemoveFromPlaybookButton } from '@/components/plays/RemoveFromPlaybookButton';
@@ -27,13 +28,17 @@ const sectionLabel = 'text-xs font-semibold uppercase tracking-wider text-zinc-4
 export default async function PlaybookPage() {
   const user = await requireUser();
   const supabase = await createClient();
+  // Plays show here only while Plays is open (src/lib/plays/live.ts)
+  const playsOpen = await playsOpenForMe();
   const [{ isCoach, staffTeams }, isPro, { data: own }] = await Promise.all([
     coachAccess(supabase, user.id),
     getHasPro(),
-    supabase.from('plays').select('id, title, category, owner_id').eq('owner_id', user.id).order('updated_at', { ascending: false }),
+    playsOpen
+      ? supabase.from('plays').select('id, title, category, owner_id').eq('owner_id', user.id).order('updated_at', { ascending: false })
+      : { data: [] },
   ]);
   const teamIds = staffTeams.map((t) => t.id);
-  const { data: book } = teamIds.length
+  const { data: book } = playsOpen && teamIds.length
     ? ((await supabase.from('team_playbook').select('team_id, plays(id, title, category, owner_id)').in('team_id', teamIds)) as unknown as {
         data: Array<{ team_id: string; plays: PlayLite | null }> | null;
       })
@@ -71,6 +76,10 @@ export default async function PlaybookPage() {
           </p>
         ) : (
           <>
+            {!playsOpen ? (
+              <p className={`${card} text-sm text-zinc-300`}>{PLAYS_NOT_OPEN} Your plays and team playbooks are kept.</p>
+            ) : (
+            <>
             <section aria-labelledby="my-plays" className={`${card} space-y-3`}>
               <div className="flex items-center justify-between gap-3">
                 <h2 id="my-plays" className={sectionLabel}>
@@ -156,6 +165,8 @@ export default async function PlaybookPage() {
                 })
               )}
             </section>
+            </>
+            )}
 
             {filmOpen && (
             <section aria-labelledby="film" className={`${card} space-y-3`}>

@@ -3,15 +3,16 @@
 // The plays server actions: saving a coach's play is checked on the server
 // (signed in, a coach, a diagram that passes the shared validator) and the
 // Free limit comes back in plain words; edits and deletes touch only the
-// coach's own rows; a quiz is marked on the server from the play itself, and
-// a Pro play opens for the quiz when the player's coach set it.
+// coach's own rows; a quiz is marked on the server from the play itself,
+// written with the server key (players cannot write their own score, 00065),
+// and a Pro play opens for the quiz when the player's coach set it.
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LIBRARY_PLAYS } from '@/data/plays/library';
 import { setupDiagram } from '@/lib/plays/setups';
 import { fakeClient, fakeState, type FakeState } from './support/supabaseFake';
 
 const auth = vi.hoisted(() => ({ user: { id: 'coach-1' } as { id: string } | null, waiting: false, pro: false }));
-const db = vi.hoisted(() => ({ state: null as unknown as FakeState }));
+const db = vi.hoisted(() => ({ state: null as unknown as FakeState, admin: null as unknown as FakeState }));
 
 vi.mock('next/cache', () => ({ revalidatePath: () => undefined }));
 vi.mock('@/lib/auth', () => ({
@@ -21,6 +22,7 @@ vi.mock('@/lib/auth', () => ({
   PARENT_APPROVAL_NEEDED: 'A parent or guardian needs to approve your account first.',
 }));
 vi.mock('@/lib/supabase/server', () => ({ createClient: async () => fakeClient(db.state) }));
+vi.mock('@/lib/supabase/admin', () => ({ createAdminClient: () => fakeClient(db.admin) }));
 
 import { deletePlay, savePlay, submitQuizAttempt } from '@/app/(app)/plays/actions';
 
@@ -44,6 +46,7 @@ beforeEach(() => {
   auth.waiting = false;
   auth.pro = false;
   db.state = fakeState();
+  db.admin = fakeState();
   db.state.tables.coach_profiles = [{ user_id: 'coach-1' }];
 });
 
@@ -121,7 +124,7 @@ describe('submitQuizAttempt', () => {
     auth.user = { id: 'player-1' };
   });
 
-  it('marks the answers on the server and keeps the attempt, with the score it worked out', async () => {
+  it('marks the answers on the server and keeps the attempt with the server key, for this player, with the score it worked out', async () => {
     db.state.tables.plays = [libraryRow(fourOut, PLAY_ID)];
     const result = await submitQuizAttempt(PLAY_ID, [
       { key: 'o1:2', pick: 'basket' },
@@ -129,7 +132,10 @@ describe('submitQuizAttempt', () => {
       { key: 'o2:6', pick: 'top' },
     ]);
     expect(result).toEqual({ ok: true, score: 2, of: 3, knowsIt: true });
-    const write = db.state.writes.find((w) => w.table === 'play_quiz_attempts')!;
+    // never through the player own client: 00065 takes INSERT away from players
+    expect(db.state.writes).toEqual([]);
+    expect(db.admin.writes.map((w) => [w.table, w.op])).toEqual([['play_quiz_attempts', 'insert']]);
+    const write = db.admin.writes[0];
     expect(write.values).toEqual({
       user_id: 'player-1',
       play_id: PLAY_ID,
@@ -158,5 +164,12 @@ describe('submitQuizAttempt', () => {
   it('refuses answers it cannot read', async () => {
     expect(await submitQuizAttempt(PLAY_ID, 'nonsense' as never)).toMatchObject({ ok: false });
     expect(await submitQuizAttempt('floppy', [])).toMatchObject({ ok: false });
+    expect(db.admin.writes).toEqual([]);
+  });
+
+  it('writes nothing for a play the player cannot read', async () => {
+    // row-level security on the player own client hides it, so the server key never writes
+    expect(await submitQuizAttempt(PLAY_ID, [{ key: 'o1:2', pick: 'basket' }])).toEqual({ ok: false, error: 'That play could not be found.' });
+    expect(db.admin.writes).toEqual([]);
   });
 });

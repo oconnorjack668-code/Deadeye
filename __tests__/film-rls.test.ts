@@ -108,6 +108,7 @@ describe('00062: saves and notes', () => {
 
 describe('00062: attempts', () => {
   it('belong to the player, for clips they can read', () => {
+    // 00065 drops the add rule: only the server adds attempts
     expect(policy('Players read own film attempts')).toMatch(/USING \(\(select auth\.uid\(\)\) = user_id\)/);
     expect(policy('Players add film attempts on clips they can see')).toMatch(/EXISTS \(SELECT 1 FROM public\.film_clips c WHERE c\.id = clip_id\)/);
   });
@@ -210,5 +211,25 @@ describe('00062: housekeeping', () => {
   it('has no apostrophes in its comments (see 00035)', () => {
     const comments = raw.split('\n').filter((l) => l.trim().startsWith('--'));
     expect(comments.filter((l) => l.includes("'"))).toEqual([]);
+  });
+});
+
+describe('00065: film attempts are written by the server only', () => {
+  const sql65 = fs
+    .readFileSync(path.join(__dirname, '..', 'supabase', 'migrations', '00065_attempts_server_written.sql'), 'utf8')
+    .replace(/--[^\n]*/g, '')
+    .replace(/\s+/g, ' ');
+
+  it('takes INSERT, UPDATE and DELETE away from players and drops the add and delete rules', () => {
+    expect(sql65).toMatch(/REVOKE INSERT, UPDATE, DELETE ON public\.film_attempts FROM anon, authenticated;/);
+    expect(sql65).not.toMatch(/GRANT (INSERT|UPDATE|DELETE|ALL)[^;]*ON public\.film_attempts TO (anon|authenticated)/);
+    expect(sql65).toMatch(/GRANT ALL ON public\.film_attempts TO service_role;/);
+    expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players add film attempts on clips they can see" ON public\.film_attempts;/);
+    expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players delete own film attempts" ON public\.film_attempts;/);
+    expect(sql65).not.toMatch(/CREATE POLICY "[^"]+" ON public\.film_attempts/);
+  });
+
+  it('keeps the score readable without the answers', () => {
+    expect(sql65.match(/GRANT SELECT \(([^)]*)\) ON public\.film_attempts TO authenticated/)![1]).not.toMatch(/answers/);
   });
 });

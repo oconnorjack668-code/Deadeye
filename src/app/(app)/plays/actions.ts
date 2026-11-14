@@ -1,19 +1,23 @@
 // src/app/(app)/plays/actions.ts
 // Server actions for plays: save a coach's play (new, edited or copied),
-// delete one, and save a role quiz attempt. Each checks who is asking and
-// what they sent, then writes with the user's own Supabase client, so
-// row-level security and the 00061 triggers (only coaches, the Free limit)
-// apply as well.
+// delete one, and save a role quiz attempt. Each checks who is asking, that
+// Plays is open (src/lib/plays/live.ts; deleting always works) and what they
+// sent. A play is written with the user's own Supabase client, so row-level
+// security and the 00061 triggers (only coaches, the Free limit) apply as
+// well. A quiz attempt is marked here and written by the server only (00065):
+// players cannot write their own score.
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { awaitingParentApproval, getCurrentUser, getHasPro, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import type { Json } from '@/lib/supabase/types';
 import { coachAccess, fromCoach } from '@/lib/plays/access';
 import { PlayInputSchema, UUID_PATTERN, type PlayInput } from '@/lib/plays/input';
 import { limitMessage } from '@/lib/plays/limits';
+import { PLAYS_NOT_OPEN, playsOpenForMe } from '@/lib/plays/live';
 import { buildQuiz, gradeQuiz, knowsIt } from '@/lib/plays/quiz';
 import { opensFor, PLAY_COLUMNS, toPlay, type PlayRow } from '@/lib/plays/rows';
 
@@ -23,6 +27,7 @@ export async function savePlay(input: PlayInput): Promise<SaveResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: 'Please log in again.' };
   if (await awaitingParentApproval()) return { ok: false, error: PARENT_APPROVAL_NEEDED };
+  if (!(await playsOpenForMe())) return { ok: false, error: PLAYS_NOT_OPEN };
 
   const parsed = PlayInputSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: parsed.error.issues[0]?.message ?? 'Something in the play needs fixing.' };
@@ -91,11 +96,17 @@ const PicksSchema = z
 
 export type QuizResult = { ok: true; score: number; of: number; knowsIt: boolean } | { ok: false; error: string };
 
-/** Marks the picks on the server, from the play as it is now, and keeps the attempt. */
+/**
+ * Marks the picks on the server, from the play as it is now, and keeps the
+ * attempt. The play is read with the player's own client, so row-level
+ * security decides whether they can open it; only then is the attempt written,
+ * with the server key, for this player and with the score worked out here.
+ */
 export async function submitQuizAttempt(playId: string, picks: Array<{ key: string; pick: string }>): Promise<QuizResult> {
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: 'Please log in again.' };
   if (await awaitingParentApproval()) return { ok: false, error: PARENT_APPROVAL_NEEDED };
+  if (!(await playsOpenForMe())) return { ok: false, error: PLAYS_NOT_OPEN };
   if (typeof playId !== 'string' || !UUID_PATTERN.test(playId)) return { ok: false, error: 'That play could not be found.' };
   const parsedPicks = PicksSchema.safeParse(picks);
   if (!parsedPicks.success) return { ok: false, error: 'Those answers could not be read. Try the quiz again.' };
@@ -115,7 +126,9 @@ export async function submitQuizAttempt(playId: string, picks: Array<{ key: stri
   const { answers, score } = gradeQuiz(questions, parsedPicks.data);
   if (answers.length !== questions.length) return { ok: false, error: 'Answer every question first.' };
 
-  const { error } = await supabase.from('play_quiz_attempts').insert({ user_id: user.id, play_id: play.id, score, answers: answers as unknown as Json });
+  const { error } = await createAdminClient()
+    .from('play_quiz_attempts')
+    .insert({ user_id: user.id, play_id: play.id, score, answers: answers as unknown as Json });
   if (error) return { ok: false, error: 'Could not save your answers. Try again.' };
   return { ok: true, score, of: questions.length, knowsIt: knowsIt(score, questions.length) };
 }

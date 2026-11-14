@@ -75,6 +75,18 @@ in brackets).
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-14 · Plays (00061) and Film (00062) marked quiz answers on the
+  server, but still granted players INSERT on `play_quiz_attempts` and
+  `film_attempts`, so anyone could post any score straight to the Supabase API
+  and a head coach would read it. The founder asked for it closed (00065); the
+  same week safety review sent both back for what coaches could see
+  (`63e71b3`). **Rule:** a score, result or anything another person reads as
+  true is written by the server only: no INSERT/UPDATE for `authenticated`, the
+  action reads the item with the user's client (RLS decides access), grades it,
+  then inserts with `createAdminClient()` and the verified user id. List the
+  table in `SERVER_WRITTEN` in `__tests__/rls-rules.test.ts`. Ship the code
+  before the migration runs, or attempts fail in between.
+
 - 2026-11-13 · The privacy page fell behind the code three times: catch-up
   commits after review for the funnel steps (`3207e06`, 25 Oct) and the
   tracker (`4f104e6`, 1 Nov), then S27, where lesson videos had loaded
@@ -97,6 +109,9 @@ file). Newest first, each with the date, what happened, and the rule.
       `getSession()`; no secret key in client code.
 - [ ] New table: RLS on, one policy per operation `to authenticated`,
       `(select auth.uid())`, policy columns indexed, migration runs twice.
+- [ ] A score or result someone else reads: players get no INSERT/UPDATE on
+      it; the server action grades and inserts with the admin client; the
+      table is in `SERVER_WRITTEN` (rls-rules test).
 - [ ] 390px wide, both themes, no sideways scroll, taps 44px (`h-11`),
       colours from `docs/design.md`.
 - [ ] Nothing loads from another company (iframe, image, font, script) before

@@ -97,6 +97,7 @@ describe('00061: assigning a play', () => {
 
 describe('00061: quiz attempts', () => {
   it('belong to the player, for plays they can read', () => {
+    // 00065 replaces this rule: players read and delete their own, only the server adds
     const own = policy('Players keep own quiz attempts');
     expect(own).toMatch(/FOR ALL TO authenticated USING \(\(select auth\.uid\(\)\) = user_id\)/);
     expect(own).toMatch(/EXISTS \(SELECT 1 FROM public\.plays p WHERE p\.id = play_id\)/);
@@ -167,5 +168,33 @@ describe('00061: housekeeping', () => {
   it('has no apostrophes in its comments (see 00035)', () => {
     const comments = raw.split('\n').filter((l) => l.trim().startsWith('--'));
     expect(comments.filter((l) => l.includes("'"))).toEqual([]);
+  });
+});
+
+describe('00065: quiz attempts are written by the server only', () => {
+  const raw65 = fs.readFileSync(path.join(__dirname, '..', 'supabase', 'migrations', '00065_attempts_server_written.sql'), 'utf8');
+  const sql65 = raw65.replace(/--[^\n]*/g, '').replace(/\s+/g, ' ');
+  const rules = [...sql65.matchAll(/CREATE POLICY "([^"]+)" ON public\.play_quiz_attempts ([^;]*);/g)];
+
+  it('takes INSERT, UPDATE and DELETE away from players, so nobody can write or wipe their own score', () => {
+    expect(sql65).toMatch(/REVOKE INSERT, UPDATE, DELETE ON public\.play_quiz_attempts FROM anon, authenticated;/);
+    expect(sql65).not.toMatch(/GRANT (INSERT|UPDATE|DELETE|ALL)[^;]*ON public\.play_quiz_attempts TO (anon|authenticated)/);
+    expect(sql65).toMatch(/GRANT ALL ON public\.play_quiz_attempts TO service_role;/);
+  });
+
+  it('replaces the FOR ALL rule with read of the player own rows only', () => {
+    expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players keep own quiz attempts" ON public\.play_quiz_attempts;/);
+    expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players delete own quiz attempts" ON public\.play_quiz_attempts;/);
+    expect(rules.map((m) => m[1])).toEqual(['Players read own quiz attempts']);
+    expect(rules[0][2]).toMatch(/^FOR SELECT TO authenticated USING \(\(select auth\.uid\(\)\) = user_id\)$/);
+  });
+
+  it('keeps the score readable without the answers', () => {
+    const select = sql65.match(/GRANT SELECT \(([^)]*)\) ON public\.play_quiz_attempts TO authenticated/)![1];
+    expect(select).not.toMatch(/answers/);
+  });
+
+  it('has no apostrophes in its comments (see 00035)', () => {
+    expect(raw65.split('\n').filter((l) => l.trim().startsWith('--') && l.includes("'"))).toEqual([]);
   });
 });
