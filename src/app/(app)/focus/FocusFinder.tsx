@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { BarChart3, BookOpen, ChevronDown, Clapperboard, Film, Lock, Send, Sparkles, Target, Video, X } from 'lucide-react';
@@ -85,6 +85,7 @@ export function FocusFinder(props: {
   const [mode, setMode] = useState<FocusMode>(props.initialMode);
   const [teamId, setTeamId] = useState<string | null>(props.initialTeamId);
   const [limitHint, setLimitHint] = useState(false);
+  const modeButtons = useRef<Array<HTMLButtonElement | null>>([]);
 
   const [ai, setAi] = useState(props.savedPlan);
   const [aiBusy, setAiBusy] = useState(false);
@@ -192,12 +193,25 @@ export function FocusFinder(props: {
         {teams.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             <div role="radiogroup" aria-label="Who is this for" className="inline-flex rounded-xl border border-zinc-800 bg-zinc-950/60 p-1">
-              {(['player', 'team'] as const).map((m) => (
+              {(['player', 'team'] as const).map((m, i, all) => (
                 <button
                   key={m}
                   type="button"
                   role="radio"
                   aria-checked={mode === m}
+                  // A radio group is one tab stop; arrow keys move and choose (WAI-ARIA radio pattern)
+                  tabIndex={mode === m ? 0 : -1}
+                  ref={(el) => {
+                    modeButtons.current[i] = el;
+                  }}
+                  onKeyDown={(e) => {
+                    const step = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowUp' ? -1 : 0;
+                    if (!step) return;
+                    e.preventDefault();
+                    const next = (i + step + all.length) % all.length;
+                    setMode(all[next]);
+                    modeButtons.current[next]?.focus();
+                  }}
                   onClick={() => setMode(m)}
                   className={`min-h-9 rounded-lg px-3 text-sm font-semibold ${mode === m ? 'bg-zinc-100 text-zinc-900' : 'text-zinc-400 hover:text-white'}`}
                 >
@@ -324,6 +338,7 @@ export function FocusFinder(props: {
       {/* 4. The AI week plan, when there is one */}
       {ai && (
         <AiPlanView
+          planId={ai.id}
           plan={ai.plan}
           drillsById={drillsById}
           lessonsById={lessonsById}
@@ -331,6 +346,12 @@ export function FocusFinder(props: {
           onClose={() => {
             setAi(null);
             router.replace('/focus', { scroll: false });
+          }}
+          onDeleted={() => {
+            setAi(null);
+            // Back to /focus, and the earlier-plans list reloads without it
+            router.replace('/focus', { scroll: false });
+            router.refresh();
           }}
         />
       )}
