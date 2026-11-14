@@ -220,16 +220,16 @@ describe('00065: film attempts are written by the server only', () => {
     .replace(/--[^\n]*/g, '')
     .replace(/\s+/g, ' ');
 
-  it('takes INSERT away from players and drops the rule that let them add attempts', () => {
-    expect(sql65).toMatch(/REVOKE INSERT, UPDATE ON public\.film_attempts FROM anon, authenticated;/);
-    expect(sql65).not.toMatch(/GRANT (INSERT|UPDATE|ALL)[^;]*ON public\.film_attempts TO (anon|authenticated)/);
+  it('takes INSERT, UPDATE and DELETE away from players and drops the add and delete rules', () => {
+    expect(sql65).toMatch(/REVOKE INSERT, UPDATE, DELETE ON public\.film_attempts FROM anon, authenticated;/);
+    expect(sql65).not.toMatch(/GRANT (INSERT|UPDATE|DELETE|ALL)[^;]*ON public\.film_attempts TO (anon|authenticated)/);
     expect(sql65).toMatch(/GRANT ALL ON public\.film_attempts TO service_role;/);
     expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players add film attempts on clips they can see" ON public\.film_attempts;/);
+    expect(sql65).toMatch(/DROP POLICY IF EXISTS "Players delete own film attempts" ON public\.film_attempts;/);
     expect(sql65).not.toMatch(/CREATE POLICY "[^"]+" ON public\.film_attempts/);
   });
 
-  it('keeps the score readable without the answers, and deleting own attempts', () => {
+  it('keeps the score readable without the answers', () => {
     expect(sql65.match(/GRANT SELECT \(([^)]*)\) ON public\.film_attempts TO authenticated/)![1]).not.toMatch(/answers/);
-    expect(sql65).toMatch(/GRANT DELETE ON public\.film_attempts TO authenticated;/);
   });
 });
