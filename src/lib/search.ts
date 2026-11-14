@@ -100,6 +100,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   // Coaching
   { id: 'coach-home', group: 'go', title: 'Coach home', hint: 'Your teams at a glance', href: '/coach', keywords: ['coach', 'home', 'dashboard'], modes: COACHING },
   { id: 'assignments', group: 'go', title: 'Assignments', hint: 'Set drills and sessions for your teams', href: '/coach/assignments', keywords: ['assignments', 'homework', 'set', 'tasks'], modes: COACHING },
+  { id: 'playbook', group: 'go', title: 'Playbook', hint: 'Draw plays and give each team its playbook', href: '/coach/playbook', keywords: ['playbook', 'plays', 'draw', 'sets', 'diagram'], modes: COACHING },
   { id: 'coach-setup', group: 'go', title: 'Coach setup', hint: 'Your club and safeguarding details', href: '/coach/setup', keywords: ['setup', 'club', 'vetting', 'safeguarding'], modes: COACHING },
 
   // Owner tools

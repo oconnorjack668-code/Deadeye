@@ -1625,6 +1625,10 @@ export interface Database {
           link: string | null;
           due_date: string | null;
           created_at: string;
+          // 00061_play_editor.sql: at most one is set; the film ones arrive in F3
+          play_id: string | null;
+          film_clip_id: string | null;
+          film_pack_id: string | null;
         };
         Insert: {
           id?: string;
@@ -1635,8 +1639,11 @@ export interface Database {
           link?: string | null;
           due_date?: string | null;
           created_at?: string;
+          play_id?: string | null;
+          film_clip_id?: string | null;
+          film_pack_id?: string | null;
         };
-        Update: { title?: string; details?: string | null; link?: string | null; due_date?: string | null };
+        Update: { title?: string; details?: string | null; link?: string | null; due_date?: string | null; play_id?: string | null };
         Relationships: [];
       };
       team_assignment_completions: {
@@ -1894,12 +1901,36 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
-        Update: never;
+        // A coach changes their own play (00061 grants only these columns)
+        Update: {
+          title?: string;
+          category?: string;
+          min_age?: string;
+          tags?: string[];
+          description?: string;
+          coaching_points?: string[];
+          diagram?: Json;
+          updated_at?: string;
+        };
         Relationships: [];
       };
       play_saves: {
         Row: { user_id: string; play_id: string; created_at: string };
         Insert: { user_id: string; play_id: string; created_at?: string };
+        Update: never;
+        Relationships: [];
+      };
+      // 00061_play_editor.sql
+      team_playbook: {
+        Row: { team_id: string; play_id: string; added_by: string; created_at: string };
+        Insert: { team_id: string; play_id: string; added_by: string; created_at?: string };
+        Update: never;
+        Relationships: [];
+      };
+      // answers is not readable by signed-in users (00061 grants the other columns only)
+      play_quiz_attempts: {
+        Row: { id: string; user_id: string; play_id: string; score: number; completed_at: string };
+        Insert: { user_id: string; play_id: string; score: number; answers: Json };
         Update: never;
         Relationships: [];
       };
@@ -2105,6 +2136,7 @@ export interface Database {
       join_team: { Args: { p_code: string }; Returns: string };
       delete_team: { Args: { p_team: string }; Returns: void };
       set_team_role: { Args: { p_team: string; p_user: string; p_role: string }; Returns: void };
+      play_assignment_split: { Args: { p_assignment: string }; Returns: { question_key: string; pick: string; players: number }[] };
       team_roster: {
         Args: { p_team: string };
         Returns: {

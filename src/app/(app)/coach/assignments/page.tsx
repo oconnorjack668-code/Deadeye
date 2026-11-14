@@ -1,24 +1,51 @@
 // src/app/(app)/coach/assignments/page.tsx
 // Every assignment across the teams you coach, with how many players have done
-// it, and a form to post a new one.
+// it, and a form to post a new one (?play=<id> starts it on a play, from
+// "Assign to team" on a play page). A play assignment opens its progress view.
 import React from 'react';
 import Link from 'next/link';
-import { requireUser } from '@/lib/auth';
+import { getHasPro, requireUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { assignmentProgress } from '@/lib/coachSide';
 import { userCalendarNow } from '@/lib/userTime';
-import { PostAssignment } from './PostAssignment';
+import { PostAssignment, type PlayChoice } from './PostAssignment';
 import { ClipboardList } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Assignments - Deadeye' };
 
 type Team = { id: string; name: string };
-type Row = { id: string; team_id: string; title: string; due_date: string | null; done: number; of: number; team: string };
+type Row = { id: string; team_id: string; title: string; due_date: string | null; play_id: string | null; done: number; of: number; team: string };
 
-export default async function CoachAssignmentsPage({ searchParams }: { searchParams: Promise<{ team?: string }> }) {
+/** The plays a coach can set: their own, their team playbooks, then the library (Pro plays locked on Free). */
+async function playChoices(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, teamIds: string[]): Promise<PlayChoice[]> {
+  const [{ data: own }, { data: book }, { data: library }, isPro] = await Promise.all([
+    supabase.from('plays').select('id, title').eq('owner_id', userId).order('title'),
+    teamIds.length
+      ? (supabase.from('team_playbook').select('plays(id, title, owner_id)').in('team_id', teamIds) as unknown as Promise<{
+          data: Array<{ plays: { id: string; title: string; owner_id: string | null } | null }> | null;
+        }>)
+      : Promise.resolve({ data: [] }),
+    supabase.from('plays').select('id, title, is_free').is('owner_id', null).order('title'),
+    getHasPro(),
+  ]);
+  const choices: PlayChoice[] = (own ?? []).map((p) => ({ id: p.id, title: p.title, group: 'Your plays' as const }));
+  const seen = new Set(choices.map((c) => c.id));
+  for (const row of book ?? []) {
+    const p = row.plays;
+    if (!p || seen.has(p.id) || p.owner_id === null) continue;
+    seen.add(p.id);
+    choices.push({ id: p.id, title: p.title, group: 'Team playbooks' });
+  }
+  for (const p of library ?? []) {
+    choices.push({ id: p.id, title: p.title, group: 'Library', locked: !p.is_free && !isPro });
+  }
+  return choices;
+}
+
+export default async function CoachAssignmentsPage({ searchParams }: { searchParams: Promise<{ team?: string; play?: string }> }) {
   const user = await requireUser();
-  const { team: defaultTeam } = await searchParams;
+  const { team: defaultTeam, play: defaultPlay } = await searchParams;
   const supabase = await createClient();
   const [{ data: memberships }, { today }] = await Promise.all([
     supabase.from('team_members').select('teams(id, name)').eq('user_id', user.id).in('role', ['coach', 'assistant']),
@@ -28,11 +55,16 @@ export default async function CoachAssignmentsPage({ searchParams }: { searchPar
   const teamIds = teams.map((t) => t.id);
 
   let rows: Row[] = [];
+  let plays: PlayChoice[] = [];
   if (teamIds.length) {
-    const [{ data: assignments }, { data: players }] = await Promise.all([
-      supabase.from('team_assignments').select('id, team_id, title, due_date').in('team_id', teamIds).order('created_at', { ascending: false }).limit(60),
+    // '*' rather than a column list: play_id only exists once 00061 has run
+    const [{ data: rawAssignments }, { data: players }, choices] = await Promise.all([
+      supabase.from('team_assignments').select('*').in('team_id', teamIds).order('created_at', { ascending: false }).limit(60),
       supabase.from('team_members').select('team_id, user_id').in('team_id', teamIds).eq('role', 'player'),
+      playChoices(supabase, user.id, teamIds),
     ]);
+    plays = choices;
+    const assignments = (rawAssignments ?? []).map((a) => ({ id: a.id, team_id: a.team_id, title: a.title, due_date: a.due_date, play_id: a.play_id ?? null }));
     const ids = (assignments || []).map((a) => a.id);
     const { data: completions } = ids.length
       ? await supabase.from('team_assignment_completions').select('assignment_id, user_id').in('assignment_id', ids)
@@ -51,7 +83,10 @@ export default async function CoachAssignmentsPage({ searchParams }: { searchPar
     <ul className="space-y-2">
       {items.map((a) => (
         <li key={a.id}>
-          <Link href={`/teams/${a.team_id}`} className="block rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 hover:bg-zinc-900">
+          <Link
+            href={a.play_id ? `/coach/assignments/${a.id}` : `/teams/${a.team_id}`}
+            className="block rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 hover:bg-zinc-900"
+          >
             <div className="flex items-baseline justify-between gap-3">
               <span className="min-w-0 truncate font-semibold text-white">{a.title}</span>
               <span className="flex-shrink-0 text-xs text-zinc-400">
@@ -67,6 +102,7 @@ export default async function CoachAssignmentsPage({ searchParams }: { searchPar
                 a.due_date
                   ? `Due ${new Date(`${a.due_date}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' })}`
                   : 'No due date',
+                a.play_id ? 'Play: see who knows it' : null,
               ]
                 .filter(Boolean)
                 .join(' · ')}
@@ -99,7 +135,7 @@ export default async function CoachAssignmentsPage({ searchParams }: { searchPar
           </p>
         ) : (
           <>
-            <PostAssignment teams={teams} defaultTeam={defaultTeam ?? null} myId={user.id} />
+            <PostAssignment teams={teams} defaultTeam={defaultTeam ?? null} myId={user.id} plays={plays} defaultPlay={defaultPlay ?? null} />
             <section className="space-y-2">
               <h2 className="font-bold text-white">Open</h2>
               {open.length ? list(open) : <p className="text-sm text-zinc-500">Nothing open. Post one above.</p>}

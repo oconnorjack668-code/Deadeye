@@ -29,6 +29,10 @@ export const EVENT_NAMES = [
   'reminder_set',
   /** Opened a play from the plays library on the IQ tab */
   'play_opened',
+  /** Finished the role quiz on a play (all three questions, answers saved) */
+  'play_quiz_done',
+  /** A coach saved a new play they drew or copied in the play editor */
+  'play_drawn',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

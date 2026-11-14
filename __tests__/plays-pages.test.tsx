@@ -62,6 +62,10 @@ vi.mock('@/lib/supabase/server', () => ({
           filters.push([col, value]);
           return q;
         },
+        // Team lookups (00061): this player is on no team, so these find nothing
+        in: () => q,
+        limit: () => q,
+        order: () => q,
         maybeSingle: async () => ({ data: result()[0] ?? null, error: null }),
         then: (resolve: (v: unknown) => void) => resolve({ data: result(), error: null }),
       };
