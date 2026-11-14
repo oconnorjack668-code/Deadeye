@@ -179,7 +179,7 @@ async function buildEvidence(userId: string, sessionId: string): Promise<Coachin
  * the same as declining to act: an old tab, a bookmark or a direct POST would
  * otherwise generate a report and spend a credit for someone who opted out.
  */
-async function assertAiEnabled(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<void> {
+export async function assertAiEnabled(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<void> {
   const { data } = await supabase.from('profiles').select('ai_coaching_enabled').eq('id', userId).maybeSingle();
   if (data?.ai_coaching_enabled === false) {
     throw new AICoachError('AI coaching is switched off in your settings.', 403);

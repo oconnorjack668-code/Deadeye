@@ -124,6 +124,15 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] **DPIA.** A new kind of processing (new data type, recipient, upload,
       AI use, public surface) is named in the verdict as needing the DPIA
       updated.
+- [ ] **The support line never depends on the AI succeeding.** Show it from
+      the player's own text in the browser (`needsSupportLine` in
+      `src/lib/ai/safety.ts` has no server imports), or return it on the error
+      path too. Focus Finder (PR #103, 13 Nov 2026) lost it when the model
+      followed COACH_SAFETY and the plan failed.
+- [ ] **Stored AI input.** If nothing reads a field back (free text above
+      all), don't store it; if it is stored, the policy's "what we collect"
+      names it. Focus Finder stored the child's description for the life of
+      the account with no reader (PR #103).
 
 ## Research
 
