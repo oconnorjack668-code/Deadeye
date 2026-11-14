@@ -37,4 +37,16 @@ describe('GET /api/account/export', () => {
     expect(body.data.app_events).toEqual([{ id: 'e1', user_id: 'player-1', name: 'welcome_later', day: '2026-10-25' }]);
     expect(asked.filter((a) => a.table === 'app_events')).toEqual([{ table: 'app_events', column: 'user_id', value: 'player-1' }]);
   });
+
+  it('includes film saves, private notes and attempts by user, and packs built as a coach by owner (00062)', async () => {
+    asked.length = 0;
+    const res = await GET();
+    const body = (await res.json()) as { data: Record<string, unknown> };
+    for (const table of ['film_saves', 'film_notes', 'film_attempts']) {
+      expect(body.data[table]).toEqual([]);
+      expect(asked.filter((a) => a.table === table)).toEqual([{ table, column: 'user_id', value: 'player-1' }]);
+    }
+    expect(body.data.film_packs).toEqual([]);
+    expect(asked.filter((a) => a.table === 'film_packs')).toEqual([{ table: 'film_packs', column: 'owner_id', value: 'player-1' }]);
+  });
 });

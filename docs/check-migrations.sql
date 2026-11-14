@@ -11,10 +11,10 @@
 -- It checks the tables, columns, functions and indexes each migration creates.
 -- It does not check policies, grants or data, so these migrations, which only
 -- change those, cannot be told apart from not being run:
---   00008, 00009, 00012, 00029, 00030, 00040, 00059
+--   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00059, 59 files, 271 things). Do not edit it by
+-- (00001 to 00064, 64 files, 315 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -291,7 +291,51 @@ WITH expected(migration, kind, obj, col) AS (
     ('00058', 'column', 'workout_routines', 'day_order'),
     ('00058', 'index', 'idx_workout_routines_program', ''),
     ('00058', 'table', 'routine_imports', ''),
-    ('00058', 'index', 'idx_routine_imports_user', '')
+    ('00058', 'index', 'idx_routine_imports_user', ''),
+    ('00060', 'table', 'plays', ''),
+    ('00060', 'index', 'plays_library_slug_key', ''),
+    ('00060', 'index', 'plays_owner_id_idx', ''),
+    ('00060', 'index', 'plays_copied_from_idx', ''),
+    ('00060', 'table', 'play_saves', ''),
+    ('00060', 'index', 'play_saves_play_id_idx', ''),
+    ('00061', 'function', 'enforce_coach_play_limit', ''),
+    ('00061', 'table', 'team_playbook', ''),
+    ('00061', 'index', 'team_playbook_play_id_idx', ''),
+    ('00061', 'index', 'team_playbook_added_by_idx', ''),
+    ('00061', 'function', 'enforce_team_playbook_rules', ''),
+    ('00061', 'column', 'team_assignments', 'play_id'),
+    ('00061', 'column', 'team_assignments', 'film_clip_id'),
+    ('00061', 'column', 'team_assignments', 'film_pack_id'),
+    ('00061', 'index', 'team_assignments_play_id_idx', ''),
+    ('00061', 'column', 'team_assignments', 'item_set_at'),
+    ('00061', 'function', 'stamp_assignment_item', ''),
+    ('00061', 'function', 'enforce_assignment_play', ''),
+    ('00061', 'table', 'play_quiz_attempts', ''),
+    ('00061', 'index', 'play_quiz_attempts_user_play_idx', ''),
+    ('00061', 'index', 'play_quiz_attempts_play_idx', ''),
+    ('00061', 'function', 'coach_sees_play_attempt', ''),
+    ('00061', 'function', 'play_assignment_split', ''),
+    ('00062', 'table', 'film_clips', ''),
+    ('00062', 'index', 'film_clips_published_idx', ''),
+    ('00062', 'table', 'film_packs', ''),
+    ('00062', 'index', 'film_packs_library_slug_key', ''),
+    ('00062', 'index', 'film_packs_owner_id_idx', ''),
+    ('00062', 'table', 'film_pack_clips', ''),
+    ('00062', 'index', 'film_pack_clips_clip_id_idx', ''),
+    ('00062', 'function', 'enforce_coach_pack_rules', ''),
+    ('00062', 'function', 'enforce_film_pack_clip_rules', ''),
+    ('00062', 'table', 'film_saves', ''),
+    ('00062', 'index', 'film_saves_clip_id_idx', ''),
+    ('00062', 'table', 'film_notes', ''),
+    ('00062', 'index', 'film_notes_clip_id_idx', ''),
+    ('00062', 'table', 'film_attempts', ''),
+    ('00062', 'index', 'film_attempts_user_clip_idx', ''),
+    ('00062', 'index', 'film_attempts_clip_idx', ''),
+    ('00062', 'function', 'coach_sees_film_attempt', ''),
+    ('00062', 'function', 'film_assignment_split', ''),
+    ('00062', 'index', 'team_assignments_film_clip_id_idx', ''),
+    ('00062', 'index', 'team_assignments_film_pack_id_idx', ''),
+    ('00062', 'function', 'enforce_assignment_film', '')
 ),
 checked AS (
   SELECT

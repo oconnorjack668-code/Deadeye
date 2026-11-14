@@ -25,6 +25,16 @@ export const EVENT_NAMES = [
   'log_finish_opened',
   /** Saved their training days, or turned reminders on, on a reminders card */
   'reminder_set',
+  /** Opened a play from the plays library on the IQ tab */
+  'play_opened',
+  /** Finished the role quiz on a play (all three questions, answers saved) */
+  'play_quiz_done',
+  /** A coach saved a new play they drew or copied in the play editor */
+  'play_drawn',
+  /** Opened a film clip on the IQ tab (the clip page, before tapping play) */
+  'film_opened',
+  /** Answered every question on a film clip, and the attempt was saved */
+  'film_done',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

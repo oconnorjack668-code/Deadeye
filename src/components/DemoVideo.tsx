@@ -1,20 +1,8 @@
 // src/components/DemoVideo.tsx
 import React from 'react';
-import { youtubeEmbedUrl } from '@/lib/video/youtube';
+import { TapToLoadYouTube } from '@/components/video/TapToLoadYouTube';
 
-/** A drill or exercise demo, played in the page. Loads only when scrolled to. */
+/** A drill or exercise demo, played in the page. Nothing loads from YouTube until the player taps play. */
 export function DemoVideo({ id, title }: { id: string; title: string }) {
-  return (
-    <div className="aspect-video w-full overflow-hidden rounded-2xl border border-zinc-800 bg-black">
-      <iframe
-        src={youtubeEmbedUrl(id)}
-        title={`${title} demo`}
-        loading="lazy"
-        allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-        referrerPolicy="strict-origin-when-cross-origin"
-        allowFullScreen
-        className="h-full w-full"
-      />
-    </div>
-  );
+  return <TapToLoadYouTube id={id} title={`${title} demo`} className="rounded-2xl" />;
 }
