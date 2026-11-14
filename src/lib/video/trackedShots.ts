@@ -54,6 +54,8 @@ export interface RunQuality {
   moved?: number;
   /** Live camera: whether it held focus and exposure for the run. */
   locked?: boolean;
+  /** Upload: the clip was slowed to half speed because frames were going unscored (workload.ts SLOW_RATE). */
+  slowed?: boolean;
 }
 
 export interface DeviceClass {

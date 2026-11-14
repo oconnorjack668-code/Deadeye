@@ -21,7 +21,7 @@ import {
   type SavedRim,
 } from '@/lib/video/rimMemory';
 import { cropRectFor } from '@/lib/video/crop';
-import { createWorkload, repeatSignature, sameSignature } from '@/lib/video/workload';
+import { createWorkload, repeatSignature, sameSignature, SLOW_RATE } from '@/lib/video/workload';
 import { createEngine, type TrackerEngine } from '@/lib/video/trackerEngine';
 import type { PipelineFrame } from '@/lib/video/trackerPipeline';
 import { shiftInFrame, type Shift } from '@/lib/video/cameraShift';
@@ -168,6 +168,8 @@ export function ShotTracker({
   const [shots, setShots] = useState<TrackedShot[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  /** The upload is playing at SLOW_RATE so that every frame is checked. */
+  const [slowedDown, setSlowedDown] = useState(false);
   const [zone, setZone] = useState<ShotZoneChoice>('all-around');
   const [saving, setSaving] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -820,8 +822,10 @@ export function ShotTracker({
     // Thins 60 fps to the 30 the tracker was measured at, and gives a device
     // that cannot keep up a smaller picture to work on instead of slowing the
     // clip (src/lib/video/workload.ts). The camera is live, so the same applies.
-    const workload = createWorkload();
+    // An upload can be slowed when frames are being lost; a live camera cannot
+    const workload = createWorkload({ slowFirst: source === 'file' });
     workloadRef.current = workload;
+    setSlowedDown(false);
     let lastSignature: Uint8Array | null = null;
     // Built on the first frame with real dimensions: videoWidth is 0 until
     // metadata loads, and the crop and the expected ball size come from it
@@ -945,6 +949,10 @@ export function ShotTracker({
       if (lastSignature && sameSignature(signature, lastSignature)) return;
       lastSignature = signature;
       workload.scored(now);
+      if (source === 'file' && workload.slowed() && video.playbackRate !== SLOW_RATE) {
+        video.playbackRate = SLOW_RATE;
+        setSlowedDown(true);
+      }
       engine.push(pixels, px, now);
       if (source === 'file' && Number.isFinite(video.duration) && video.duration > 0) setProgress(video.currentTime / video.duration);
     };
@@ -1009,6 +1017,7 @@ export function ShotTracker({
         ...(inWorker !== null ? { worker: inWorker } : {}),
         ...(movesRef.current ? { moved: movesRef.current } : {}),
         ...(source === 'camera' ? { locked: lockedRef.current } : {}),
+        ...(workloadRef.current?.slowed() ? { slowed: true } : {}),
       });
     }
     setShootingMs(activeMs(activityRef.current, elapsedRef.current));
@@ -1648,9 +1657,11 @@ export function ShotTracker({
           )}
           <p className="text-sm text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />
-            {rechecked
-              ? 'Checking the recording again at full frame rate. It plays at normal speed.'
-              : health.issues.length
+            {slowedDown
+              ? 'Checking every frame, so this clip plays at half speed. It takes a little longer and gets more shots right.'
+              : rechecked
+                ? 'Checking the recording again at full frame rate. It plays at normal speed.'
+                : health.issues.length
                 ? 'Something needs fixing: see the amber note on the picture.'
                 : 'Counting shots. Every one can be corrected before you save.'}
           </p>
