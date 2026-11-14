@@ -7,7 +7,7 @@ import { getConfiguredAI, AINotConfiguredError } from '@/lib/ai/config';
 import { AICoachError, assertAiEnabled, refundCredit, reserveCredit } from '@/lib/ai/service';
 import { isStaff } from '@/lib/coachSide';
 import type { Database } from '@/lib/supabase/types';
-import { buildCatalogue, buildFocusPrompt, namesForRefs, parseFocusPlan, FOCUS_PROMPT_VERSION, MAX_FOCUS_TEXT, type FocusAiPlan } from './ai';
+import { buildCatalogue, buildFocusPrompt, withNames, parseFocusPlan, FOCUS_PROMPT_VERSION, MAX_FOCUS_TEXT, type FocusAiPlan } from './ai';
 import { loadFocusContent, loadPlayerSignals } from './content';
 import { buildFocusPlan, drillLevelFor, type FocusMode } from './plan';
 import { cleanWeaknessIds, matchWeaknesses } from './weaknesses';
@@ -101,7 +101,7 @@ export async function generateFocusPlan(userId: string, req: FocusRequest): Prom
   try {
     const raw = await ai.provider.generateJson(system, user, ai.config);
     plan = parseFocusPlan(raw, catalogue);
-    plan.week = plan.week.map((line) => namesForRefs(line, catalogue, content));
+    plan = withNames(plan, catalogue, content);
   } catch (err) {
     if (credit === 'reserved') await refundCredit(userId);
     throw new AICoachError(err instanceof Error ? err.message : 'AI request failed', 502);
