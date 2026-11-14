@@ -400,7 +400,7 @@ export function TeamClient({
                     </span>
                     {isSafeAppPath(a.link) && (
                       <Link href={a.link} className="text-cyan-400 underline">
-                        {LINK_OPTIONS.find((o) => o.value === a.link)?.label || 'Open'}
+                        {LINK_OPTIONS.find((o) => o.value === a.link)?.label || (a.link.startsWith('/focus') ? 'Open the focus plan' : 'Open')}
                       </Link>
                     )}
                   </div>

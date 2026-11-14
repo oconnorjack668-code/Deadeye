@@ -18,6 +18,10 @@ const funnel = (joined: number, setup: number, first: number): Funnel => ({
     },
   ],
   biggestDrop: { from: 'Finished setup', to: 'Logged a 1st hoops session', lost: setup - first },
+  routes: [
+    { route: 'friend', joined: 3, setup: 3, firstSession: first > 0 ? 1 : 0 },
+    { route: null, joined: joined - 3, setup: setup - 3, firstSession: first > 0 ? first - 1 : 0 },
+  ],
 });
 
 vi.mock('@/lib/funnel-server', () => ({
@@ -35,7 +39,7 @@ vi.mock('@/lib/supabase/admin', () => ({
   }),
 }));
 
-import { clubCounts, countsFile, countsPath } from '@/lib/agentCounts';
+import { clubCounts, countsFile, countsPath, publicRoutes } from '@/lib/agentCounts';
 import { GET } from '@/app/api/cron/agent-counts/route';
 
 const fetchMock = vi.fn();
@@ -66,9 +70,36 @@ describe('countsFile', () => {
     expect(file).not.toMatch(/@|[0-9a-f]{8}-[0-9a-f]{4}/);
   });
 
+  it('splits joins and 1st sessions by sign-up answer, all-time only, adding small answers together so nobody can be picked out', () => {
+    const file = countsFile('2026-10-26', funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('## Where they heard about Deadeye');
+    expect(file).not.toContain('| A friend or teammate |');
+    expect(file).toContain('| Answer | Joined | 1st session |');
+    expect(file).toContain('| Other answers (under 5 each) | 3 | 1 |');
+    expect(file).toContain("| Didn't say | 21 | 1 |");
+    expect(file).not.toContain('1st session in 7 days');
+  });
+
   it('dates the file by Irish time', () => {
     // 23:30 UTC on Sunday is 00:30 on Monday in Dublin in summer
     expect(countsPath(new Date('2026-07-26T23:30:00Z'))).toEqual({ date: '2026-07-27', path: 'docs/agent-os/data/2026-07-27-funnel.md' });
+  });
+});
+
+describe('publicRoutes', () => {
+  it('names answers with 5 or more players, sums the rest, and keeps "Didn\'t say" last', () => {
+    expect(
+      publicRoutes([
+        { route: 'friend', joined: 7, setup: 6, firstSession: 4 },
+        { route: 'youth-club', joined: 2, setup: 2, firstSession: 1 },
+        { route: 'radio-press', joined: 1, setup: 0, firstSession: 0 },
+        { route: null, joined: 9, setup: 5, firstSession: 3 },
+      ])
+    ).toEqual([
+      { label: 'A friend or teammate', joined: 7, firstSession: 4 },
+      { label: 'Other answers (under 5 each)', joined: 3, firstSession: 1 },
+      { label: "Didn't say", joined: 9, firstSession: 3 },
+    ]);
   });
 });
 
