@@ -1,6 +1,8 @@
 # Data Protection Impact Assessment (DPIA): Deadeye
 
-**Status: DRAFT, 2026-11-07.** Written by Claude from the code, the privacy
+**Status: DRAFT, 2026-11-07; Film and Plays rows, YouTube as a recipient,
+R12 and R13 added 2026-11-14 (founder asked; read them before signing).**
+Written by Claude from the code, the privacy
 policy (`src/app/privacy/page.tsx`) and `docs/agent-os/knowledge/safety-reviewer.md`.
 Not legal advice. It becomes the record once the founder and the adult who holds
 the accounts (the controller, `LEGAL_NAME`) have read it, corrected it and signed
@@ -31,6 +33,10 @@ Deadeye is for players from 13, so most users are under 18.
 | Reminder settings, push address | Player | Reminders | Consent (switched on by the player) | Until switched off |
 | Plan, founding offer dates, billing status | Player | Pro | Contract; legal obligation for payment records | Account life; Stripe keeps payment records |
 | Crash reports, problem reports, app steps | Player | Fixing bugs, finding where new players stall | Legitimate interest | 90 days |
+| Plays: saved plays (`play_saves`), play quiz attempts (score and the spots picked, `play_quiz_attempts`) | Player | Learning plays (IQ tab) | Contract | Account life. A head coach sees done and score for plays set for their team, never the spots picked, until 90 days after the due date |
+| Coach plays and team playbooks (`plays` with an owner, `team_playbook`) | Coach | Drawing plays and sharing them with a team; players shown by number only, never by name | Contract | Until the coach deletes them or the account |
+| Film: saved clips (`film_saves`), private notes on a clip (`film_notes`, free text up to 500 characters, only the player can read them), film attempts (score and answers, `film_attempts`) | Player | Learning to read the game from film (IQ tab) | Contract | Account life. A head coach sees done and score for film set for their team, never the answers or notes, until 90 days after the due date |
+| Coach film packs (`film_packs` with an owner) | Coach | Grouping library clips to set for a team | Contract | Until the coach deletes them or the account |
 
 Processors: Supabase (database, files), Vercel (hosting), Anthropic (AI coach:
 receives profile and training numbers, never name, email, photo or video;
@@ -38,6 +44,18 @@ routine import: receives only the pasted text or screenshot, with no account
 details; deletes API data within 30 days),
 Stripe (payments), Resend or Gmail SMTP (email). Check each one's data
 processing terms and where it stores data (EU or with transfer safeguards).
+
+Other recipients (not processors): YouTube (Google) plays lesson, drill,
+exercise and film videos. Nothing loads from YouTube or Google until the
+player taps play on a video (`TapToLoadYouTube`, since F0). After the tap,
+YouTube receives the IP address and device and browser details, the YouTube
+IFrame API script loads from youtube.com for film clips, YouTube may store data
+on the device (even in youtube-nocookie mode), and it can link what is watched
+to a signed-in Google account. Deadeye sends YouTube no account details. Named
+on the privacy page under "Cookies and videos" with a link to Google's privacy
+policy. Videos are embedded from official channels that allow embedding (the
+owner tool checks oEmbed); none is downloaded or hosted by Deadeye, and no
+video is part of Pro (YouTube Developer Policies III.F.3.a).
 
 Not done: no ads, no selling data, no third-party analytics or tracking, no
 location data, no profiling for marketing, no direct messages between users.
@@ -72,6 +90,8 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
 | R9 | Video of players (faces, other children in shot) | Medium | Medium | Analysis on the phone; upload optional; videos never sent to the AI provider. No consent step for other people in shot | Medium |
 | R10 | Marketing reaches or targets children unfairly | Medium | Medium | Marketing agent rules: no identifiable under-18s without written parent consent, ASAI code, no pressure, no money talk to under-16s | Low |
 | R11 | A screenshot or pasted message carries other people's details (names, faces, phone numbers, other children) or the player's own to the AI provider | Medium | Low-medium | Sent only when the player chooses; shrunk on the phone; no account id; not stored by Deadeye; provider deletes within 30 days; a line on the screen asks players to crop out names and faces; the model is told not to copy names or numbers; stops when AI is off | Low |
+| R12 | A third-party video player (YouTube) tracks a child's viewing | Medium | Medium | Nothing loads from YouTube or Google before a tap, and the card says "This plays from YouTube; YouTube sees that you watched it"; youtube-nocookie; no likes, subscribes or other YouTube actions; official channels only; named on the privacy page and the parents page; the rest of a lesson or drill works without playing the video. YouTube still receives IP and device details after the tap | Low-medium |
+| R13 | Coaches monitor players too closely, or players feel pressured by film and play homework | Medium | Medium | Only head coaches (18+, not assistants) see results, and only done and score for film or plays they set, until 90 days after the due date; never the answers, the spots picked or private notes; teammates see nothing; no leaderboards or share cards for scores; a line on screen tells the player what the coach sees; no overdue pushes and no copy naming who has not done it; no comments or free-text coach feedback (that waits for C4 and parent visibility) | Low |
 
 ## 4. Open actions
 
