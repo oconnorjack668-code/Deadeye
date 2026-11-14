@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00061, 60 files, 292 things). Do not edit it by
+-- (00001 to 00062, 61 files, 313 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -312,7 +312,28 @@ WITH expected(migration, kind, obj, col) AS (
     ('00061', 'index', 'play_quiz_attempts_user_play_idx', ''),
     ('00061', 'index', 'play_quiz_attempts_play_idx', ''),
     ('00061', 'function', 'coach_sees_play_attempt', ''),
-    ('00061', 'function', 'play_assignment_split', '')
+    ('00061', 'function', 'play_assignment_split', ''),
+    ('00062', 'table', 'film_clips', ''),
+    ('00062', 'index', 'film_clips_published_idx', ''),
+    ('00062', 'table', 'film_packs', ''),
+    ('00062', 'index', 'film_packs_library_slug_key', ''),
+    ('00062', 'index', 'film_packs_owner_id_idx', ''),
+    ('00062', 'table', 'film_pack_clips', ''),
+    ('00062', 'index', 'film_pack_clips_clip_id_idx', ''),
+    ('00062', 'function', 'enforce_coach_pack_rules', ''),
+    ('00062', 'function', 'enforce_film_pack_clip_rules', ''),
+    ('00062', 'table', 'film_saves', ''),
+    ('00062', 'index', 'film_saves_clip_id_idx', ''),
+    ('00062', 'table', 'film_notes', ''),
+    ('00062', 'index', 'film_notes_clip_id_idx', ''),
+    ('00062', 'table', 'film_attempts', ''),
+    ('00062', 'index', 'film_attempts_user_clip_idx', ''),
+    ('00062', 'index', 'film_attempts_clip_idx', ''),
+    ('00062', 'function', 'coach_sees_film_attempt', ''),
+    ('00062', 'function', 'film_assignment_split', ''),
+    ('00062', 'index', 'team_assignments_film_clip_id_idx', ''),
+    ('00062', 'index', 'team_assignments_film_pack_id_idx', ''),
+    ('00062', 'function', 'enforce_assignment_film', '')
 ),
 checked AS (
   SELECT

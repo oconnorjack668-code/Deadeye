@@ -1,6 +1,7 @@
 // src/app/(app)/coach/playbook/page.tsx
-// The coach's Playbook tab: the plays they have drawn or copied, and each
-// team's playbook (the plays its players can open). Free keeps 5 plays and a
+// The coach's Playbook tab: the plays they have drawn or copied, each
+// team's playbook (the plays its players can open), and their film: packs
+// they built and favourite (saved) clips. Free keeps 5 plays and a
 // playbook for one team; the page says so before the limit is hit.
 import React from 'react';
 import Link from 'next/link';
@@ -38,6 +39,17 @@ export default async function PlaybookPage() {
     : { data: [] };
   const mine = (own ?? []) as PlayLite[];
   const canDraw = canDrawAnother(mine.length, isPro);
+  // Favourite clips are the saved ones; packs are built from them (00062).
+  // Both read as empty before that migration runs.
+  const [{ data: packs }, { data: favourites }] = isCoach
+    ? await Promise.all([
+        supabase.from('film_packs').select('id, title').eq('owner_id', user.id).order('updated_at', { ascending: false }),
+        supabase.from('film_saves').select('film_clips(id, title)').eq('user_id', user.id) as unknown as Promise<{
+          data: Array<{ film_clips: { id: string; title: string } | null }> | null;
+        }>,
+      ])
+    : [{ data: [] }, { data: [] }];
+  const favouriteClips = (favourites ?? []).flatMap((f) => (f.film_clips ? [f.film_clips] : []));
 
   return (
     <div className="flex-1 overflow-auto">
@@ -140,6 +152,45 @@ export default async function PlaybookPage() {
                   );
                 })
               )}
+            </section>
+
+            <section aria-labelledby="film" className={`${card} space-y-3`}>
+              <h2 id="film" className={sectionLabel}>
+                Film
+              </h2>
+              <h3 className="text-sm font-semibold text-zinc-300">Your packs</h3>
+              {(packs ?? []).length === 0 ? (
+                <p className="text-sm text-zinc-400">None yet. Open a clip on the Film tab and tap Add to pack.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {(packs ?? []).map((p) => (
+                    <li key={p.id}>
+                      <Link href={`/film/packs/${p.id}`} className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-zinc-950/60 px-3 py-2 hover:bg-zinc-900">
+                        <span className="truncate text-sm font-semibold text-white">{p.title}</span>
+                        <ChevronRight className="h-5 w-5 flex-shrink-0 text-zinc-500" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <h3 className="text-sm font-semibold text-zinc-300">Favourite clips</h3>
+              {favouriteClips.length === 0 ? (
+                <p className="text-sm text-zinc-400">Tap the bookmark on a clip to keep it here.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {favouriteClips.map((c) => (
+                    <li key={c.id}>
+                      <Link href={`/film/${c.id}`} className="flex min-h-11 items-center justify-between gap-2 rounded-xl bg-zinc-950/60 px-3 py-2 hover:bg-zinc-900">
+                        <span className="truncate text-sm font-semibold text-white">{c.title}</span>
+                        <ChevronRight className="h-5 w-5 flex-shrink-0 text-zinc-500" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <Link href="/film" className="inline-flex h-11 items-center rounded-xl border border-zinc-700 px-4 text-sm font-medium text-zinc-200 hover:bg-zinc-800/80">
+                Browse film
+              </Link>
             </section>
           </>
         )}

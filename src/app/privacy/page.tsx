@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 13, 2026';
+const LAST_UPDATED = 'November 14, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -86,6 +86,10 @@ export default function PrivacyPage() {
               Plays: the plays you save, and for each play quiz you finish, your score and the spots you picked. If you
               coach, the plays you draw or copy and the plays you add to a team&apos;s playbook. Plays show players by
               number only, never by name.
+            </li>
+            <li>
+              Film: the clips you save, your notes on clips (only you can ever see them), and for each clip whose
+              questions you answer, your score and the answers you picked. If you coach, the packs of clips you build.
             </li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
@@ -193,7 +197,8 @@ export default function PrivacyPage() {
             )}
             <li>Your browser&apos;s push service (for example Google or Apple) delivers training reminders you turn on.</li>
             <li>
-              YouTube, which is owned by Google, plays the lesson, drill and exercise videos, and only when you tap play.
+              YouTube, which is owned by Google, plays the lesson, drill and exercise videos and the film clips, and only
+              when you tap play.
               What it receives is under <a className="text-orange-400 underline" href="#cookies-and-videos">Cookies and videos</a>.
             </li>
           </ul>
@@ -219,7 +224,10 @@ export default function PrivacyPage() {
             totals, streak and your game averages (points, rebounds, assists, FG%). Coaches can post assignments and
             see who completed them. When a head coach sets a play for the team, they see whether you took its quiz
             and whether you passed, and how the team answered each question as totals, never which spots you picked,
-            until 90 days after the due date. Assistant coaches and teammates do not see quiz results. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
+            until 90 days after the due date. The same goes for a film clip or pack a head coach sets: they see whether
+            you answered its questions and your score, and how the team answered each question as totals, never which
+            answers you picked. Assistant coaches and teammates do not see quiz or film results, and nobody but you sees
+            your notes on clips. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any
             time from its page.
@@ -278,8 +286,9 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
           <p>Deadeye&apos;s own cookies are only there to keep you logged in.</p>
           <p>
-            Lesson, drill and exercise videos play from YouTube, which is owned by Google. Nothing loads from YouTube
-            until you tap play on a video. When you do, YouTube receives your IP address (the number that identifies
+            Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads
+            from YouTube until you tap play on a video. (On a film clip, the tap also loads YouTube&apos;s player
+            controls, so the clip can stop at each question.) When you do, YouTube receives your IP address (the number that identifies
             your internet connection) and details about your phone or computer and its browser, and it may store data
             on your device. If you are signed in to YouTube or Google on the same browser, YouTube can link what you
             watch to that account. What YouTube does with that is covered by{' '}

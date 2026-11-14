@@ -33,6 +33,10 @@ export const EVENT_NAMES = [
   'play_quiz_done',
   /** A coach saved a new play they drew or copied in the play editor */
   'play_drawn',
+  /** Opened a film clip on the IQ tab (the clip page, before tapping play) */
+  'film_opened',
+  /** Answered every question on a film clip, and the attempt was saved */
+  'film_done',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

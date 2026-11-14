@@ -32,6 +32,16 @@ describe('the privacy page', () => {
   it('lists YouTube with the other companies that receive data', () => {
     render(<PrivacyPage />);
     const list = screen.getByRole('heading', { name: 'Who processes it' }).closest('section')!;
-    expect(list.textContent).toMatch(/YouTube, which is owned by Google, plays the lesson, drill and exercise videos, and only when you tap play/);
+    expect(list.textContent).toMatch(/YouTube, which is owned by Google, plays the lesson, drill and exercise videos and the film clips, and only\s+when you tap play/);
+  });
+
+  it('says what Film keeps, that notes are private, and that head coaches see done and score, never the answers (F3)', () => {
+    const { container } = render(<PrivacyPage />);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toMatch(/Film: the clips you save, your notes on clips \(only you can ever see them\)/);
+    expect(text).toMatch(/film clip or pack a head coach sets: they see whether you answered its questions and your score/);
+    expect(text).toMatch(/never which answers you picked/);
+    expect(text).toMatch(/nobody but you sees your notes on clips/);
+    expect(text).toMatch(/film clips play from YouTube/);
   });
 });

@@ -1,6 +1,6 @@
 # Builder knowledge
 
-Last researched: 2026-11-13
+Last researched: 2026-11-14 (YouTube IFrame API, developer policies, oEmbed)
 
 Read `README.md` in this folder for how this file works. Stack then: Next.js
 16.4.2, React 19.2.8, eslint-plugin-react-hooks 7.1.1, Vitest 5 + jsdom.
@@ -100,8 +100,11 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] 390px wide, both themes, no sideways scroll, taps 44px (`h-11`),
       colours from `docs/design.md`.
 - [ ] Nothing loads from another company (iframe, image, font, script) before
-      the player asks for it; a YouTube video goes through `TapToLoadYouTube`;
-      the privacy page names whoever receives data.
+      the player asks for it; a YouTube video goes through `TapToLoadYouTube`
+      (or `FilmClipPlayer`, which shares its tap card); the privacy page names
+      whoever receives data.
+- [ ] A `'use server'` file exports only async functions: constants and
+      helpers live in `src/lib/` (caught on F3 before it shipped).
 - [ ] Camera/video: `playsInline` + `muted`, tracks stopped on unmount, each
       `getUserMedia` error named, each stage has a time limit.
 - [ ] Heavy work (model, decode, export) in a worker or chunked; no tap
