@@ -449,6 +449,52 @@ function firstHits(t: string, patterns: RegExp[]): { hits: number; first: number
 }
 
 /**
+ * A clause about what the OTHER team does to you: "we give up open threes",
+ * "we allow offensive rebounds", "they get past us", "teams run on us". In such
+ * a clause "threes" is a defensive problem, not a shooting one. Found on the
+ * first live team test (14 Nov 2026): "we give up open corner threes" also
+ * picked "Missing open catch-and-shoot shots".
+ */
+const DEFENSIVE_CLAUSE = new RegExp(
+  [
+    // "give up" a shot, not "give up when I miss" (giving up as a mindset)
+    '(give|gives|giving|gave) up(?! (on|when|after|if|easily|too easily|too early))',
+    '(allow|allows|allowing|allowed|concede|concedes|conceding|conceded|leak|leaks|leaking)',
+    "let(ting)? (them|teams|opponents|other teams|the other team|guards|bigs|shooters|players|people)",
+    "(they|they're|opponents|other teams|the other team|teams|guards|bigs|shooters) (keep |always |just |easily |all )?(hit|hits|make|makes|get|gets|score|scores|drain|drains|blow|blows|go|goes|beat|beats|cut|cuts|shoot|shoots|run|runs|kill|kills|torch|torches)",
+    'against us',
+    'on us',
+  ]
+    .map((p) => `(?<![a-z0-9])(?:${p})(?![a-z0-9])`)
+    .join('|'),
+  'i'
+);
+
+/** In a defensive clause, an attacking weakness is really its defensive side. */
+export const DEFENSIVE_SIDE: Record<string, string> = {
+  catch_shoot: 'closeouts_help',
+  off_dribble: 'on_ball_defense',
+  shooting_pressure: 'closeouts_help',
+  finishing_contact: 'closeouts_help',
+  touch_finishes: 'closeouts_help',
+  beat_defender: 'on_ball_defense',
+  offensive_rebounding: 'boxing_out',
+  transition_offense: 'transition_defense',
+  pnr_reads: 'pnr_defense',
+  post_play: 'closeouts_help',
+  passing_reads: 'closeouts_help',
+  free_throws: 'on_ball_defense',
+};
+
+/** Raw text into clauses, before punctuation is stripped: ".", ",", ";", "!", "?", new lines and "but". */
+export function clauses(text: string): string[] {
+  return text
+    .split(/[.,;!?\n]+|(?<![a-z])but(?![a-z])/i)
+    .map((c) => c.trim())
+    .filter(Boolean);
+}
+
+/**
  * The weaknesses free text talks about, most mentioned first.
  *
  * Deliberately simple and visible: what it picks up is shown as chips the
@@ -456,20 +502,41 @@ function firstHits(t: string, patterns: RegExp[]): { hits: number; first: number
  * tap, and nothing is decided behind their back.
  */
 export function matchWeaknesses(text: string, max = 6): string[] {
-  const t = normaliseText(text);
-  if (t.trim().length < 2) return [];
-  const scored: Array<{ id: string; group: WeaknessGroup; hits: number; first: number }> = [];
-  for (const { id, group, patterns } of COMPILED) {
-    const { hits, first } = firstHits(t, patterns);
-    if (hits > 0) scored.push({ id, group, hits, first });
-  }
+  if (normaliseText(text).trim().length < 2) return [];
+  const byId = new Map<string, { id: string; group: WeaknessGroup; hits: number; first: number }>();
+  const add = (id: string, hits: number, first: number) => {
+    const w = BY_ID.get(id);
+    if (!w) return;
+    const s = byId.get(id);
+    if (s) {
+      s.hits += hits;
+      s.first = Math.min(s.first, first);
+    } else byId.set(id, { id, group: w.group, hits, first });
+  };
+
+  const parts = clauses(text).map((c) => normaliseText(c));
+  // Each clause's matches, its defensive side when the clause is about the other team
+  parts.forEach((t, ci) => {
+    const defensive = DEFENSIVE_CLAUSE.test(t);
+    for (const { id, patterns } of COMPILED) {
+      const { hits, first } = firstHits(t, patterns);
+      if (hits > 0) add(defensive ? (DEFENSIVE_SIDE[id] ?? id) : id, hits, ci * 10_000 + first);
+    }
+  });
+
   // Broad words only where their group has nothing more specific
-  const groupsHit = new Set(scored.map((s) => s.group));
-  for (const { id, group, broad } of COMPILED) {
-    if (!broad.length || groupsHit.has(group)) continue;
-    const { hits, first } = firstHits(t, broad);
-    if (hits > 0) scored.push({ id, group, hits: 0.5, first });
-  }
-  scored.sort((a, b) => b.hits - a.hits || a.first - b.first);
-  return scored.slice(0, max).map((s) => s.id);
+  const groupsHit = new Set([...byId.values()].map((s) => s.group));
+  parts.forEach((t, ci) => {
+    const defensive = DEFENSIVE_CLAUSE.test(t);
+    for (const { id, group, broad } of COMPILED) {
+      if (!broad.length || groupsHit.has(group)) continue;
+      const { hits, first } = firstHits(t, broad);
+      if (hits > 0) add(defensive ? (DEFENSIVE_SIDE[id] ?? id) : id, 0.5, ci * 10_000 + first);
+    }
+  });
+
+  return [...byId.values()]
+    .sort((a, b) => b.hits - a.hits || a.first - b.first)
+    .slice(0, max)
+    .map((s) => s.id);
 }

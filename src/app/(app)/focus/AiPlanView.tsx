@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, CalendarDays, Film, Lock, Sparkles, Target, TrendingUp, X } from 'lucide-react';
+import { BookOpen, CalendarDays, Film, Lock, Sparkles, Target, Trash2, TrendingUp, X } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import type { FocusAiPlan } from '@/lib/focus/ai';
 import type { FocusDrill, FocusGuide, FocusLesson } from '@/lib/focus/plan';
@@ -22,18 +22,48 @@ function Label({ icon: Icon, children }: { icon: React.ComponentType<{ className
  * rather than showing as a dead link.
  */
 export function AiPlanView({
+  planId,
   plan,
   drillsById,
   lessonsById,
   guidesBySlug,
   onClose,
+  onDeleted,
 }: {
+  planId: string;
   plan: FocusAiPlan;
   drillsById: Map<string, FocusDrill>;
   lessonsById: Map<string, FocusLesson>;
   guidesBySlug: Map<string, FocusGuide>;
   onClose: () => void;
+  onDeleted: () => void;
 }) {
+  // Two taps to delete, no browser dialog: the first arms it, the second deletes
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function deletePlan() {
+    if (!confirming) return setConfirming(true);
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/focus/plan/${planId}`, { method: 'DELETE' });
+      const body = (await res.json().catch(() => null)) as { error?: string } | null;
+      if (!res.ok) {
+        setDeleteError(body?.error || 'Could not delete the plan.');
+        setConfirming(false);
+        return;
+      }
+      onDeleted();
+    } catch {
+      setDeleteError('No connection. Try again.');
+      setConfirming(false);
+    } finally {
+      setDeleting(false);
+    }
+  }
+
   const film = plan.film.map((f) => ({ ...f, lesson: lessonsById.get(f.lessonId) })).filter((f) => f.lesson);
   const drills = plan.drills.map((d) => ({ ...d, drill: drillsById.get(d.drillId) })).filter((d) => d.drill);
   const reads = plan.reads.map((r) => ({ ...r, guide: guidesBySlug.get(r.guideSlug) })).filter((r) => r.guide);
@@ -164,6 +194,24 @@ export function AiPlanView({
         </Link>
         . The AI can be wrong: if something does not fit, skip it.
       </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={deletePlan}
+          disabled={deleting}
+          className={`inline-flex min-h-10 items-center gap-1.5 rounded-lg border px-3 text-sm font-semibold ${
+            confirming ? 'border-red-500/60 text-red-300 hover:bg-red-950/40' : 'border-zinc-700 text-zinc-300 hover:bg-zinc-800'
+          }`}
+        >
+          <Trash2 className="h-4 w-4" /> {deleting ? 'Deleting…' : confirming ? 'Tap again to delete for good' : 'Delete this plan'}
+        </button>
+        {confirming && !deleting && (
+          <button type="button" onClick={() => setConfirming(false)} className="text-sm text-zinc-400 underline">
+            Keep it
+          </button>
+        )}
+        {deleteError && <span className="text-sm text-red-400">{deleteError}</span>}
+      </div>
     </section>
   );
 }
