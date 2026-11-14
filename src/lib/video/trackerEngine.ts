@@ -31,12 +31,16 @@ export type ToWorker =
   | { type: 'start'; config: PipelineConfig }
   | { type: 'frame'; buffer: ArrayBuffer; px: number; t: number }
   | { type: 'bitmap'; bitmap: ImageBitmap; px: number; t: number }
+  | { type: 'decode'; file: Blob; px: number }
   | { type: 'finish' }
   | { type: 'reset-shift' };
 
 export type FromWorker =
   | { type: 'frame'; result: PipelineFrame }
   | { type: 'finished'; shots: DetectedShot[] }
+  | { type: 'decode-progress'; t: number; durationMs: number }
+  | { type: 'decoded'; frames: number; durationMs: number }
+  | { type: 'decode-failed'; message: string; frames: number }
   | { type: 'failed'; message: string };
 
 export interface TrackerEngine {
@@ -50,10 +54,26 @@ export interface TrackerEngine {
   takesBitmaps(): boolean;
   /** Hands over a frame's hoop crop, already px square, as a bitmap the worker reads back. It is closed after use. */
   pushBitmap(bitmap: ImageBitmap, px: number, t: number): void;
+  /** Whether decodeFile can be used: a worker is running and this browser has WebCodecs (clipDecoder.ts). */
+  takesFiles(): boolean;
+  /**
+   * Has the worker decode an uploaded clip and score every frame, as fast as
+   * it can, instead of frames being pushed (clipDecoder.ts). Frame results
+   * arrive through onFrame as usual; finish() still calls the last shot.
+   */
+  decodeFile(file: Blob, px: number, events: DecodeEvents): void;
   /** Calls what is still being judged, once every frame sent has been scored: the shots that decided, oldest first. */
   finish(): Promise<DetectedShot[]>;
   resetShift(): void;
   dispose(): void;
+}
+
+export interface DecodeEvents {
+  onProgress(t: number, durationMs: number): void;
+  /** Every frame has been scored. */
+  onDone(frames: number, durationMs: number): void;
+  /** It could not decode the clip; `frames` were scored before it stopped. */
+  onFailed(message: string, frames: number): void;
 }
 
 /** The pipeline on this thread: each frame is answered before push returns. */
@@ -65,6 +85,8 @@ export function createInlineEngine(config: PipelineConfig, onFrame: (r: Pipeline
     push: (pixels, px, t) => onFrame(pipeline.frame(pixels, px, t)),
     takesBitmaps: () => false,
     pushBitmap: (bitmap) => bitmap.close(),
+    takesFiles: () => false,
+    decodeFile: (_file, _px, events) => events.onFailed('Decoding needs the worker', 0),
     finish: async () => pipeline.finish(),
     resetShift: () => pipeline.resetShift(),
     dispose: () => undefined,
@@ -86,6 +108,17 @@ export function bitmapsWork(): boolean {
 }
 
 /**
+ * Whether this browser can decode an uploaded clip in the worker
+ * (clipDecoder.ts): WebCodecs' VideoDecoder, and what bitmapsWork needs to cut
+ * and read each frame. Kept here, not in clipDecoder.ts, so that the page does
+ * not load the clip reader (mp4box) just to ask. Whether a given clip's format
+ * decodes is only known once its file is open.
+ */
+export function decodeWorks(): boolean {
+  return typeof VideoDecoder !== 'undefined' && typeof EncodedVideoChunk !== 'undefined' && bitmapsWork();
+}
+
+/**
  * The pipeline in a worker, falling back to this thread if the worker cannot
  * start or fails part way. A failure part way loses the shot being judged at
  * that moment and nothing already called.
@@ -104,6 +137,7 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
   let inFlight = 0;
   let fallback: TrackerEngine | null = null;
   let finishing: ((shots: DetectedShot[]) => void) | null = null;
+  let decoding: DecodeEvents | null = null;
 
   const fail = () => {
     if (fallback) return;
@@ -115,6 +149,8 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
     // A finish waiting on the worker will not be answered now
     finishing?.([]);
     finishing = null;
+    decoding?.onFailed('The worker stopped', 0);
+    decoding = null;
   };
 
   worker.onmessage = (e: MessageEvent<FromWorker>) => {
@@ -125,6 +161,14 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
     } else if (msg.type === 'finished') {
       finishing?.(msg.shots);
       finishing = null;
+    } else if (msg.type === 'decode-progress') {
+      decoding?.onProgress(msg.t, msg.durationMs);
+    } else if (msg.type === 'decoded') {
+      decoding?.onDone(msg.frames, msg.durationMs);
+      decoding = null;
+    } else if (msg.type === 'decode-failed') {
+      decoding?.onFailed(msg.message, msg.frames);
+      decoding = null;
     } else if (msg.type === 'failed') {
       fail();
     }
@@ -145,6 +189,12 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       worker!.postMessage({ type: 'frame', buffer, px, t } satisfies ToWorker, [buffer]);
     },
     takesBitmaps: () => fallback === null && bitmapsWork(),
+    takesFiles: () => fallback === null && decodeWorks(),
+    decodeFile(file, px, events) {
+      if (fallback) return fallback.decodeFile(file, px, events);
+      decoding = events;
+      worker!.postMessage({ type: 'decode', file, px } satisfies ToWorker);
+    },
     pushBitmap(bitmap, px, t) {
       if (fallback) return fallback.pushBitmap(bitmap, px, t);
       inFlight++;

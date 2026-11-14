@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-14 · tracker-speed · Uploads decoded not played (every frame, ~3x faster); camera off main thread (#113 #115 #118) → [handoff](2026-11-14-tracker-speed.md)
 - 2026-11-14 · tracker-accuracy-steady-slow · Bench 81.6% to 90.7%, hold-out 69% to 76%; steadier, slow phones (#108) → [handoff](2026-11-14-tracker-accuracy-steady-slow.md)
 - 2026-11-14 · film-and-plays-live · Plays live for all; Film built, closed until S1; #112 → [handoff](2026-11-14-film-and-plays-live.md)
 - 2026-11-14 · f3-film · Film tab built on exp/f3-film; 00062 not applied; live after S1 → [handoff](2026-11-14-f3-film.md)

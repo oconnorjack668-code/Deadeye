@@ -339,6 +339,33 @@ arrived. The pixels differ from the old way's by about 4 levels (the graphics
 chip converts the colours a little differently); clip 2 at half speed, where
 no frames are lost, called 30 of 31 both ways.
 
+Uploads are now decoded rather than played where the browser has WebCodecs
+(`clipDecoder.ts`, in the tracker's worker): mp4box (BSD-3, pinned 2.4.1)
+reads the MP4 or MOV a slice at a time, `VideoDecoder` decodes it, the
+graphics chip cuts and shrinks each frame's hoop crop, and the tracker scores
+every frame, as fast as the device allows. There is no playback clock to keep
+up with, so nothing is lost. The app's own code, end to end in Chrome on the
+bench laptop (14 Nov 2026), every frame scored each time:
+
+| clip | right | took | the bench |
+| --- | --- | --- | --- |
+| 1 (51s, HEVC) | 10/10 | 13.4s | 10/10 |
+| 2 (2:40, 60 fps, portrait) | 30/31 | 51.9s | 31/31 |
+| 3 (2:32) | 16/17 | 37.8s | 16/17 |
+| 4 (2:47) | 23/24 | 53.3s | 24/24 |
+
+Clip 2 played at normal speed had called 25 of 31; at half speed, 30 of 31 in
+5:20. Clip 4's one difference is its last shot, judged as the clip ends, on
+pixels decoded a little differently from ffmpeg's. Two things are handled
+that playing never needed: the rotation phones store portrait video with
+(checked against the `<video>` on clips flagged 90, 180 and 270: crops within
+2-4 levels), and the edit list a clip can start partway into its first frames
+with (without it the shot times did not match the video's). A clip it cannot
+read (a WebM, say, or a format the device cannot decode) fails before any frame
+and is played instead, as before; one that fails part way is called on what
+was seen. Either is reported to `/admin/errors`. While decoding, the video
+stays paused, no ball is drawn over it, and calls make no sound.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player
