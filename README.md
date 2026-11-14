@@ -292,6 +292,19 @@ no shot 7 to 5. Every clip as filmed the same or better.
 from 60 to 72. Four runs lost a call or more: clip 4 wobbly (5), clip 1 at
 15 fps, clip 3 hard, clip 4 dim (1 each).
 
+The hold-out, `clip5`, scored once before and after (14 Nov 2026), six of its
+versions (the grainy `dark` and `hard` ones were left out: they took hours to
+encode): **120 to 133 right of 174 (69.0% to 76.4%)**, no version worse, no
+calls with no shot either time. As filmed 21 to 22 of 29, 15 fps 22 to 26,
+10 fps 23 to 25, wobbly 15 to 19. That clip is the honest measure, and it
+says the tracker still gets about one shot in four wrong on footage it was
+never tuned on: very low, the rim in the top corner, two players.
+
+The steadier and the held frames cost about 0.7 ms a frame on the bench
+laptop (3.7-4.1 to 4.6-4.7 ms on clip 1, measured back to back on a quiet
+machine). Slid frames go into a ring of four reused buffers rather than a
+new array each time.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

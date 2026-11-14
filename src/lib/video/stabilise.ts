@@ -78,7 +78,16 @@ export interface Steadied {
   sure: boolean;
 }
 
+/**
+ * Slid frames are written into a ring of this many buffers rather than a new
+ * one each time: a fresh 400 KB array thirty times a second is garbage the
+ * phone has to collect. A frame handed out is overwritten POOL calls later,
+ * and the trackerPipeline keeps a frame for two calls after its own.
+ */
+export const POOL = 4;
+
 export interface Stabiliser {
+  /** The frame returned may be written over POOL calls later: see POOL. */
   push(pixels: Uint8ClampedArray, width: number, height: number): Steadied;
   /** Starts again from the next frame, after the rim or the canvas size changed. */
   reset(): void;
@@ -227,9 +236,12 @@ export function coarseSlide(ref: Float32Array, cur: Float32Array, w: number, h: 
   return { dx: best.dx, dy: best.dy };
 }
 
-/** `pixels` slid by whole pixels: out(x, y) = in(x + dx, y + dy), the edges repeated. */
-export function slideWhole(pixels: Uint8ClampedArray, width: number, height: number, dx: number, dy: number): Uint8ClampedArray {
-  const out = new Uint8ClampedArray(pixels.length);
+/**
+ * `pixels` slid by whole pixels: out(x, y) = in(x + dx, y + dy), the edges
+ * repeated. Into `into` when it is the right size, else a new array.
+ */
+export function slideWhole(pixels: Uint8ClampedArray, width: number, height: number, dx: number, dy: number, into?: Uint8ClampedArray): Uint8ClampedArray {
+  const out = into && into.length === pixels.length ? into : new Uint8ClampedArray(pixels.length);
   const rowBytes = width * 4;
   for (let y = 0; y < height; y++) {
     const sy = Math.min(height - 1, Math.max(0, y + dy));
@@ -291,6 +303,8 @@ export function createStabiliser(): Stabiliser {
   let ay = 0;
   let off = 0;
   let unsure = 0;
+  const pool: Uint8ClampedArray[] = [];
+  let next = 0;
 
   const reset = () => {
     ref = null;
@@ -387,7 +401,10 @@ export function createStabiliser(): Stabiliser {
         off = 0;
       }
       if (!ax && !ay) return { pixels, dx: sx, dy: sy, moved: false, ax: 0, ay: 0, sure };
-      return { pixels: slideWhole(pixels, width, height, ax, ay), dx: sx, dy: sy, moved: true, ax, ay, sure };
+      const slot = next;
+      next = (next + 1) % POOL;
+      pool[slot] = slideWhole(pixels, width, height, ax, ay, pool[slot]);
+      return { pixels: pool[slot], dx: sx, dy: sy, moved: true, ax, ay, sure };
     },
   };
 }
