@@ -305,6 +305,25 @@ laptop (3.7-4.1 to 4.6-4.7 ms on clip 1, measured back to back on a quiet
 machine). Slid frames go into a ring of four reused buffers rather than a
 new array each time.
 
+### What the bench cannot see: frames lost in the browser
+
+The bench decodes every frame. A phone plays the clip and reads each frame's
+pixels out of the video as it goes, and that reading can cost frames the
+bench never loses. Measured in Chrome on the bench laptop (14 Nov 2026) with
+the app's own frame path and tracker, scored against the labels: clip 2
+(60 fps, portrait) lost about a quarter of its frames at normal speed and
+called 25 of 31 (the bench: 31). Reading the pixels another way
+(`createImageBitmap` into the worker, or a `VideoFrame`) lost the same
+frames, 26 and 27 of 31; reading none lost almost none. Clip 1 (30 fps) lost
+almost nothing.
+
+So an upload that loses a quarter of its frames now plays at half speed
+(`SLOW_RATE` in `workload.ts`) and says so under the progress bar: clip 2 then
+scored every frame and called 30 of 31, taking 5:20 for 2:40. A lighter loss
+gets the smaller picture as before, and the live camera is unchanged. Runs
+that slowed are marked `slowed` in the saved quality, so `/admin/tracker` data
+can say how often it happens on real phones.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

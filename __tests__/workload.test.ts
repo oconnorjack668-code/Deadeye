@@ -63,6 +63,62 @@ describe('createWorkload', () => {
   });
 });
 
+describe('createWorkload for an upload (slowFirst)', () => {
+  /** Frames 100ms apart: each one after the first counts as a skip. */
+  const falling = (w: ReturnType<typeof createWorkload>, from: number, count: number) => {
+    for (let i = 0; i < count; i++) {
+      const t = from + i * 100;
+      if (w.wants(t)) w.scored(t);
+    }
+  };
+  /** Frames at 30 a second, none skipped. */
+  const keeping = (w: ReturnType<typeof createWorkload>, from: number, count: number) => {
+    for (let i = 0; i < count; i++) {
+      const t = from + (i * 1000) / 30;
+      if (w.wants(t)) w.scored(t);
+    }
+  };
+
+  it('slows the clip, keeping the full picture, when a quarter of frames are lost', () => {
+    const w = createWorkload({ slowFirst: true });
+    // Eight skips
+    falling(w, 0, 9);
+    expect(w.slowed()).toBe(true);
+    expect(w.canvas()).toBe(CANVAS_LEVELS[0]);
+  });
+
+  it('answers a few lost frames with a smaller picture at the end of the window, not a slower clip', () => {
+    const w = createWorkload({ slowFirst: true });
+    // Four skips, then a clean run to fill the window
+    falling(w, 0, 5);
+    expect(w.canvas()).toBe(CANVAS_LEVELS[0]);
+    keeping(w, 500, 30);
+    expect(w.slowed()).toBe(false);
+    expect(w.canvas()).toBe(CANVAS_LEVELS[1]);
+  });
+
+  it('still steps the picture down if frames are lost once slowed', () => {
+    const w = createWorkload({ slowFirst: true });
+    falling(w, 0, 9);
+    falling(w, 900, 4);
+    expect(w.slowed()).toBe(true);
+    expect(w.canvas()).toBe(CANVAS_LEVELS[1]);
+  });
+
+  it('never slows a live camera: it gives a smaller picture at once, as before', () => {
+    const w = createWorkload();
+    falling(w, 0, 5);
+    expect(w.slowed()).toBe(false);
+    expect(w.canvas()).toBe(CANVAS_LEVELS[1]);
+  });
+
+  it('does not slow a clip it is keeping up with', () => {
+    const w = createWorkload({ slowFirst: true });
+    keeping(w, 0, 300);
+    expect(w.slowed()).toBe(false);
+  });
+});
+
 describe('isRepeat', () => {
   const frame = (seed: number) => {
     const f = new Uint8ClampedArray(64 * 64 * 4);

@@ -45,6 +45,42 @@ const WINDOW = 30;
 /** Clean frames in a row after which the work steps back up a level. */
 const CALM_TO_STEP_UP = 300;
 
+/**
+ * The speed an uploaded clip drops to when frames are going unscored.
+ *
+ * Slowing the clip was dropped once (see above) because it was always on. It
+ * comes back as the first answer to falling behind on an upload, and only
+ * then, because the frames lost are not this code's to win back. Measured in
+ * Chrome on the bench laptop (14 Nov 2026), playing clip 2 (60 fps, portrait)
+ * at full speed lost about a quarter of the frames however they were read out
+ * of the video - on the main thread, through createImageBitmap in a worker, or
+ * as a VideoFrame - and the calls fell from 31 of 31 to 25-27. Reading pixels
+ * back from the graphics chip is what costs them: with no reading at all the
+ * same playback lost almost none. At half speed every frame arrived and it
+ * called 30 of 31; at three quarters it still lost them. A smaller picture
+ * does not help here, since the cost is the reading, not the pixel work.
+ */
+export const SLOW_RATE = 0.5;
+
+/**
+ * Skipped frames, within the last WINDOW scored, that slow an upload: a
+ * quarter of them, which is what clip 2 lost at full speed. Fewer get the
+ * smaller picture as before. At SKIPS_TO_STEP_DOWN a laptop that keeps up
+ * with a 30 fps clip slowed it during one busy moment, doubling the time to
+ * check it for nothing.
+ */
+const SKIPS_TO_SLOW = 8;
+
+export interface WorkloadOptions {
+  /**
+   * Answer a heavy loss of frames (SKIPS_TO_SLOW) by asking for the clip to
+   * be played slower (`slowed()`), keeping the full picture; a lighter loss
+   * still gets the smaller picture, decided once a whole window has gone by.
+   * For an uploaded clip, which can be slowed; a live camera cannot.
+   */
+  slowFirst?: boolean;
+}
+
 export interface Workload {
   /**
    * Whether a frame presented at this clip time should be scored at all.
@@ -57,11 +93,14 @@ export interface Workload {
   canvas(): number;
   /** Frames estimated to have gone unscored so far. */
   skipped(): number;
+  /** The clip should now play at SLOW_RATE: see WorkloadOptions.slowFirst. Once set, it stays set. */
+  slowed(): boolean;
 }
 
-export function createWorkload(): Workload {
+export function createWorkload(options: WorkloadOptions = {}): Workload {
   let last: number | null = null;
   let level = 0;
+  let slowed = false;
   let skipped = 0;
   let calm = 0;
   // 1 for each recent scored frame that followed a skip, newest last
@@ -89,7 +128,14 @@ export function createWorkload(): Workload {
       }
       recent.push(skip ? 1 : 0);
       if (recent.length > WINDOW) recent.shift();
-      if (recent.reduce((n, s) => n + s, 0) >= SKIPS_TO_STEP_DOWN && level < CANVAS_LEVELS.length - 1) {
+      const skips = recent.reduce((n, s) => n + s, 0);
+      // An upload not yet slowed waits for a whole window before taking the
+      // smaller picture, so that a heavy loss can reach SKIPS_TO_SLOW first
+      const deciding = options.slowFirst && !slowed;
+      if (deciding && skips >= SKIPS_TO_SLOW) {
+        slowed = true;
+        recent.length = 0;
+      } else if (skips >= SKIPS_TO_STEP_DOWN && (!deciding || recent.length >= WINDOW) && level < CANVAS_LEVELS.length - 1) {
         level++;
         recent.length = 0;
       } else if (calm >= CALM_TO_STEP_UP && level > 0) {
@@ -99,6 +145,7 @@ export function createWorkload(): Workload {
     },
     canvas: () => CANVAS_LEVELS[level],
     skipped: () => skipped,
+    slowed: () => slowed,
   };
 }
 
