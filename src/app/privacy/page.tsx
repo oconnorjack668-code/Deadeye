@@ -296,6 +296,10 @@ export default function PrivacyPage() {
             4.0), &ldquo;Basketball Shot Tracking&rdquo; (CC BY 4.0) and &ldquo;basketball-computer-vision&rdquo;
             (public domain). Thank you to their authors.
           </p>
+          <p>
+            Uploaded clips are read on your phone with MP4Box.js (BSD 3-Clause, copyright 2012 Telecom ParisTech/TSI/MM/GPAC
+            Cyril Concolato).
+          </p>
         </section>
 
         {contactEmail && (

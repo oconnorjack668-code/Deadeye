@@ -56,6 +56,8 @@ export interface RunQuality {
   locked?: boolean;
   /** Upload: the clip was slowed to half speed because frames were going unscored (workload.ts SLOW_RATE). */
   slowed?: boolean;
+  /** Upload: every frame was decoded and scored, not played (clipDecoder.ts). */
+  decoded?: boolean;
 }
 
 export interface DeviceClass {
