@@ -129,6 +129,9 @@ function edgesOfRim(rim: Rim): [Point, Point] {
 /** After a drill is done, how long the last call stays up before review. */
 const DRILL_END_MS = 1500;
 
+/** Live camera: bitmaps that may be in the making at once (see scoreFrame). */
+const MAX_CAPTURES = 2;
+
 const CALM: HealthReading = { ball: false, issues: [], fps: null };
 
 export function ShotTracker({
@@ -827,6 +830,10 @@ export function ShotTracker({
     workloadRef.current = workload;
     setSlowedDown(false);
     let lastSignature: Uint8Array | null = null;
+    // Bitmaps being made from frames, and the chain that hands them over in
+    // order: see scoreFrame
+    let capturing = 0;
+    let captures: Promise<void> = Promise.resolve();
     // Built on the first frame with real dimensions: videoWidth is 0 until
     // metadata loads, and the crop and the expected ball size come from it
     let engine: TrackerEngine | null = null;
@@ -931,6 +938,39 @@ export function ShotTracker({
       cropSideRef.current = crop.side;
       const px = workload.canvas();
       if (minCanvasRef.current === null || px < minCanvasRef.current) minCanvasRef.current = px;
+      // The live camera hands the worker the crop as a bitmap the graphics
+      // chip has already cut and shrunk, so this thread does not stop to read
+      // the frame back (trackerEngine.ts). Not uploads: a clip can show a
+      // frame twice, and spotting that needs the pixels here, before the
+      // workload counts the frame (see the repeat check below). A camera
+      // never repeats one.
+      if (source === 'camera' && engine.takesBitmaps()) {
+        // Two may be in the making at once: with one, the next frame often
+        // arrived before the last bitmap was ready and went unscored (about
+        // two frames a second fewer on the bench laptop's fake camera)
+        if (capturing >= MAX_CAPTURES) return;
+        capturing++;
+        const engineNow = engine;
+        const made = createImageBitmap(video, crop.sx, crop.sy, crop.side, crop.side, { resizeWidth: px, resizeHeight: px, resizeQuality: 'low' });
+        // Handed over strictly in the order the frames came: the tracker
+        // compares each frame with the ones before it
+        captures = captures.then(() =>
+          made.then(
+            (bitmap) => {
+              capturing--;
+              if (run !== runRef.current || stopRef.current || engineRef.current !== engineNow) {
+                bitmap.close();
+                return;
+              }
+              workload.scored(now);
+              engineNow.pushBitmap(bitmap, px, now);
+            },
+            // The frame was not ready to read: it goes unscored, as a skip
+            () => void capturing--
+          )
+        );
+        return;
+      }
       const canvas = cropCanvasRef.current;
       if (!canvas) return;
       if (canvas.width !== px) {

@@ -11,6 +11,9 @@ const scope = self as unknown as {
 };
 
 let pipeline: TrackerPipeline | null = null;
+// Where a bitmap from the main thread is drawn to read its pixels back
+let canvas: OffscreenCanvas | null = null;
+let ctx: OffscreenCanvasRenderingContext2D | null = null;
 
 scope.onmessage = (e) => {
   const msg = e.data;
@@ -20,6 +23,21 @@ scope.onmessage = (e) => {
     } else if (msg.type === 'frame') {
       if (!pipeline) return;
       const result = pipeline.frame(new Uint8ClampedArray(msg.buffer), msg.px, msg.t);
+      scope.postMessage({ type: 'frame', result });
+    } else if (msg.type === 'bitmap') {
+      if (!pipeline) {
+        msg.bitmap.close();
+        return;
+      }
+      if (!canvas || canvas.width !== msg.px) {
+        canvas = new OffscreenCanvas(msg.px, msg.px);
+        ctx = canvas.getContext('2d', { willReadFrequently: true });
+      }
+      if (!ctx) throw new Error('No 2d context for bitmaps');
+      ctx.drawImage(msg.bitmap, 0, 0);
+      msg.bitmap.close();
+      const pixels = ctx.getImageData(0, 0, msg.px, msg.px).data;
+      const result = pipeline.frame(pixels, msg.px, msg.t);
       scope.postMessage({ type: 'frame', result });
     } else if (msg.type === 'finish') {
       scope.postMessage({ type: 'finished', shots: pipeline?.finish() ?? [] });
