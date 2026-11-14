@@ -176,14 +176,10 @@ describe('rows', () => {
     expect(toClip({ ...ROW, end_s: 10 })).toBeNull();
   });
 
-  it('opens a free clip for all, a Pro clip with Pro, and any clip a coach set or in a free pack', () => {
+  it('opens every clip and pack for everyone: film is never part of Pro (YouTube III.F.3.a)', () => {
     expect(opensFor({ isFree: true }, false)).toBe(true);
-    expect(opensFor({ isFree: false }, false)).toBe(false);
-    expect(opensFor({ isFree: false }, true)).toBe(true);
-    expect(opensFor({ isFree: false }, false, true)).toBe(true);
-    expect(opensFor({ isFree: false }, false, false, true)).toBe(true);
-    expect(packOpensFor({ is_free: false, owner_id: null }, false)).toBe(false);
-    expect(packOpensFor({ is_free: false, owner_id: null }, false, true)).toBe(true);
+    expect(opensFor({ isFree: false }, false)).toBe(true);
+    expect(packOpensFor({ is_free: false, owner_id: null }, false)).toBe(true);
     expect(packOpensFor({ is_free: false, owner_id: 'coach' }, false)).toBe(true);
   });
 

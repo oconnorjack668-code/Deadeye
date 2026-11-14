@@ -73,14 +73,12 @@ describe('submitFilmAttempt', () => {
     ]);
   });
 
-  it('refuses a Pro clip on Free unless the coach set it', async () => {
+  it('takes answers on any clip on Free: film is never part of Pro (YouTube III.F.3.a)', async () => {
     db.state.tables.film_clips = [row(false)];
     const picks = [
       { key: 'q1', pick: 0 },
       { key: 'q2', pick: 1 },
     ];
-    expect(await submitFilmAttempt(CLIP, picks)).toEqual({ ok: false, error: 'This clip is part of Pro.' });
-    db.state.tables.team_assignments = [{ id: 'a1', film_clip_id: CLIP }];
     expect(await submitFilmAttempt(CLIP, picks)).toEqual({ ok: true, score: 2, total: 2 });
   });
 

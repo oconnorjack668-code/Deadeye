@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS public.film_clips (
   questions jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (
     jsonb_typeof(questions) = 'array' AND jsonb_array_length(questions) <= 10 AND octet_length(questions::text) <= 20000
   ),
-  is_free boolean NOT NULL DEFAULT false,
+  is_free boolean NOT NULL DEFAULT true, -- film is never part of Pro (YouTube Developer Policies III.F.3.a)
   -- null while the owner is still working on it; players never see a draft
   published_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS public.film_packs (
   slug text CHECK (slug IS NULL OR slug ~ '^[a-z0-9]+(-[a-z0-9]+)*$'),
   title text NOT NULL CHECK (char_length(title) BETWEEN 1 AND 80),
   description text NOT NULL DEFAULT '' CHECK (char_length(description) <= 400),
-  is_free boolean NOT NULL DEFAULT false,
+  is_free boolean NOT NULL DEFAULT true, -- film is never part of Pro (YouTube Developer Policies III.F.3.a)
   -- library packs only: null until the owner publishes it
   published_at timestamptz,
   created_at timestamptz NOT NULL DEFAULT now(),

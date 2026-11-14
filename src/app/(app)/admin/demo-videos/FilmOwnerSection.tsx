@@ -94,9 +94,6 @@ export async function FilmOwnerSection({ show, edit }: { show: 'film' | 'packs';
                 ))}
               </fieldset>
               <label className="flex items-center gap-2 text-sm text-zinc-300">
-                <input type="checkbox" name="is_free" defaultChecked={p.is_free} className="h-5 w-5" /> Free
-              </label>
-              <label className="flex items-center gap-2 text-sm text-zinc-300">
                 <input type="checkbox" name="published" defaultChecked={!!p.published_at} className="h-5 w-5" /> Published
               </label>
               <button type="submit" className="h-11 rounded-lg bg-orange-600 px-4 text-sm font-semibold text-white hover:brightness-110">
@@ -150,8 +147,7 @@ export async function FilmOwnerSection({ show, edit }: { show: 'film' | 'packs';
                     {c.title}
                   </span>
                   <span className="block text-xs text-zinc-500">
-                    {themeLabel(c.theme)} · {formatClock(c.start_s)} to {formatClock(c.end_s)} · {c.is_free ? 'Free' : 'Pro'}
-                    {c.published_at ? '' : ' · Draft'}
+                    {themeLabel(c.theme)} · {formatClock(c.start_s)} to {formatClock(c.end_s)}                    {c.published_at ? '' : ' · Draft'}
                   </span>
                 </span>
                 <span className="text-xs text-zinc-400">Edit</span>

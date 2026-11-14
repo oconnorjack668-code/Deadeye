@@ -46,31 +46,27 @@ async function playChoices(supabase: Awaited<ReturnType<typeof createClient>>, u
 
 /**
  * The film a coach can set: their own packs, published library packs, then
- * published clips. On Free, Pro clips and Pro library packs are listed but
- * locked (the 00062 trigger refuses them too); a coach pack is locked when it
- * holds a Pro clip. Empty before 00062 has run.
+ * published clips. Film is never part of Pro (see opensFor), so nothing is
+ * locked. Empty before 00062 has run.
  */
-async function filmChoices(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, isPro: boolean): Promise<FilmChoice[]> {
+async function filmChoices(supabase: Awaited<ReturnType<typeof createClient>>, userId: string): Promise<FilmChoice[]> {
   const [{ data: packs }, { data: clips }] = await Promise.all([
     supabase.from('film_packs').select('id, title, owner_id, is_free').or(`owner_id.eq.${userId},owner_id.is.null`).order('title'),
     supabase.from('film_clips').select('id, title, is_free').order('title'),
   ]);
-  const proClips = new Set((clips ?? []).filter((c) => !c.is_free).map((c) => c.id));
   const own = (packs ?? []).filter((p) => p.owner_id === userId);
-  const { data: ownClips } = own.length
-    ? await supabase.from('film_pack_clips').select('pack_id, clip_id').in('pack_id', own.map((p) => p.id))
-    : { data: [] as Array<{ pack_id: string; clip_id: string }> };
   const choices: FilmChoice[] = own.map((p) => ({
     id: p.id,
     kind: 'pack' as const,
     title: p.title,
     group: 'Your packs' as const,
-    locked: !isPro && (ownClips ?? []).some((c) => c.pack_id === p.id && proClips.has(c.clip_id)),
+    // Film is never part of Pro (YouTube Developer Policies III.F.3.a; see opensFor)
+    locked: false,
   }));
   for (const p of packs ?? []) {
-    if (p.owner_id === null) choices.push({ id: p.id, kind: 'pack', title: p.title, group: 'Library packs', locked: !p.is_free && !isPro });
+    if (p.owner_id === null) choices.push({ id: p.id, kind: 'pack', title: p.title, group: 'Library packs', locked: false });
   }
-  for (const c of clips ?? []) choices.push({ id: c.id, kind: 'clip', title: c.title, group: 'Clips', locked: !c.is_free && !isPro });
+  for (const c of clips ?? []) choices.push({ id: c.id, kind: 'clip', title: c.title, group: 'Clips', locked: false });
   return choices;
 }
 
@@ -99,7 +95,7 @@ export default async function CoachAssignmentsPage({
       supabase.from('team_assignments').select('*').in('team_id', teamIds).order('created_at', { ascending: false }).limit(60),
       supabase.from('team_members').select('team_id, user_id').in('team_id', teamIds).eq('role', 'player'),
       playChoices(supabase, user.id, teamIds),
-      getHasPro().then((isPro) => filmChoices(supabase, user.id, isPro)),
+      filmChoices(supabase, user.id),
     ]);
     plays = choices;
     film = filmList;

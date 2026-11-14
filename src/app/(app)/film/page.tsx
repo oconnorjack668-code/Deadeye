@@ -16,7 +16,7 @@ import { cleanSearch } from '@/lib/search';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { IqTabs } from '@/components/study/IqTabs';
-import { ProBadge, ProNote } from '@/components/ProGate';
+import { ProBadge } from '@/components/ProGate';
 import { FilmFromYourCoach } from '@/components/film/FilmFromYourCoach';
 import { coachFilmFor, doneClipIds } from '@/lib/film/access';
 import { FILM_LEVELS, FILM_THEMES, isFilmLevel, isFilmTheme, levelLabel } from '@/lib/film/catalog';
@@ -106,7 +106,6 @@ export default async function FilmPage({ searchParams }: { searchParams: Promise
   const coachClipIds = new Set([...fromCoach.clips.map((a) => a.clip.id), ...fromCoach.packs.flatMap((a) => a.clipIds)]);
   const freePackClipIds = new Set(packs.filter((p) => p.is_free).flatMap((p) => clipsOf(p.id)));
   const groups = groupByTheme(filterClips(all, filters, saved));
-  const freeCount = all.filter((c) => c.isFree).length;
   const filtered = !!(filters.theme || filters.level || filters.q || filters.saved);
   const going = continuePacks(
     [
@@ -204,12 +203,6 @@ export default async function FilmPage({ searchParams }: { searchParams: Promise
                   ))}
                 </nav>
               </div>
-
-              {!isPro && freeCount > 0 && (
-                <ProNote>
-                  {freeCount === 1 ? '1 clip is free' : `${freeCount} clips are free`}, and so are the free packs. Every clip in the library is part of Pro.
-                </ProNote>
-              )}
 
               {!filtered && shownPacks.length > 0 && (
                 <section aria-labelledby="film-packs">

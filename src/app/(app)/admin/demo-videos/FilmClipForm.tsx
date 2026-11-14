@@ -1,6 +1,6 @@
 // src/app/(app)/admin/demo-videos/FilmClipForm.tsx
 // Owner tool: add or edit one film clip. A YouTube link, the start and end,
-// the title and channel, theme and level, Free or Pro, and the questions,
+// the title and channel, theme and level, and the questions,
 // each stopping the clip at its own moment. Saving asks YouTube whether the
 // video may play inside other sites first (filmActions.ts). The owner also
 // checks the video is not "Made for Kids" (YouTube API policy III.E.4.j).
@@ -222,9 +222,6 @@ export function FilmClipForm({ initial }: { initial: FilmClipFormValues }) {
         )}
       </fieldset>
 
-      <label className="flex items-center gap-2 text-sm text-zinc-300">
-        <input type="checkbox" checked={v.isFree} onChange={(e) => set('isFree', e.target.checked)} className="h-5 w-5" /> Free (everyone can open it; otherwise Pro)
-      </label>
       <label className="flex items-center gap-2 text-sm text-zinc-300">
         <input type="checkbox" checked={v.published} onChange={(e) => set('published', e.target.checked)} className="h-5 w-5" /> Published (players can see it)
       </label>

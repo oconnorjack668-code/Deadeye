@@ -73,18 +73,20 @@ export function parseClock(text: string): number | null {
 }
 
 /**
- * A free clip opens for everyone and the rest with Pro. Film from the
- * player's coach (a clip set for their team, or in a pack set for it) always
- * opens, and so does a clip in a free library pack: team work is never behind
- * a paywall (plan section 7), and a free pack means its clips.
+ * Every clip opens for everyone. The clips play in YouTube's embedded player,
+ * and YouTube's Developer Policies (III.F.3.a) do not allow charging people to
+ * watch content in it, so film is never part of Pro (founder, 14 Nov 2026).
+ * The parameters stay so the callers read the same if that ever changes.
  */
-export function opensFor(clip: Pick<FilmClip, 'isFree'>, isPro: boolean, fromCoach = false, inFreePack = false): boolean {
-  return clip.isFree || isPro || fromCoach || inFreePack;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function opensFor(clip: Pick<FilmClip, 'isFree'>, isPro: boolean, fromCoach?: boolean, inFreePack?: boolean): boolean {
+  return true;
 }
 
-/** A library pack opens when it is free or with Pro; a pack from the coach always does. */
-export function packOpensFor(pack: { is_free: boolean; owner_id: string | null }, isPro: boolean, fromCoach = false): boolean {
-  return pack.is_free || isPro || fromCoach || pack.owner_id !== null;
+/** Every pack opens for everyone, for the same reason as opensFor. */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function packOpensFor(pack: { is_free: boolean; owner_id: string | null }, isPro: boolean, fromCoach?: boolean): boolean {
+  return true;
 }
 
 export interface FilmFilters {

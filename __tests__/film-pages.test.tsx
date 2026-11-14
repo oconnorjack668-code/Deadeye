@@ -102,16 +102,16 @@ const renderFilm = async (params: Record<string, string> = {}) => render(await F
 const renderClip = async (clipId: string) => render(await FilmClipPage({ params: Promise.resolve({ id: clipId }) }));
 
 describe('/film', () => {
-  it('lists clips by theme, tags Pro clips on Free, and opens clips in a free pack', async () => {
+  it('lists clips by theme with no Pro tags on Free: film is never part of Pro', async () => {
     await renderFilm();
     expect(screen.getByRole('heading', { name: 'Spacing' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Help defence' })).toBeTruthy();
     const pro = screen.getByRole('link', { name: /Spacing on the drive/ });
-    expect(within(pro).getByText('Pro')).toBeTruthy();
+    expect(within(pro).queryByText('Pro')).toBeNull();
     expect(within(screen.getByRole('link', { name: /Reading the hedge/ })).queryByText('Pro')).toBeNull();
     expect(within(screen.getByRole('link', { name: /Help from the gap/ })).queryByText('Pro')).toBeNull();
     expect(screen.getByRole('link', { name: /Start here/ }).getAttribute('href')).toBe(`/film/packs/${PACK}`);
-    expect(screen.getByText(/1 clip is free, and so are the free packs/)).toBeTruthy();
+    expect(screen.queryByText(/clips? (is|are) free/)).toBeNull();
     expect(screen.queryByText('Clips are on the way')).toBeNull();
   });
 
@@ -146,11 +146,11 @@ describe('/film', () => {
 });
 
 describe('/film/[id]', () => {
-  it('locks a Pro clip on Free: no video, no notes', async () => {
+  it('opens a clip once marked Pro on Free: film is never part of Pro (YouTube III.F.3.a)', async () => {
     await renderClip(PRO);
-    expect(screen.getByText('This clip is part of Pro')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /Play video/ })).toBeNull();
-    expect(screen.queryByLabelText('Your notes')).toBeNull();
+    expect(screen.queryByText('This clip is part of Pro')).toBeNull();
+    expect(screen.getByRole('button', { name: /Play video/ })).toBeTruthy();
+    expect(screen.getByLabelText('Your notes')).toBeTruthy();
   });
 
   it('opens a Pro clip with Pro: the tap card, where it is from, save and private notes', async () => {
@@ -202,10 +202,10 @@ describe('/film/packs/[id]', () => {
     expect(items.map((li) => li.textContent)).toEqual([expect.stringMatching(/^1Help from the gap.*Done/), expect.stringMatching(/^2Reading the hedge/)]);
   });
 
-  it('locks a Pro library pack on Free', async () => {
+  it('opens a library pack once marked Pro on Free', async () => {
     render(await FilmPackPage({ params: Promise.resolve({ id: PRO_PACK }) }));
-    expect(screen.getByText('This pack is part of Pro')).toBeTruthy();
-    expect(screen.queryByRole('link', { name: /Spacing on the drive/ })).toBeNull();
+    expect(screen.queryByText('This pack is part of Pro')).toBeNull();
+    expect(screen.getByRole('link', { name: /Spacing on the drive/ })).toBeTruthy();
   });
 });
 

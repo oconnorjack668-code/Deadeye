@@ -36,7 +36,7 @@ export async function saveFilmClip(draft: ClipDraft): Promise<SaveClipResult> {
     theme: clip.theme,
     level: clip.level,
     questions: clip.questions as unknown as Json,
-    is_free: clip.isFree,
+    is_free: true, // film is never part of Pro (see opensFor)
     updated_at: now,
   };
 
@@ -85,7 +85,7 @@ export async function saveLibraryPack(formData: FormData): Promise<void> {
     .update({
       title,
       description,
-      is_free: formData.get('is_free') === 'on',
+      is_free: true, // film is never part of Pro (see opensFor)
       published_at: published ? (pack.published_at ?? new Date().toISOString()) : null,
       updated_at: new Date().toISOString(),
     })

@@ -16,8 +16,8 @@
 //   coach plays         FREE_COACH_PLAYS, playbook teams FREE_PLAYBOOK_TEAMS and
 //                       PRO_PLAYBOOK_TEAMS in src/lib/plays/limits.ts, enforced by
 //                       the 00061 triggers (a test checks the numbers match)
-//   free film           film_clips.is_free and film_packs.is_free (00062), set in
-//                       Owner tools; film a coach sets always opens
+//   film                every clip and pack is free (opensFor in src/lib/film/rows.ts):
+//                       YouTube does not allow charging to watch embedded video
 //   drills              DRILL_COUNT below, checked against the migrations by a test
 //
 // The thinking behind the split: Free keeps everything that brings players in
@@ -49,7 +49,7 @@ export const FREE_PLAN: Plan = {
     '4 complete training programs, including Basketball Strength Foundations',
     'Basketball IQ: the question of the day and the first 3 sections',
     'The free plays in the library with a quiz on your role, and every play your coach sets',
-    'The free film clips and packs, and every clip your coach sets',
+    'Every film clip in the library, each stopping to ask you the right read',
     'Your shot chart for the last 30 days',
     `${FREE_MONTHLY_AI_REPORTS} AI coaching reports a month and ${FREE_CHAT_PER_DAY} questions to the coach a day`,
     'Friends, leaderboard, challenges, badges and highlight reels',
@@ -67,7 +67,6 @@ export const PRO_PLAN: Plan = {
     'Every training program, built around a goal or your position',
     'Every Basketball IQ section, with all lessons and quizzes',
     'Every play in the library, each with a quiz on your role',
-    'Every film clip and pack in the library',
     'Your all-time shot chart, and how your form changes over time',
     'An AI development plan from your NBA style match',
     'Coach up to 10 teams from one coach home',
