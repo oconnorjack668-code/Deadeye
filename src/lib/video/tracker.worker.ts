@@ -58,6 +58,7 @@ scope.onmessage = (e) => {
         stopped: () => stopDecoding || pipeline !== run,
         onFrame: (pixels, px, t) => scope.postMessage({ type: 'frame', result: run.frame(pixels, px, t) }),
         onProgress: (t, durationMs) => scope.postMessage({ type: 'decode-progress', t, durationMs }),
+        onStage: (stage) => scope.postMessage({ type: 'decode-stage', stage }),
       })
         .then((done) => scope.postMessage({ type: 'decoded', frames: done.frames, durationMs: done.durationMs }))
         .catch((err) =>

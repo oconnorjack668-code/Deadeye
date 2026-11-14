@@ -39,6 +39,7 @@ export type FromWorker =
   | { type: 'frame'; result: PipelineFrame }
   | { type: 'finished'; shots: DetectedShot[] }
   | { type: 'decode-progress'; t: number; durationMs: number }
+  | { type: 'decode-stage'; stage: string }
   | { type: 'decoded'; frames: number; durationMs: number }
   | { type: 'decode-failed'; message: string; frames: number }
   | { type: 'failed'; message: string };
@@ -70,6 +71,8 @@ export interface TrackerEngine {
 
 export interface DecodeEvents {
   onProgress(t: number, durationMs: number): void;
+  /** A step of the decode was reached for the first time (clipDecoder.ts onStage). */
+  onStage?(stage: string): void;
   /** Every frame has been scored. */
   onDone(frames: number, durationMs: number): void;
   /** It could not decode the clip; `frames` were scored before it stopped. */
@@ -163,6 +166,8 @@ export function createEngine(config: PipelineConfig, onFrame: (r: PipelineFrame)
       finishing = null;
     } else if (msg.type === 'decode-progress') {
       decoding?.onProgress(msg.t, msg.durationMs);
+    } else if (msg.type === 'decode-stage') {
+      decoding?.onStage?.(msg.stage);
     } else if (msg.type === 'decoded') {
       decoding?.onDone(msg.frames, msg.durationMs);
       decoding = null;
