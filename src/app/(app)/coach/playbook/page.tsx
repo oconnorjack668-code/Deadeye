@@ -7,6 +7,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ChevronRight, Pencil, Plus } from 'lucide-react';
 import { requireUser, getHasPro } from '@/lib/auth';
+import { filmOpenForMe } from '@/lib/film/live';
 import { createClient } from '@/lib/supabase/server';
 import { ProNote } from '@/components/ProGate';
 import { RemoveFromPlaybookButton } from '@/components/plays/RemoveFromPlaybookButton';
@@ -41,7 +42,9 @@ export default async function PlaybookPage() {
   const canDraw = canDrawAnother(mine.length, isPro);
   // Favourite clips are the saved ones; packs are built from them (00062).
   // Both read as empty before that migration runs.
-  const [{ data: packs }, { data: favourites }] = isCoach
+  // Film shows here only once it is open (src/lib/film/live.ts)
+  const filmOpen = await filmOpenForMe();
+  const [{ data: packs }, { data: favourites }] = isCoach && filmOpen
     ? await Promise.all([
         supabase.from('film_packs').select('id, title').eq('owner_id', user.id).order('updated_at', { ascending: false }),
         supabase.from('film_saves').select('film_clips(id, title)').eq('user_id', user.id) as unknown as Promise<{
@@ -154,6 +157,7 @@ export default async function PlaybookPage() {
               )}
             </section>
 
+            {filmOpen && (
             <section aria-labelledby="film" className={`${card} space-y-3`}>
               <h2 id="film" className={sectionLabel}>
                 Film
@@ -192,6 +196,7 @@ export default async function PlaybookPage() {
                 Browse film
               </Link>
             </section>
+            )}
           </>
         )}
       </div>

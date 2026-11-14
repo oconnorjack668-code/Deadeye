@@ -6,6 +6,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { getHasPro, requireUser } from '@/lib/auth';
+import { filmOpenForMe } from '@/lib/film/live';
 import { createClient } from '@/lib/supabase/server';
 import { assignmentProgress } from '@/lib/coachSide';
 import { userCalendarNow } from '@/lib/userTime';
@@ -95,7 +96,8 @@ export default async function CoachAssignmentsPage({
       supabase.from('team_assignments').select('*').in('team_id', teamIds).order('created_at', { ascending: false }).limit(60),
       supabase.from('team_members').select('team_id, user_id').in('team_id', teamIds).eq('role', 'player'),
       playChoices(supabase, user.id, teamIds),
-      filmChoices(supabase, user.id),
+      // Film is not set while it is closed (src/lib/film/live.ts)
+      filmOpenForMe().then((open) => (open ? filmChoices(supabase, user.id) : [])),
     ]);
     plays = choices;
     film = filmList;

@@ -30,6 +30,8 @@ vi.mock('next/link', () => ({
 vi.mock('@/lib/events', () => ({ track: () => undefined }));
 vi.mock('@/lib/supabase/client', () => ({ createClient: () => ({}) }));
 vi.mock('@/app/(app)/plays/actions', () => ({ savePlay: async () => ({ ok: true, id: 'x' }), deletePlay: async () => ({ ok: true }), submitQuizAttempt: async () => ({ ok: true }) }));
+// Film is open in these tests; film-live.test.ts covers it closed
+process.env.FILM_LIVE = 'true';
 vi.mock('@/lib/auth', () => ({
   requireUser: async () => ({ id: auth.id }),
   getHasPro: async () => auth.pro,

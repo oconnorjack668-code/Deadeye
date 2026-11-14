@@ -10,6 +10,8 @@ import { fakeClient, fakeState, type FakeState } from './support/supabaseFake';
 const auth = vi.hoisted(() => ({ user: { id: 'user-1' } as { id: string } | null, pro: false, owner: false, waiting: false }));
 const db = vi.hoisted(() => ({ state: null as unknown as FakeState, admin: null as unknown as FakeState }));
 
+// Film is open in these tests; film-live.test.ts covers it closed
+process.env.FILM_LIVE = 'true';
 vi.mock('next/cache', () => ({ revalidatePath: () => undefined }));
 vi.mock('@/lib/auth', () => ({
   getCurrentUser: async () => auth.user,

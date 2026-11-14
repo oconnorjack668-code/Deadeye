@@ -16,6 +16,7 @@ import { filmLimitMessage, MAX_NOTE } from '@/lib/film/limits';
 import { gradeFilm } from '@/lib/film/questions';
 import { FILM_CLIP_COLUMNS, opensFor, toClip, type FilmClipRow } from '@/lib/film/rows';
 import { coachAccess } from '@/lib/plays/access';
+import { FILM_NOT_OPEN, filmOpenForMe } from '@/lib/film/live';
 import { UUID_PATTERN } from '@/lib/plays/input';
 
 type Done = { ok: true } | { ok: false; error: string };
@@ -29,6 +30,7 @@ export async function submitFilmAttempt(clipId: string, picks: Array<{ key: stri
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: 'Please log in again.' };
   if (await awaitingParentApproval()) return { ok: false, error: PARENT_APPROVAL_NEEDED };
+  if (!(await filmOpenForMe())) return { ok: false, error: FILM_NOT_OPEN };
   if (typeof clipId !== 'string' || !UUID_PATTERN.test(clipId)) return { ok: false, error: 'That clip could not be found.' };
   const parsed = PicksSchema.safeParse(picks);
   if (!parsed.success) return { ok: false, error: 'Those answers could not be read. Try the clip again.' };
@@ -59,6 +61,7 @@ export async function saveFilmNote(clipId: string, body: string): Promise<Done> 
   const user = await getCurrentUser();
   if (!user) return { ok: false, error: 'Please log in again.' };
   if (await awaitingParentApproval()) return { ok: false, error: PARENT_APPROVAL_NEEDED };
+  if (!(await filmOpenForMe())) return { ok: false, error: FILM_NOT_OPEN };
   if (typeof clipId !== 'string' || !UUID_PATTERN.test(clipId) || typeof body !== 'string') return { ok: false, error: 'That note could not be saved.' };
   const text = body.trim();
   if (text.length > MAX_NOTE) return { ok: false, error: `Keep a note to ${MAX_NOTE} characters.` };
@@ -81,6 +84,7 @@ async function coachOnly(): Promise<{ ok: true; userId: string; supabase: Awaite
   const supabase = await createClient();
   const { isCoach } = await coachAccess(supabase, user.id);
   if (!isCoach) return { ok: false, error: filmLimitMessage('not_coach', '') };
+  if (!(await filmOpenForMe())) return { ok: false, error: FILM_NOT_OPEN };
   return { ok: true, userId: user.id, supabase };
 }
 
