@@ -97,6 +97,49 @@ when a better source arrives, rather than adding beside it.
   the prompt returning each launch. Test the camera from the home-screen icon
   on a real iPhone. [WebKit bug 215884](https://bugs.webkit.org/show_bug.cgi?id=215884), 2021, practitioner (bug report).
 
+### Third-party embeds (YouTube)
+
+- **Load a third-party player only after the tap (the facade pattern), and
+  use the privacy-preserving host:** "load the interactive iframe only after
+  the user clicks". The guide's own example still fetches the thumbnail from
+  YouTube's image host, which tells YouTube about the visit before any tap.
+  Deadeye: `TapToLoadYouTube` shows no thumbnail and no preconnect, so the
+  first request to YouTube or Google is the player itself, after the tap.
+  [Modern Web Guidance, privacy guide](https://github.com/GoogleChrome/modern-web-guidance), 2026, official (Chrome team).
+- **Player parameters: `cc_load_policy=1` shows captions by default; `start`
+  and `end` are whole seconds, both counted from the start of the video;
+  `autoplay=1` starts data sharing as soon as the player loads; on iOS the
+  default is fullscreen unless `playsinline=1`; the player must be at least
+  200 by 200 px.** Deadeye: `youtubeEmbedUrl(id, { start, end, captions,
+  autoplay })` builds every address; autoplay only after the tap; the frame
+  has `min-h-[200px]` because 16:9 inside a card on a phone is about 180px
+  tall. Film (F3) will want `playsinline=1` so the question stays in view.
+  [YouTube embedded player parameters](https://developers.google.com/youtube/player_parameters), revised 2023, official.
+- **The IFrame Player API: load `https://www.youtube.com/iframe_api`, wait
+  for `onYouTubeIframeAPIReady`, then `new YT.Player(existingIframe)` (the
+  iframe needs `enablejsapi=1` and `origin`). There is no time event: poll
+  `getCurrentTime()`. `seekTo(s, true)`; `setPlaybackRate` is only a
+  suggestion; `getAvailablePlaybackRates()` always includes 1; error 101/150
+  means embedding is off, 100 removed. The page does not document a
+  youtube-nocookie `host` option.** Deadeye: `FilmClipPlayer` builds the
+  nocookie iframe itself with `youtubeEmbedUrl(id, { jsApiOrigin })` and
+  attaches the API to it after the tap, polling every 250 ms (F3).
+  [IFrame Player API reference](https://developers.google.com/youtube/iframe_api_reference), checked 2026, official.
+- **YouTube API Developer Policies: do not modify, build upon or block any
+  part of the player (III.I.6) or obscure its attribution (III.F.2.c); look
+  up each embedded video's Made for Kids status and turn tracking off for
+  those (III.E.4.j); do not charge users to watch content in an embedded
+  player (III.F.3.a).** Deadeye: questions sit below the player, never on
+  it; the owner tool makes the owner tick a Made for Kids check; III.F.3.a
+  conflicts with Pro-locking clips and is raised to the founder (S28).
+  [YouTube API Services Developer Policies](https://developers.google.com/youtube/terms/developer-policies), checked 2026, official.
+- **oEmbed (`https://www.youtube.com/oembed?url=<watch url>&format=json`)
+  answers 200 for a public video that may be embedded, 401/403 when the
+  channel turned embedding off, 404 when private or removed.** Deadeye:
+  `checkEmbeddable` refuses anything but 200 before a clip is saved. Status
+  meanings are widely reported, not in an official spec page; the 200-only
+  rule is safe either way. [oEmbed spec](https://oembed.com/), 2008+, standard.
+
 ### Accessibility
 
 - **WCAG 2.2 AA: targets 24×24 CSS px (2.5.8), 44×44 (2.5.5) advised for

@@ -39,11 +39,46 @@ describe('isRealYoutubeId', () => {
 
 describe('youtubeEmbedUrl', () => {
   it('uses the no-cookie host, since the audience starts at 13', () => {
-    expect(youtubeEmbedUrl('dQw4w9WgXcQ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(youtubeEmbedUrl('dQw4w9WgXcQ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0');
   });
 
   it('trims whitespace from the stored id', () => {
-    expect(youtubeEmbedUrl(' dQw4w9WgXcQ ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ');
+    expect(youtubeEmbedUrl(' dQw4w9WgXcQ ')).toBe('https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0');
+  });
+});
+
+describe('youtubeEmbedUrl options', () => {
+  const id = 'dQw4w9WgXcQ';
+  const base = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ';
+
+  it('only turns off other channels suggestions when no option is set', () => {
+    expect(youtubeEmbedUrl(id, {})).toBe(base + '?rel=0');
+  });
+
+  it('turns captions on and plays after the tap', () => {
+    const url = new URL(youtubeEmbedUrl(id, { captions: true, autoplay: true }));
+    expect(url.origin + url.pathname).toBe(base);
+    expect(url.searchParams.get('cc_load_policy')).toBe('1');
+    expect(url.searchParams.get('autoplay')).toBe('1');
+  });
+
+  it('starts and ends a clip at whole seconds', () => {
+    const url = new URL(youtubeEmbedUrl(id, { start: 42.9, end: 61.2 }));
+    expect(url.searchParams.get('start')).toBe('42');
+    expect(url.searchParams.get('end')).toBe('61');
+  });
+
+  it('leaves out a start or end that makes no sense', () => {
+    expect(youtubeEmbedUrl(id, { start: -5, end: Number.NaN })).toBe(base + '?rel=0');
+    expect(youtubeEmbedUrl(id, { start: 0 })).toBe(base + '?rel=0');
+    // An end at or before the start would play nothing
+    expect(youtubeEmbedUrl(id, { start: 30, end: 30 })).toBe(base + '?rel=0&start=30');
+    expect(youtubeEmbedUrl(id, { start: 30, end: 10 })).toBe(base + '?rel=0&start=30');
+  });
+
+  it('never leaves the no-cookie host, whatever the options', () => {
+    const url = new URL(youtubeEmbedUrl(id, { start: 5, end: 9, captions: true, autoplay: true }));
+    expect(url.hostname).toBe('www.youtube-nocookie.com');
   });
 });
 

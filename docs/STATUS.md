@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-14 (S34 closed: Focus Finder follow-ups live, #110)
+Last updated: 2026-11-14 (Film and Plays merged in: S36; S34 closed: Focus Finder follow-ups live, #110)
 
 ## Rules
 
@@ -52,6 +52,7 @@ Last updated: 2026-11-14 (S34 closed: Focus Finder follow-ups live, #110)
 | S25 | First runs of the new agents. Done: designer (reviewed S8, `docs/agent-os/design/2026-11-13-tracker-s8-review.md`, on main); player-outreach plan `docs/agent-os/outreach/2026-11-13-outreach.md` and qa-tester run `docs/agent-os/qa/2026-11-13-qa.md` (10 of 10 tested steps passed on `e330a94`, 2 P3s: slow sample-clip load, Today's 32px nested buttons; leave the Chrome window restored next run), both on main since PR #97. Left: exams (S12). | Lead | 2026-11-11 | 2026-11-13: all three have run |
 | S32 | Trend board TikTok gap. Done 13 Nov: `docs/agent-os/trends/ads.md` filled from marketing's scan (written in by the lead on the founder's word; the agent's write was blocked by the older guard in the main checkout, fixed once the main checkout is pulled) plus the Meta Ad Library, Ireland, read in a browser. Left: TikTok Creative Center (Top Ads, Trend Discovery) needs a TikTok for Business login; the founder logs in (free) and pastes UK Trend Discovery, Sports, 7 days, or marketing keeps working without it. | Founder | 2026-11-13 | 2026-11-13: board written; TikTok login gap |
 | S33 | FDYS poster (outreach plan, route 3): safety-reviewer reads it before it is printed: QR to the plain address only, no identifiable under-18s. Not drafted yet (designer). | Designer, then safety-reviewer | 2026-11-13 | 2026-11-13: poster not made |
+| S36 | Film and Plays (`docs/plans/film-and-plays.md`, PRs #101-#109 and the F4 branch): **Plays** (36 library plays, editor, role quiz, team playbook, assigning) is live for everyone once merged. **Film** (39 starter clips, all free; YouTube does not allow charging for embedded video) is closed to players until `FILM_LIVE=true` is set in Vercel; the owner can always open it. Founder: (1) sign the DPIA (S1; rows for plays and film, YouTube as a recipient, R12, R13 added 14 Nov), then set `FILM_LIVE=true` and redeploy; (2) before that, open a few clips as owner and check end screens and in-video promos (Championship Productions clips promote DVDs; PGC clips promote courses) and swap any you dislike in Owner tools; (3) check the plays are basketball-correct (sideline plays name the inbounder spot "right side"; press break uses half-court spot names). Notes from the safety review: Plays has no switch, so play quiz results go live on merge while the DPIA is unsigned (founder's call; no new recipient); players can fake their own quiz scores (affects only what their coach sees). | Founder | 2026-11-14 | 2026-11-14: safety review PASS WITH NOTES, its 3 fixes done (totals from 3 players, visibility from when set, rel=0) |
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)

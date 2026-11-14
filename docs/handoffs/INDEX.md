@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-14 · f3-film · Film tab built on exp/f3-film; 00062 not applied; live after S1 → [handoff](2026-11-14-f3-film.md)
 - 2026-11-14 · focus-finder-live · Focus Finder live and checked; ref fix; matcher, delete plan, team rename → [handoff](2026-11-14-focus-finder-live.md)
 - 2026-11-13 · focus-finder · Weakness to film, IQ and drills; AI week plan; coach send-to-team (#103) → [handoff](2026-11-13-focus-finder.md)
 - 2026-11-13 · finish-pr-97 · Option A built: sign-up question, plain outreach links; safety re-review passed → [handoff](2026-11-13-finish-pr-97.md)
