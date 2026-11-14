@@ -137,7 +137,13 @@ export async function GET() {
   const body = {
     exported_at: new Date().toISOString(),
     app: 'Deadeye Basketball Training',
-    account: { id: user.id, email: user.email, created_at: authUser.data?.user?.created_at ?? null },
+    account: {
+      id: user.id,
+      email: user.email,
+      created_at: authUser.data?.user?.created_at ?? null,
+      // Their optional sign-up answer to "Where did you hear about Deadeye?" (src/lib/heardFrom.ts)
+      heard_from: authUser.data?.user?.user_metadata?.heard_from ?? null,
+    },
     profile: profile.data || null,
     data,
     note: 'Uploaded video and profile-photo files are not included in this file. They stay in your account until you delete them.',

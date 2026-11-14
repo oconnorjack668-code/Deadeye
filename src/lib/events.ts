@@ -5,8 +5,6 @@
 // at /admin/funnel.
 
 export const EVENT_NAMES = [
-  /** Tapped sign-up under the landing page demo, then reached the welcome screen */
-  'signup_from_demo',
   'welcome_seen',
   /** Picked "Yes, I'm at a court" on the welcome screen */
   'welcome_court',
@@ -41,31 +39,10 @@ export const EVENT_NAMES = [
 
 export type EventName = (typeof EVENT_NAMES)[number];
 
-/**
- * Visitors to the landing page are not signed in, so nothing can be recorded
- * against them there. Tapping sign-up under the demo leaves this mark on the
- * device instead, and the welcome screen records it once the account exists.
- */
-const FROM_DEMO_KEY = 'deadeye-from-demo';
-
-export function markFromDemo(): void {
-  try {
-    localStorage.setItem(FROM_DEMO_KEY, '1');
-  } catch {
-    // Storage blocked: that sign-up just is not counted as from the demo
-  }
-}
-
-/** On the welcome screen: records signup_from_demo once, if this device came from the demo. */
-export function trackIfFromDemo(): void {
-  try {
-    if (localStorage.getItem(FROM_DEMO_KEY) !== '1') return;
-    localStorage.removeItem(FROM_DEMO_KEY);
-  } catch {
-    return;
-  }
-  track('signup_from_demo');
-}
+// Nothing is recorded for visitors who are not signed in, and nothing is put on
+// their device to count them later: the old landing-demo mark in localStorage
+// needed ePrivacy consent (safety review of PR #97, F4). Where a player heard
+// about Deadeye comes from the optional sign-up question (src/lib/heardFrom.ts).
 
 export function isEventName(value: unknown): value is EventName {
   return typeof value === 'string' && (EVENT_NAMES as readonly string[]).includes(value);

@@ -71,6 +71,7 @@ export default async function TeamPage({
           openShare={share === '1'}
           clubLink={clubLink.error ? null : clubLink.data ?? null}
           team={{
+            name: team.name,
             club_name: team.club_name ?? null,
             country: team.country ?? null,
             region: team.region ?? null,

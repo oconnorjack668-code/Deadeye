@@ -5,6 +5,10 @@ One line per session, newest first. Open a handoff only when its line matches th
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
 - 2026-11-14 · f3-film · Film tab built on exp/f3-film; 00062 not applied; live after S1 → [handoff](2026-11-14-f3-film.md)
+- 2026-11-14 · focus-finder-live · Focus Finder live and checked; ref fix; matcher, delete plan, team rename → [handoff](2026-11-14-focus-finder-live.md)
+- 2026-11-13 · focus-finder · Weakness to film, IQ and drills; AI week plan; coach send-to-team (#103) → [handoff](2026-11-13-focus-finder.md)
+- 2026-11-13 · finish-pr-97 · Option A built: sign-up question, plain outreach links; safety re-review passed → [handoff](2026-11-13-finish-pr-97.md)
+- 2026-11-13 · ref-tracking-build-id · Outreach routes counted, build id, first outreach plan; safety B5 open → [handoff](2026-11-13-ref-tracking-build-id.md)
 - 2026-11-13 · new-agents-merged · PR #94 merged: designer, outreach and QA agents on main → [handoff](2026-11-13-new-agents-merged.md)
 - 2026-11-11 · new-agents · Designer, player-outreach and QA tester agents; weekly TikTok trend scan → [handoff](2026-11-11-new-agents.md)
 - 2026-11-11 · planner-ty-timetable · Personal planner synced across devices; TY timetable doc; Opera browser connected → [handoff](2026-11-11-planner-ty-timetable.md)
@@ -31,6 +35,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-10-23 · sample-rim-fix · Sample rim and start, camera black screen, Next.js patch, club card gap · open: 2 → [handoff](2026-10-23-sample-rim-fix.md)
 - 2026-10-22 · pricing-and-claude · Club pricing sheet and founding offer; AI on Claude; club picker · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)
 - 2026-10-22 · league-and-club-board · League picker for teams; club boards with founder approval · open: 2 → [handoff](2026-10-22-league-and-club-board.md)
-- 2026-10-22 · home-club · Players pick a home club; not-listed suggestions; opt-in card badge · open: 2 → [handoff](2026-10-22-home-club.md)
-- 2026-10-22 · club-growth · Club-growth agent, club directory and leagues started · open: 2 → [handoff](2026-10-22-club-growth.md)
-- 2026-10-22 · agent-automation · Monday auto-run, counts job, support-triage, PRs, merge on founder word · open: 2 → [handoff](2026-10-22-agent-automation.md)

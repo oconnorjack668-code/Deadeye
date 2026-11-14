@@ -107,6 +107,10 @@ export default function PrivacyPage() {
               only ever added up across sessions, never shown per player.
             </li>
             <li>AI coaching reports generated from your session data.</li>
+            <li>
+              Focus Finder week plans you ask the AI for: the weaknesses picked, the numbers behind them and the plan, kept
+              until you delete your account. What you wrote to get the plan is not kept.
+            </li>
             <li>Programs, goals, challenges, badges and NBA style match results.</li>
             <li>Game stats you log (box scores, opponent name, score) and teams you create or join.</li>
             <li>Settings you choose: country, county/region, time zone, whether you use Deadeye as a player or coach, and your privacy choices.</li>
@@ -135,6 +139,13 @@ export default function PrivacyPage() {
               only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
               anyone. Deleting your account deletes them straight away.
             </li>
+            <li>
+              If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
+              example &quot;A friend or teammate&quot;), saved with your account so we know which places bring players who stick with
+              it. We only use it as counts by answer; in anything we publish, answers from fewer than 5 players are added
+              together. It is cleared 12 months after you join, you can clear it yourself in Settings → Privacy, and
+              deleting your account deletes it.
+            </li>
           </ul>
         </section>
 
@@ -157,8 +168,9 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
-              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly and knowing where new
+              players hear about us.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>
@@ -190,6 +202,16 @@ export default function PrivacyPage() {
               When you use AI Coach chat or an AI report, {ai === 'Our AI provider' ? 'it' : ai} also receives your age
               range, height, position, strong hand, playing level, goals and recent training numbers, so the advice fits
               you. It never receives your name, email address or photo.
+            </li>
+            <li>
+              When you ask Focus Finder for an AI week plan, {ai === 'Our AI provider' ? 'it' : ai} receives what you wrote
+              about the weaknesses, the ones you picked, your position and playing level, the goals you picked when you
+              set up, and the numbers behind any suggestion (your make rates by area of the court, how many daily IQ
+              questions you got right in a section, how many of your film reads your coach saw a better option on). For a
+              coach planning for a team, it receives the team&apos;s age group, level and number of players. We ask you not
+              to write names; anything you write is sent as written. Deadeye does not keep what you wrote;{' '}
+              {ai === 'Our AI provider' ? 'our AI provider' : ai} deletes it within 30 days (longer only if its safety
+              systems flag it for misuse). The free Focus Finder list sends nothing anywhere.
             </li>
             <li>Stripe processes Pro payments.</li>
             {emailConfigured() && (
@@ -285,7 +307,11 @@ export default function PrivacyPage() {
 
         <section id="cookies-and-videos" className="space-y-2">
           <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
-          <p>Deadeye&apos;s own cookies are only there to keep you logged in.</p>
+          <p>
+            Deadeye&apos;s own cookies are only there to keep you logged in. The app also keeps a few things on your
+            device so it works for you (for example unsent drafts, offline saves, your settings and invite links you
+            followed); nothing on your device is used to track you or count visits.
+          </p>
           <p>
             Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads
             from YouTube until you tap play on a video. (On a film clip, the tap also loads YouTube&apos;s player

@@ -77,4 +77,27 @@ describe('buildFunnel', () => {
     expect(f.biggestDrop).toEqual({ from: 'Finished setup', to: 'Logged a 1st hoops session', lost: 2 });
     expect(buildFunnel([], [], []).biggestDrop).toBeNull();
   });
+
+  it('counts players by where they heard about Deadeye, judged on 1st sessions, no answer last', () => {
+    const f = buildFunnel(
+      [
+        { id: 'a', setupDone: true, heardFrom: 'friend' },
+        { id: 'b', setupDone: false, heardFrom: 'friend' },
+        { id: 'c', setupDone: true, heardFrom: null },
+        { id: 'd', setupDone: true, heardFrom: 'tiktok' },
+        { id: 'e', setupDone: true },
+      ],
+      [],
+      [
+        { user_id: 'a', verified_by_video: false },
+        { user_id: 'a', verified_by_video: false },
+        { user_id: 'c', verified_by_video: false },
+      ]
+    );
+    expect(f.routes).toEqual([
+      { route: 'friend', joined: 2, setup: 1, firstSession: 1 },
+      { route: 'tiktok', joined: 1, setup: 1, firstSession: 0 },
+      { route: null, joined: 2, setup: 2, firstSession: 1 },
+    ]);
+  });
 });

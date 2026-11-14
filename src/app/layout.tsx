@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { ServiceWorkerRegistrar } from "@/components/ServiceWorkerRegistrar";
 import { ErrorReporter } from "@/components/ErrorReporter";
 import { ThemeWatcher } from "@/components/ThemeWatcher";
+import { buildLabel } from "@/lib/build";
 import { THEME_COLOR, THEME_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
@@ -33,6 +34,8 @@ export const metadata: Metadata = {
     title: "Deadeye",
     statusBarStyle: "black",
   },
+  // Which build this page came from, for test runs (src/lib/build.ts)
+  other: { "deadeye-build": buildLabel() },
 };
 
 export const viewport: Viewport = {

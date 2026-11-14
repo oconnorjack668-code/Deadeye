@@ -100,7 +100,8 @@ export default async function StudyTopicPage({
               const hasVideo = isRealYoutubeId(item.youtube_video_id);
               const questionCount = Array.isArray(item.quiz_questions) ? item.quiz_questions.length : 0;
               return (
-                <Card key={item.id} className="border-zinc-800 bg-zinc-900/70">
+                // The id is the anchor Focus Finder links to (/study/<topic>#lesson-<item>)
+                <Card key={item.id} id={`lesson-${item.id}`} className="scroll-mt-20 border-zinc-800 bg-zinc-900/70">
                   <CardContent className="p-5 space-y-3">
                     <div className="flex items-start gap-3">
                       <div className="mt-1">
