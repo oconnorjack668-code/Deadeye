@@ -86,6 +86,22 @@ const HEAT_DECAY = 0.95;
 
 const FRAME_MS = 1000 / 30;
 
+/**
+ * From this many tuned frames apart (under 20 a second), a followed thing
+ * seen twice, far apart, counts as moving like a ball in flight.
+ *
+ * In flight takes three sightings in a line. At 10 frames a second a ball is
+ * in the hoop crop for five or six frames in all and above the ring for one
+ * or two, so by its third sighting the shot is over. Two sightings far apart
+ * are enough there: in a tenth of a second a ball covers two of its widths,
+ * and a head or a shoulder does not.
+ */
+const SLOW_FRAMES = 1.5;
+/** Ball widths two sightings must be apart to count as in flight on a slow phone. */
+const SLOW_FLIGHT = 1.5;
+/** Recent gaps between frames whose median says how far apart frames arrive. */
+const GAP_FRAMES = 15;
+
 /** Match radius, in ball widths, for something seen only once: no speed to predict from. */
 const FIRST_GATE = 2.5;
 
@@ -221,6 +237,14 @@ export interface BallTracker {
    * that turns up near the rim.
    */
   ballId(): number | null;
+  /**
+   * The sightings of the thing last reported as the ball, oldest first, the
+   * frame just tracked last; empty when no ball was reported. A thing is only
+   * reported once it has been seen moving like a ball for a few frames, and
+   * the frames before that are where it was coming down from above the rim:
+   * the trackerPipeline hands them on too, rather than throw them away.
+   */
+  recent(): ReadonlyArray<{ t: number; x: number; y: number; diameter: number }>;
 }
 
 interface Sighting {
@@ -264,12 +288,16 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
   let lastNet: number | null = null;
   let lastUnder = false;
   let lastId: number | null = null;
+  let lastSeen: ReadonlyArray<Sighting> = [];
   let nextTrackId = 1;
 
   const current = (): Rgb | null => learned ?? options.initialColour ?? null;
 
   let tracks: Track[] = [];
   let clock = 0;
+  // How far apart frames arrive, ms: the median of the recent gaps
+  const gaps: number[] = [];
+  let frameMs = FRAME_MS;
 
   // Heat per ball-sized cell, see HOT_SPOT
   const cell = Math.max(4, D);
@@ -294,6 +322,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
   };
   const inFlight = (tr: Track) => {
     const w = tr.seen.slice(-FLIGHT_WINDOW);
+    if (w.length === 2 && frameMs >= FRAME_MS * SLOW_FRAMES) return Math.hypot(w[1].x - w[0].x, w[1].y - w[0].y) >= D * SLOW_FLIGHT;
     if (w.length < 3) return false;
     let walked = 0;
     for (let i = 1; i < w.length; i++) walked += Math.hypot(w[i].x - w[i - 1].x, w[i].y - w[i - 1].y);
@@ -303,8 +332,17 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
 
   return {
     track(prev, cur, width, height, next, at) {
-      clock = at ?? clock + 1000 / 30;
+      const gap = (at ?? clock + FRAME_MS) - clock;
+      clock = at ?? clock + FRAME_MS;
       const now = clock;
+      // A gap over half a second is a pause, not the frame rate
+      if (gap > 5 && gap < 500) {
+        gaps.push(gap);
+        if (gaps.length > GAP_FRAMES) gaps.shift();
+        frameMs = Math.max(FRAME_MS, [...gaps].sort((a, b) => a - b)[gaps.length >> 1]);
+      }
+      // Long enough to coast through a frame or two unseen, whatever the frame rate
+      const coastMs = Math.max(TRACK_COAST_MS, frameMs * 2.5);
       if (fixedThreshold === undefined) {
         const s = lumaSpread(cur);
         spread = spread === null ? s : spread * 0.9 + s * 0.1;
@@ -346,7 +384,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
       // stopped moving: a "ball" that stays put for six sightings is a fixture
       // that got lucky
       tracks = tracks.filter((tr) => {
-        if (now - tr.seen[tr.seen.length - 1].t > TRACK_COAST_MS) return false;
+        if (now - tr.seen[tr.seen.length - 1].t > coastMs) return false;
         if (tr.seen.length >= 6) {
           const recent = tr.seen.slice(-6);
           const spread = Math.max(
@@ -384,7 +422,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
         // enough to take in the flicker beside the backboard
         // Seen once, it has no speed yet, and a shot can cover more than its
         // own width between frames: allow for the fastest one
-        const gate = tr.seen.length < 2 ? D * FIRST_GATE : D * TRACK_GATE + Math.hypot(vx, vy) * FRAME_MS * 1.5;
+        const gate = tr.seen.length < 2 ? D * FIRST_GATE * (frameMs / FRAME_MS > 1 ? Math.min(2, frameMs / FRAME_MS / 1.5) : 1) : D * TRACK_GATE + Math.hypot(vx, vy) * frameMs * 1.5;
         let bestDistance = Infinity;
         for (const c of candidates) {
           if (claimed.has(c)) continue;
@@ -448,6 +486,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
       // followed counts.
       let found: BallCandidate | null = null;
       lastId = null;
+      lastSeen = [];
       let best = -1;
       for (const tr of tracks) {
         if (!tr.current) continue;
@@ -468,6 +507,7 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
           best = rank;
           found = tr.current;
           lastId = tr.id;
+          lastSeen = tr.seen;
         }
       }
 
@@ -517,5 +557,6 @@ export function createBallTracker(options: BallTrackerOptions): BallTracker {
     netMotion: () => lastNet,
     underNet: () => lastUnder,
     ballId: () => lastId,
+    recent: () => lastSeen.slice(),
   };
 }

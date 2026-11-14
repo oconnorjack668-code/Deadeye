@@ -989,7 +989,7 @@ export function ShotTracker({
     // what the net does next - and without this the last shot was dropped
     const engine = engineRef.current;
     engineRef.current = null;
-    addLastCall(engine ? await engine.finish() : null);
+    for (const last of engine ? await engine.finish() : []) addLastCall(last);
     const inWorker = engine?.inWorker() ?? null;
     engine?.dispose();
     // Snapshot how the run went. Seconds come from the clip for a file and
@@ -1050,7 +1050,7 @@ export function ShotTracker({
     if (source === 'file') video.pause();
     const engine = engineRef.current;
     engineRef.current = null;
-    addLastCall(engine ? await engine.finish() : null);
+    for (const last of engine ? await engine.finish() : []) addLastCall(last);
     engine?.dispose();
     clockBaseRef.current = elapsedRef.current;
     fixStartedRef.current = performance.now();

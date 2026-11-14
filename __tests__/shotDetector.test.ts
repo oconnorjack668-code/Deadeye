@@ -178,11 +178,20 @@ describe('ShotDetector', () => {
     expect(shots[0].made).toBe(false);
   });
 
-  it('counts an airball that never reaches the rim area as a miss', () => {
+  it('drops a shot whose ball is lost before it reaches the ring', () => {
+    // Decided 9 Nov 2026: a shot that never reached the ring is not called.
+    // Passes, balls going up beside the ring and people at the lens look like
+    // this, and were 17 of the 24 calls with no shot on the bench; the cost
+    // was 2 real misses on the smallest, dimmest, slowest test footage, where
+    // the ball is lost before the ring. See README, "The bench suite".
     const shots = run(arc(0, 0.2, 0.44, 0.2, 30).map((o) => (o.t > 700 ? { ...o, ball: null } : o)).concat([{ t: 3000, ball: null }]));
+    expect(shots).toHaveLength(0);
+  });
+
+  it('still calls a miss on a ball that came down beside the ring and was lost there', () => {
+    const shots = run(arc(0, 0.2, 0.545, 0.2, 30).map((o) => (o.t > 950 ? { ...o, ball: null } : o)).concat([{ t: 4000, ball: null }]));
     expect(shots).toHaveLength(1);
     expect(shots[0].made).toBe(false);
-    expect(shots[0].confident).toBe(false);
   });
 
   it('counts several shots in a row and ignores rim bounces right after a decision', () => {
@@ -300,10 +309,52 @@ describe('ShotDetector', () => {
     expect(d.push({ t: 66, ball: { x: 0.80, y: 0.42 } })).toBeNull();
     expect(d.shots).toHaveLength(0);
 
-    // The real ball arrives and is still judged on its own merits
+    // The real ball arrives and is still judged on its own merits, once it is
+    // seen under the ring (the frame that crosses the line is not evidence of
+    // that on its own)
     d.push({ t: 99, ball: { x: 0.46, y: 0.28 } });
-    const shot = d.push({ t: 132, ball: { x: 0.48, y: 0.32 } });
+    expect(d.push({ t: 132, ball: { x: 0.48, y: 0.32 } })).toBeNull();
+    const shot = d.push({ t: 165, ball: { x: 0.49, y: 0.36 } });
     expect(shot?.made).toBe(true);
+  });
+
+  it('does not take the frame that crosses the line as the ball under the ring', () => {
+    // The 4 Nov clip4 rattle-out (88.1s): a ball landing on the ring was seen
+    // a quarter of a rim above the line, then a quarter below on the next
+    // frame, and was lost while it bounced. The net shook from the hit on
+    // every frame. It was next seen 0.8s later dropping beside the ring.
+    const d = new ShotDetector(RIM);
+    const net = 0.1;
+    d.push({ t: 0, ball: { x: 0.5, y: 0.2 }, net: 0 });
+    d.push({ t: 33, ball: { x: 0.5, y: 0.23 }, net: 0 });
+    d.push({ t: 66, ball: { x: 0.5, y: 0.26 }, net: 0 });
+    d.push({ t: 99, ball: { x: 0.5, y: 0.285 }, net: 0 });
+    d.push({ t: 132, ball: { x: 0.5, y: 0.315 }, net });
+    for (let t = 165; t < 930; t += 33) d.push({ t, ball: null, net });
+    d.push({ t: 930, ball: { x: 0.545, y: 0.31 }, net: 0.06 });
+    d.push({ t: 963, ball: { x: 0.545, y: 0.33 }, net: 0.06 });
+    d.push({ t: 996, ball: { x: 0.545, y: 0.36 }, net: 0.06 });
+    expect(d.shots).toHaveLength(1);
+    expect(d.shots[0].made).toBe(false);
+  });
+
+  it('still takes a crossing frame a ball-width under the line as through the ring', () => {
+    // The 15 fps make on the 2:39 clip (53.8s): crossed dead centre, first
+    // seen 0.499 rims below the line, then pushed sideways out of the net. The
+    // first three sightings under the ring decide; without the crossing frame
+    // two of them were beside the ring and it was called a miss.
+    const d = new ShotDetector(RIM);
+    const at = (t: number, y: number, side: number, net = 0) => d.push({ t, ball: { x: 0.5 + (side * RIM.width) / 2, y }, net });
+    at(0, 0.2, 2.2);
+    at(67, 0.25, 1.9);
+    at(133, 0.285, 0.42);
+    at(200, 0.32994, -0.79, 0.17);
+    at(267, 0.355, -1.23, 0.28);
+    at(333, 0.364, -1.9, 0.05);
+    at(400, 0.388, -2.55, 0.05);
+    for (let t = 467; t <= 1500; t += 67) d.push({ t, ball: null, net: 0.12 });
+    expect(d.shots).toHaveLength(1);
+    expect(d.shots[0].made).toBe(true);
   });
 
   it('still accepts a ball that genuinely covered the ground', () => {
