@@ -5,7 +5,8 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
-import { LIBRARY_PLAYS } from '@/data/plays/library';
+// The page, not the content: a fixed set of 10 plays (the first seed), so new library plays never move these numbers
+import { STARTER_PLAYS as LIBRARY_PLAYS } from '@/data/plays/library';
 
 const rows = LIBRARY_PLAYS.map((p, i) => ({
   id: `00000000-0000-4000-8000-${String(i + 1).padStart(12, '0')}`,

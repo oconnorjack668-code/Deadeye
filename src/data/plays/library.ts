@@ -1,10 +1,11 @@
 // src/data/plays/library.ts
 // The library plays, drawn for Deadeye (not copied from a book or FastModel;
-// safety rule 8 in docs/plans/film-and-plays.md). Each play is written as
-// moves and turned into a diagram by buildDiagram, then:
+// safety rule 8 in docs/plans/film-and-plays.md): the ten starter plays below
+// (F1) and the launch plays in launch.ts (F4). Each play is written as moves
+// and turned into a diagram by buildDiagram, then:
 //   - validated by parseDiagram and checked against the age rules in
 //     __tests__/plays-library.test.ts;
-//   - written into supabase/migrations/00060_plays.sql by the same test
+//   - written into its migration (PLAY_SEEDS below) by the same test
 //     (WRITE_PLAYS_SEED=1 npx vitest run __tests__/plays-library.test.ts).
 // Change a play here, never in the SQL.
 //
@@ -14,6 +15,7 @@ import { buildDiagram } from '@/lib/plays/build';
 import { spot } from '@/lib/plays/spots';
 import type { AgeGrade, PlayCategory } from '@/lib/plays/catalog';
 import type { Diagram } from '@/lib/plays/diagram';
+import { LAUNCH_PLAYS } from './launch';
 
 export interface LibraryPlay {
   slug: string;
@@ -29,7 +31,8 @@ export interface LibraryPlay {
 
 const BASKET = { x: 25, y: 7 };
 
-export const LIBRARY_PLAYS: LibraryPlay[] = [
+/** The F1 starter plays, seeded by 00060_plays.sql. */
+export const STARTER_PLAYS: LibraryPlay[] = [
   {
     slug: 'four-out-one-in',
     title: '4-out 1-in: pass and cut',
@@ -429,4 +432,16 @@ export const LIBRARY_PLAYS: LibraryPlay[] = [
       ]
     ),
   },
+];
+
+/** Every library play: the starter plays, then the launch plays. */
+export const LIBRARY_PLAYS: LibraryPlay[] = [...STARTER_PLAYS, ...LAUNCH_PLAYS];
+
+/**
+ * Which migration seeds which plays. A migration that has been run is never
+ * changed to add plays: new plays get a new migration and a new entry here.
+ */
+export const PLAY_SEEDS: ReadonlyArray<{ migration: string; plays: readonly LibraryPlay[] }> = [
+  { migration: '00060_plays.sql', plays: STARTER_PLAYS },
+  { migration: '00063_launch_plays.sql', plays: LAUNCH_PLAYS },
 ];

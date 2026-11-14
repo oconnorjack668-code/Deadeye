@@ -1,8 +1,9 @@
 // src/lib/plays/seedSql.ts
 // Turns the library plays (src/data/plays/library.ts) into the INSERT that
 // seeds them, so the SQL is never edited by hand. __tests__/plays-library.test.ts
-// checks the block in supabase/migrations/00060_plays.sql matches, and
-// rewrites it when run with WRITE_PLAYS_SEED=1.
+// checks the block in each seed migration (PLAY_SEEDS in the data file: 00060
+// for the starter plays, 00063 for the launch plays) matches, and rewrites
+// them when run with WRITE_PLAYS_SEED=1.
 //
 // Re-runnable: a play already there (same slug, library row) is updated in
 // place, so fixing a coaching point and re-running the file fixes it live.

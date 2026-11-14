@@ -11,10 +11,10 @@
 -- It checks the tables, columns, functions and indexes each migration creates.
 -- It does not check policies, grants or data, so these migrations, which only
 -- change those, cannot be told apart from not being run:
---   00008, 00009, 00012, 00029, 00030, 00040
+--   00008, 00009, 00012, 00029, 00030, 00040, 00063, 00064
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00062, 61 files, 313 things). Do not edit it by
+-- (00001 to 00064, 63 files, 315 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -307,6 +307,8 @@ WITH expected(migration, kind, obj, col) AS (
     ('00061', 'column', 'team_assignments', 'film_clip_id'),
     ('00061', 'column', 'team_assignments', 'film_pack_id'),
     ('00061', 'index', 'team_assignments_play_id_idx', ''),
+    ('00061', 'column', 'team_assignments', 'item_set_at'),
+    ('00061', 'function', 'stamp_assignment_item', ''),
     ('00061', 'function', 'enforce_assignment_play', ''),
     ('00061', 'table', 'play_quiz_attempts', ''),
     ('00061', 'index', 'play_quiz_attempts_user_play_idx', ''),

@@ -5,33 +5,63 @@
 // valid diagram, a sensible number of steps, no age-rule warnings for the
 // grade it is marked for, and every player given a job.
 //
-// It also keeps the seed in supabase/migrations/00060_plays.sql in step with
-// the data file. After changing a play, rewrite the SQL with:
+// It also keeps the seeds in supabase/migrations/ (00060 for the starter
+// plays, 00063 for the launch plays; PLAY_SEEDS in the data file) in step
+// with the data. After changing a play, rewrite the SQL with:
 //   WRITE_PLAYS_SEED=1 npx vitest run __tests__/plays-library.test.ts
 import { describe, it, expect } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
-import { LIBRARY_PLAYS } from '@/data/plays/library';
-import { parseDiagram, stepCount } from '@/lib/plays/diagram';
+import { LIBRARY_PLAYS, PLAY_SEEDS, STARTER_PLAYS } from '@/data/plays/library';
+import { LAUNCH_PLAYS } from '@/data/plays/launch';
+import { MOVEMENT_TYPES, parseDiagram, stepCount } from '@/lib/plays/diagram';
 import { ageRuleWarnings } from '@/lib/plays/ageRules';
 import { isAgeGrade, isPlayCategory } from '@/lib/plays/catalog';
+import { buildQuiz } from '@/lib/plays/quiz';
 import { roleJobs, roleStart, stepNames } from '@/lib/plays/roles';
 import { playsSeedSql, readSeedBlock, replaceSeedBlock } from '@/lib/plays/seedSql';
 
-const MIGRATION = path.join(__dirname, '..', 'supabase', 'migrations', '00060_plays.sql');
+const MIGRATIONS = path.join(__dirname, '..', 'supabase', 'migrations');
 
 describe('the library plays', () => {
-  it('has ten plays with unique, URL-safe slugs', () => {
-    expect(LIBRARY_PLAYS).toHaveLength(10);
+  it('has 36 plays with unique, URL-safe slugs', () => {
+    expect(LIBRARY_PLAYS).toHaveLength(36);
     const slugs = LIBRARY_PLAYS.map((p) => p.slug);
     expect(new Set(slugs).size).toBe(slugs.length);
     for (const slug of slugs) expect(slug).toMatch(/^[a-z0-9]+(-[a-z0-9]+)*$/);
   });
 
-  it('makes about half free, principles first', () => {
+  it('has the launch mix from plan section 10', () => {
+    const count = (category: string) => LIBRARY_PLAYS.filter((p) => p.category === category).length;
+    expect({
+      principles: count('principles'),
+      half_court: count('half_court'),
+      pick_and_roll: count('pick_and_roll'),
+      blob: count('blob'),
+      slob: count('slob'),
+      press_break: count('press_break'),
+      zone_offence: count('zone_offence'),
+      end_of_quarter: count('end_of_quarter'),
+    }).toEqual({ principles: 6, half_court: 10, pick_and_roll: 3, blob: 5, slob: 4, press_break: 2, zone_offence: 4, end_of_quarter: 2 });
+    expect(LIBRARY_PLAYS.filter((p) => p.tags.includes('horns'))).toHaveLength(3);
+  });
+
+  it('makes about 12 free, every principle among them', () => {
     const free = LIBRARY_PLAYS.filter((p) => p.is_free);
-    expect(free.length).toBe(5);
+    expect(free.length).toBe(12);
     expect(LIBRARY_PLAYS.filter((p) => p.category === 'principles').every((p) => p.is_free)).toBe(true);
+  });
+
+  it('keeps zone offences for U15 and up, and pick-and-roll for U12 and up', () => {
+    for (const p of LIBRARY_PLAYS.filter((x) => x.category === 'zone_offence')) expect(p.min_age, p.slug).toBe('U15');
+    for (const p of LIBRARY_PLAYS.filter((x) => x.category === 'pick_and_roll')) expect(p.min_age, p.slug).toBe('U12');
+    expect(LIBRARY_PLAYS.find((p) => p.slug === 'spain-pick-and-roll')?.min_age).toBe('U15');
+  });
+
+  it.each(LAUNCH_PLAYS.map((p) => [p.slug, p] as const))('%s moves at least three players, so the role quiz has three questions', (_slug, p) => {
+    const movers = new Set(p.diagram.frames.flatMap((f) => f.actions.filter((a) => MOVEMENT_TYPES.includes(a.type)).map((a) => a.from)));
+    expect(movers.size).toBeGreaterThanOrEqual(3);
+    expect(buildQuiz(p.diagram)).toHaveLength(3);
   });
 
   it('files every play under a known type and age grade, within the column limits', () => {
@@ -42,7 +72,7 @@ describe('the library plays', () => {
       expect(p.description.length, p.slug).toBeLessThanOrEqual(600);
       expect(p.tags.length, p.slug).toBeLessThanOrEqual(10);
       expect(p.coaching_points.length, p.slug).toBeGreaterThanOrEqual(4);
-      expect(p.coaching_points.length, p.slug).toBeLessThanOrEqual(12);
+      expect(p.coaching_points.length, p.slug).toBeLessThanOrEqual(6);
     }
   });
 
@@ -82,12 +112,20 @@ describe('the library plays', () => {
   });
 });
 
-describe('the seed in 00060_plays.sql', () => {
-  it('matches src/data/plays/library.ts (rewrite with WRITE_PLAYS_SEED=1)', () => {
-    const fileText = fs.readFileSync(MIGRATION, 'utf8');
-    const generated = playsSeedSql(LIBRARY_PLAYS);
+describe('the seed migrations', () => {
+  it('seeds every play exactly once, and 00060 keeps its ten starter plays', () => {
+    const seeded = PLAY_SEEDS.flatMap((s) => s.plays.map((p) => p.slug));
+    expect(seeded.sort()).toEqual(LIBRARY_PLAYS.map((p) => p.slug).sort());
+    expect(PLAY_SEEDS[0]).toEqual({ migration: '00060_plays.sql', plays: STARTER_PLAYS });
+    expect(STARTER_PLAYS).toHaveLength(10);
+  });
+
+  it.each(PLAY_SEEDS.map((s) => [s.migration, s] as const))('%s matches the data file (rewrite with WRITE_PLAYS_SEED=1)', (migration, seed) => {
+    const file = path.join(MIGRATIONS, migration);
+    const fileText = fs.readFileSync(file, 'utf8');
+    const generated = playsSeedSql(seed.plays);
     if (process.env.WRITE_PLAYS_SEED === '1') {
-      fs.writeFileSync(MIGRATION, replaceSeedBlock(fileText, generated));
+      fs.writeFileSync(file, replaceSeedBlock(fileText, generated));
       return;
     }
     // A Windows checkout (core.autocrlf) turns line endings into \r\n
