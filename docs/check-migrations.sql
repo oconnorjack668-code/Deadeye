@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00060, 59 files, 277 things). Do not edit it by
+-- (00001 to 00061, 60 files, 292 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -297,7 +297,22 @@ WITH expected(migration, kind, obj, col) AS (
     ('00060', 'index', 'plays_owner_id_idx', ''),
     ('00060', 'index', 'plays_copied_from_idx', ''),
     ('00060', 'table', 'play_saves', ''),
-    ('00060', 'index', 'play_saves_play_id_idx', '')
+    ('00060', 'index', 'play_saves_play_id_idx', ''),
+    ('00061', 'function', 'enforce_coach_play_limit', ''),
+    ('00061', 'table', 'team_playbook', ''),
+    ('00061', 'index', 'team_playbook_play_id_idx', ''),
+    ('00061', 'index', 'team_playbook_added_by_idx', ''),
+    ('00061', 'function', 'enforce_team_playbook_rules', ''),
+    ('00061', 'column', 'team_assignments', 'play_id'),
+    ('00061', 'column', 'team_assignments', 'film_clip_id'),
+    ('00061', 'column', 'team_assignments', 'film_pack_id'),
+    ('00061', 'index', 'team_assignments_play_id_idx', ''),
+    ('00061', 'function', 'enforce_assignment_play', ''),
+    ('00061', 'table', 'play_quiz_attempts', ''),
+    ('00061', 'index', 'play_quiz_attempts_user_play_idx', ''),
+    ('00061', 'index', 'play_quiz_attempts_play_idx', ''),
+    ('00061', 'function', 'coach_sees_play_attempt', ''),
+    ('00061', 'function', 'play_assignment_split', '')
 ),
 checked AS (
   SELECT

@@ -55,11 +55,13 @@ export function toPlay(row: PlayRow): Play | null {
 
 /**
  * Free plays open for everyone, the rest with Pro. A coach's own play always
- * opens for them. (F2 adds: a play the player's coach assigned always opens,
- * Pro or not.)
+ * opens for them, and a team member reads a coach play only when it is theirs
+ * to see (row-level security, 00061). A play from the player's coach (set
+ * for their team, or in their team playbook) always opens, Pro or not: team
+ * work is never behind a paywall (plan section 7).
  */
-export function opensFor(play: Pick<Play, 'isFree' | 'ownerId'>, isPro: boolean): boolean {
-  return play.isFree || isPro || play.ownerId !== null;
+export function opensFor(play: Pick<Play, 'isFree' | 'ownerId'>, isPro: boolean, fromCoach = false): boolean {
+  return play.isFree || isPro || fromCoach || play.ownerId !== null;
 }
 
 export interface PlayFilters {

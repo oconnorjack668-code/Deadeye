@@ -4,7 +4,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, CalendarCheck, Shield, ClipboardList, ListChecks, Settings } from 'lucide-react';
+import { LayoutDashboard, Target, Dumbbell, Sparkles, BookOpen, Trophy, CalendarCheck, Shield, ClipboardList, ListChecks, NotebookPen } from 'lucide-react';
 import type { AppMode } from '@/lib/supabase/types';
 import { shownMode } from '@/lib/coachSide';
 
@@ -33,15 +33,17 @@ export const DESKTOP_NAV_ITEMS = [
   { href: '/leaderboard', label: 'Ranks', icon: Trophy, match: ['/leaderboard'] },
 ];
 
-// Coaching mode: the coach home, teams, assignments, the drill library to
-// plan a practice, and settings. Same five tabs on phones and desktop.
+// Coaching mode: the coach home, teams, assignments, the playbook (plays the
+// coach draws and each team's plays) and the drill library to plan a
+// practice. Same five tabs on phones and desktop. Settings is the gear in the
+// top bar on every screen, so it gave its tab to the playbook (F2).
 export const COACH_NAV_ITEMS = [
   // Exact, so the home tab is not lit on /coach/assignments
   { href: '/coach', label: 'Home', icon: LayoutDashboard, match: ['/coach', '/coach/setup'], exact: true },
   { href: '/teams', label: 'Teams', icon: Shield, match: ['/teams'] },
   { href: '/coach/assignments', label: 'Assignments', icon: ClipboardList, match: ['/coach/assignments'] },
+  { href: '/coach/playbook', label: 'Playbook', icon: NotebookPen, match: ['/coach/playbook', '/plays/new'] },
   { href: '/drills', label: 'Drills', icon: ListChecks, match: ['/drills'] },
-  { href: '/settings', label: 'Settings', icon: Settings, match: ['/settings'] },
 ];
 
 export function isNavActive(pathname: string, match: string[], exact = false): boolean {

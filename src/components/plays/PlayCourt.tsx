@@ -13,18 +13,29 @@ import { movePath, sceneAt } from '@/lib/plays/animation';
 import { MOVEMENT_TYPES, type Diagram, type DiagramAction } from '@/lib/plays/diagram';
 import type { Point } from '@/lib/plays/spots';
 
-const TOKEN_R = 1.9 * S;
-const BALL_R = 0.8 * S;
+export const TOKEN_R = 1.9 * S;
+export const BALL_R = 0.8 * S;
 
-/** The part of the court a play uses: always the top 34 ft, more if a play runs further. */
-export function viewBoxFor(d: Diagram): string {
+/** The part of the court a play uses, in SVG units: always the top 34 ft, more if a play runs further. */
+export function viewBoxRect(d: Diagram): { x: number; y: number; width: number; height: number } {
   let maxY = 34;
   for (const f of d.frames) {
     for (const p of Object.values(f.positions)) maxY = Math.max(maxY, p.y);
     for (const a of f.actions) for (const p of a.path) maxY = Math.max(maxY, p.y);
   }
   const bottom = Math.min(Math.ceil(maxY + 4), 51);
-  return `${-4 * S} ${-4 * S} ${58 * S} ${(bottom + 4) * S}`;
+  return { x: -4 * S, y: -4 * S, width: 58 * S, height: (bottom + 4) * S };
+}
+
+export function viewBoxFor(d: Diagram): string {
+  const r = viewBoxRect(d);
+  return `${r.x} ${r.y} ${r.width} ${r.height}`;
+}
+
+/** Where a court point (feet) sits in the drawing, as percentages of its width and height. */
+export function percentOf(d: Diagram, p: Point): { left: number; top: number } {
+  const r = viewBoxRect(d);
+  return { left: ((p.x * S - r.x) / r.width) * 100, top: ((p.y * S - r.y) / r.height) * 100 };
 }
 
 const toSvg = (p: Point) => ({ x: p.x * S, y: p.y * S });
@@ -88,7 +99,7 @@ function zigzag(points: Point[]): Point[] {
 
 const pointsAttr = (pts: Point[]) => pts.map((p) => `${p.x},${p.y}`).join(' ');
 
-function MoveLine({ d, step, action, tone }: { d: Diagram; step: number; action: DiagramAction; tone: 'normal' | 'mine' | 'faded' }) {
+export function MoveLine({ d, step, action, tone }: { d: Diagram; step: number; action: DiagramAction; tone: 'normal' | 'mine' | 'faded' }) {
   const before = d.frames[step - 1].positions;
   const after = d.frames[step].positions;
   const raw =
@@ -133,19 +144,23 @@ export interface PlayCourtProps {
   role?: string | null;
   /** Steady speed instead of the eased curve (reduced motion holds still anyway). */
   ease?: boolean;
+  /** Leaves out this player's moves (the role quiz asks where they go). */
+  hideMovesOf?: string | null;
   /** Read out by screen readers in place of the drawing; leave empty for a thumbnail beside its title. */
   label: string;
   className?: string;
 }
 
-export function PlayCourt({ diagram, t = 0, role = null, ease = true, label, className }: PlayCourtProps) {
+export function PlayCourt({ diagram, t = 0, role = null, ease = true, hideMovesOf = null, label, className }: PlayCourtProps) {
   const scene = sceneAt(diagram, t, { ease });
   const frame = diagram.frames[scene.step];
   const toneFor = (id: string) => (!role ? 'normal' : id === role ? 'mine' : 'faded');
   const holderAt = scene.ballHolder ? scene.positions[scene.ballHolder] : null;
   const ball = scene.ball && (holderAt ? { x: holderAt.x + 1.4, y: holderAt.y + 1.4 } : scene.ball);
   // The chosen player's lines go on top, so a faded line never crosses them
-  const actions = [...frame.actions].sort((a, b) => Number(a.from === role) - Number(b.from === role));
+  const actions = frame.actions
+    .filter((a) => !hideMovesOf || a.from !== hideMovesOf)
+    .sort((a, b) => Number(a.from === role) - Number(b.from === role));
 
   return (
     <svg

@@ -82,6 +82,11 @@ export default function PrivacyPage() {
             <li>Your level and XP, worked out from your training, so friends can see your level.</li>
             <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests, and the routines and programs you save or import (with their reps targets and notes).</li>
             <li>Study activity: quiz scores and lesson progress.</li>
+            <li>
+              Plays: the plays you save, and for each play quiz you finish, your score and the spots you picked. If you
+              coach, the plays you draw or copy and the plays you add to a team&apos;s playbook. Plays show players by
+              number only, never by name.
+            </li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
@@ -212,7 +217,9 @@ export default function PrivacyPage() {
           <p>
             If you join a team, its members (including coaches) can see your display name, last 7 days of training
             totals, streak and your game averages (points, rebounds, assists, FG%). Coaches can post assignments and
-            see who completed them. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
+            see who completed them. When a head coach sets a play for the team, they see whether you took its quiz
+            and whether you passed, and how the team answered each question as totals, never which spots you picked,
+            until 90 days after the due date. Assistant coaches and teammates do not see quiz results. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any
             time from its page.

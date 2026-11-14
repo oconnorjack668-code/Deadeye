@@ -1,7 +1,9 @@
 // src/app/(app)/plays/page.tsx
 // The plays library on the IQ tab: plays grouped by type, with filters for
 // type, team age group and saved plays, and a search. Pro plays stay in the
-// list with a Pro tag (see ProGate.tsx: shown, tagged, explained).
+// list with a Pro tag (see ProGate.tsx: shown, tagged, explained). A player
+// on a team sees "From your coach" first: plays set for them and the team
+// playbook, which always open, Pro or not.
 import React from 'react';
 import Link from 'next/link';
 import { Bookmark, BookOpen, ChevronRight, Search } from 'lucide-react';
@@ -13,6 +15,8 @@ import { HUB_CONTAINER } from '@/components/layout/HubGrid';
 import { IqTabs } from '@/components/study/IqTabs';
 import { ProBadge, ProNote } from '@/components/ProGate';
 import { PlayCourt } from '@/components/plays/PlayCourt';
+import { FromYourCoach } from '@/components/plays/FromYourCoach';
+import { coachPlaysFor } from '@/lib/plays/access';
 import { AGE_GRADES, ageLabel, isAgeGrade, isPlayCategory, PLAY_CATEGORIES } from '@/lib/plays/catalog';
 import { filterPlays, groupByCategory, opensFor, PLAY_COLUMNS, toPlay, type PlayFilters, type PlayRow } from '@/lib/plays/rows';
 import { stepCount } from '@/lib/plays/diagram';
@@ -62,11 +66,13 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
 
   const supabase = await createClient();
   // Before 00060 runs the tables are missing, which reads as an empty library
-  const [{ data: rows }, { data: savedRows }, isPro] = await Promise.all([
+  const [{ data: rows }, { data: savedRows }, isPro, fromCoach] = await Promise.all([
     supabase.from('plays').select(PLAY_COLUMNS).is('owner_id', null) as unknown as Promise<{ data: PlayRow[] | null }>,
     supabase.from('play_saves').select('play_id').eq('user_id', user.id),
     getHasPro(),
+    coachPlaysFor(supabase, user.id),
   ]);
+  const coachIds = new Set([...fromCoach.assigned.map((a) => a.play.id), ...fromCoach.playbook.map((p) => p.id)]);
   const all = (rows ?? []).map(toPlay).filter((p) => p !== null);
   const saved = new Set((savedRows ?? []).map((s) => s.play_id));
   const groups = groupByCategory(filterPlays(all, filters, saved));
@@ -80,6 +86,8 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
         <IqTabs active="plays" />
 
         <div className="max-w-3xl space-y-4">
+          <FromYourCoach data={fromCoach} />
+
           {/* A plain GET form: works before any JavaScript has loaded, and
               keeps the chips by sending them along */}
           <form action="/plays" role="search">
@@ -165,7 +173,7 @@ export default async function PlaysPage({ searchParams }: { searchParams: Promis
                       <span className="min-w-0 flex-1">
                         <span className="flex items-start justify-between gap-2">
                           <span className="font-bold text-white">{play.title}</span>
-                          {!opensFor(play, isPro) ? (
+                          {!opensFor(play, isPro, coachIds.has(play.id)) ? (
                             <ProBadge />
                           ) : saved.has(play.id) ? (
                             <Bookmark className="h-4 w-4 flex-shrink-0 fill-current text-emerald-400" aria-label="Saved" />

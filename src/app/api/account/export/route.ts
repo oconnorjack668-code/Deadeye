@@ -50,6 +50,8 @@ const USER_TABLES = [
   'drill_favorites',
   // Plays saved from the plays library (00060)
   'play_saves',
+  // Role quiz attempts on plays, with the answers picked (00061)
+  'play_quiz_attempts',
   // The parent consent record, which is about this account
   'age_checks',
   // The optional profile photo record and the cached player level (00043).
@@ -80,7 +82,7 @@ export async function GET() {
   if (!user) return Response.json({ error: 'Please log in again.' }, { status: 401 });
 
   const admin = createAdminClient();
-  const [authUser, friendships, filmQuestions, follows, founderPosts, clubNotices, ownPlays, profile, ...tables] = await Promise.all([
+  const [authUser, friendships, filmQuestions, follows, founderPosts, clubNotices, ownPlays, playbookAdds, profile, ...tables] = await Promise.all([
     admin.auth.admin.getUserById(user.id),
     admin.from('friendships').select('*').or(`requester_id.eq.${user.id},addressee_id.eq.${user.id}`),
     // Keyed by player_id rather than user_id
@@ -92,8 +94,10 @@ export async function GET() {
     admin.from('founder_posts').select('*').eq('author_id', user.id),
     // Club board notices this account posted as a coach (00053)
     admin.from('club_notices').select('*').eq('author_id', user.id),
-    // Plays this account drew (00060; the editor arrives in F2), keyed by owner_id
+    // Plays this account drew or copied as a coach (00060, 00061), keyed by owner_id
     admin.from('plays').select('*').eq('owner_id', user.id),
+    // Plays this account added to a team playbook (00061), keyed by added_by
+    admin.from('team_playbook').select('*').eq('added_by', user.id),
     admin.from('profiles').select('*').eq('id', user.id).maybeSingle(),
     ...USER_TABLES.map((table) => admin.from(table).select('*').eq('user_id', user.id)),
   ]);
@@ -120,6 +124,7 @@ export async function GET() {
   data.founder_posts = founderPosts.error ? { error: 'unavailable' } : founderPosts.data || [];
   data.club_notices = clubNotices.error ? { error: 'unavailable' } : clubNotices.data || [];
   data.plays = ownPlays.error ? { error: 'unavailable' } : ownPlays.data || [];
+  data.team_playbook = playbookAdds.error ? { error: 'unavailable' } : playbookAdds.data || [];
 
   const body = {
     exported_at: new Date().toISOString(),

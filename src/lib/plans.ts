@@ -12,6 +12,10 @@
 //   free IQ sections    study_topics.is_free (00037)
 //   30-day shot chart   dashboard page
 //   teams coached       create_team_with_details (00047): 1 free, 10 with Pro
+//   free plays          plays.is_free (00060); plays a coach sets always open
+//   coach plays         FREE_COACH_PLAYS, playbook teams FREE_PLAYBOOK_TEAMS and
+//                       PRO_PLAYBOOK_TEAMS in src/lib/plays/limits.ts, enforced by
+//                       the 00061 triggers (a test checks the numbers match)
 //   drills              DRILL_COUNT below, checked against the migrations by a test
 //
 // The thinking behind the split: Free keeps everything that brings players in
@@ -20,6 +24,7 @@
 // unlimited AI, the one thing that costs money every time it runs.
 import { FREE_MONTHLY_AI_REPORTS } from './entitlements';
 import { FREE_CHAT_PER_DAY } from './ai/chat';
+import { FREE_COACH_PLAYS, FREE_PLAYBOOK_TEAMS, PRO_PLAYBOOK_TEAMS } from './plays/limits';
 
 /** Drills in the library: 150 in 00013 and 18 in 00048. __tests__/plans.test.ts counts them. */
 export const DRILL_COUNT = 168;
@@ -41,10 +46,12 @@ export const FREE_PLAN: Plan = {
     `All ${DRILL_COUNT} drills, and form check whenever you want`,
     '4 complete training programs, including Basketball Strength Foundations',
     'Basketball IQ: the question of the day and the first 3 sections',
+    'The free plays in the library with a quiz on your role, and every play your coach sets',
     'Your shot chart for the last 30 days',
     `${FREE_MONTHLY_AI_REPORTS} AI coaching reports a month and ${FREE_CHAT_PER_DAY} questions to the coach a day`,
     'Friends, leaderboard, challenges, badges and highlight reels',
     'Coach one team: a team code, the roster, assignments and this week at a glance',
+    `As a coach, draw and keep ${FREE_COACH_PLAYS} plays, with a playbook for ${FREE_PLAYBOOK_TEAMS} team`,
   ],
 };
 
@@ -56,9 +63,11 @@ export const PRO_PLAN: Plan = {
     'Unlimited questions to your AI coach, plus a weekly AI report',
     'Every training program, built around a goal or your position',
     'Every Basketball IQ section, with all lessons and quizzes',
+    'Every play in the library, each with a quiz on your role',
     'Your all-time shot chart, and how your form changes over time',
     'An AI development plan from your NBA style match',
     'Coach up to 10 teams from one coach home',
+    `As a coach, as many plays as you like, with playbooks for up to ${PRO_PLAYBOOK_TEAMS} teams`,
     'Everything in Free',
   ],
 };
