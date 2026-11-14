@@ -1,6 +1,6 @@
 # Tracker speed: uploads decoded, not played; camera frames off the main thread (2026-11-14)
 
-Agent: Claude Code (Opus 5.5) · Commits: 9951936 (#113), 53bedba (#115), 5c0321e (#118) · PR: #113, #115, #118 (drafts, stacked on #108) · Status: in review
+Agent: Claude Code (Opus 5.5) · Commits: 9951936 (#113), 53bedba (#115), 5c0321e (#118) · PR: #113, #115, #118 (stacked on #108) · Status: merged 14 Nov (#113 a7e98ba, #115 34b12cd, #118)
 
 ## Outcome
 - Founder asked how to make the tracker faster on phones. Measured in Chrome on the laptop with the app's own frame path: the tracker's pixel work is ~1.7 ms a frame; reading each frame out of a playing video is 11-16 ms, and on clip 2 (60 fps) a quarter of the frames never reached the tracker (25/31; bench 31/31), whichever way the pixels were read.
@@ -24,7 +24,7 @@ Agent: Claude Code (Opus 5.5) · Commits: 9951936 (#113), 53bedba (#115), 5c0321
 
 ## Status changes
 - Closed: none
-- Opened: S37
+- Opened: S38
 
 ## Gotchas
 - A clip cut with `-c copy` carries an edit list; ignoring it made the decoder's first frame a different moment from the <video>'s, which looked like a rotation bug.

@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 13, 2026';
+const LAST_UPDATED = 'November 14, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -82,6 +82,15 @@ export default function PrivacyPage() {
             <li>Your level and XP, worked out from your training, so friends can see your level.</li>
             <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests, and the routines and programs you save or import (with their reps targets and notes).</li>
             <li>Study activity: quiz scores and lesson progress.</li>
+            <li>
+              Plays: the plays you save, and for each play quiz you finish, your score and the spots you picked. If you
+              coach, the plays you draw or copy and the plays you add to a team&apos;s playbook. Plays show players by
+              number only, never by name.
+            </li>
+            <li>
+              Film: the clips you save, your notes on clips (only you can ever see them), and for each clip whose
+              questions you answer, your score and the answers you picked. If you coach, the packs of clips you build.
+            </li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
@@ -209,6 +218,11 @@ export default function PrivacyPage() {
               <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>
             )}
             <li>Your browser&apos;s push service (for example Google or Apple) delivers training reminders you turn on.</li>
+            <li>
+              YouTube, which is owned by Google, plays the lesson, drill and exercise videos and the film clips, and only
+              when you tap play.
+              What it receives is under <a className="text-orange-400 underline" href="#cookies-and-videos">Cookies and videos</a>.
+            </li>
           </ul>
         </section>
 
@@ -230,7 +244,13 @@ export default function PrivacyPage() {
           <p>
             If you join a team, its members (including coaches) can see your display name, last 7 days of training
             totals, streak and your game averages (points, rebounds, assists, FG%). Coaches can post assignments and
-            see who completed them. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
+            see who completed them. When a head coach sets a play for the team, they see whether you took its quiz
+            and whether you passed, and how the team answered each question as totals once 3 or more players have
+            answered, never which spots you picked, until 90 days after the due date. They only see results from after
+            the play was set. The same goes for a film clip or pack a head coach sets: they see whether you answered its
+            questions and your score, and how the team answered each question as totals once 3 or more have answered,
+            never which answers you picked. Assistant coaches and teammates do not see quiz or film results, and nobody but you sees
+            your notes on clips. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any
             time from its page.
@@ -280,11 +300,35 @@ export default function PrivacyPage() {
             Data Protection Commission (dataprotection.ie).
           </p>
           <p>
-            Deadeye only uses the cookies needed to keep you logged in. The app also keeps a few things on your device so
-            it works for you (for example unsent drafts, offline saves, your settings and invite links you followed); nothing
-            on your device is used to track
-            you or count visits. Data is stored on servers that may be outside the
-            EU; our providers use the EU&apos;s standard contractual clauses to protect it.
+            Data is stored on servers that may be outside the EU; our providers use the EU&apos;s standard contractual
+            clauses to protect it.
+          </p>
+        </section>
+
+        <section id="cookies-and-videos" className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
+          <p>
+            Deadeye&apos;s own cookies are only there to keep you logged in. The app also keeps a few things on your
+            device so it works for you (for example unsent drafts, offline saves, your settings and invite links you
+            followed); nothing on your device is used to track you or count visits.
+          </p>
+          <p>
+            Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads
+            from YouTube until you tap play on a video. (On a film clip, the tap also loads YouTube&apos;s player
+            controls, so the clip can stop at each question.) When you do, YouTube receives your IP address (the number that identifies
+            your internet connection) and details about your phone or computer and its browser, and it may store data
+            on your device. If you are signed in to YouTube or Google on the same browser, YouTube can link what you
+            watch to that account. What YouTube does with that is covered by{' '}
+            <a
+              className="text-orange-400 underline"
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Google&apos;s privacy policy
+            </a>
+            . If you would rather YouTube did not get this, do not tap play: the rest of the lesson or drill still
+            works.
           </p>
         </section>
 

@@ -23,7 +23,7 @@ Agent: Claude Code (Fable 5.2, then Opus 5.5) · Commits: d10207d (merge of `ben
 
 ## Status changes
 - Closed: none
-- Opened: S36
+- Opened: S37
 
 ## Gotchas
 - Running two bench suites at once ran the laptop out of memory (Claude Code stopped one). Run one clip at a time; freeze a copy of the code outside the worktree so edits do not corrupt a run.

@@ -1,7 +1,9 @@
 // src/app/(app)/admin/demo-videos/page.tsx
 // Owner tool: pick the YouTube video that plays on each drill, exercise and
 // IQ lesson. Players see it in the drill page, the exercise library and the
-// lesson; anything without one keeps the YouTube search link.
+// lesson; anything without one keeps the YouTube search link. The Film clips
+// and Film packs tabs add the clips with questions on the Film tab (F3,
+// FilmOwnerSection.tsx).
 import React from 'react';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
@@ -13,6 +15,7 @@ import { PageHeader } from '@/components/layout/PageHeader';
 import { isRealYoutubeId, youtubeIdFromLink } from '@/lib/video/youtube';
 import { skillLabel } from '@/lib/drills';
 import { muscleLabel } from '@/lib/exercises';
+import { FilmOwnerSection } from './FilmOwnerSection';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Demo videos - Deadeye' };
@@ -48,9 +51,44 @@ interface Item {
   search: string;
 }
 
-export default async function DemoVideosPage({ searchParams }: { searchParams: Promise<{ show?: string; bad?: string }> }) {
+/** The film tabs: clips with questions, and the library packs (00062). */
+const FILM_TABS = ['film', 'packs'] as const;
+type FilmTab = (typeof FILM_TABS)[number];
+
+function Tabs({ show }: { show: string }) {
+  return (
+    <div className="mb-4 flex flex-wrap gap-2">
+      {[...KINDS, ...FILM_TABS].map((k) => (
+        <Link
+          key={k}
+          href={`/admin/demo-videos?show=${k}`}
+          aria-current={show === k ? 'page' : undefined}
+          className={`inline-flex min-h-11 items-center rounded-full px-3 text-xs font-semibold capitalize ${
+            show === k ? 'bg-orange-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          {k === 'film' ? 'Film clips' : k === 'packs' ? 'Film packs' : k}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+export default async function DemoVideosPage({ searchParams }: { searchParams: Promise<{ show?: string; bad?: string; edit?: string }> }) {
   if (!(await checkIsOwner())) notFound();
   const params = await searchParams;
+  const filmTab: FilmTab | undefined = FILM_TABS.find((k) => k === params.show);
+  if (filmTab) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="p-4 md:p-8 max-w-2xl mx-auto">
+          <PageHeader tone="hoops" icon={PlayCircle} title="Demo videos" subtitle="Videos on drills, exercises and lessons, and the film clips" />
+          <Tabs show={filmTab} />
+          <FilmOwnerSection show={filmTab} edit={params.edit} />
+        </div>
+      </div>
+    );
+  }
   const show: Kind = KINDS.find((k) => k === params.show) ?? 'drills';
   const admin = createAdminClient();
 
@@ -105,19 +143,7 @@ export default async function DemoVideosPage({ searchParams }: { searchParams: P
       <div className="p-4 md:p-8 max-w-2xl mx-auto">
         <PageHeader tone="hoops" icon={PlayCircle} title="Demo videos" subtitle="The video that plays on each drill, exercise and IQ lesson" />
 
-        <div className="mb-4 flex gap-2">
-          {KINDS.map((k) => (
-            <Link
-              key={k}
-              href={`/admin/demo-videos?show=${k}`}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold capitalize ${
-                show === k ? 'bg-orange-600 text-white' : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200'
-              }`}
-            >
-              {k}
-            </Link>
-          ))}
-        </div>
+        <Tabs show={show} />
 
         {problem && show !== 'lessons' ? (
           <p className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
