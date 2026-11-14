@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-14 (Focus Finder follow-ups built; under-16 consent question answered)
+Last updated: 2026-11-14 (S34 closed: Focus Finder follow-ups live, #110)
 
 ## Rules
 
@@ -33,7 +33,6 @@ Last updated: 2026-11-14 (Focus Finder follow-ups built; under-16 consent questi
 | Id | What | Owner | Since | Last checked |
 | --- | --- | --- | --- | --- |
 | S1 | Sign the DPIA (`docs/legal/dpia.md`, section 7) with the account holder, then its 7 open actions (action 7, routine import, is done apart from S21). Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions), and Focus Finder AI plans (PR #103). From its safety review: section 1 row (free text, picked weaknesses, position, level, make rates, IQ scores, coach read counts, setup goals; team age group, level, size; contract plus parent consent for 13-15; plan kept for the account's life, text not kept, provider 30 days); R5 support line now shown in the browser; R11 extended to free text naming other people; note that suggestions are profiling for the core service only (ICO std 12) and free text may hold Art 9 health data, minimised by not storing it. | Founder | 2026-11-07 | 2026-11-13: still DRAFT; sign-up answer row and R8 added on PR #97 |
-| S34 | Focus Finder follow-ups, built 14 Nov on branch `feat/focus-followups` (PR, see Recently done): matcher reads defensive clauses, delete one saved plan, arrow keys on the For me / For my team switch, coaches can rename a team. Next: founder merges it; then rename the test team ("Deadeye Test TeamDeadeye Test Team", code T8RM7J, no players) to "Deadeye Test Team" on the live site with the new field. | Founder (merge), lead (rename) | 2026-11-13 | 2026-11-14: built, tests green |
 | S35 | 5 of 36 IQ lesson videos are gone from YouTube (oEmbed 404 on 13 Nov; the player sees "Video unavailable"): One-Motion Shooting Dip (`rCwr_b4sVQE`), Shot Pocket Alignment (`b7r-YJ6kLz8`), The Veer Finish (`W5b7fN_zRkk`), Reading Drop Coverage (`k9F7pX2_1sQ`), Running the Floor (`JBSAIy6npKY`). The first four are in free sections, and Focus Finder links straight to them. Pick replacement clips (watch them first), then update `study_items.youtube_video_id` in a migration. | Founder decides / builder | 2026-11-13 | 2026-11-13: all 36 ids checked |
 | S2 | Hoop model credits (`ml/rim-detector/ATTRIBUTION.md`): rim-finding shipped 3 Nov, CC BY needs the credit. Done: ballllls, X-Basket, basketball-computer-vision (links added 11 Nov). Missing: the page link for Basketball Shot Tracking (311 images, CC BY 4.0, classes ball, rim, backboard; the Colab file was `Basketball Shot Tracking.coco.zip`). Not found by the founder or by web search. If it cannot be found, ask whether to drop that dataset and retrain. | Founder | 2026-11-03 | 2026-11-11: 3 of 4 linked |
 | S3 | Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (`docs/founder-setup-guide.md`); then the Play Store. | Founder | 2026-11-09 | 2026-11-09 |
@@ -56,6 +55,8 @@ Last updated: 2026-11-14 (Focus Finder follow-ups built; under-16 consent questi
 | S17 | Optional: delete the unused `OPENAI_API_KEY` in Vercel; check `src/proxy.ts` refreshes sessions as current Supabase docs say. | Founder / builder | 2026-11-09 | unconfirmed since 2026-11-09 |
 
 ## Recently done (do not raise again)
+
+- 2026-11-14 · S34 closed: Focus Finder follow-ups merged in #110 (`18e9431`) on the founder's word and checked live as the tester: "We give up open corner threes and never box out" now picks only help defence/closeouts and boxing out; Team details renamed the test team to "Deadeye Test Team" (code T8RM7J, no players). Delete-a-plan and the arrow keys are covered by tests, not tried live.
 
 - 2026-11-14 · Focus Finder follow-ups built (branch `feat/focus-followups`): "we give up open corner threes" now means closeouts, not catch-and-shoot (clause-level defensive reading); "Delete this plan" (server route, own Focus plans only, no migration); arrow keys on the mode switch; team name editable in Team details. 1245 tests green. 
 - 2026-11-14 · Safety review question closed: the founder confirmed no other under-16 has signed up since the parent page changed, so no one needs fresh consent for Focus Finder.
