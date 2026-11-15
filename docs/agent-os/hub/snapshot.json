@@ -337,6 +337,24 @@
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
       "title": "Merge PR #86: overclaim wording fixed site-wide",
       "words": "merge 86"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS (3 notes: totals by subtraction, Plays live before S1); typegen, tsc, eslint, 1654 tests pass; migrations 00060-00064 (check they are live); FILM_LIVE stays off until S1 is signed.",
+      "id": "merge-112",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
+      "title": "Merge PR #112: Film and Plays on the IQ tab",
+      "words": "merge 112"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "PR #116 merged (head 74d4b16, the one that passed safety and checks). Once the new deploy is live: Supabase SQL editor, run supabase/migrations/00065_attempts_server_written.sql, then the two checks in its header (both false). Then a role quiz and a Film clip with the tester account. Steps 4 to 7 of the PR comment checklist.",
+      "id": "run-00065",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/116",
+      "onApprove": "It moves to In progress. Tell Claude when it has run and the smoke test passed, then mark it Done.",
+      "title": "Run migration 00065 now #116 is merged"
     }
   ],
   "clubs": {
@@ -549,12 +567,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (new agents, PR #94, 11 Nov) is running (checked 13 Nov).",
+      "detail": "Live and up to date: the latest version (PR #121, 15 Nov) is running (checked 15 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "0 errors in the last 24 hours (checked 13 Nov; Vercel keeps about an hour of detail). 0 problem or crash reports open (9 Nov counts).",
+      "detail": "1 small error in the last 24 hours (checked 15 Nov): the age check lookup failed for a moment on the dashboard because of a clock difference between servers (2 times since 18 Oct). Ranked P2: the page let the player in for that one load. No crash.",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -564,9 +582,9 @@
       "status": "warn"
     },
     {
-      "detail": "2 open, checks green on both. PR #95 (agent scheduled runs, docs only) is up to date with main. PR #87 (handoff notes, docs only) clashes with newer changes on main and needs updating before it can merge.",
+      "detail": "3 open, checks green on all: PR #117 (status notes), PR #95 (agent scheduled runs) and PR #87 (handoff notes), all docs only.",
       "name": "Code changes",
-      "status": "warn"
+      "status": "ok"
     }
   ],
   "learn": [
@@ -608,6 +626,46 @@
     }
   ],
   "log": [
+    {
+      "at": "2026-11-15T08:09:24Z",
+      "text": "Morning check: live site up to date (PR #121, ready). 1 small error (age check lookup, clock difference, P2), no crash. 3 open pull requests, all checks green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T15:20:00Z",
+      "text": "PR #116 merged (head 74d4b16, the commit that passed safety and checks). Merge call replaced with one task: run migration 00065 once the deploy is live.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T15:10:00Z",
+      "text": "PR #116 checked (Plays switch and server-written scores, head 74d4b16): safety PASS, all checks green. Run 00065 only after the merge is live. Ready for merge 116.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T14:29:00Z",
+      "text": "PR #112 checked (Film and Plays, head 96600f2): safety PASS with 3 notes, all checks green. 5 migrations to confirm, FILM_LIVE stays off. Ready for merge 112.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T13:45:00Z",
+      "text": "PR #110 merged (head 5519311, the commit that passed safety and checks). Merge call removed; nothing for you to do.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T13:35:00Z",
+      "text": "PR #110 checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 110.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T04:40:00Z",
+      "text": "PR #107 merged (head 3557110, the commit that passed safety and checks). Merge call removed; nothing for you to do.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-14T04:30:00Z",
+      "text": "PR #107 checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 107.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-13T16:30:00Z",
       "text": "Learning digest: 26 new lessons this week (video editor 15, marketing 3, designer 2, release checker 2, support triage 2, player outreach 1, safety reviewer 1). No research due.",
@@ -667,46 +725,6 @@
       "at": "2026-11-09T16:15:00Z",
       "text": "Parent consent wording for 16 and 17 year olds drafted for you to edit: docs/agent-os/clubs/2026-11-09-parent-consent-16-17.md. Nothing sent.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T15:28:00Z",
-      "text": "E4 checked live on the reset tester account: reminders card shows, suggested days, all three messages right, no console errors.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T15:25:00Z",
-      "text": "PR #77 (E4 follow-ups) and PR #78 (hub redesign) merged. Hub pinned to your claude.ai sidebar.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T15:20:00Z",
-      "text": "PR check re-ran on PR #78 after it was brought up to date: safety passed.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T15:10:00Z",
-      "text": "PR check ran on PR #78 (hub redesign): safety passed.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T14:58:00Z",
-      "text": "PR check ran on PR #77: safety passed, all checks green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T14:42:00Z",
-      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T14:40:00Z",
-      "text": "PR #74 merged and live: E4 reminders card on the dashboard.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T14:14:00Z",
-      "text": "Morning check: no errors, live site up to date, no urgent problems.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -723,7 +741,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-13T16:30:00Z",
-  "updatedBy": "Learning digest",
+  "updatedAt": "2026-11-15T08:09:24Z",
+  "updatedBy": "Morning check",
   "version": 1
 }
