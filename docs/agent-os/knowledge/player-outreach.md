@@ -30,7 +30,8 @@ first, each with the date, what happened, and the rule.
       moderators asked where required.
 - [ ] Gives something useful first; under 150 words; one ask; never the same text twice; at
       most one community a day; no DMs to members of a server or group.
-- [ ] Its own tracking link or QR per route (`?ref=` or UTM); no per-person tracking.
+- [ ] Names the sign-up answer per route; links and QR go to the plain address, no `?ref=`, UTM
+      or other code (ePrivacy, safety review 13 Nov 2026); no per-person tracking.
 - [ ] Only features that exist and prices on `/pro`; no "thousands of players", no results an
       ordinary child cannot reach, no pressure to recruit friends (ASAI section 7, CAP 5.2.2).
 - [ ] The founder sends or posts; nothing published by the agent.
@@ -56,8 +57,21 @@ first, each with the date, what happened, and the rule.
 - [ ] Zero from a small number is not proof of zero (rule of three: 0 of 30 could still be up
       to about 10%).
 - [ ] One or two routes run for several weeks before adding more.
-- [ ] Optional "how did you hear about us?" with fixed answers suggested to the builder (`G`
-      item), alongside `?ref=` capture, which the app does not record yet (2026-11-11).
+- [ ] The sign-up answer ("Where did you hear about Deadeye?") is counted (joined, set up, 1st
+      session) at `/admin/funnel` and in the weekly counts file once PR #97 merges; check it is
+      merged before reading numbers. It names a channel, not a route: two routes with the same
+      answer cannot be told apart, so run one per answer at a time. Skipped shows as "Didn't say".
+- [ ] Optional "how did you hear about us?" with fixed answers could still catch the "no
+      route" players; suggest it to the lead, not as a ref-capture item.
+
+### Before drafting
+
+- [ ] Trend board (`trends/ads.md`) read; if over 7 days old or "never", say so in the plan.
+- [ ] Clubs, schools and academies (and their adult or social teams) are club-growth's; check
+      `clubs/pipeline.md` before adding a route.
+- [ ] The founder is under 18 (`docs/launch-checklist.md`): any press, interview or email to an
+      organisation copies in a parent, and a parent agrees before the founder's name or photo
+      appears anywhere.
 
 ## Research
 

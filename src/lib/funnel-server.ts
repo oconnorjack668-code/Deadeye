@@ -5,6 +5,7 @@
 // page and the agents see the same numbers.
 import { createAdminClient } from '@/lib/supabase/admin';
 import { testAccountEmails } from '@/lib/testAccounts';
+import { normaliseHeardFrom } from '@/lib/heardFrom';
 import { buildFunnel, type Funnel, type FunnelSession } from '@/lib/funnel';
 import { clubCounts, type ClubCounts } from '@/lib/agentCounts';
 
@@ -46,7 +47,10 @@ export async function loadFunnel(days: number): Promise<{ funnel: Funnel; exclud
     const users = list.users;
     const excluded = await excludedIds(admin, users);
     const since = days > 0 ? Date.now() - days * 86_400_000 : 0;
-    const cohort = users.filter((u) => !excluded.has(u.id) && Date.parse(u.created_at) >= since).map((u) => u.id);
+    const cohortUsers = users.filter((u) => !excluded.has(u.id) && Date.parse(u.created_at) >= since);
+    const cohort = cohortUsers.map((u) => u.id);
+    // The optional sign-up answer (src/lib/heardFrom.ts); older accounts have none
+    const heardOf = new Map(cohortUsers.map((u) => [u.id, normaliseHeardFrom(u.user_metadata?.heard_from)]));
 
     const [profiles, events, sessions, first] = await Promise.all([
       inBatches<{ id: string; onboarding_completed: boolean }>(cohort, (b) => admin.from('profiles').select('id, onboarding_completed').in('id', b)),
@@ -56,7 +60,7 @@ export async function loadFunnel(days: number): Promise<{ funnel: Funnel; exclud
     ]);
     const setup = new Set(profiles.filter((p) => p.onboarding_completed).map((p) => p.id));
     const funnel = buildFunnel(
-      cohort.map((id) => ({ id, setupDone: setup.has(id) })),
+      cohort.map((id) => ({ id, setupDone: setup.has(id), heardFrom: heardOf.get(id) ?? null })),
       events,
       sessions
     );

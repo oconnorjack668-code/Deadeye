@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getActiveProgram } from '@/lib/programs';
 import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck, Flame } from 'lucide-react';
+import { CalendarCheck, Wand2, ListChecks, Sparkles, Video, Users, BookHeart, Trophy, ChevronRight, Medal, Crosshair, Crown, Shield, UserPlus, MessageCircle, ClipboardList, ClipboardCheck, Flame, ScanSearch } from 'lucide-react';
 
 export const metadata = { title: 'Train - Deadeye' };
 
@@ -58,6 +58,7 @@ const GROUPS: Array<{ label: string; labelColor: string; items: Item[] }> = [
     label: 'Learn',
     labelColor: 'text-blue-400',
     items: [
+      { href: '/focus', icon: ScanSearch, title: 'Focus Finder', desc: 'Name a weakness, get the film, IQ and drills for it', ...LEARN },
       { href: '/drills', icon: ListChecks, title: 'Drill library', desc: 'Steps, cues and mistakes', ...LEARN },
       { href: '/style-match', icon: Users, title: 'Play style match', desc: 'NBA players you play like', ...LEARN },
       { href: '/guides', icon: BookHeart, title: 'Guides', desc: 'Mindset, recovery, nutrition', ...LEARN },

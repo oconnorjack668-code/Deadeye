@@ -63,8 +63,9 @@ in the README), not only to get views.
    - 1 to 3 founder posts for followers in the app (Owner tools → Founder
      posts): plain text, at most 500 characters.
    - One experiment to try and how you will know it worked: a link click,
-     a sign-up from the landing demo (`signup_from_demo` in `/admin/funnel`),
-     or a first session.
+     sign-ups answering TikTok, Instagram or YouTube to "Where did you hear
+     about Deadeye?" (`/admin/funnel`, by answer), or a first session. No
+     codes or UTM tags in links (ePrivacy; `docs/agent-os/outreach/routes.md`).
 4. Add the top ideas to `docs/agent-os/marketing/ideas.md` (a running list,
    newest first, each marked `idea`, `approved`, `posted` or `dropped`).
    Done when the plan exists and the founder has a short list to approve.

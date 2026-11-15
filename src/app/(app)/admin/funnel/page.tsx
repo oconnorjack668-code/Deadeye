@@ -3,6 +3,7 @@
 // Joining and sessions come from the tables they already live in; the welcome
 // and tracker steps come from app_events (00045).
 import React from 'react';
+import { heardFromLabel } from '@/lib/heardFrom';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
@@ -86,6 +87,34 @@ export default async function FunnelPage({ searchParams }: { searchParams: Promi
                 </ul>
               </section>
             ))}
+
+            <section className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
+              <h2 className="text-sm font-bold text-white">Where they heard about Deadeye</h2>
+              <p className="mb-3 text-xs text-zinc-500">
+                The optional question at sign-up (asked from 13 Nov 2026). Judge a route on 1st sessions; under about 30 players
+                it is a hint, not a result.
+              </p>
+              <table className="w-full text-sm tabular-nums">
+                <thead>
+                  <tr className="text-left text-xs text-zinc-500">
+                    <th className="pb-2 font-medium">Answer</th>
+                    <th className="pb-2 text-right font-medium">Joined</th>
+                    <th className="pb-2 text-right font-medium">Set up</th>
+                    <th className="pb-2 text-right font-medium">1st session</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {result.funnel.routes.map((r) => (
+                    <tr key={r.route ?? 'none'} className="border-t border-zinc-800">
+                      <td className="py-2 text-zinc-300">{heardFromLabel(r.route)}</td>
+                      <td className="py-2 text-right text-white">{r.joined}</td>
+                      <td className="py-2 text-right text-white">{r.setup}</td>
+                      <td className="py-2 text-right font-bold text-white">{r.firstSession}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
 
             <p className="text-sm text-zinc-500">
               Percentages are of players who joined in this window. Your own account

@@ -21,8 +21,8 @@ import {
   type SavedRim,
 } from '@/lib/video/rimMemory';
 import { cropRectFor } from '@/lib/video/crop';
-import { createWorkload, repeatSignature, sameSignature } from '@/lib/video/workload';
-import { createEngine, type TrackerEngine } from '@/lib/video/trackerEngine';
+import { createWorkload, repeatSignature, sameSignature, SLOW_RATE, CANVAS_LEVELS } from '@/lib/video/workload';
+import { createEngine, decodeWorks, type TrackerEngine } from '@/lib/video/trackerEngine';
 import type { PipelineFrame } from '@/lib/video/trackerPipeline';
 import { shiftInFrame, type Shift } from '@/lib/video/cameraShift';
 import { createHealthMonitor, type HealthMonitor, type HealthReading } from '@/lib/video/liveHealth';
@@ -129,6 +129,19 @@ function edgesOfRim(rim: Rim): [Point, Point] {
 /** After a drill is done, how long the last call stays up before review. */
 const DRILL_END_MS = 1500;
 
+/** Live camera: bitmaps that may be in the making at once (see scoreFrame). */
+const MAX_CAPTURES = 2;
+
+/**
+ * An upload being decoded that has scored no frame by now is given up on and
+ * played instead (clipDecoder.ts). On the live site in Chrome on the bench
+ * laptop (14 Nov 2026) decoding stalled without an error - no frame, no
+ * failure - while the same build on its preview decoded the same clip in
+ * under 8 seconds. Without this the player was left on "Checking every frame"
+ * for ever. A clip normally scores its first frame well inside a second.
+ */
+const DECODE_START_MS = 8000;
+
 const CALM: HealthReading = { ball: false, issues: [], fps: null };
 
 export function ShotTracker({
@@ -168,6 +181,14 @@ export function ShotTracker({
   const [shots, setShots] = useState<TrackedShot[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
+  /** The upload is playing at SLOW_RATE so that every frame is checked. */
+  const [slowedDown, setSlowedDown] = useState(false);
+  /**
+   * The upload is being decoded frame by frame rather than played
+   * (clipDecoder.ts). A ref too, for the tracking loop's closures.
+   */
+  const [decoding, setDecoding] = useState(false);
+  const decodingRef = useRef(false);
   const [zone, setZone] = useState<ShotZoneChoice>('all-around');
   const [saving, setSaving] = useState(false);
   const [elapsedMs, setElapsedMs] = useState(0);
@@ -791,7 +812,15 @@ export function ShotTracker({
 
     const startedAt = performance.now() - clockBaseRef.current;
 
-    if (source === 'file') {
+    // An uploaded clip is decoded frame by frame where the browser can, rather
+    // than played (clipDecoder.ts): nothing is lost to the playback clock, and
+    // it is usually faster than watching it. Not the sample, which comes as an
+    // address rather than a file, and not a session resumed after a re-aim.
+    const decodeFirst = source === 'file' && !resume && !sample && !!videoFile && decodeWorks();
+    decodingRef.current = false;
+    setDecoding(false);
+
+    if (source === 'file' && !decodeFirst) {
       if (!resume) video.currentTime = 0;
       // Always real time: never faster (see the note where the 2x selector
       // used to be), and never slower either - see src/lib/video/workload.ts
@@ -803,12 +832,13 @@ export function ShotTracker({
     // requestVideoFrameCallback only fires while new frames are being
     // presented; once a clip ends none are, so nothing ever schedules
     // processFrame again and the video.ended check inside it is never reached.
-    if (source === 'file') {
+    const listenForEnd = () => {
       endedCleanupRef.current?.();
       const onEnded = () => void finish();
       video.addEventListener('ended', onEnded);
       endedCleanupRef.current = () => video.removeEventListener('ended', onEnded);
-    }
+    };
+    if (source === 'file' && !decodeFirst) listenForEnd();
 
     // A live session is kept on the phone for replays, the highlight reel and
     // a second look (liveRecorder.ts). Started with the clock, so a shot's
@@ -820,9 +850,15 @@ export function ShotTracker({
     // Thins 60 fps to the 30 the tracker was measured at, and gives a device
     // that cannot keep up a smaller picture to work on instead of slowing the
     // clip (src/lib/video/workload.ts). The camera is live, so the same applies.
-    const workload = createWorkload();
+    // An upload can be slowed when frames are being lost; a live camera cannot
+    const workload = createWorkload({ slowFirst: source === 'file' });
     workloadRef.current = workload;
+    setSlowedDown(false);
     let lastSignature: Uint8Array | null = null;
+    // Bitmaps being made from frames, and the chain that hands them over in
+    // order: see scoreFrame
+    let capturing = 0;
+    let captures: Promise<void> = Promise.resolve();
     // Built on the first frame with real dimensions: videoWidth is 0 until
     // metadata loads, and the crop and the expected ball size come from it
     let engine: TrackerEngine | null = null;
@@ -838,7 +874,9 @@ export function ShotTracker({
       activityRef.current.push(shot.t);
       overlayLogRef.current?.call(shot);
       lastCallRef.current = { t: shot.t, made: shot.made };
-      navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
+      // Decoding calls shots faster than real time, with nobody shooting:
+      // the counts and the call beside the rim are enough
+      if (!decodingRef.current) navigator.vibrate?.(shot.made ? 40 : [20, 50, 20]);
       // Counted from the run's own list rather than from `shots` state, which
       // has not re-rendered yet
       const attempts = madeRef.current.length;
@@ -846,7 +884,7 @@ export function ShotTracker({
       setFlash({ id, made: shot.made, confident: shot.confident, makes, attempts, streak: streaks(madeRef.current).current });
       // A phone on a tripod is metres away and the player is usually facing
       // the hoop, so sound is the part of the confirmation that reaches them
-      announceShot(sound, shot.made, makes, attempts, drillCue(modeRef.current, madeRef.current));
+      if (!decodingRef.current) announceShot(sound, shot.made, makes, attempts, drillCue(modeRef.current, madeRef.current));
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       flashTimerRef.current = setTimeout(() => setFlash(null), 1400);
       const milestone = milestoneFor(madeRef.current);
@@ -879,12 +917,18 @@ export function ShotTracker({
       }
       if (r.moved) {
         movesRef.current += 1;
-        healthRef.current.setMoved(true);
-        setMoved(r.moved);
+        // Fix rim re-aims on the picture the video is showing, which while
+        // decoding is not the frame being scored: the move is only counted
+        if (!decodingRef.current) {
+          healthRef.current.setMoved(true);
+          setMoved(r.moved);
+        }
       }
       overlayLogRef.current?.frame(r.t, r.ball);
       if (r.shot) onShot(r.shot);
-      draw(calibratedRim, r.ball, r.t);
+      // The video is not playing while decoding, so a ball drawn over it
+      // would be in the wrong place
+      if (!decodingRef.current) draw(calibratedRim, r.ball, r.t);
 
       // Only re-render a few times a second, not every frame
       if (r.t - lastPush > 250) {
@@ -927,6 +971,39 @@ export function ShotTracker({
       cropSideRef.current = crop.side;
       const px = workload.canvas();
       if (minCanvasRef.current === null || px < minCanvasRef.current) minCanvasRef.current = px;
+      // The live camera hands the worker the crop as a bitmap the graphics
+      // chip has already cut and shrunk, so this thread does not stop to read
+      // the frame back (trackerEngine.ts). Not uploads: a clip can show a
+      // frame twice, and spotting that needs the pixels here, before the
+      // workload counts the frame (see the repeat check below). A camera
+      // never repeats one.
+      if (source === 'camera' && engine.takesBitmaps()) {
+        // Two may be in the making at once: with one, the next frame often
+        // arrived before the last bitmap was ready and went unscored (about
+        // two frames a second fewer on the bench laptop's fake camera)
+        if (capturing >= MAX_CAPTURES) return;
+        capturing++;
+        const engineNow = engine;
+        const made = createImageBitmap(video, crop.sx, crop.sy, crop.side, crop.side, { resizeWidth: px, resizeHeight: px, resizeQuality: 'low' });
+        // Handed over strictly in the order the frames came: the tracker
+        // compares each frame with the ones before it
+        captures = captures.then(() =>
+          made.then(
+            (bitmap) => {
+              capturing--;
+              if (run !== runRef.current || stopRef.current || engineRef.current !== engineNow) {
+                bitmap.close();
+                return;
+              }
+              workload.scored(now);
+              engineNow.pushBitmap(bitmap, px, now);
+            },
+            // The frame was not ready to read: it goes unscored, as a skip
+            () => void capturing--
+          )
+        );
+        return;
+      }
       const canvas = cropCanvasRef.current;
       if (!canvas) return;
       if (canvas.width !== px) {
@@ -945,6 +1022,10 @@ export function ShotTracker({
       if (lastSignature && sameSignature(signature, lastSignature)) return;
       lastSignature = signature;
       workload.scored(now);
+      if (source === 'file' && workload.slowed() && video.playbackRate !== SLOW_RATE) {
+        video.playbackRate = SLOW_RATE;
+        setSlowedDown(true);
+      }
       engine.push(pixels, px, now);
       if (source === 'file' && Number.isFinite(video.duration) && video.duration > 0) setProgress(video.currentTime / video.duration);
     };
@@ -962,6 +1043,80 @@ export function ShotTracker({
       if (v.requestVideoFrameCallback) v.requestVideoFrameCallback(processFrame);
       else requestAnimationFrame(processFrame);
     };
+
+    /** Plays the clip instead, as before decoding existed: options 1 and 3 still apply. */
+    const playInstead = async () => {
+      video.currentTime = 0;
+      video.playbackRate = 1;
+      listenForEnd();
+      await video.play().catch(() => undefined);
+      processFrame();
+    };
+
+    if (decodeFirst && videoFile) {
+      const decoder = createEngine({ rim: calibratedRim, videoWidth: video.videoWidth, videoHeight: video.videoHeight }, onResult);
+      if (decoder.takesFiles()) {
+        video.pause();
+        video.currentTime = 0;
+        engine = decoder;
+        engineRef.current = decoder;
+        inWorkerRef.current = true;
+        decodingRef.current = true;
+        setDecoding(true);
+        cropSideRef.current = cropRectFor(calibratedRim, video.videoWidth, video.videoHeight).side;
+        minCanvasRef.current = CANVAS_LEVELS[0];
+        const startedDecoding = performance.now();
+        let lastStage = 'sent';
+        let settled = false;
+        const failed = (message: string, frames: number) => {
+          if (settled || run !== runRef.current || stopRef.current) return;
+          settled = true;
+          clearTimeout(watchdog);
+          reportError(
+            'client',
+            new Error(
+              `Clip decoding failed after ${frames} frames, ${Math.round((performance.now() - startedDecoding) / 1000)}s, last step ${lastStage}: ${message}`
+            )
+          );
+          if (frames > 0) {
+            // Part way: call what was seen rather than start again
+            void finish();
+            return;
+          }
+          // Nothing was scored: play it instead, from the start. Disposing
+          // ends the worker, and a decode stalled in it with it.
+          decoder.dispose();
+          engine = null;
+          engineRef.current = null;
+          decodingRef.current = false;
+          setDecoding(false);
+          void playInstead();
+        };
+        // Given up on when nothing has been scored in time: see DECODE_START_MS
+        const watchdog = setTimeout(() => {
+          if (analysedRef.current === 0) failed(`no frame in ${DECODE_START_MS / 1000}s`, 0);
+        }, DECODE_START_MS);
+        decoder.decodeFile(videoFile, CANVAS_LEVELS[0], {
+          onProgress: (t, durationMs) => {
+            if (run === runRef.current && durationMs > 0) setProgress(Math.min(1, t / durationMs));
+          },
+          onStage: (stage) => {
+            lastStage = stage;
+          },
+          onDone: () => {
+            if (settled || run !== runRef.current) return;
+            settled = true;
+            clearTimeout(watchdog);
+            void finish();
+          },
+          onFailed: failed,
+        });
+        return;
+      }
+      decoder.dispose();
+      await playInstead();
+      return;
+    }
     processFrame();
   }
 
@@ -989,13 +1144,16 @@ export function ShotTracker({
     // what the net does next - and without this the last shot was dropped
     const engine = engineRef.current;
     engineRef.current = null;
-    addLastCall(engine ? await engine.finish() : null);
+    for (const last of engine ? await engine.finish() : []) addLastCall(last);
     const inWorker = engine?.inWorker() ?? null;
     engine?.dispose();
     // Snapshot how the run went. Seconds come from the clip for a file and
     // from the clock for the camera, less any time spent re-aiming.
-    const seconds =
-      source === 'file' && video && Number.isFinite(video.duration) && video.duration > 0
+    // A decoded clip's clock is the last frame scored: the video never played
+    const decoded = decodingRef.current;
+    const seconds = decoded
+      ? elapsedRef.current / 1000
+      : source === 'file' && video && Number.isFinite(video.duration) && video.duration > 0
         ? Math.min(video.currentTime, video.duration)
         : (elapsedRef.current - pausedMsRef.current) / 1000;
     const frames = analysedRef.current;
@@ -1009,8 +1167,12 @@ export function ShotTracker({
         ...(inWorker !== null ? { worker: inWorker } : {}),
         ...(movesRef.current ? { moved: movesRef.current } : {}),
         ...(source === 'camera' ? { locked: lockedRef.current } : {}),
+        ...(workloadRef.current?.slowed() ? { slowed: true } : {}),
+        ...(decoded ? { decoded: true } : {}),
       });
     }
+    decodingRef.current = false;
+    setDecoding(false);
     setShootingMs(activeMs(activityRef.current, elapsedRef.current));
     const log = overlayLogRef.current;
     if (log) setTimeline(log.snapshot({ activity: activityRef.current, mode: modeRef.current, endT: elapsedRef.current }));
@@ -1050,7 +1212,7 @@ export function ShotTracker({
     if (source === 'file') video.pause();
     const engine = engineRef.current;
     engineRef.current = null;
-    addLastCall(engine ? await engine.finish() : null);
+    for (const last of engine ? await engine.finish() : []) addLastCall(last);
     engine?.dispose();
     clockBaseRef.current = elapsedRef.current;
     fixStartedRef.current = performance.now();
@@ -1648,9 +1810,13 @@ export function ShotTracker({
           )}
           <p className="text-sm text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />
-            {rechecked
-              ? 'Checking the recording again at full frame rate. It plays at normal speed.'
-              : health.issues.length
+            {decoding
+              ? 'Checking every frame of the clip, without playing it. Usually quicker than watching it, and no shot is missed between frames.'
+              : slowedDown
+              ? 'Checking every frame, so this clip plays at half speed. It takes a little longer and gets more shots right.'
+              : rechecked
+                ? 'Checking the recording again at full frame rate. It plays at normal speed.'
+                : health.issues.length
                 ? 'Something needs fixing: see the amber note on the picture.'
                 : 'Counting shots. Every one can be corrected before you save.'}
           </p>

@@ -8,7 +8,6 @@ import React from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { SAMPLE_POSTER, SAMPLE_RIM, SAMPLE_TRUTH, downloadSample } from '@/lib/video/sampleClip';
-import { markFromDemo } from '@/lib/events';
 
 // Browser-only (canvas and video frames), and most visitors never press play
 const ShotTracker = dynamic(() => import('@/components/video/ShotTracker').then((m) => m.ShotTracker), {
@@ -30,7 +29,6 @@ export function LandingDemo({ signedIn }: { signedIn: boolean }) {
       </p>
       <Link
         href={signedIn ? '/video' : '/signup'}
-        onClick={signedIn ? undefined : markFromDemo}
         className="mt-3 flex h-12 items-center justify-center rounded-xl bg-orange-600 font-semibold text-white hover:bg-orange-500"
       >
         {signedIn ? 'Open the tracker' : 'Create a free account'}

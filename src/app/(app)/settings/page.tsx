@@ -7,6 +7,7 @@ import { AvatarEditor, type OwnPhoto } from '@/components/profile/AvatarEditor';
 import { asMeasurementSystem } from '@/lib/units';
 import { hasPro, planLabel } from '@/lib/entitlements';
 import { isTestAccount } from '@/lib/testAccounts';
+import { normaliseHeardFrom } from '@/lib/heardFrom';
 import { SettingsClient } from './SettingsClient';
 import { ResetTesterCard } from './ResetTesterCard';
 import { HomeClubCard } from './HomeClubCard';
@@ -21,7 +22,7 @@ export const metadata = { title: 'Settings - Deadeye' };
 export default async function SettingsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-  const [profile, subscription, ageCheck, { data: photoRow }, { data: coachProfile }, { data: homeClub }] = await Promise.all([
+  const [profile, subscription, ageCheck, { data: photoRow }, { data: coachProfile }, { data: homeClub }, { data: authData }] = await Promise.all([
     getCurrentProfile(),
     getCurrentSubscription(),
     getCurrentAgeCheck(),
@@ -31,6 +32,9 @@ export default async function SettingsPage() {
     supabase.from('coach_profiles').select('user_id').eq('user_id', user.id).maybeSingle(),
     // The player's own home club; missing before 00051, which reads as none
     supabase.from('player_clubs').select('club_id, show_on_card').eq('user_id', user.id).maybeSingle(),
+    // From Supabase Auth, not the session token, so a cleared sign-up answer
+    // (src/lib/heardFrom.ts) is gone straight away
+    supabase.auth.getUser(),
   ]);
   const photo: OwnPhoto | null = photoRow
     ? { url: await signedPhotoUrl(photoRow.path), status: photoRow.status, visibility: photoRow.visibility }
@@ -88,6 +92,7 @@ export default async function SettingsPage() {
             supportEmail={process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL || null}
             version={pkg.version}
             coachSetUp={!!coachProfile}
+            heardFrom={normaliseHeardFrom(authData.user?.user_metadata?.heard_from)}
             homeClub={
               <HomeClubCard
                 initial={homeClub ? { clubId: homeClub.club_id, showOnCard: homeClub.show_on_card } : null}

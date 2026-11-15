@@ -1,9 +1,47 @@
 # Ads and formats: what is working now
 
-Kept by marketing; read by the video-editor, designer and player-outreach.
-See `README.md`. Not yet refreshed: marketing's next run (Thursday) fills it
-from TikTok Creative Center (Top Ads, Trend Discovery: sounds, hashtags,
-creators by type), the Meta Ad Library (rival basketball and training apps)
-and what basketball accounts posted this week.
+Kept by marketing; read by the video-editor, designer and player-outreach. See `README.md`. Each line: format · hook · length · sound · why it works · source and date · **Take** (what Deadeye does with it). Formats only: never lift footage, audio or a creator's exact idea.
 
-Last refreshed: never
+Last refreshed: 2026-11-13 (marketing's scan, written in by the lead with the founder's go-ahead; the agent's own write was blocked, STATUS S32)
+
+**Gaps this week (2026-11-13).** TikTok Creative Center needs a TikTok for Business login: in a browser, Top Ads (UK, 30 days) showed 4 unrelated ads then "Log in to access all Top Ads", and Trends redirects to a login-only "TikTok One Creative Suite". So no Top Ads, rising sounds or hashtag counts are below, and no numbers are made up. Meta Ad Library does load in a browser (see Rival apps). To fill the TikTok gap the founder logs in to Creative Center (free business account) and pastes Trend Discovery (UK, 7 days, Sports).
+
+## TikTok and Instagram formats, newest first
+
+- 2026-11 · **Reveal carousel**: 4 to 5 photos telling a story, the last shows what really happened · about 5 swipes · clip-based original sound · its sound went from 174K to 408K videos in six days; the swipe makes you want the end · [SocialPilot, 27 Oct to 10 Nov 2026](https://www.socialpilot.co/blog/tiktok-trends) · **Take:** a photo carousel of a session (court, hoop, phone propped up) with the real session number on the last slide. Works as a TikTok photo post and an Instagram carousel.
+- 2026-11 · **Side-by-side "AI vs handmade"**: two versions next to each other on a beat · 7 to 12s · dembow track · reads with the sound off · same source · **Take:** "guessing in my head vs the number" split screen. Never "the app vs a hand count": that is an accuracy claim we cannot make.
+- 2026-11 · **Gym clips on a new rap single ("Thin Ice")**: early, about 1.2K videos · same source · **Take:** skip. Brand accounts can't use most pop tracks; pick from the Commercial Music Library at posting time.
+- 2026-11 · **The Christmas Switch**: one take, the room flips season · from 1 Nov · same source · **Take:** early December, "summer court to a winter session", same framing and hoop.
+- 2026-10-29 · **Two-person mini-game challenges** ("rock paper scissors, loser eats it"): early, rising from small bases (54 creators vs 2 the week before) · 10 to 20s · trend sound · a simple rule plus a forfeit · [Virlo, 29 Oct 2026](https://virlo.ai/blog/current-tiktok-trends) · **Take:** "rock paper scissors: loser shoots from a step further back", two adults, final score from a logged session. Check it is still live first; sound trends peak in about 7 to 10 days.
+- 2026-08-24 · **Irish sport, July 2026**: Instagram carries about 70% of Irish sport's engagement; the top Irish TikTok used its own original sound (about 500K views); the top Reel was a raw reaction at the final whistle · [Sport for Business and Olytico](https://sportforbusiness.com/?p=93731) · **Take:** our own sound (swish, count tick, voice); post every TikTok as a Reel too; a real reaction to a make beats a polished shot.
+- 2026-07-16 · **Basketball interest on TikTok is rising**: "NBA" up nearly 30%, "WNBA" about 15% since January; 64% say TikTok is their go-to for women's basketball (TikTok's figures) · [Relevant Audience, 21 Jul 2026](https://www.relevantaudience.com/tiktok-ads/tiktok-nba-wnba-partnership/) · **Take:** the NBA season is on, so basketball has an audience; make posts plainly for girls too (adults or consented). No NBA footage, logos or names.
+- 2026-06-19 · **Creator-led 3x3**: the 2026 3x3 World Cup brought creators on site (150M+ views); Women's Series 2026 reached 90M views (+88%) · [Broadcast](https://www.broadcastnow.co.uk/broadcasting/fiba-3x3-world-cup-nets-150m-social-media-views/5217825.article), [FIBA](https://about.fiba.basketball/en/news/fiba-3x3-womens-series-builds-on-strong-momentum-with-landmark-2026-season) (self-reported) · **Take:** a "shooting round" filmed by an adult creator at an Irish 3x3 event (see For player-outreach).
+- 2026-03-16 · **Irish sport, February 2026**: top Irish sport TikTok was one young player's personal story (500K views); trending formats with a recurring character did well · [Sport for Business](https://sportforbusiness.com/irish-sport-on-social-media-monthly-report-february-2026-on-tiktok/) · **Take:** one person's story beats highlights, but our person is the founder or an adult player (a minor only with written parental consent). A recurring character, such as the founder chasing their own number week by week, gives people a reason to follow.
+- 2026 · **Timed streak challenge**: "how many in a row in one minute?", timer on screen, viewer asked to beat it · 60s · voice and court sound · [Dr. Dish blog](https://blog.drdishbasketball.com/basketball-drills-streak-shooting-challenge-0) · **Take:** film with a timer, log the session after; "beat it" invites stitches. Don't say the app times or counts it unless checked in the code.
+- 2026-07 · **Adult trainer teaches a total beginner**, a series with a new beginner each time · [Snapchat basketball-training topic](https://www.snapchat.com/topic/basketball-training) · **Take:** an adult beginner's first 5 sessions with the real number each time ("Aim is earned").
+- 2026 · **Session 1 vs session 10**, showing the process, not only the result · [AdCreate](https://adcreate.com/blog/ai-tiktok-ad-generator-viral-ads), [RocketShip HQ](https://www.rocketshiphq.com/?p=5476), practitioner · **Take:** show the reps between the two numbers; real numbers only (founder or tester account).
+- 2026-01-14 · **TikTok Next 2026** (official): "Reali-TEA" (real over curated), "Curiosity Detours" (niche interests), "Emotional ROI" (say what you get) · [Social Media Today](https://www.socialmediatoday.com/news/tiktok-shares-2026-trend-predictions-for-marketers/809651/) · **Take:** a real court and a real phone screen, hooper language, one plain line on what the app does.
+
+## Rival apps and paid formats
+
+- 2026-11-13 · **Meta Ad Library, Ireland, "basketball app", active, by impressions (~290 results; read in a browser)**: no shot-tracker or training app is advertising in Ireland. The top results are mobile-game bundles ("Play NBA Live Mobile Basketball"), an NBA sim game, and a betting app using Irish creators with `#Ad`. The one close rival is **SilentBall Academy** (since 21 Sep 2026): a quiet ball, mat and coaching app sold to parents, "Kids into Basketball? You NEED This", "20 minutes a day", "never replacing team practice", "Over 10,000 families in Europe" · [Meta Ad Library](https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=IE&q=basketball%20app&search_type=keyword_unordered) · **Take:** paid space for basketball training in Ireland is empty. Parents are the buyers rivals target: a parent-facing line ("10 minutes at the hoop, a number to beat, works alongside team training") suits FDYS and press routes. Never sit next to betting: no gambling creators or betting-adjacent sounds and hashtags, and check a creator's past `#Ad` posts before approaching them.
+
+- 2026-11-13 · **Rival shot-tracker apps**: Project X ("Never guess what to work on again"), Shot Count ("detects every make and miss in real time"), Hoopy (coach personalities, Apple Watch logging); all small, no ad activity found · [Project X](https://mwm.ai/apps/project-x-basketball/6780528523), [Hoopy](https://mwm.ai/apps/hoops-basketball-shot-tracker/6746102688), [Shot Count](https://apps.apple.com/us/app/shot-count-basketball-ai/id1486237449) · **Take:** rivals lead with "stop guessing"; Deadeye leads with effort ("Aim is earned"). Never echo "every make" wording; it is on our banned list.
+- 2026-11-13 · **HomeCourt**: no 2026 ads found for the basketball app; "HomeCourt" ads in 2026 are an unrelated home-fragrance brand · [Modash](https://www.modash.io/content-library/brands/homecourt-examples) · **Take:** filter by app or category in the Ad Library.
+- 2026 · **Boosting a creator's post (Spark Ads) vs a made ad**: CTR 2.4% vs 1.0% (Q1 2026 composite, third party); length advice conflicts (9 to 15s vs 21 to 34s for fitness installs) · [Digital Applied](https://www.digitalapplied.com/blog/tiktok-ads-benchmarks-2026-cpc-cpm-cvr-industry), [Advertizingly](https://advertizingly.com/tiktok-ads-strategy/), practitioner · **Take:** if the founder ever pays, boost an organic post; keep 15 to 25s and test length as one variable.
+
+## Sounds and hashtags
+
+- 2026-11-13 · No basketball-specific rising sound or hashtag found in public sources; Creative Center did not load · **Take:** our own sound first (swish, count tick, voice); a Commercial Music Library track chosen in the app at posting time; check hashtag counts in the app.
+
+## For player-outreach
+
+Types only, never a person's name or handle; brand or organisation accounts can be named.
+
+- **Adult skills trainers** who post drill clips: pitch a "60-second streak, beat my number" or "session 1 vs session 10" with their own number.
+- **Adult coaches of club or senior teams**: an adults-only team shooting round, the best score posted as the number to beat.
+- **3x3 event organisers** (Basketball Ireland national 3x3 events from May): a shooting-round station or a creator filming at the event; minors not identifiable without written consent.
+- **Adult beginners and rec-league players** who vlog progress: "teach a beginner" or "first 5 sessions". Effort, not talent.
+- **Adult women players and coaches**: fun, friends and a personal number, never comparisons with boys.
+- **Challenge formats:** 60-second streak; rock paper scissors, loser steps back (two adults; check it's live); session 1 vs session 10; a 3x3 shooting round; a reveal carousel ending on the number.
+- **Rules:** public business address only, contacted by the founder; #Ad and TikTok's commercial content setting whenever anything is given; our own sound or a Commercial Music Library track; one tracking route per creator type.

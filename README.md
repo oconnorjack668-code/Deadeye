@@ -242,6 +242,139 @@ under a checked session in the tracker's review, which saves the video and a
 and are left out). Copy both into `DEADEYE_BENCH_DIR` and the suite picks them
 up. Players' videos never leave their phones; this is the owner's footage.
 
+Three clips filmed on 4 Nov 2026 (`clip3` to `clip5`) are the first footage
+the tracker was never tuned on. Each is cut, without re-encoding, from just
+before the first shot to just after the last (the phone being set down and
+picked up are not in them), and labelled frame by frame. `clip5` is the
+hold-out (`"holdout": true`): the suite skips it unless it is named
+(`node scripts/bench-suite.mjs clip5`). Never tune on it; score it once, when
+a change is finished, and report that as the real number.
+
+Two changes from those clips (9 Nov 2026), measured over all 32 runs:
+
+- A ball resting on the ring is not counted as through it (`ON_RING` in
+  `shotDetector.ts`): 535 to 537 right, no run worse.
+- A shot whose ball never reached the ring is dropped, not called a miss.
+  Calls with no shot behind them went from 24 to 7: passes across the picture,
+  balls going up beside the ring, a player walking past the lens. Accepted by
+  the founder although it breaks the "no run worse" rule once: on the small,
+  dim, 15 fps version of clip 2 the ball is lost before the ring on two real
+  misses, which are no longer called (15 to 13 of 31). Nothing was lost on any
+  clip as filmed.
+
+Three changes on 13 Nov 2026, measured together over the same 32 runs:
+**535 to 595 right (81.6% to 90.7%)**, shots never called 63 to 16, calls with
+no shot 7 to 5. Every clip as filmed the same or better.
+
+- **Frames are held still before they are scored** (`stabilise.ts`). Measured
+  frame against frame, clip 1's phone sags 2.8 canvas pixels over 51 seconds
+  and clip 2's is knocked 2 pixels at 86s; both are under the camera
+  watcher's alarm, and on a wobbly mount every edge reads as moving. Each
+  frame is lined up with a reference picture of the crop and slid back, by
+  whole pixels only: sliding by fractions softens frames unevenly and lost
+  calls on clip 1's half-size and 15 fps versions. A still camera is passed
+  through untouched. `DEADEYE_BENCH_NOSTEADY=1` turns it off,
+  `DEADEYE_BENCH_STEADYTRACE` writes the slide per frame. Wobbly mount 56 to
+  65 of 82; it costs clip 4's (20 to 15), where the test video moves in steps
+  of just under a pixel and whole-pixel rounding leaves edges flickering.
+- **The ball's first sightings are no longer thrown away**
+  (`HOLD_FRAMES` in `trackerPipeline.ts`). The tracker only reports a ball
+  after following it for three frames, and at 10 fps that is the whole time it
+  is above the ring. The shot detector now runs two frames behind and is given
+  those sightings once the tracker settles it was the ball. On a slow phone
+  two far-apart sightings count as a ball in flight, and a followed ball
+  survives one missed frame (`ballTracker.ts`).
+- **On a slow phone, a ball that reached the ring and vanished is judged by
+  the net** (`VANISHED_AT_RING` in `shotDetector.ts`), needing three times the
+  usual late swing to be a make, and always marked unsure.
+
+10 fps went from 39 to 68 of 82, 15 fps from 71 to 77, small-dim-and-slow
+from 60 to 72. Four runs lost a call or more: clip 4 wobbly (5), clip 1 at
+15 fps, clip 3 hard, clip 4 dim (1 each).
+
+The hold-out, `clip5`, scored once before and after (14 Nov 2026), six of its
+versions (the grainy `dark` and `hard` ones were left out: they took hours to
+encode): **120 to 133 right of 174 (69.0% to 76.4%)**, no version worse, no
+calls with no shot either time. As filmed 21 to 22 of 29, 15 fps 22 to 26,
+10 fps 23 to 25, wobbly 15 to 19. That clip is the honest measure, and it
+says the tracker still gets about one shot in four wrong on footage it was
+never tuned on: very low, the rim in the top corner, two players.
+
+The steadier and the held frames cost about 0.7 ms a frame on the bench
+laptop (3.7-4.1 to 4.6-4.7 ms on clip 1, measured back to back on a quiet
+machine). Slid frames go into a ring of four reused buffers rather than a
+new array each time.
+
+### What the bench cannot see: frames lost in the browser
+
+The bench decodes every frame. A phone plays the clip and reads each frame's
+pixels out of the video as it goes, and that reading can cost frames the
+bench never loses. Measured in Chrome on the bench laptop (14 Nov 2026) with
+the app's own frame path and tracker, scored against the labels: clip 2
+(60 fps, portrait) lost about a quarter of its frames at normal speed and
+called 25 of 31 (the bench: 31). Reading the pixels another way
+(`createImageBitmap` into the worker, or a `VideoFrame`) lost the same
+frames, 26 and 27 of 31; reading none lost almost none. Clip 1 (30 fps) lost
+almost nothing.
+
+So an upload that loses a quarter of its frames now plays at half speed
+(`SLOW_RATE` in `workload.ts`) and says so under the progress bar: clip 2 then
+scored every frame and called 30 of 31, taking 5:20 for 2:40. A lighter loss
+gets the smaller picture as before, and the live camera is unchanged. Runs
+that slowed are marked `slowed` in the saved quality, so `/admin/tracker` data
+can say how often it happens on real phones.
+
+The live camera reads its frames another way where the browser allows
+(`pushBitmap` in `trackerEngine.ts`): `createImageBitmap` has the graphics
+chip cut and shrink the hoop crop, and the tracker's worker reads it back, so
+the main thread no longer stops for about 11 ms a frame on the bench laptop
+to read the frame itself. Uploads keep the old way: a clip can show a frame
+twice, and spotting that needs the pixels on the main thread before the
+workload counts the frame. On Chromium's fake camera playing clip 1 at
+1080p, 20 seconds, two rounds: the main thread held 0.8-1.0 ms a frame
+against 15.6-16.3, no long tasks, and as many frames reached the tracker
+(25.1-25.5 a second against 25.5-25.6). Two bitmaps may be in the making at
+once, handed over in order; with one, about two frames a second fewer
+arrived. The pixels differ from the old way's by about 4 levels (the graphics
+chip converts the colours a little differently); clip 2 at half speed, where
+no frames are lost, called 30 of 31 both ways.
+
+Uploads are now decoded rather than played where the browser has WebCodecs
+(`clipDecoder.ts`, in the tracker's worker): mp4box (BSD-3, pinned 2.4.1)
+reads the MP4 or MOV a slice at a time, `VideoDecoder` decodes it, the
+graphics chip cuts and shrinks each frame's hoop crop, and the tracker scores
+every frame, as fast as the device allows. There is no playback clock to keep
+up with, so nothing is lost. The app's own code, end to end in Chrome on the
+bench laptop (14 Nov 2026), every frame scored each time:
+
+| clip | right | took | the bench |
+| --- | --- | --- | --- |
+| 1 (51s, HEVC) | 10/10 | 13.4s | 10/10 |
+| 2 (2:40, 60 fps, portrait) | 30/31 | 51.9s | 31/31 |
+| 3 (2:32) | 16/17 | 37.8s | 16/17 |
+| 4 (2:47) | 23/24 | 53.3s | 24/24 |
+
+Clip 2 played at normal speed had called 25 of 31; at half speed, 30 of 31 in
+5:20. Clip 4's one difference is its last shot, judged as the clip ends, on
+pixels decoded a little differently from ffmpeg's. Two things are handled
+that playing never needed: the rotation phones store portrait video with
+(checked against the `<video>` on clips flagged 90, 180 and 270: crops within
+2-4 levels), and the edit list a clip can start partway into its first frames
+with (without it the shot times did not match the video's). A clip it cannot
+read (a WebM, say, or a format the device cannot decode) fails before any frame
+and is played instead, as before; one that fails part way is called on what
+was seen. Either is reported to `/admin/errors`. While decoding, the video
+stays paused, no ball is drawn over it, and calls make no sound.
+
+On the live site, in Chrome on the bench laptop, decoding stalled after the
+merge without any error, while the identical build on its preview decoded the
+same clip in under 8 seconds (14 Nov 2026; cause not yet known). So a decode
+that has scored no frame after 8 seconds (`DECODE_START_MS` in
+`ShotTracker.tsx`) is given up on and the clip is played instead, and the
+worker reports each step it reaches (`onStage` in `clipDecoder.ts`). The last
+step reached goes into the `/admin/errors` report, so a stall on a real phone
+says where it stopped.
+
 Every session saved from the tracker now keeps the tracker's own calls next
 to the player's corrections, so real-world accuracy, by camera or upload and
 by phone type, is at `/admin/tracker`. Read it as an upper bound: a player

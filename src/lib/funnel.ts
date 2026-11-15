@@ -11,6 +11,8 @@ import type { EventName } from '@/lib/events';
 export interface FunnelPlayer {
   id: string;
   setupDone: boolean;
+  /** Their answer to "Where did you hear about Deadeye?" at sign-up (src/lib/heardFrom.ts), if any */
+  heardFrom?: string | null;
 }
 
 export interface FunnelSession {
@@ -34,13 +36,23 @@ export interface Funnel {
   groups: FunnelGroup[];
   /** The step on the main line that loses the most players, if any are lost */
   biggestDrop: { from: string; to: string; lost: number } | null;
+  /** Players by where they heard about Deadeye, most joined first; no answer last */
+  routes: RouteRow[];
+}
+
+export interface RouteRow {
+  /** The sign-up answer's value (src/lib/heardFrom.ts), or null for no answer */
+  route: string | null;
+  joined: number;
+  setup: number;
+  /** Logged at least one hoops session: the number a route is judged on */
+  firstSession: number;
 }
 
 const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label: string }> }> = [
   {
     title: 'Welcome',
     steps: [
-      { name: 'signup_from_demo', label: 'Signed up from the landing page demo' },
       { name: 'welcome_seen', label: 'Saw the welcome screen' },
       { name: 'welcome_court', label: 'Said they are at a court' },
       { name: 'welcome_later', label: 'Said not right now' },
@@ -111,8 +123,22 @@ export function buildFunnel(players: FunnelPlayer[], events: Array<{ user_id: st
   }));
   eventGroups[1].steps.push({ key: 'tracker_saved', label: 'Saved a tracked session', count: trackedSaved.size });
 
+  const byRoute = new Map<string | null, RouteRow>();
+  for (const p of players) {
+    const route = p.heardFrom ?? null;
+    const row = byRoute.get(route) ?? { route, joined: 0, setup: 0, firstSession: 0 };
+    row.joined += 1;
+    if (p.setupDone) row.setup += 1;
+    if ((sessionCount.get(p.id) ?? 0) > 0) row.firstSession += 1;
+    byRoute.set(route, row);
+  }
+  const routes = [...byRoute.values()].sort(
+    (a, b) => Number(a.route === null) - Number(b.route === null) || b.joined - a.joined || (a.route ?? '').localeCompare(b.route ?? '')
+  );
+
   return {
     joined: players.length,
+    routes,
     groups: [
       { title: 'Joining and logging', steps: main },
       ...eventGroups,

@@ -46,6 +46,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   { id: 'log-game', group: 'do', title: 'Log a game', hint: 'Your points, rebounds and assists from a match', href: '/games/new', keywords: ['game', 'match', 'box score', 'stats', 'points', 'rebounds', 'assists'] },
   { id: 'iq-question', group: 'do', title: "Answer today's IQ question", hint: 'One question a day about reads, rules and decisions', href: '/study', keywords: ['iq', 'quiz', 'daily', 'question', 'rules', 'decisions'] },
   { id: 'plan', group: 'do', title: 'Make a training plan', hint: 'A session built for what you want to work on', href: '/train/generate', keywords: ['plan', 'generate', 'routine', 'schedule', 'what to train', 'build'] },
+  { id: 'focus', group: 'do', title: 'Work on a weakness', hint: 'Say what needs work and get the film, IQ and drills for it', href: '/focus', keywords: ['weakness', 'weaknesses', 'focus', 'improve', 'struggle', 'bad at', 'fix', 'what to work on', 'film', 'iq', 'drills', 'team weakness'], modes: BOTH },
   { id: 'ask-coach', group: 'do', title: 'Ask the AI coach', hint: 'Chat about your game', href: '/ai-coach/chat', keywords: ['coach', 'ai', 'chat', 'help', 'advice', 'question'] },
   { id: 'perf-test', group: 'do', title: 'Run a performance test', hint: 'Sprints, agility and more, to track over time', href: '/workouts/tests/new', keywords: ['test', 'sprint', 'speed', 'agility', 'benchmark', 'fitness', 'metres', 'meters'] },
   { id: 'add-friend', group: 'do', title: 'Add a friend', hint: 'Swap friend codes', href: '/friends', keywords: ['friend', 'friend code', 'invite', 'add', 'mates'] },
@@ -72,6 +73,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   { id: 'game-film', group: 'go', title: 'Game film', hint: 'Tag plays in your game videos', href: '/video?tab=film', keywords: ['film', 'game video', 'tag', 'plays'] },
   { id: 'clips', group: 'go', title: 'Saved clips', hint: 'Your saved videos', href: '/video?tab=clips', keywords: ['clips', 'videos', 'highlights', 'saved'] },
   { id: 'iq', group: 'go', title: 'Basketball IQ', hint: 'Lessons and quizzes on reads and rules', href: '/study', keywords: ['iq', 'study', 'lessons', 'quiz', 'rules', 'learn'] },
+  { id: 'plays', group: 'go', title: 'Plays', hint: 'Learn plays step by step, and your role in each', href: '/plays', keywords: ['plays', 'playbook', 'sets', 'motion', 'pick and roll', 'horns', 'out of bounds', 'press break'] },
   { id: 'film-questions', group: 'go', title: 'Film questions', hint: 'Was that the right read? Ask your coach', href: '/film-questions', keywords: ['film', 'question', 'read', 'coach'] },
   { id: 'ai-coach', group: 'go', title: 'AI Coach', hint: 'Reports on your sessions', href: '/ai-coach', keywords: ['coach', 'ai', 'reports', 'feedback'] },
   { id: 'games', group: 'go', title: 'Games', hint: 'Every game you have logged', href: '/games', keywords: ['games', 'matches', 'stats', 'box scores'] },
@@ -99,6 +101,7 @@ export const SEARCH_ENTRIES: SearchEntry[] = [
   // Coaching
   { id: 'coach-home', group: 'go', title: 'Coach home', hint: 'Your teams at a glance', href: '/coach', keywords: ['coach', 'home', 'dashboard'], modes: COACHING },
   { id: 'assignments', group: 'go', title: 'Assignments', hint: 'Set drills and sessions for your teams', href: '/coach/assignments', keywords: ['assignments', 'homework', 'set', 'tasks'], modes: COACHING },
+  { id: 'playbook', group: 'go', title: 'Playbook', hint: 'Draw plays and give each team its playbook', href: '/coach/playbook', keywords: ['playbook', 'plays', 'draw', 'sets', 'diagram'], modes: COACHING },
   { id: 'coach-setup', group: 'go', title: 'Coach setup', hint: 'Your club and safeguarding details', href: '/coach/setup', keywords: ['setup', 'club', 'vetting', 'safeguarding'], modes: COACHING },
 
   // Owner tools

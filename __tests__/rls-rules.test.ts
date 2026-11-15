@@ -9,7 +9,10 @@
 //   - "anyone may read" rules (USING (true)) are read-only and only on the
 //     shared catalogue tables listed below;
 //   - a table with no rules at all (players get nothing, only the server can
-//     reach it) is one of the server-only tables listed below.
+//     reach it) is one of the server-only tables listed below;
+//   - a server-written table (players read their own rows, only the server
+//     adds them, e.g. quiz scores) ends with no INSERT for players, after
+//     every migration has run in order.
 // A new table that belongs in either list is added here on purpose, with the
 // reason, in the same pull request. Static: it reads the SQL, it does not run it.
 import { describe, it, expect } from 'vitest';
@@ -63,6 +66,42 @@ const SERVER_ONLY = new Set([
   'leaderboard_refresh', // internal refresh bookkeeping
 ]);
 
+/**
+ * Players read (and may delete) their own rows, but only the server adds them,
+ * so nobody can write their own score.
+ */
+const SERVER_WRITTEN = new Set([
+  'play_quiz_attempts', // play quiz scores, marked in submitQuizAttempt (00065)
+  'film_attempts', // film scores, marked in submitFilmAttempt (00065)
+]);
+
+/**
+ * After every migration in order: the rules on a table that can add rows
+ * (made, and not dropped since), and whether players hold INSERT on it.
+ */
+function finalState(table: string): { addRules: string[]; playersInsert: boolean } {
+  const live = new Map<string, string>();
+  let playersInsert = false;
+  const steps: Array<{ at: number; run: () => void }> = [];
+  const policyRe = /(create|drop)\s+policy\s+(?:if\s+exists\s+)?(?:"([^"]*)"|(\w+))\s+on\s+(?:public\.)?"?(\w+)"?([^;]*);/gi;
+  for (const m of sql.matchAll(policyRe)) {
+    if (m[4].toLowerCase() !== table) continue;
+    const name = m[2] ?? m[3];
+    const command = ((m[5].match(/\bfor\s+(select|insert|update|delete|all)\b/i) || [, 'all'])[1] as string).toLowerCase();
+    const create = m[1].toLowerCase() === 'create';
+    steps.push({ at: m.index!, run: () => (create ? live.set(name, command) : live.delete(name)) });
+  }
+  const grantRe = /\b(grant|revoke)\s+([^;]*?)\s+on\s+(?:table\s+)?public\.(\w+)\s+(?:to|from)\s+([^;]*);/gi;
+  for (const m of sql.matchAll(grantRe)) {
+    if (m[3].toLowerCase() !== table || !/\b(insert|all)\b/i.test(m[2]) || !/\bauthenticated\b/i.test(m[4])) continue;
+    const grant = m[1].toLowerCase() === 'grant';
+    steps.push({ at: m.index!, run: () => (playersInsert = grant) });
+  }
+  for (const step of steps.sort((a, b) => a.at - b.at)) step.run();
+  const addRules = [...live].filter(([, command]) => command === 'insert' || command === 'all').map(([name]) => name);
+  return { addRules, playersInsert };
+}
+
 /** Shared content every signed-in player reads; nobody but the server writes it. */
 const PUBLIC_CATALOGUE = new Set([
   'leaderboard_seasons',
@@ -105,5 +144,12 @@ describe('database access rules (row-level security)', () => {
     const withRules = new Set(policies.map((p) => p.table));
     const noRules = [...tables].filter((t) => !withRules.has(t));
     expect(noRules.filter((t) => !SERVER_ONLY.has(t))).toEqual([]);
+  });
+
+  it('lets only the server add rows to a server-written table', () => {
+    for (const t of SERVER_WRITTEN) {
+      expect(tables.has(t)).toBe(true);
+      expect({ table: t, ...finalState(t) }).toEqual({ table: t, addRules: [], playersInsert: false });
+    }
   });
 });

@@ -1,0 +1,51 @@
+# Focus Finder (2026-11-13)
+
+Agent: Claude Code, Opus 5.5 · Commits: c9ba87a · PR: #103 (draft) · Status: in progress (awaiting safety review and merge)
+
+## Outcome
+New `/focus` page. A player or coach names a weakness in their own words or from a list of 29, and gets
+the app's own IQ lesson clips with their quizzes, drills and guides for it, instantly and with no AI.
+Suggestions come from the player's log (make rates by area, daily IQ misses, coach film verdicts, setup).
+An optional AI week plan costs 1 AI report. A coach can send the plan to a team as an assignment.
+
+## Decisions
+- The free plan is deterministic (`src/lib/focus/weaknesses.ts`, `plan.ts`): the founder asked for AI, but
+  AI_API_KEY may be unset and players punish made-up advice, so the core works without it.
+- The AI only picks from the library by ref (D12, L3, G2); unknown refs are dropped, an empty plan is
+  refused and refunded (`src/lib/focus/ai.ts`). It cannot invent a drill or a video.
+- Saved as `ai_reports.report_type = 'development_plan'` (allowed since 00004): no migration needed.
+- Lessons are referenced by topic slug + title word, not id, so the catalogue is the same in every database.
+  `__tests__/focus.test.ts` checks every reference against the live titles of 13 Nov.
+- No names to the AI provider: a player is position + level, a team is age group + level + player count.
+- Solo players never get team drills unless nothing else fits; coaches get team drills first.
+- Privacy policy gets a Focus Finder line (what an AI plan sends).
+
+## Where things are
+- `src/lib/focus/`: catalogue, plan builder, data signals, AI prompt/parse, content loader, service
+- `src/app/(app)/focus/`: page, `FocusFinder.tsx`, `AiPlanView.tsx`
+- `src/app/api/focus/plan/route.ts`: AI plan endpoint
+- Entry points: Train hub (Learn), search, Coach home ("Fix a team weakness"), team assignment label, AI Coach card
+- `src/app/(app)/study/[id]/page.tsx`: lesson cards have `#lesson-<id>` anchors
+
+## Status changes
+- Closed: none
+- Opened: S34, S35 (S1 note added; first numbered S28, S29 on the branch, renumbered at the merge with main because main had moved to S30-S33)
+
+## Preview check (signed in as the tester)
+- `/focus` loads; free text matched live into chips; film, drills (solo only, spread across weaknesses,
+  demo videos first), guides and the own-film nudge all from live content; AI shows "not switched on"
+  (no AI key on previews). Watch opens `/study/<topic>#lesson-<id>` at the right card.
+- Fixed after: suggestions heading said "numbers" for setup-only picks; item reasons were clunky.
+- Found S35: 5 lesson videos are dead on YouTube. Not checked: phone width (window resize did not apply).
+
+## Safety review (safety-reviewer agent, 13 Nov)
+- BLOCK on 3, all fixed: parent page (`src/app/parents/WhatParentsAgreeTo.tsx`) now names Focus Finder;
+  free text no longer stored in `ai_reports.input_data`; Childline line shown in the browser from the text.
+- Fix-soon items done too; left for later in S34 (delete one plan, radiogroup arrow keys).
+- Reviewer's two new checklist lines added to `docs/agent-os/knowledge/safety-reviewer.md`.
+- DPIA additions listed on S1.
+
+## Gotchas
+- New worktrees have no `.next/types`, so `tsc` reports `LayoutProps` missing: run `npx next typegen` first.
+- Python heredoc string replacement mangled `\\w` escapes in TS regex strings; use Edit for regex-heavy text.
+- `press\w*` matched "pressure"; matcher phrases need whole-word stems, and vague words go in `broad`.

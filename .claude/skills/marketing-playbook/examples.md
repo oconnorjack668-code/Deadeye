@@ -18,7 +18,7 @@ Claims and sources: counts makes and misses (the tracker under
 src/app/(app)/video/, landing copy "count makes and misses"); free to start
 (/pro: FREE_PLAN in src/lib/plans).
 Test this week: point-of-view hook (this) vs last week's "did you know" text
-hook. Read: link clicks per 1,000 views and signup_from_demo over 7 days;
+hook. Read: link clicks per 1,000 views and sign-ups answering TikTok over 7 days;
 under 1,000 views = hint.
 Safety: an adult films; no under-18 shown. Music from TikTok's Commercial
 Music Library only.

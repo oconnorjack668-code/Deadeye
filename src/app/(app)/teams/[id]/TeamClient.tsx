@@ -18,6 +18,7 @@ import { teamLeagueText } from '@/lib/leagues';
 import { ClubLinkCard } from '@/components/clubs/ClubLinkCard';
 import type { ClubLink } from '@/lib/clubBoard';
 import { ReportProblem } from '@/components/ReportProblem';
+import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 
 export interface RosterRow {
   user_id: string;
@@ -41,6 +42,8 @@ export interface RosterRow {
 }
 
 export interface TeamDetails {
+  /** teams.name, 2 to 60 characters (00022); coaches may change it ("Coaches rename their teams") */
+  name: string;
   club_name: string | null;
   country: string | null;
   region: string | null;
@@ -115,12 +118,17 @@ export function TeamClient({
   async function saveDetails(e: React.FormEvent) {
     e.preventDefault();
     const clean = (v: string | null, max: number) => (v ? v.replace(/\s+/g, ' ').trim().slice(0, max) || null : null);
+    // The same checks as naming the team at setup (coach/setup)
+    const name = clean(info.name, 60) ?? '';
+    if (name.length < 2) return setMessage({ tone: 'error', text: 'Give your team a name (at least 2 characters).' });
+    if (nameBlocked(name)) return setMessage({ tone: 'error', text: NAME_BLOCKED_MESSAGE });
     await run(
       'details',
       () =>
         db()
           .from('teams')
           .update({
+            name,
             club_name: clean(info.club_name, 80),
             country: info.country || null,
             region: clean(info.region, 60),
@@ -245,6 +253,14 @@ export function TeamClient({
         <details className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-white">Team details</summary>
           <form onSubmit={saveDetails} className="mt-3 grid grid-cols-2 gap-2">
+            <input
+              value={info.name}
+              onChange={(e) => setInfo({ ...info, name: e.target.value })}
+              placeholder="Team name"
+              aria-label="Team name"
+              maxLength={60}
+              className="col-span-2 rounded-lg bg-zinc-800 px-3 py-2 text-sm text-white"
+            />
             <input
               value={info.club_name || ''}
               onChange={(e) => setInfo({ ...info, club_name: e.target.value })}
@@ -400,7 +416,7 @@ export function TeamClient({
                     </span>
                     {isSafeAppPath(a.link) && (
                       <Link href={a.link} className="text-cyan-400 underline">
-                        {LINK_OPTIONS.find((o) => o.value === a.link)?.label || 'Open'}
+                        {LINK_OPTIONS.find((o) => o.value === a.link)?.label || (a.link.startsWith('/focus') ? 'Open the focus plan' : 'Open')}
                       </Link>
                     )}
                   </div>

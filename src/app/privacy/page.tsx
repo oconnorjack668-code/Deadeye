@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 11, 2026';
+const LAST_UPDATED = 'November 14, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -82,6 +82,15 @@ export default function PrivacyPage() {
             <li>Your level and XP, worked out from your training, so friends can see your level.</li>
             <li>Training data you log: basketball sessions, drills, shots by zone, workouts, sets and performance tests, and the routines and programs you save or import (with their reps targets and notes).</li>
             <li>Study activity: quiz scores and lesson progress.</li>
+            <li>
+              Plays: the plays you save, and for each play quiz you finish, your score and the spots you picked. If you
+              coach, the plays you draw or copy and the plays you add to a team&apos;s playbook. Plays show players by
+              number only, never by name.
+            </li>
+            <li>
+              Film: the clips you save, your notes on clips (only you can ever see them), and for each clip whose
+              questions you answer, your score and the answers you picked. If you coach, the packs of clips you build.
+            </li>
             <li>Videos you choose to upload, with the camera angle and drill type you select.</li>
             <li>
               Video analysis results: shot counts, form measurements (angles and timings) and film tags. The analysis
@@ -98,6 +107,10 @@ export default function PrivacyPage() {
               only ever added up across sessions, never shown per player.
             </li>
             <li>AI coaching reports generated from your session data.</li>
+            <li>
+              Focus Finder week plans you ask the AI for: the weaknesses picked, the numbers behind them and the plan, kept
+              until you delete your account. What you wrote to get the plan is not kept.
+            </li>
             <li>Programs, goals, challenges, badges and NBA style match results.</li>
             <li>Game stats you log (box scores, opponent name, score) and teams you create or join.</li>
             <li>Settings you choose: country, county/region, time zone, whether you use Deadeye as a player or coach, and your privacy choices.</li>
@@ -126,6 +139,13 @@ export default function PrivacyPage() {
               only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
               anyone. Deleting your account deletes them straight away.
             </li>
+            <li>
+              If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
+              example &quot;A friend or teammate&quot;), saved with your account so we know which places bring players who stick with
+              it. We only use it as counts by answer; in anything we publish, answers from fewer than 5 players are added
+              together. It is cleared 12 months after you join, you can clear it yourself in Settings → Privacy, and
+              deleting your account deletes it.
+            </li>
           </ul>
         </section>
 
@@ -148,8 +168,9 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, measuring and improving the shot tracker,
-              and keeping the service secure rely on our legitimate interest in Deadeye working properly.
+              Crash reports, problem reports you send, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
+              and keeping the service secure rely on our legitimate interest in Deadeye working properly and knowing where new
+              players hear about us.
             </li>
             <li>Payment records are kept because tax law requires it.</li>
           </ul>
@@ -182,11 +203,26 @@ export default function PrivacyPage() {
               range, height, position, strong hand, playing level, goals and recent training numbers, so the advice fits
               you. It never receives your name, email address or photo.
             </li>
+            <li>
+              When you ask Focus Finder for an AI week plan, {ai === 'Our AI provider' ? 'it' : ai} receives what you wrote
+              about the weaknesses, the ones you picked, your position and playing level, the goals you picked when you
+              set up, and the numbers behind any suggestion (your make rates by area of the court, how many daily IQ
+              questions you got right in a section, how many of your film reads your coach saw a better option on). For a
+              coach planning for a team, it receives the team&apos;s age group, level and number of players. We ask you not
+              to write names; anything you write is sent as written. Deadeye does not keep what you wrote;{' '}
+              {ai === 'Our AI provider' ? 'our AI provider' : ai} deletes it within 30 days (longer only if its safety
+              systems flag it for misuse). The free Focus Finder list sends nothing anywhere.
+            </li>
             <li>Stripe processes Pro payments.</li>
             {emailConfigured() && (
               <li>Resend sends our emails to parents and payment receipts, so it receives the address and the message.</li>
             )}
             <li>Your browser&apos;s push service (for example Google or Apple) delivers training reminders you turn on.</li>
+            <li>
+              YouTube, which is owned by Google, plays the lesson, drill and exercise videos and the film clips, and only
+              when you tap play.
+              What it receives is under <a className="text-orange-400 underline" href="#cookies-and-videos">Cookies and videos</a>.
+            </li>
           </ul>
         </section>
 
@@ -208,7 +244,13 @@ export default function PrivacyPage() {
           <p>
             If you join a team, its members (including coaches) can see your display name, last 7 days of training
             totals, streak and your game averages (points, rebounds, assists, FG%). Coaches can post assignments and
-            see who completed them. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
+            see who completed them. When a head coach sets a play for the team, they see whether you took its quiz
+            and whether you passed, and how the team answered each question as totals once 3 or more players have
+            answered, never which spots you picked, until 90 days after the due date. They only see results from after
+            the play was set. The same goes for a film clip or pack a head coach sets: they see whether you answered its
+            questions and your score, and how the team answered each question as totals once 3 or more have answered,
+            never which answers you picked. Assistant coaches and teammates do not see quiz or film results, and nobody but you sees
+            your notes on clips. Only if you choose &ldquo;Share my training details with coaches&rdquo; (per team,
             off by default) can that team&apos;s coaches also see your sessions, shooting zones, workouts, tests and
             game box scores from recent weeks. Coaches never see your notes, videos or AI reports. Leave a team at any
             time from its page.
@@ -258,8 +300,35 @@ export default function PrivacyPage() {
             Data Protection Commission (dataprotection.ie).
           </p>
           <p>
-            Deadeye only uses the cookies needed to keep you logged in. Data is stored on servers that may be outside the
-            EU; our providers use the EU&apos;s standard contractual clauses to protect it.
+            Data is stored on servers that may be outside the EU; our providers use the EU&apos;s standard contractual
+            clauses to protect it.
+          </p>
+        </section>
+
+        <section id="cookies-and-videos" className="space-y-2">
+          <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
+          <p>
+            Deadeye&apos;s own cookies are only there to keep you logged in. The app also keeps a few things on your
+            device so it works for you (for example unsent drafts, offline saves, your settings and invite links you
+            followed); nothing on your device is used to track you or count visits.
+          </p>
+          <p>
+            Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads
+            from YouTube until you tap play on a video. (On a film clip, the tap also loads YouTube&apos;s player
+            controls, so the clip can stop at each question.) When you do, YouTube receives your IP address (the number that identifies
+            your internet connection) and details about your phone or computer and its browser, and it may store data
+            on your device. If you are signed in to YouTube or Google on the same browser, YouTube can link what you
+            watch to that account. What YouTube does with that is covered by{' '}
+            <a
+              className="text-orange-400 underline"
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Google&apos;s privacy policy
+            </a>
+            . If you would rather YouTube did not get this, do not tap play: the rest of the lesson or drill still
+            works.
           </p>
         </section>
 
@@ -270,6 +339,10 @@ export default function PrivacyPage() {
             public datasets from Roboflow Universe: &ldquo;ballllls&rdquo; (CC BY 4.0), &ldquo;X-Basket&rdquo; (CC BY
             4.0), &ldquo;Basketball Shot Tracking&rdquo; (CC BY 4.0) and &ldquo;basketball-computer-vision&rdquo;
             (public domain). Thank you to their authors.
+          </p>
+          <p>
+            Uploaded clips are read on your phone with MP4Box.js (BSD 3-Clause, copyright 2012 Telecom ParisTech/TSI/MM/GPAC
+            Cyril Concolato).
           </p>
         </section>
 

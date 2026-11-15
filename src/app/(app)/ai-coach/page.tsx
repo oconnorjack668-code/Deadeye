@@ -247,6 +247,14 @@ export default async function AICoachPage() {
                       {report.report_type === 'weekly_summary' && (
                         <Badge variant="success" className="text-xs">Weekly report</Badge>
                       )}
+                      {report.report_type === 'development_plan' && (
+                        <div className="flex items-center gap-2">
+                          <Badge variant="orange" className="text-xs">Focus plan</Badge>
+                          <Link href={`/focus?plan=${report.id}`} className="text-xs font-semibold text-cyan-400 underline underline-offset-2">
+                            Open the plan
+                          </Link>
+                        </div>
+                      )}
                       <p className="text-sm text-zinc-400">
                         {new Date(report.created_at).toLocaleDateString('en-US', {
                           month: 'short',
