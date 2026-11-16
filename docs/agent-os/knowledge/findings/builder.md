@@ -140,21 +140,6 @@ when a better source arrives, rather than adding beside it.
   meanings are widely reported, not in an official spec page; the 200-only
   rule is safe either way. [oEmbed spec](https://oembed.com/), 2008+, standard.
 
-### Recording a funnel step (app_events)
-
-- **Fire a "player reached this screen" step from a client effect, not the
-  server render.** A dynamic route is prefetched only up to its first
-  `loading.js` boundary (`(app)/loading.tsx` exists), and with Partial
-  Prefetching an App Shell; a record written during render would depend on
-  that staying true. A tiny `'use client'` leaf that calls `track()` in
-  `useEffect` and returns null does not. [Next prefetching guide (local
-  `01-app/02-guides/prefetching.md`)](https://nextjs.org/docs/app/guides/prefetching), 2026, official.
-- **A mount effect that POSTs a visit is React's own example; leave the
-  development double-run alone.** Strict Mode remounts once in development
-  only; "In production, there will be no duplicate visit logs." Don't block
-  it with a ref. Deadeye's `/api/events` keeps one row per player, step and
-  day anyway. [react.dev, Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects), current, official.
-
 ### Accessibility
 
 - **WCAG 2.2 AA: targets 24×24 CSS px (2.5.8), 44×44 (2.5.5) advised for
