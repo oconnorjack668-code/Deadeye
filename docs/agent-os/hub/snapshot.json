@@ -567,12 +567,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #121, 15 Nov) is running (checked 15 Nov).",
+      "detail": "Live and up to date: the latest version (PR #121, 15 Nov) is running (checked 16 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "1 small error in the last 24 hours (checked 15 Nov): the age check lookup failed for a moment on the dashboard because of a clock difference between servers (2 times since 18 Oct). Ranked P2: the page let the player in for that one load. No crash.",
+      "detail": "1 small error in the last 24 hours (checked 16 Nov): the age check lookup failed for a moment on the welcome page because of a clock difference between servers (3 times since 18 Oct, the same one as yesterday). Ranked P2: the page let the player in for that one load. No crash.",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -626,6 +626,11 @@
     }
   ],
   "log": [
+    {
+      "at": "2026-11-16T08:20:00Z",
+      "text": "Morning check: live site up to date (PR #121, ready). 1 small error (age check lookup, clock difference, P2, same as yesterday), no crash. 3 open pull requests, all checks green.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-15T08:09:24Z",
       "text": "Morning check: live site up to date (PR #121, ready). 1 small error (age check lookup, clock difference, P2), no crash. 3 open pull requests, all checks green.",
@@ -720,11 +725,6 @@
       "at": "2026-11-09T16:08:00Z",
       "text": "Landing page fix ready as PR #80, waiting for your go-ahead to go live. The welcome page also says \"calls every make and miss\"; left for you.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T16:15:00Z",
-      "text": "Parent consent wording for 16 and 17 year olds drafted for you to edit: docs/agent-os/clubs/2026-11-09-parent-consent-16-17.md. Nothing sent.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -741,7 +741,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-15T08:09:24Z",
+  "updatedAt": "2026-11-16T08:20:00Z",
   "updatedBy": "Morning check",
   "version": 1
 }
