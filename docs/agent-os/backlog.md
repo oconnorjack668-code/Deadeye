@@ -279,6 +279,23 @@ Report: [2026-11-16](reports/2026-11-16-activation.md)
 - Founder checklist: <from release-checker>
 - Result:
 
+## S41 · Landing demo stuck on "Starting…" when the clip download fails · idea (P2, found by qa-tester)
+
+Report: [qa 2026-11-16](qa/2026-11-16-qa.md) B3 · for support-triage to check before the builder takes it
+
+- Hypothesis: a visitor on weak signal taps "Play the sample" on `/`; the 3.6 MB clip download fails and the
+  demo shows "Starting…" for ever (6 of 6 on live `0454f77`: offline, connection reset, and offline then back
+  online). No message, no retry; only a reload recovers. Likely `downloadSample()` (`src/lib/video/sampleClip.ts`)
+  keeps the plain URL after a failed fetch and nothing handles the video's load error. Likely the same on
+  `/welcome/sample` (setup step 2), not yet confirmed signed in.
+- Change: on a failed download or a video load error, show "Couldn't load the clip. Check your connection" with
+  a "Try again" that fetches afresh (clear the cached promise). No data, no new markers.
+- Signal: the journey passes on the next run (qa B3 steps: offline, then reset, then back online, each ends in a
+  message or the verdict, never a spinner past 15 s).
+- Safety: <safety-reviewer verdict> (signed-out page; nothing stored)
+- Founder checklist: <from release-checker>
+- Result:
+
 ## E0 · Ask 5 players why they stopped · founder
 
 - Hypothesis: the players know why, and 5 answers beat a week of guessing at 17 players.
