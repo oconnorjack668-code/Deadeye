@@ -18,7 +18,14 @@ practice), `weak`/`practitioner`; `dated` = over ~2 years.
 What the outcome of earlier work taught (see "Results review" in the agent file). Newest
 first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16 · Results of the 13 Nov run: B1 (sample clip waits for the whole download) and
+  B2 (Today's 32px nested buttons) are both still open, neither fixed nor ranked won't-fix; no
+  player report has been matched to a missed journey yet (the 3 open crash reports were not
+  readable in the cloud). Rule: retest open P3s each run and say "still open" with the build.
+- 2026-11-16 · The landing demo passed every happy-path run but stuck on "Starting…" for ever
+  when the clip download failed (B3, P2). Rule: every screen that downloads something before
+  it starts (demo, sample, hoop model, uploads) gets a failed-download run: offline, connection
+  reset, and offline then back online.
 
 ## Checklist
 
@@ -28,10 +35,14 @@ first, each with the date, what happened, and the rule.
       worker could be stale.
 - [ ] Tester account signed in (never typed a password); Chrome with the tester, phone size.
 - [ ] Plan in order: smoke, retest of last fixes, changed areas, charters; untested areas named.
+- [ ] Cloud run (Playwright): block every request except GET/HEAD and log what was blocked,
+      so no form or error report can leave the browser; build from the `deadeye-build` meta.
 
 ### During
 
 - [ ] Each journey step marked pass, fail or not tested with the reason.
+- [ ] Anything that downloads before it starts tried with the download failing (offline,
+      reset, back online), not only on a good connection.
 - [ ] Console errors and failed requests read on every journey.
 - [ ] Every failure tried twice more from a clean start; written as "x of y".
 - [ ] Emulation used for layout only; camera, worker, push and speed marked "needs a real
@@ -75,6 +86,10 @@ first, each with the date, what happened, and the rule.
 - New 2026-11-13: in the founder's Chrome, `resize_window` did nothing (window minimised).
   Phone size was emulated with a 390x844 same-origin iframe; screenshots and timers fail
   while minimised. Ask the founder to leave the Chrome window restored for QA runs.
+
+- New 2026-11-16: cloud runs have no Vercel tool or token, so runtime errors and the
+  deployment id cannot be read there. Can the cloud session get read-only Vercel access, or
+  do Vercel checks stay in local runs?
 
 ## Research
 
