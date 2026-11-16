@@ -1,8 +1,8 @@
-Skills: all 5 loaded (2026-11-16 review of the marketing, outreach and clubs drafts)
+Skills: all 5 loaded (2026-11-16 review of E6, exp/E6-dashboard-seen)
 
 # Safety reviewer knowledge
 
-Last researched: 2026-11-16 (press and children, ASAI free offers); 2026-11-13 (attribution links, ePrivacy, small numbers)
+Last researched: 2026-11-16 (EDPB 2/2023 on browser-sent events; press and children, ASAI free offers); 2026-11-13 (attribution links, ePrivacy, small numbers)
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -20,6 +20,15 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-16 · E6 review. (1) I passed F2 and F3 (plays and film, 13-14
+  Nov) although they added five `EVENT_NAMES` that the privacy page's closed
+  list of app steps never named. The builder found it building E6 (S40).
+  (2) My E3 verdict (25 Oct) said "the repo must stay private". The repo is
+  public (GitHub API, 16 Nov), so the 1-to-4 counts in the funnel step rows
+  were published for three weeks; PR #97 grouped only the route table. Rule:
+  any change to `EVENT_NAMES` is checked against the privacy clause name by
+  name. A condition I set is checked as a fact today, and if it is false it
+  becomes a finding with a fix, not a note.
 - 2026-11-16 · Focus Finder (PR #103) and the FDYS draft (PR #97 O1) came
   back in the drafts review. (1) I passed "Send to team" without asking what a
   Free player meets when they open it: the list can hold IQ lessons in a Pro
@@ -115,6 +124,14 @@ file). Newest first, each with the date, what happened, and the rule.
       (video stays on the phone, nothing collected, parent approval) is checked
       against the code and the privacy page before it passes (PR #97 re-review,
       O1: the FDYS draft missed coach uploads).
+- [ ] **Every app step is named.** A branch that adds to `EVENT_NAMES`
+      (`src/lib/events.ts`) names each new step in plain words in the privacy
+      clause "A few steps you reach in the app", and the clause still matches
+      its own "no page tracking" style promises (E6, S40).
+- [ ] **Public counts, every table.** Run the under-5 check on every table
+      `src/lib/agentCounts.ts` writes (funnel steps as well as routes), and
+      check the repo's visibility (`gh api repos/<owner>/<repo>`) instead of
+      relying on a note that it is private (E6 review).
 - [ ] **A weekly public file leaks the weekly split by subtraction.** The
       under-5 rule applies to the change between two published files too, not
       only to each file. PR #97 accepted the residual for fixed answer labels

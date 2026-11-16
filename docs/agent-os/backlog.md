@@ -229,7 +229,66 @@ Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-
   set 2026-11-16, read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
   5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
   under 30 players. Guardrail: no change players can see; first sessions not lower than 3.
-- Safety: <safety-reviewer verdict>
+- Safety: PASS WITH NOTES (2026-11-16, head ab80f98; no BLOCK). Findings, most urgent first, all FIX SOON:
+  (1) S40, already on main, not this branch: `src/app/privacy/page.tsx:135-141` presents the recorded steps as
+  a complete list but leaves out the five Plays and Film steps (`play_opened`, `play_quiz_done`, `play_drawn`,
+  `film_opened`, `film_done`, live since F2 and F3, 13-14 Nov). Its purpose, "where new players get stuck", also does
+  not cover them. This breaks GDPR Art 5(1)(a) and Art 12(1) and DPC Fundamental 6 (transparency for children);
+  E3 was blocked for the same gap. Fix: the founder approves one clause covering E6 and S40 together (suggested
+  text below); merge it in this branch or the same day.
+  (2) Pre-existing, made slightly worse by E6: `src/lib/agentCounts.ts:150-156` prints every funnel step count,
+  including 1 to 4 in the "Joined in 7 days" column, into a file in a public repo (GitHub visibility checked
+  16 Nov: public). The file's "This file is public" is right. E3's note that "the repo must stay private" was a
+  condition that was never met, so it no longer holds. Grouping counts under 5 (PR #97) was done only for the
+  where-you-heard table. E6 adds one more small-count row, and it says something negative about a player
+  ("came Home, still saved nothing"). Its decision line also asks the analyst to compare small numbers across
+  columns and weeks. Standards: ICO anonymisation guidance 2025 (someone who knows the two players who joined
+  could work out which one it was), Revenue statistical disclosure guidance (cells under 10), and our own checklist
+  rule for counts under 5. Fix before the counts job runs on 23 Nov: if fewer than 5 joined in the 7 days, print
+  "under 5" and no 7-day split for any step; otherwise print 1 to 4 as "under 5". Exact numbers stay on
+  `/admin/funnel`. Update DPIA R8 (`docs/legal/dpia.md:92`) to cover step rows. If the analyst needs exact small
+  numbers, the founder moves the weekly data to a private place. Making the repo private now would not hide
+  what is already public in git history.
+  (3) `privacy/page.tsx:140` "No page tracking" now sits in the same sentence as "opening the dashboard"
+  (`:136`). E6 records a visit to one page, so this contradicts itself (Art 12(1), DPC F6). Also, the app calls this
+  screen "Home" (`BottomNav.tsx:20`), not "dashboard". The marker fires while no hoops session is saved
+  (`dashboard/page.tsx:298`), even for a player who logged shots in a game box score, so "saved a shooting session"
+  is more accurate than "logged any shots". Suggested clause for the founder (the privacy-page test regex
+  changes with it): "A few steps you reach in the app, at most once a day each: seeing the welcome screen and
+  which answer you gave there (at a court, or not right now), opening the Home screen before you have saved a
+  shooting session, playing the sample clip, opening the shot logger and pressing Finish in it, and opening,
+  starting and finishing the shot tracker. On the IQ tab, opening a play, finishing its quiz, opening a film clip
+  and answering all its questions, and, for coaches, saving a play you drew. We also note when you turn training
+  reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id, only to
+  see where players get stuck so we can fix it. We record only the steps named here, not the other pages you
+  open; no device details, nothing shared with anyone. Deleting your account deletes them straight away."
+  NOTE (needs a solicitor, not for this branch): `DashboardSeen.tsx:16` sends the step from the browser. EDPB 2/2023
+  para 33 puts JavaScript that tells the browser to send information inside ePrivacy Art 5(3), and every
+  `track()` step works this way. Open question in findings. NOTE: `cron/reminders/route.ts:50-58` swallows
+  delete errors, so a failed 90-day clean-up goes unseen (checklist: retention jobs report failures); this
+  is pre-existing.
+  Data map, `dashboard_seen`: what = a row (`user_id`, `name`, `day`, `created_at`), at most one per player a
+  day, with no free text and no device details. About = players in player mode with no saved hoops session.
+  Coaching mode is redirected first (`page.tsx:102`) and under-16s waiting for a parent never reach it
+  (`(app)/layout.tsx:36`). Why = to see whether players who stalled come back (E6 decision). Lawful basis =
+  legitimate interest, covered by "the app steps above" (`privacy/page.tsx:172`). Low impact, so it does not
+  work against the child's interests (DPC F3). Stored = `public.app_events` (00045). Who reads = service_role
+  only (RLS on, no policies, REVOKE from anon and authenticated), the owner at `/admin/funnel`, and the weekly
+  counts as a number (see 2). Sent to = no AI or other processor beyond the hosting. Export = yes
+  (`api/account/export/route.ts:69`). Deletion = ON DELETE CASCADE (00045:24) when the account is deleted.
+  Kept = 90 days, deleted by the daily job (`cron/reminders/route.ts:50`). No DPIA change needed: same table,
+  purpose and basis as E3. The update in (2) is for R8.
+  Per file: `DashboardSeen.tsx` (data): only a client event, renders nothing, no message. Gate, nudges, AI
+  and public surfaces: not applicable. `dashboard/page.tsx` (data): mounted only when `totalSessions === 0`;
+  nothing a player sees changes. `events.ts` (data): adds a name to the allow-list; the server route is unchanged
+  and checks the user server-side (`api/events/route.ts:12`). `funnel.ts` (data, surface): a new group on the
+  owner-only page and in the public counts file (see 2). `docs/funnel-counts.sql` (data): read in the SQL editor,
+  counts only, no ids. `privacy/page.tsx` (copy): names the step correctly; see (1) and (3). Tests
+  (`dashboard-seen`, `funnel`, `privacy-page`): none, no data. Security review: no issues (no new route,
+  table or secret; a player can only fake their own marker).
+  Not checked: tests and the build were not run by me (the branch was read with `git show`, not checked out). No
+  migration, so the Supabase advisors were not needed. Whether Next 16 prefetch would have triggered a
+  server-side record was not checked; I took the builder's word.
 - Founder checklist: <from release-checker>
 - Result:
 
