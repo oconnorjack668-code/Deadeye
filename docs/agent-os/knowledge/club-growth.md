@@ -16,7 +16,10 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16: the Wexford Blazers trial aimed "by 16 Nov" passed with 0 coaches set up; no head
+  coach or kick-off night had been named, and the club sat in `talking` 25 days. Rule: a trial
+  date counts only with a named head coach (role), a kick-off training night and the DSCO told;
+  ask for all three together and write a pause date into the pipeline.
 
 ## Checklist
 
@@ -40,6 +43,7 @@ file). Newest first, each with the date, what happened, and the rule.
 
 ### Trial plans
 
+- [ ] The start is a training night with a named head coach (role) and a pause date if it slips.
 - [ ] One team first: head coach as champion, a committee contact (chair or underage
       coordinator) who knows it is running, and the DSCO told in writing before players join.
 - [ ] Two or three success criteria readable from the Monday counts, and a decision date.
