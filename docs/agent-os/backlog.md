@@ -292,6 +292,15 @@ Report: [qa 2026-11-16](qa/2026-11-16-qa.md) B3 · for support-triage to check b
   a "Try again" that fetches afresh (clear the cached promise). No data, no new markers.
 - Signal: the journey passes on the next run (qa B3 steps: offline, then reset, then back online, each ends in a
   message or the verdict, never a spinner past 15 s).
+- Support-triage check (2026-11-16): real, P2 confirmed (a reload gets round it; no data lost; the
+  sample is optional at setup). Cause from the code: `src/lib/video/sampleClip.ts:39` turns a failed
+  fetch into the plain `SAMPLE_URL`, and `:36` (`download ??=`) keeps that answer for the page's life,
+  so a retry never fetches again. `ShotTracker.tsx:1281-1283` then sets `video.src` with no `error`
+  listener; `calibrating` stays true, so `:1686` shows "Starting…" for ever (`videoReady` never fires).
+  Same path on `/welcome/sample` (`SampleClient.tsx:19`), so setup step 2 has it too. Not known before:
+  not in STATUS.md; the 13 Nov QA's "slow sample-clip load" P3 is a different bug. Fix also needs: clear
+  `download` on failure. Check that would have caught it: a test with `fetch` rejecting that expects a
+  message, not "Starting…". Signal also: no new report of this.
 - Safety: <safety-reviewer verdict> (signed-out page; nothing stored)
 - Founder checklist: <from release-checker>
 - Result:
