@@ -32,6 +32,7 @@ import { founderNoticeCutoff, type FounderPost } from '@/lib/founderPosts';
 import { LevelUpCelebration } from '@/components/LevelUpCelebration';
 import { TIER_THEME } from '@/lib/tierTheme';
 import { appModeFor } from '@/lib/coachSide';
+import { DashboardSeen } from './DashboardSeen';
 
 export const dynamic = 'force-dynamic';
 
@@ -292,9 +293,11 @@ export default async function DashboardPage() {
 
         {/* Nobody has saved a session: most players who stalled never saw the
             reminders on the welcome screen. Asks for nothing on load; the card's
-            own button asks for push permission. */}
+            own button asks for push permission. DashboardSeen shows nothing: it
+            records the visit, to see whether stalled players come back (E6). */}
         {metrics.totalSessions === 0 && (
           <div className="mb-4">
+            <DashboardSeen />
             <RemindersCard showWeekly={false} description="When do you next train? Pick your days." />
           </div>
         )}

@@ -68,7 +68,22 @@ describe('buildFunnel', () => {
     expect(count(f, 'log_finish_opened')).toBe(1);
     // The tracker group still carries tracker_saved, whatever groups follow it
     expect(f.groups.find((g) => g.title === 'Shot tracker')?.steps.map((s) => s.key)).toContain('tracker_saved');
-    expect(f.groups.map((g) => g.title)).toEqual(['Joining and logging', 'Welcome', 'Shot tracker', 'Logging shots', 'Reminders']);
+    expect(f.groups.map((g) => g.title)).toEqual(['Joining and logging', 'Welcome', 'Shot tracker', 'Logging shots', 'Reminders', 'Coming back']);
+  });
+
+  it('counts players with no session who came back to the dashboard, by player, not by day (E6)', () => {
+    const f = buildFunnel(
+      players,
+      [
+        { user_id: 'a', name: 'dashboard_seen' },
+        { user_id: 'a', name: 'dashboard_seen' }, // a second day
+        { user_id: 'b', name: 'dashboard_seen' },
+        { user_id: 'zz', name: 'dashboard_seen' }, // joined before the window
+      ],
+      []
+    );
+    expect(count(f, 'dashboard_seen')).toBe(2);
+    expect(f.groups.find((g) => g.title === 'Coming back')?.steps.map((s) => s.key)).toEqual(['dashboard_seen']);
   });
 
   it('names the step on the main line that loses the most players', () => {

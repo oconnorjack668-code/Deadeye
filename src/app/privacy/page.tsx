@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 14, 2026';
+const LAST_UPDATED = 'November 16, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -133,7 +133,8 @@ export default function PrivacyPage() {
             </li>
             <li>
               A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
-              gave there (at a court, or not right now), playing the sample clip, opening the shot logger and pressing
+              gave there (at a court, or not right now), opening the dashboard before you have logged any shots,
+              playing the sample clip, opening the shot logger and pressing
               Finish in it, and opening, starting and finishing the shot tracker. We also note when you turn training
               reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id,
               only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with

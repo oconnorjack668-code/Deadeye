@@ -10,6 +10,8 @@ export const EVENT_NAMES = [
   'welcome_court',
   /** Picked "Not right now" on the welcome screen */
   'welcome_later',
+  /** Opened the dashboard with no hoops session saved yet (E6) */
+  'dashboard_seen',
   'sample_played',
   'sample_finished',
   'tracker_opened',

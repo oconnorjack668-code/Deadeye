@@ -44,4 +44,10 @@ describe('the privacy page', () => {
     expect(text).toMatch(/nobody but you sees your notes on clips/);
     expect(text).toMatch(/film clips play from YouTube/);
   });
+
+  it('names opening the dashboard before any shots are logged among the recorded app steps (E6)', () => {
+    const { container } = render(<PrivacyPage />);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toMatch(/A few steps you reach in the app, at most once a day each: [^.]*opening the dashboard before you have logged any shots/);
+  });
 });

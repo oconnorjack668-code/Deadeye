@@ -81,6 +81,11 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
     title: 'Reminders',
     steps: [{ name: 'reminder_set', label: 'Turned reminders on (or changed days with them on)' }],
   },
+  {
+    // Last, so the groups above keep their places in the weekly counts file
+    title: 'Coming back',
+    steps: [{ name: 'dashboard_seen', label: 'Opened the dashboard with no session saved' }],
+  },
 ];
 
 export function buildFunnel(players: FunnelPlayer[], events: Array<{ user_id: string; name: string }>, sessions: FunnelSession[]): Funnel {
