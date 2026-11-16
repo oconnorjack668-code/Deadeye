@@ -206,7 +206,7 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Founder checklist: <from release-checker>
 - Result:
 
-## E6 · Marker for a no-session player reaching the dashboard · NEXT
+## E6 · Marker for a no-session player reaching the dashboard · review (exp/E6-dashboard-seen)
 
 Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-09](reports/2026-11-09-activation.md))
 
@@ -218,6 +218,13 @@ Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-
   `dashboard/page.tsx`. Add the name to `src/lib/events.ts`, `/admin/funnel` (`funnel.ts`), `docs/funnel-counts.sql`
   and the events clause of `privacy/page.tsx`. No migration (the name rule is a regex); nothing on screen changes.
   `today_log_tapped` is dropped: `log_opened` and `tracker_opened` already count the next step.
+- Built: `dashboard_seen` fires once a day (the server keeps one row per player a day) when a player with no saved
+  hoops session opens the dashboard: `DashboardSeen.tsx`, a client component that renders nothing, in the
+  `metrics.totalSessions === 0` block of `dashboard/page.tsx`. Fired from the browser, so a link prefetch is never
+  counted. Shows on `/admin/funnel` and in the weekly counts as a new last group, "Coming back", and in
+  `docs/funnel-counts.sql`. The privacy clause names it ("opening the dashboard before you have logged any shots",
+  last updated 16 Nov). No migration, nothing on screen. Branch `exp/E6-dashboard-seen` (code 0e35d1f; docs moved
+  to `agent-os`, ab80f98). 1702 tests pass; the new tests fail on main.
 - Signal: `dashboard_seen`, Everyone minus Joined in 7 days = older stalled players coming back. Decision line,
   set 2026-11-16, read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
   5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
