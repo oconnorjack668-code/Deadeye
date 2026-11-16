@@ -57,7 +57,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
      phone has a mode saved.
 - Live check (2026-10-22, founder): merged to main (pull request 18). A new account's first log opens in
   Enter totals; an account that has logged before still opens in Track every shot.
-- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups.
+- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 3 of 27 (11%, 3% to 29%); `log_opened` is 0 all-time, so no player has met the change yet: not enough players yet, stays **kept**.
 
 ## E2 · "Trained already? Log it" for players away from a court · kept (shipped 2026-10-25)
 
@@ -89,7 +89,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      today already? Log it by hand" shows under the intro, and opens the logger in Enter totals.
   5. Open Watch the tracker call a session, let it finish: the end card has Open the tracker, Log shots by hand
      and Back to my dashboard.
-- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed.
+- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 0 of 1 who answered "Not right now" and 0 of 2 who finished the sample opened the logger (logger opens 0 all-time). Hint only (3 players); stays **kept**.
 
 ## E3 · Markers for the welcome answer and the by-hand logger · kept (shipped 2026-10-25)
 
@@ -124,7 +124,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      spot logged. At `/admin/funnel` the new rows show 1 at each step you reached (the page counts players who
      joined in the window, so use a new test account).
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
-- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup.
+- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup. 2026-11-16: `welcome_court` 1 and `welcome_later` 1 from real players, so `track()` records live and the logger's 0 is a real 0. **kept**, confirmed.
 
 ## E4 · Training-days reminder on the dashboard for a player with no session · shipped 2026-11-09
 
@@ -188,7 +188,10 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
     until fixed the policy is slightly narrower than the behaviour. (2) The Mon/Wed/Fri default shows as picked
     before anything is saved, with no "saved" message. (3) `reminder_set` means days saved, not a reminder that
     can arrive, and fires from any RemindersCard (profile, welcome, dashboard); read it that way.
-- Result:
+- Result (2026-11-16, week 1 of 2, [report](reports/2026-11-16-activation.md)): `reminder_set` 0 (everyone and
+  7-day); first sessions 3 of 27, unchanged. How many no-session players saw the card is unknown (no dashboard
+  marker, so E6). The Signal set no number, so it cannot be called a win or a loss: not enough players yet.
+  Final read 2026-11-23 with E6's count if live; keep only if at least 1 player turns reminders on from it.
 
 ## E5 · Tracker "no shots detected" offers a by-hand log · idea
 
@@ -203,16 +206,69 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Founder checklist: <from release-checker>
 - Result:
 
-## E6 · Markers for the dashboard and the Today card · idea
+## E6 · Marker for a no-session player reaching the dashboard · NEXT
 
-Report: [2026-11-09](reports/2026-11-09-activation.md)
+Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-09](reports/2026-11-09-activation.md))
 
-- Hypothesis: the dashboard is where a stalled player returns, and nothing records arriving there or tapping
-  "Log shots", so a stall before the logger looks like no activity.
-- Change: add `dashboard_seen` (zero-session players) and `today_log_tapped` to `src/lib/events.ts`, list them
-  on `/admin/funnel` and in `docs/funnel-counts.sql`. No migration.
-- Signal: counts at the two steps in the next data file; not activation itself.
+- Hypothesis: barrier **forgot**. At least 23 of 27 who finished setup never opened the logger or tracker, and
+  nothing shows whether they ever come back. Every dashboard bet (E4, E7) assumes they do; if they don't, only
+  messages from outside the app (E0) and new signups can move the number.
+- Change: fire `dashboard_seen` (one row per player a day, as every step) when a player with no saved session
+  opens the dashboard: a small client component rendered only in the `metrics.totalSessions === 0` branch of
+  `dashboard/page.tsx`. Add the name to `src/lib/events.ts`, `/admin/funnel` (`funnel.ts`), `docs/funnel-counts.sql`
+  and the events clause of `privacy/page.tsx`. No migration (the name rule is a regex); nothing on screen changes.
+  `today_log_tapped` is dropped: `log_opened` and `tracker_opened` already count the next step.
+- Signal: `dashboard_seen`, Everyone minus Joined in 7 days = older stalled players coming back. Decision line,
+  set 2026-11-16, read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
+  5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
+  under 30 players. Guardrail: no change players can see; first sessions not lower than 3.
 - Safety: <safety-reviewer verdict>
+- Founder checklist: <from release-checker>
+- Result:
+
+## E7 · Today card leads with the camera for a player with no session · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **no reason yet**. Players come for the camera (the TikTok promise): 4 tracker opens vs 0
+  logger opens all-time, 3 of them from the dashboard's secondary button or the menu. The Today card's primary
+  button is the by-hand logger nobody opens.
+- Change: in the `metrics.totalSessions === 0` branch of `dashboard/page.tsx` (l.241-247), swap the two buttons'
+  variants: "Track with the camera" primary, "Log shots" outline. Copy unchanged.
+- Signal: tracker opens from no-session players, then first sessions. Success: 3 of the next 10 no-session players
+  seen on the dashboard (E6) open the tracker, and at least 1 saves. Guardrail: logger opens do not fall (they are 0)
+  and tracker saves per open not below 1 of 4. Hint: under 30. Read 2 weeks after it ships. Needs E6 first.
+- Safety: <safety-reviewer verdict>
+- Founder checklist: <from release-checker>
+- Result:
+
+## E8 · "Got a clip of you shooting? Track it now" on Not right now · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **can't** (no court now). Most new players answer "Not right now" (1 of the 2 answers this
+  week); the tracker takes a video from the phone, so a player with a clip can save a first session from the sofa,
+  and nothing on that branch says so.
+- Change: one link in `welcome/WelcomeClient.tsx`'s later branch, beside E2's, to `/video`, labelled "Got a clip of
+  you shooting? Track it now", with the line "Pick a video from your phone. No court needed."
+- Signal: `tracker_opened` from players who said "Not right now", then `tracker_saved`. Success: 2 of the next 10
+  who answer "Not right now" open the tracker. Guardrail: E2's by-hand link and the sample still get taps. Hint.
+- Safety: <safety-reviewer verdict> (check where an uploaded clip goes, and that it may show other people)
+- Founder checklist: <from release-checker>
+- Result:
+
+## E9 · "Add to my calendar" when push is off · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **forgot**. 0 of 27 turned reminders on: it takes days, "Remind me" and push permission, and
+  on iPhone a Home Screen install first. A calendar entry needs none of that.
+- Change: in `profile/RemindersCard.tsx`, when this device has no push, an "Add to my calendar" button that builds
+  an .ics on the phone for the next picked day at the reminder time ("Deadeye: track your shots", link to `/video`).
+  Nothing stored on the server. One marker, `calendar_added`.
+- Signal: `reminder_set` + `calendar_added` from no-session players. Success: 3 of the next 15 who see the card
+  (E6). Guardrail: `reminder_set` not lower. Hint.
+- Safety: <safety-reviewer verdict> (neutral wording; nothing stored)
 - Founder checklist: <from release-checker>
 - Result:
 
