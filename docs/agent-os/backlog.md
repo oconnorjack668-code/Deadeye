@@ -289,6 +289,16 @@ Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-
   Not checked: tests and the build were not run by me (the branch was read with `git show`, not checked out). No
   migration, so the Supabase advisors were not needed. Whether Next 16 prefetch would have triggered a
   server-side record was not checked; I took the builder's word.
+  Follow-up (2026-11-16, head b93c10c): PASS WITH NOTES. Fixes (1)-(3) are done: the clause matches my text word
+  for word, steps reached by 1 to 4 players read "under 5" in both columns with the 7-day split hidden when fewer
+  than 5 joined, the biggest-drop line hides its number, and the label says Home. The founder still approves the
+  clause before merging. Builder's gap (b) must change before 23 Nov: `agentCounts.ts:194` prints the
+  where-you-heard "1st session" column raw (as does the grouped "Other answers" row), so "A friend | 6 | 1" points
+  at one child among friends who know each other. That breaks our under-5 rule for every column (PR #97 N1). Fix:
+  print `funnelCell`-style "under 5" for 1 to 4 in the Joined and 1st session columns, plus a test. Gap (a)
+  (Everyone minus 7-day, and differences between rows or weeks) is accepted as a leftover risk: no code change.
+  Two conditions: the analyst never writes a worked-out number from 1 to 4 into a public report (write "under 5";
+  the founder reads E6's 2-or-fewer / 3-4 / 5-or-more decision on `/admin/funnel`), and DPIA R8 records it.
 - Founder checklist: <from release-checker>
 - Result:
 
