@@ -35,7 +35,10 @@ checks here are marketing's: scripts, claims, brand and the audience.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16 · Two weekly tests (23 Oct, 9 Nov) could not be read: no post dates or link
+  taps came back, TikTok has no bio link, and 2 players a week join. **Rule:** test one
+  thing per week across every post, read it on the week's sign-up answers and first
+  sessions (`/admin/funnel`), and ask the founder for each post's date when it goes up.
 
 ## Checklist before the founder sees a video or post
 
