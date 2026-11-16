@@ -1,8 +1,8 @@
-Skills: all 5 loaded (2026-11-13 review of PR #97, ref tracking and build id)
+Skills: all 5 loaded (2026-11-16 review of the marketing, outreach and clubs drafts)
 
 # Safety reviewer knowledge
 
-Last researched: 2026-11-13 (attribution links, ePrivacy, small numbers)
+Last researched: 2026-11-16 (press and children, ASAI free offers); 2026-11-13 (attribution links, ePrivacy, small numbers)
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -20,6 +20,21 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-16 · Focus Finder (PR #103) and the FDYS draft (PR #97 O1) came
+  back in the drafts review. (1) I passed "Send to team" without asking what a
+  Free player meets when they open it: the list can hold IQ lessons in a Pro
+  section, and `study/[id]/layout.tsx` has no coach-set exception (plays and
+  film do), so a child can hit a paywall on work their coach set. (2) My O1
+  fix, "videos stay on the phone unless the player uploads one to ask a
+  coach", left out uploads kept to watch back. Rule: for anything a coach can
+  set, open it as a Free player on that team; for any "stays on the phone"
+  line, list every upload path in code (`storage.from(`) first.
+- 2026-11-16 · Clubs draft: the DSCO facts said teammates see nothing, while
+  `team_roster` (00034) gives every member each teammate's weekly totals,
+  shots and game averages, and film questions are a written coach answer to
+  one player. Rule: club and DSCO wording is checked against the RPCs and RLS
+  (what a head coach, assistant, teammate and parent each get), not against
+  the feature's own notes.
 - 2026-11-11 · Routine import re-review: I asked for import-count rows to be
   "deleted before last month" without saying when. The builder deleted them on
   the player's next import, so a player who stops importing keeps them for
@@ -121,6 +136,21 @@ file). Newest first, each with the date, what happened, and the rule.
       user_metadata or app_metadata must add it to the `account` block of
       `src/app/api/account/export/route.ts`; the export does not copy metadata
       by itself.
+- [ ] **Coach-set work opens for every player on the team.** Anything a
+      coach can set (assignment, Focus list, play, film, IQ lesson) opens for a
+      Free player on that team, or the coach cannot set it. A child never meets
+      "part of Pro" on homework their coach set (ASAI children, pester power).
+- [ ] **Who sees what, per role.** Any text for a club, DSCO, parent or
+      player saying who can see a child's data names all five: head coach,
+      assistant, teammate, parent of an under-16, parent of a 16-17 year old,
+      checked against `team_roster`, `film_questions` and the plays RLS.
+- [ ] **13 and over, everywhere we pitch.** No club email, trial plan or post
+      aimed at a team or group mostly under 13 (U13 and younger); an U14 team
+      gets the "anyone still 12 waits" line.
+- [ ] **Photos and recordings for posts.** Location off or stripped before a
+      photo leaves the phone; no distinctive court features, school or club
+      kit; posted after leaving; Do Not Disturb on for screen recordings;
+      recorded on a Free, non-owner account so viewers see what they would get.
 - [ ] **DPIA.** A new kind of processing (new data type, recipient, upload,
       AI use, public surface) is named in the verdict as needing the DPIA
       updated.

@@ -1,4 +1,4 @@
-Skills: all 5 loaded (2026-11-13 review of PR #97)
+Skills: all 5 loaded (2026-11-16 drafts review)
 
 # Safety reviewer findings
 
@@ -229,6 +229,25 @@ when a better source arrives, rather than adding beside it.
   [Revenue SDC protocol](https://revenue.ie/en/corporate/documents/statistics/about/statistical-disclosure-control.pdf), 2019, regulator (Irish public body);
   [ICO anonymisation guidance summary](https://www.rpclegal.com/snapshots/data-protection/summer-2025/ico-publishes-new-guidance-on-anonymisation-and-pseudonymisation/), 2025, practitioner (of benchmark).
 
+### Press and promotion (added 2026-11-16)
+
+- Press Council of Ireland Code of Practice, Principle 9 (Children): papers
+  must take particular care when seeking or presenting information or comment
+  about a child under 16; the Ombudsman has upheld complaints over a child's
+  images and over details that identified children. The Code is under review
+  (2025-2026). **For Deadeye:** the paper is bound, not us, but an under-18
+  founder's name, age, town and photo should reach a paper only with a
+  parent copied and agreeing first, and any court meeting with a parent there.
+  [Press Council Handbook 2025](https://pressombudsman.ie/wp-content/uploads/2026/01/Handbook-2025-Code-of-Practice-of-the-Press-Council-of-Ireland.pdf), 2025, regulator (press self-regulation).
+- ASAI Code, Promotional Marketing Practices 5.22-5.28 (page dated Jan 2024):
+  "free" only if the consumer pays nothing beyond unavoidable costs (5.22);
+  where an offer covers several items and only some are free, say what is free
+  and what must be paid for (5.26); 5.7 asks special care for promotions
+  addressed to children. **For Deadeye:** "Free to start" is safe; "a free
+  app" or "it's free" about a screen that holds Pro items is not, so say what
+  is free ("the list and every drill").
+  [ASAI Promotional Marketing Practices](https://adstandards.ie/code/promotional-marketing-practices/), 2024, regulator (self-regulatory).
+
 ## Open questions
 
 - Does a new AI use need fresh consent from parents who approved before it
@@ -253,5 +272,9 @@ when a better source arrives, rather than adding beside it.
   be used without consent, given EDPB 2/2023 paras 49-51 and the DPC's "low
   priority" line on first-party analytics? Asked by PR #97 (2026-11-13).
   **(legal advice)**
+- Film questions: a head coach writes an answer to one player, seen by all
+  head coaches and an under-16's parent, but no parent of a 16-17 year old.
+  Is that within BI's policy for coaches of minors (groups including other
+  adults, parent copied) when a team has one head coach? Asked 2026-11-16.
 - Next research: AI Act Art. 5 (exploiting age), a DPC or EDPB text on push
   notifications, Sport Ireland's online safeguarding text.
