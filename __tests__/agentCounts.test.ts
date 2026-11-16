@@ -105,9 +105,26 @@ describe('countsFile', () => {
     expect(file).toContain('## Where they heard about Deadeye');
     expect(file).not.toContain('| A friend or teammate |');
     expect(file).toContain('| Answer | Joined | 1st session |');
-    expect(file).toContain('| Other answers (under 5 each) | 3 | 1 |');
-    expect(file).toContain("| Didn't say | 21 | 1 |");
+    expect(file).toContain('| Other answers (under 5 each) | under 5 | under 5 |');
+    expect(file).toContain("| Didn't say | 21 | under 5 |");
     expect(file).not.toContain('1st session in 7 days');
+  });
+
+  // Safety re-review of E6: the answers table follows the funnel tables' rule
+  it('shows 1 to 4 as "under 5" in both columns of the answers table, the grouped row included, and keeps 0 and 5 or more', () => {
+    const f = funnel(24, 18, 0);
+    f.routes = [
+      { route: 'friend', joined: 6, setup: 6, firstSession: 3 },
+      { route: 'tiktok', joined: 5, setup: 5, firstSession: 5 },
+      { route: 'instagram', joined: 2, setup: 2, firstSession: 0 },
+      { route: null, joined: 11, setup: 5, firstSession: 0 },
+    ];
+    const file = countsFile('2026-10-26', f, funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('| A friend or teammate | 6 | under 5 |');
+    expect(file).toContain('| TikTok | 5 | 5 |');
+    expect(file).toContain('| Other answers (under 5 each) | under 5 | 0 |');
+    expect(file).toContain("| Didn't say | 11 | 0 |");
+    expect(file.split('## Where they heard')[1].split('## Problems')[0]).not.toMatch(/\| [1-4] \|/);
   });
 
   it('dates the file by Irish time', () => {

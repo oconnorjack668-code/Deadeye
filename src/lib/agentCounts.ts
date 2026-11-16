@@ -147,8 +147,13 @@ function pct(count: number, of: number): string {
  */
 const isSmall = (n: number) => n > 0 && n < ROUTE_GROUP_MIN;
 
+/** A count for the public file: 1 to 4 reads "under 5"; 0 stays 0, as nobody can be picked out of it */
+function publicCount(n: number): string {
+  return isSmall(n) ? `under ${ROUTE_GROUP_MIN}` : String(n);
+}
+
 function funnelCell(count: number, joined: number): string {
-  return isSmall(count) ? `under ${ROUTE_GROUP_MIN}` : `${count}${pct(count, joined)}`;
+  return isSmall(count) ? publicCount(count) : `${count}${pct(count, joined)}`;
 }
 
 /** The step count on the main line with this label, to tell if the biggest drop would give a small one away */
@@ -184,14 +189,15 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
     'The optional question at sign-up (asked from 2026-11-13; older players',
     'show as "Didn\'t say"). Judge a route on 1st sessions; under about 30',
     'players it is a hint. This file is public, so answers with fewer than',
-    `${ROUTE_GROUP_MIN} players joined are added together and only all-time numbers are`,
-    'shown; `/admin/funnel` has every answer and the 7-day split.',
+    `${ROUTE_GROUP_MIN} players joined are added together, any count of 1 to ${ROUTE_GROUP_MIN - 1} reads`,
+    `"under ${ROUTE_GROUP_MIN}", and only all-time numbers are shown; \`/admin/funnel\` has every`,
+    'answer and the 7-day split.',
     '',
     '| Answer | Joined | 1st session |',
     '| --- | --- | --- |'
   );
   for (const r of publicRoutes(everyone.routes)) {
-    lines.push(`| ${r.label} | ${r.joined} | ${r.firstSession} |`);
+    lines.push(`| ${r.label} | ${publicCount(r.joined)} | ${publicCount(r.firstSession)} |`);
   }
   lines.push('');
   if (everyone.biggestDrop) {
