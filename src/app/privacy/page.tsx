@@ -133,12 +133,13 @@ export default function PrivacyPage() {
             </li>
             <li>
               A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
-              gave there (at a court, or not right now), opening the dashboard before you have logged any shots,
-              playing the sample clip, opening the shot logger and pressing
-              Finish in it, and opening, starting and finishing the shot tracker. We also note when you turn training
-              reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id,
-              only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
-              anyone. Deleting your account deletes them straight away.
+              gave there (at a court, or not right now), opening the Home screen before you have saved a shooting
+              session, playing the sample clip, opening the shot logger and pressing Finish in it, and opening, starting
+              and finishing the shot tracker. On the IQ tab, opening a play, finishing its quiz, opening a film clip and
+              answering all its questions, and, for coaches, saving a play you drew. We also note when you turn training
+              reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id, only
+              to see where players get stuck so we can fix it. We record only the steps named here, not the other pages
+              you open; no device details, nothing shared with anyone. Deleting your account deletes them straight away.
             </li>
             <li>
               If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for

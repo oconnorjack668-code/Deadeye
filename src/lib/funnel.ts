@@ -84,7 +84,7 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
   {
     // Last, so the groups above keep their places in the weekly counts file
     title: 'Coming back',
-    steps: [{ name: 'dashboard_seen', label: 'Opened the dashboard with no session saved' }],
+    steps: [{ name: 'dashboard_seen', label: 'Opened Home with no session saved' }],
   },
 ];
 

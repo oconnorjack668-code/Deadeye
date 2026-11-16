@@ -61,13 +61,43 @@ const call = (auth?: string) => GET(new Request('http://localhost/api/cron/agent
 
 describe('countsFile', () => {
   it('writes both windows, the biggest drop and the problem counts, and nothing else', () => {
-    const file = countsFile('2026-10-26', funnel(24, 18, 2), funnel(17, 12, 0), { reportsNew: 1, reportsOpen: 2, crashesOpen: 3 });
+    const file = countsFile('2026-10-26', funnel(24, 18, 6), funnel(17, 12, 0), { reportsNew: 1, reportsOpen: 2, crashesOpen: 3 });
     expect(file).toContain('# Funnel, 2026-10-26');
     expect(file).toContain('| Finished setup | 18 (75%) | 12 (71%) |');
-    expect(file).toContain('| Logged a 1st hoops session | 2 (8%) | 0 (0%) |');
-    expect(file).toContain('Biggest drop (everyone): Finished setup to Logged a 1st hoops session, 16 lost.');
+    expect(file).toContain('| Logged a 1st hoops session | 6 (25%) | 0 (0%) |');
+    expect(file).toContain('Biggest drop (everyone): Finished setup to Logged a 1st hoops session, 12 lost.');
     expect(file).toContain('- Crash reports open: 3');
     expect(file).not.toMatch(/@|[0-9a-f]{8}-[0-9a-f]{4}/);
+  });
+
+  // The file is public: a step only 1 to 4 players reached could point to one of them (safety review of E6)
+  it('shows a step reached by 1 to 4 players as "under 5", in both columns, with no percentage and no "lost" that gives it back', () => {
+    const file = countsFile('2026-10-26', funnel(24, 18, 2), funnel(17, 12, 3), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('| Logged a 1st hoops session | under 5 | under 5 |');
+    expect(file).toContain('| Finished setup | 18 (75%) | 12 (71%) |');
+    // 18 shown and "16 lost" would give back the 2
+    expect(file).toContain('Biggest drop (everyone): Finished setup to Logged a 1st hoops session.');
+    // No funnel table cell holds 1 to 4 (the answers table below has its own grouping rule)
+    expect(file.split('## Where they heard')[0]).not.toMatch(/\| [1-4]( \(\d+%\))? \|/);
+  });
+
+  it('does not split the 7-day column by step when fewer than 5 joined in the 7 days, the Coming back row included', () => {
+    const everyone = funnel(24, 18, 6);
+    const week = funnel(2, 2, 0);
+    everyone.groups.push({ title: 'Coming back', steps: [{ key: 'dashboard_seen', label: 'Opened Home with no session saved', count: 7 }] });
+    week.groups.push({ title: 'Coming back', steps: [{ key: 'dashboard_seen', label: 'Opened Home with no session saved', count: 1 }] });
+    const file = countsFile('2026-10-26', everyone, week, { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('| Joined | 24 (100%) | under 5 |');
+    expect(file).toContain('| Finished setup | 18 (75%) | - |');
+    expect(file).toContain('| Logged a 1st hoops session | 6 (25%) | - |');
+    expect(file).toContain('## Coming back');
+    expect(file).toContain('| Opened Home with no session saved | 7 (29%) | - |');
+  });
+
+  it('keeps a 0 as 0: nobody reached it, so nobody can be picked out', () => {
+    const file = countsFile('2026-10-26', funnel(24, 18, 0), funnel(17, 12, 0), { reportsNew: 0, reportsOpen: 0, crashesOpen: 0 });
+    expect(file).toContain('| Logged a 1st hoops session | 0 (0%) | 0 (0%) |');
+    expect(file).toContain('Biggest drop (everyone): Finished setup to Logged a 1st hoops session, 18 lost.');
   });
 
   it('splits joins and 1st sessions by sign-up answer, all-time only, adding small answers together so nobody can be picked out', () => {

@@ -139,19 +139,42 @@ function pct(count: number, of: number): string {
   return of > 0 ? ` (${Math.round((count / of) * 100)}%)` : '';
 }
 
+/**
+ * The funnel tables follow the same rule as the answers (safety review of E6,
+ * 2026-11-16): a step reached by 1 to 4 players reads "under 5", with no
+ * percentage that would give the number back, and when fewer than 5 joined in
+ * the 7 days that column has no split at all. Exact numbers stay on /admin/funnel.
+ */
+const isSmall = (n: number) => n > 0 && n < ROUTE_GROUP_MIN;
+
+function funnelCell(count: number, joined: number): string {
+  return isSmall(count) ? `under ${ROUTE_GROUP_MIN}` : `${count}${pct(count, joined)}`;
+}
+
+/** The step count on the main line with this label, to tell if the biggest drop would give a small one away */
+function mainCount(f: Funnel, label: string): number {
+  return f.groups[0]?.steps.find((s) => s.label === label)?.count ?? 0;
+}
+
 export function countsFile(date: string, everyone: Funnel, week: Funnel, reports: ReportCounts, clubs?: ClubCounts): string {
   const lines = [
     `# Funnel, ${date}`,
     '',
     'Written by the weekly counts job (`api/cron/agent-counts`) from the same',
     'numbers as `/admin/funnel`, owner and test accounts left out. Percentages',
-    'are of players who joined in the window. Counts only.',
+    'are of players who joined in the window. Counts only. This file is public,',
+    `so a step reached by 1 to ${ROUTE_GROUP_MIN - 1} players shows as "under ${ROUTE_GROUP_MIN}", and when fewer than`,
+    `${ROUTE_GROUP_MIN} joined in the 7 days that column is not split by step;`,
+    '`/admin/funnel` has the exact numbers.',
   ];
+  // Fewer than 5 new players: any 7-day step count could point to one of them
+  const weekHidden = isSmall(week.joined);
   everyone.groups.forEach((group, g) => {
     lines.push('', `## ${group.title}`, '', '| Step | Everyone | Joined in 7 days |', '| --- | --- | --- |');
     group.steps.forEach((step, i) => {
       const w = week.groups[g]?.steps[i]?.count ?? 0;
-      lines.push(`| ${step.label} | ${step.count}${pct(step.count, everyone.joined)} | ${w}${pct(w, week.joined)} |`);
+      const weekCell = !weekHidden ? funnelCell(w, week.joined) : step.key === 'joined' ? `under ${ROUTE_GROUP_MIN}` : '-';
+      lines.push(`| ${step.label} | ${funnelCell(step.count, everyone.joined)} | ${weekCell} |`);
     });
   });
   lines.push(
@@ -172,7 +195,10 @@ export function countsFile(date: string, everyone: Funnel, week: Funnel, reports
   }
   lines.push('');
   if (everyone.biggestDrop) {
-    lines.push(`Biggest drop (everyone): ${everyone.biggestDrop.from} to ${everyone.biggestDrop.to}, ${everyone.biggestDrop.lost} lost.`, '');
+    const { from, to, lost } = everyone.biggestDrop;
+    // "27 to 3, 24 lost" would give back a step shown as under 5
+    const hideLost = [mainCount(everyone, from), mainCount(everyone, to), lost].some(isSmall);
+    lines.push(`Biggest drop (everyone): ${from} to ${to}${hideLost ? '' : `, ${lost} lost`}.`, '');
   }
   if (clubs) {
     lines.push(

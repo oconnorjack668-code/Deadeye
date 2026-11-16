@@ -45,9 +45,12 @@ describe('the privacy page', () => {
     expect(text).toMatch(/film clips play from YouTube/);
   });
 
-  it('names opening the dashboard before any shots are logged among the recorded app steps (E6)', () => {
+  it('names every recorded app step, Home (E6) and the Plays and Film steps (S40) included, and no longer says "No page tracking"', () => {
     const { container } = render(<PrivacyPage />);
     const text = (container.textContent ?? '').replace(/\s+/g, ' ');
-    expect(text).toMatch(/A few steps you reach in the app, at most once a day each: [^.]*opening the dashboard before you have logged any shots/);
+    expect(text).toMatch(/A few steps you reach in the app, at most once a day each: [^.]*opening the Home screen before you have saved a shooting session/);
+    expect(text).toMatch(/On the IQ tab, opening a play, finishing its quiz, opening a film clip and answering all its questions, and, for coaches, saving a play you drew\./);
+    expect(text).toMatch(/We record only the steps named here, not the other pages you open; no device details, nothing shared with anyone\./);
+    expect(text).not.toMatch(/No page tracking/);
   });
 });
