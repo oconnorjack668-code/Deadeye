@@ -9,10 +9,10 @@
 --   * oEmbed returns 200, and the channel below is the author_name it gave;
 --   * the watch page reports status OK, playableInEmbed true, isFamilySafe true;
 --   * the English transcript was read to confirm the clip teaches what the
---     lesson's title and takeaways say (notes per row below).
+--     title and takeaways of the lesson say (notes per row below).
 -- The other 31 lesson ids were rechecked the same day and all return 200.
 --
--- duration_minutes is set to the new clip's length (rounded up), because the
+-- duration_minutes is set to the length of the new clip (rounded up), because the
 -- lesson card and Focus Finder show it next to the video.
 --
 -- Rows are matched by the dead video id, so this touches only those five rows,
