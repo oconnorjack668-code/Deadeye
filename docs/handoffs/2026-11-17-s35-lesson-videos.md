@@ -1,6 +1,6 @@
 # S35 replacement lesson videos (2026-11-17)
 
-Agent: Claude Code, Opus 5.5 · Commits: see PR · PR: #124 (branch `worktree-s35-lesson-videos`) · Status: in progress (waiting for founder to approve and apply)
+Agent: Claude Code, Opus 5.5 · Commits: see PR · PR: #124 (branch `worktree-s35-lesson-videos`) · Status: shipped (00066 applied live on the founder's word, #124 merged)
 
 ## Outcome
 Found and checked replacements for the 5 IQ lesson videos YouTube removed. Migration
@@ -24,8 +24,8 @@ dead ids. Players still see "Video unavailable" until 00066 is applied to the li
 - `supabase/seed.sql`: same four seed rows updated (the fifth comes from a migration)
 
 ## Status changes
-- Closed: none
-- Opened: none (S35 updated)
+- Closed: S35
+- Opened: none
 
 ## Gotchas
 - Plain caption URLs return empty now; `youtube-transcript-api` in a temp venv worked.
