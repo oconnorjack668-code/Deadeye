@@ -1,6 +1,6 @@
 # S35 replacement lesson videos (2026-11-17)
 
-Agent: Claude Code, Opus 5.5 · Commits: see PR · PR: S35 PR (branch `worktree-s35-lesson-videos`) · Status: in progress (waiting for founder to approve and apply)
+Agent: Claude Code, Opus 5.5 · Commits: see PR · PR: #124 (branch `worktree-s35-lesson-videos`) · Status: in progress (waiting for founder to approve and apply)
 
 ## Outcome
 Found and checked replacements for the 5 IQ lesson videos YouTube removed. Migration
