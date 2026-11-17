@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-17 · exam-followups · Save fix, Today first step, agent fixes live (#125-127); S42, S43 → [handoff](2026-11-17-exam-followups.md)
 - 2026-11-17 · agent-exams-baseline · First exams for all 11 agents: 39/49 pass, 0 fail; S39, S40 opened → [handoff](2026-11-17-agent-exams-baseline.md)
 - 2026-11-17 · s35-lesson-videos · 5 dead lesson videos replaced; 00066 applied live, #124 merged → [handoff](2026-11-17-s35-lesson-videos.md)
 - 2026-11-14 · tracker-speed · Uploads decoded not played (every frame, ~3x faster); camera off main thread (#113 #115 #118) → [handoff](2026-11-14-tracker-speed.md)
@@ -33,4 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
 - 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
 - 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
-- 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
