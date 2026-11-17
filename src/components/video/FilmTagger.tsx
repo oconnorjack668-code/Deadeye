@@ -11,7 +11,7 @@ import { FILM_TAGS, STYLE_TAGS, findMatches, styleFromFilm, MIN_FILM_SHOTS, type
 import { boxScoreFromFilm, statEventCount, tagCountsToBoxScore, type FilmEvent } from '@/lib/filmStats';
 import { GAME_TYPES, points, statLine } from '@/lib/games';
 import { localDateString } from '@/lib/dates';
-import { enqueue, getUserIdForSave, isOffline, newId, saveGame, type GameSavePayload } from '@/lib/offline';
+import { enqueue, getUserIdForSave, isOffline, newId, NOT_KEPT_MESSAGE, saveGame, type GameSavePayload } from '@/lib/offline';
 import type { Database } from '@/lib/supabase/types';
 import { FileVideo, Undo2, Users, X, Rewind, FastForward, StepForward, ClipboardList } from 'lucide-react';
 
@@ -128,7 +128,7 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
       return;
     }
     if (res.network) {
-      enqueue({
+      const kept = enqueue({
         id: payload.id,
         kind: 'game',
         userId,
@@ -137,7 +137,7 @@ export function FilmTagger({ heightCm, position }: { heightCm: number | null; po
         payload,
       });
       setSavingGame(false);
-      setError('Saved on this phone. It will sync to your stats once you are back online.');
+      setError(kept ? 'Saved on this phone. It will sync to your stats once you are back online.' : NOT_KEPT_MESSAGE);
       return;
     }
     router.push(`/games/${payload.id}`);

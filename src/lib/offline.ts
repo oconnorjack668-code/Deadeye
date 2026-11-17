@@ -2,8 +2,10 @@
 // Offline logging: finished sessions that cannot reach Supabase are kept in a queue on the
 // phone and uploaded by <OfflineSync /> when the connection comes back.
 //
-// Every save carries a client-generated id. A retry first deletes that id (children cascade),
-// so a save that half-finished before the signal dropped is never duplicated.
+// Every save carries a client-generated id. A retry first checks whether the server already
+// holds the whole save (the first try can succeed with the reply lost to the signal): if so it
+// is done and nothing is deleted. Only a half-finished copy is deleted (children cascade) and
+// saved again, so a save is never duplicated and a complete one is never put at risk.
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, SessionType, DrillCategory, ShotZone, WorkoutType } from '@/lib/supabase/types';
@@ -115,18 +117,30 @@ export function readQueue(): QueuedSave[] {
   }
 }
 
-function writeQueue(items: QueuedSave[]) {
+/** false when the phone would not store the queue (storage full or blocked) */
+function writeQueue(items: QueuedSave[]): boolean {
+  let ok = true;
   try {
     localStorage.setItem(QUEUE_KEY, JSON.stringify(items));
   } catch {
-    // storage full or blocked: nothing else we can do on the device
+    ok = false;
   }
   if (typeof window !== 'undefined') window.dispatchEvent(new Event(QUEUE_EVENT));
+  return ok;
 }
 
-export function enqueue(item: QueuedSave) {
-  writeQueue([...readQueue().filter((q) => q.id !== item.id), item]);
+/**
+ * Keeps a save on the phone until it can be uploaded. Returns false when the
+ * phone would not store it: the caller must keep the draft and say so, never
+ * tell the player it was saved.
+ */
+export function enqueue(item: QueuedSave): boolean {
+  return writeQueue([...readQueue().filter((q) => q.id !== item.id), item]);
 }
+
+/** Shown when a save could neither reach the server nor be kept on the phone */
+export const NOT_KEPT_MESSAGE =
+  'No signal, and this phone would not keep a copy (its storage is full or blocked). Nothing was saved: keep this screen open and press save again when you have signal.';
 
 export function removeFromQueue(id: string) {
   writeQueue(readQueue().filter((q) => q.id !== id));
@@ -159,8 +173,27 @@ export async function saveBasketballSession(
   retry = false
 ): Promise<SaveResult> {
   if (retry) {
-    const { error } = await supabase.from('training_sessions').delete().eq('id', p.id);
+    const { data: row, error } = await supabase.from('training_sessions').select('id').eq('id', p.id).maybeSingle();
     if (error) return fail(error.message, 'Could not reach the server');
+    if (row) {
+      const { data: savedDrills, error: drillsError } = await supabase.from('session_drills').select('id').eq('session_id', p.id);
+      if (drillsError) return fail(drillsError.message, 'Could not reach the server');
+      const drillIds = (savedDrills ?? []).map((d) => d.id);
+      const expectedShots = p.drills.reduce((n, d) => n + d.zones.length, 0);
+      let complete = drillIds.length === p.drills.length;
+      if (complete && expectedShots > 0) {
+        const { count, error: shotsError } = await supabase
+          .from('shooting_entries')
+          .select('id', { count: 'exact', head: true })
+          .in('drill_id', drillIds);
+        if (shotsError) return fail(shotsError.message, 'Could not reach the server');
+        complete = count === expectedShots;
+      }
+      // The first try saved everything; only its reply was lost
+      if (complete) return { id: p.id };
+      const { error: deleteError } = await supabase.from('training_sessions').delete().eq('id', p.id);
+      if (deleteError) return fail(deleteError.message, 'Could not reach the server');
+    }
   }
 
   const { error: sessionError } = await supabase.from('training_sessions').insert({ id: p.id, user_id: userId, ...p.session });
@@ -197,8 +230,19 @@ export async function saveBasketballSession(
 
 export async function saveWorkout(supabase: Supabase, userId: string, p: WorkoutSavePayload, retry = false): Promise<SaveResult> {
   if (retry) {
-    const { error } = await supabase.from('workouts').delete().eq('id', p.id);
+    const { data: row, error } = await supabase.from('workouts').select('id').eq('id', p.id).maybeSingle();
     if (error) return fail(error.message, 'Could not reach the server');
+    if (row) {
+      const { count, error: setsError } = await supabase
+        .from('workout_sets')
+        .select('id', { count: 'exact', head: true })
+        .eq('workout_id', p.id);
+      if (setsError) return fail(setsError.message, 'Could not reach the server');
+      // The first try saved everything (the optional routine is not checked: it never undoes a workout)
+      if (count === p.sets.length) return { id: p.id };
+      const { error: deleteError } = await supabase.from('workouts').delete().eq('id', p.id);
+      if (deleteError) return fail(deleteError.message, 'Could not reach the server');
+    }
   }
 
   const { error: workoutError } = await supabase.from('workouts').insert({ id: p.id, user_id: userId, ...p.workout });
@@ -230,8 +274,10 @@ export async function saveWorkout(supabase: Supabase, userId: string, p: Workout
 
 export async function saveGame(supabase: Supabase, userId: string, p: GameSavePayload, retry = false): Promise<SaveResult> {
   if (retry) {
-    const { error } = await supabase.from('games').delete().eq('id', p.id);
+    // A game is one row: if it is there, the first try saved it
+    const { data: row, error } = await supabase.from('games').select('id').eq('id', p.id).maybeSingle();
     if (error) return fail(error.message, 'Could not reach the server');
+    if (row) return { id: p.id };
   }
   const { error } = await supabase.from('games').insert({ ...p.game, id: p.id, user_id: userId });
   if (error) return fail(error.message, 'Could not save the game');
