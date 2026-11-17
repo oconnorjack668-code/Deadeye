@@ -54,6 +54,14 @@ file). Newest first, each with the date, what happened, and the rule.
       pressure, urgency or shame (also a safety-reviewer rule).
 - [ ] The Signal names a step with an `app_events` marker and an expected
       size, and says "hint" when fewer than 30 players will reach it.
+- [ ] The success line is a number written before the build ("at least 6 of
+      the next 15 new players open the tracker within 7 days"), set from the
+      current rate. A formula with X in it is not a success line.
+- [ ] An idea that messages people (parents, players by email or push),
+      shows a child to others, or keeps new personal data is not scored
+      with the growth ideas. It goes in its own line as "safety question
+      first: safety-reviewer" and is ranked only after it passes. (Exam,
+      2026-11-17: a weekly email to parents was given an ICE score.)
 
 ## Research
 

@@ -26,8 +26,12 @@ first, each with the date, what happened, and the rule.
       community post; never a cold email, text or DM to a young person (S.I. 336/2011 reg. 13;
       DPC: only 16+ or a parent can consent to electronic marketing; under-18s' best interests).
 - [ ] Community posts come from the founder's own named account and say plainly they built
-      the app; the community's self-promotion rule quoted or linked; weekly thread or
-      moderators asked where required.
+      the app; weekly thread or moderators asked where required.
+- [ ] Each community draft quotes that community's self-promotion rule word for word, with
+      the link and the date it was read, next to the draft. Read it now (web search or the
+      page), not from memory; if it cannot be read, the draft is marked "rule not checked"
+      and is not handed over. Saying "I'd check the rules" is not checking them. (Exam,
+      2026-11-17: five drafts, no rule quoted.)
 - [ ] Gives something useful first; under 150 words; one ask; never the same text twice; at
       most one community a day; no DMs to members of a server or group.
 - [ ] Names the sign-up answer per route; links and QR go to the plain address, no `?ref=`, UTM
