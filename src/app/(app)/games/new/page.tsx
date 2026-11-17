@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { SavedOfflineCard } from '@/components/SavedOfflineCard';
 import { COUNTING_STATS, EMPTY_BOX, GAME_TYPES, clampBox, points, type BoxScore, type CountingStat } from '@/lib/games';
-import { enqueue, getUserIdForSave, isOffline, newId, saveGame, type GameSavePayload } from '@/lib/offline';
+import { enqueue, getUserIdForSave, isOffline, newId, NOT_KEPT_MESSAGE, saveGame, type GameSavePayload } from '@/lib/offline';
 import { localDateString } from '@/lib/dates';
 import { ArrowLeft, Undo2, Pencil } from 'lucide-react';
 
@@ -152,7 +152,7 @@ export default function NewGamePage() {
       return;
     }
     if (res.network) {
-      enqueue({
+      const kept = enqueue({
         id: payload.id,
         kind: 'game',
         userId,
@@ -160,6 +160,12 @@ export default function NewGamePage() {
         createdAt: Date.now(),
         payload,
       });
+      if (!kept) {
+        // Keep the draft: the player must not be told it was saved
+        setError(NOT_KEPT_MESSAGE);
+        setSaving(false);
+        return;
+      }
     }
     try {
       localStorage.removeItem(DRAFT_KEY);

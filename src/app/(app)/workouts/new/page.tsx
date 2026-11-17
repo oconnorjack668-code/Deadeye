@@ -39,6 +39,7 @@ import {
   isNetworkError,
   isOffline,
   newId,
+  NOT_KEPT_MESSAGE,
   saveWorkout as saveWorkoutRecord,
   type WorkoutSavePayload,
 } from '@/lib/offline';
@@ -614,7 +615,7 @@ export default function NewWorkoutPage() {
       return;
     }
     if (result.network) {
-      enqueue({
+      const kept = enqueue({
         id: payload.id,
         kind: 'workout',
         userId,
@@ -622,6 +623,12 @@ export default function NewWorkoutPage() {
         createdAt: Date.now(),
         payload,
       });
+      if (!kept) {
+        // Keep the draft: the player must not be told it was saved
+        setError(NOT_KEPT_MESSAGE);
+        setSaving(false);
+        return;
+      }
     }
 
     try {
