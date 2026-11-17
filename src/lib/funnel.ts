@@ -61,8 +61,18 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
     ],
   },
   {
+    // Players with no session yet: which way in they took from Today
+    title: 'Today card',
+    steps: [
+      { name: 'today_log_tapped', label: 'Tapped Log shots' },
+      { name: 'today_track_tapped', label: 'Tapped track with the camera' },
+      { name: 'today_program_tapped', label: 'Tapped the program link' },
+    ],
+  },
+  {
     title: 'Shot tracker',
     steps: [
+      { name: 'video_opened', label: 'Opened the Video AI page' },
       { name: 'tracker_opened', label: 'Opened the tracker' },
       { name: 'tracker_setup', label: 'Picked camera or video, set the rim' },
       { name: 'tracker_started', label: 'Started tracking' },
@@ -70,7 +80,7 @@ const EVENT_STEPS: Array<{ title: string; steps: Array<{ name: EventName; label:
     ],
   },
   {
-    // After the tracker group: tracker_saved is added to that group by position below
+    // After the tracker group: tracker_saved is added to that group (by its title) below
     title: 'Logging shots',
     steps: [
       { name: 'log_opened', label: 'Opened the shot logger' },
@@ -121,7 +131,9 @@ export function buildFunnel(players: FunnelPlayer[], events: Array<{ user_id: st
     title: g.title,
     steps: g.steps.map((s) => ({ key: s.name, label: s.label, count: reached.get(s.name)?.size ?? 0 })),
   }));
-  eventGroups[1].steps.push({ key: 'tracker_saved', label: 'Saved a tracked session', count: trackedSaved.size });
+  eventGroups
+    .find((g) => g.title === 'Shot tracker')
+    ?.steps.push({ key: 'tracker_saved', label: 'Saved a tracked session', count: trackedSaved.size });
 
   const byRoute = new Map<string | null, RouteRow>();
   for (const p of players) {
