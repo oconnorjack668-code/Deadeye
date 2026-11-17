@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-17 · agent-exams-baseline · First exams for all 11 agents: 39/49 pass, 0 fail; S39, S40 opened → [handoff](2026-11-17-agent-exams-baseline.md)
 - 2026-11-14 · tracker-speed · Uploads decoded not played (every frame, ~3x faster); camera off main thread (#113 #115 #118) → [handoff](2026-11-14-tracker-speed.md)
 - 2026-11-14 · tracker-accuracy-steady-slow · Bench 81.6% to 90.7%, hold-out 69% to 76%; steadier, slow phones (#108) → [handoff](2026-11-14-tracker-accuracy-steady-slow.md)
 - 2026-11-14 · film-and-plays-live · Plays live for all; Film built, closed until S1; #112 → [handoff](2026-11-14-film-and-plays-live.md)
@@ -33,7 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
 - 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
 - 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
-- 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
-- 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
-- 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
-- 2026-10-23 · sample-rim-fix · Sample rim and start, camera black screen, Next.js patch, club card gap · open: 2 → [handoff](2026-10-23-sample-rim-fix.md)
