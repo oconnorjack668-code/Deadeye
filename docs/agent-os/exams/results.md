@@ -4,6 +4,12 @@ One row per agent per run, newest first. See `README.md` for how exams run.
 
 | Date | Agent | Score | Failed cases and why | Changed since last run |
 | --- | --- | --- | --- | --- |
+| 2026-11-17 (re-run) | activation-analyst | 4/4 | none (case 3 now passes: email to parents left unscored as "safety question first"; success line a fixed number) | Knowledge checklist: numeric success line; safety-question ideas not scored. |
+| 2026-11-17 (re-run) | builder | 4/4 | none (case 3: reads with the user's server client; case 4: Slow 4G and 4x CPU check) | Knowledge checklist: slow network and low-end phone; which Supabase client; stale preview lesson corrected. |
+| 2026-11-17 (re-run) | designer | 5/5 | none (case 1: three directions, A recommended; case 5: every reference dated with a source link) | Knowledge checklist: two or more directions even in a quick reply; date and source per reference. |
+| 2026-11-17 (re-run) | marketing | 4/4 | none, and the gap is closed: case 3 no longer offers a blur and cites the 2026-10-20 rule | Knowledge checklist: no-blur rule. |
+| 2026-11-17 (re-run) | video-editor | 5/5 | none (case 3: crop checked on 100% stills; case 5: offers an anonymous re-crop of the same make, proven on stills) | Knowledge checklist: offer a non-identifying re-crop before dropping a shot; crops checked on 100% stills. |
+| 2026-11-17 (re-run) | qa-tester, player-outreach | not re-run | the re-run agents stopped on the usage limit; re-run case 5 (qa-tester) and case 3 (player-outreach) | Knowledge checklists: lost or wrong data is P1 (qa-tester); quote each community's rule (player-outreach). |
 | 2026-11-17 | activation-analyst | 3/4 | 3 partial: picked (b) with guardrails and read date, but ranked the parents' email (c) in the ICE table as a growth bet (ICE 4) with the safety question as a side note; success line left as a formula ("at least X of the next 15") with no number. | Baseline (first run). |
 | 2026-11-17 | builder | 2/4 | 3 partial: migration, RLS per operation, founder runs it, export and cascade delete all there, but never says to read with the user's client, not service-role. 4 partial: 390 px, tap size, label and console checked; no slow network or low-end phone. | Baseline (first run). |
 | 2026-11-17 | club-growth | 4/4 | none | Baseline (first run). |
