@@ -92,14 +92,19 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
       {/* Phones and small tablets: the same sections as a strip that scrolls sideways */}
       <nav aria-label="Sections" className="border-t border-zinc-900/80 md:hidden">
         <div className="mx-auto flex max-w-5xl gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none]">
-          {LANDING_SECTIONS.map((s) => (
-            <a key={s.id} href={`#${s.id}`} className={linkClass(s.id)} aria-current={active === s.id ? 'true' : undefined}>
-              {s.label}
-            </a>
+          {/* For clubs second, so it is on screen without scrolling the strip */}
+          {LANDING_SECTIONS.map((s, i) => (
+            <React.Fragment key={s.id}>
+              <a href={`#${s.id}`} className={linkClass(s.id)} aria-current={active === s.id ? 'true' : undefined}>
+                {s.label}
+              </a>
+              {i === 0 && (
+                <Link href="/clubs" className={clubsLinkClass}>
+                  For clubs
+                </Link>
+              )}
+            </React.Fragment>
           ))}
-          <Link href="/clubs" className={clubsLinkClass}>
-            For clubs
-          </Link>
         </div>
       </nav>
     </header>
