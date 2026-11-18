@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-18 (Next step column added for Deadeye HQ; S14 and S17 closed after checking; S45 fix merged in #134; S16 being redone by Codex)
+Last updated: 2026-11-18 (HQ next steps, groups and freshness line live, #141; S9 closed)
 
 ## Rules
 
@@ -49,7 +49,6 @@ Last updated: 2026-11-18 (Next step column added for Deadeye HQ; S14 and S17 clo
 | S5 | Get consent for the two people in the Tuesday video, then post it | Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). | Founder | 2026-11-11 | 2026-11-11 |
 | S6 | Add link taps per platform and the TikTok post date to the results | Promo numbers: views, likes, profile visits, follows, retention and audience for TikTok and Instagram are in `docs/agent-os/marketing/results.md` (18 Nov, #131). Still missing: link taps per platform and the TikTok post date. | Founder | 2026-11-11 | 2026-11-18: results.md on main read |
 | S27 | Try the tracker visuals on your phone and decide on "N in a row" | Tracker visuals (PR #99): try them on a phone in a real session, inline and full screen sideways; only checked on stills from the sample clip so far. Also decide whether "N in a row" should show at phone size (it is left out there when it would cover the full-screen button). | Founder | 2026-11-13 | 2026-11-13 |
-| S9 | Merge the PR that adds the 168-drills note to the promo plan | `docs/brand/promo-video/PLAN.md` says 150 drills; the app has 168 (`DRILL_COUNT`). | Founder | 2026-11-11 | 2026-11-18: note added in the HQ next-steps PR |
 | S10 | Film new clips for posts: phone on a bag, nobody else in the hall | New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. | Founder | 2026-11-11 | 2026-11-11 |
 | S11 | Pick one to start: Blazers trial, the two club emails, or messaging 5 players | Getting players in. Counts 16 Nov (`docs/agent-os/data/2026-11-16-funnel.md` on the `agent-os` branch): 35 joined, 27 finished setup, 3 logged a first session; 2 joined in the last 7 days (both set up, 0 first sessions). Not started by the founder (18 Nov): the Wexford Blazers next step (agree a head coach and start date, dated 9 Nov in `docs/agent-os/clubs/pipeline.md`), the Enniscorthy and Gorey drafts (`2026-11-09-clubs.md`), and all three outreach routes in `docs/agent-os/outreach/routes.md` (E0 messages, local media, FDYS: all `drafted`, none sent). | Founder + agents | 2026-11-09 | 2026-11-18: founder says the Blazers trial and the two club emails are not started; the 13-15 Nov weekend posts were never made |
 | S13 | Try "Find the hoop for me" with the live camera on your phone | Hoop finder: retry with the live camera on a phone (Chrome's permission bubble blocked it in testing). | Founder | 2026-11-03 | unconfirmed since 2026-11-03 |
@@ -63,6 +62,7 @@ Last updated: 2026-11-18 (Next step column added for Deadeye HQ; S14 and S17 clo
 
 ## Recently done (do not raise again)
 
+- 2026-11-18 · S9 closed: `docs/brand/promo-video/PLAN.md` has a dated note that the app has 168 drills (`DRILL_COUNT`) and new cuts say 168; the shipped plan itself is left as recorded. PR #141 merged (`c690b20`), which also added the Next step column, grouped to-dos and the freshness line to Deadeye HQ.
 - 2026-11-18 · S14 closed: the PR check routine fires on PRs; it ran on #137 at 12:46 UTC and posted its safety and checks comment.
 - 2026-11-18 · S17 closed: `OPENAI_API_KEY` is no longer in Vercel (env list read), and `src/proxy.ts` refreshes sessions through `getClaims()` in `src/lib/supabase/middleware.ts`, the current Supabase pattern.
 - 2026-11-18 · S46 closed: the privacy page names every step the app notes (Today card taps, Video AI page, tracker setup and save, plays, film) and no longer says "No page tracking". PR #137 merged (`3b6e231`) on the founder's word, PR check safety PASS; live page checked (shows "Today card").
