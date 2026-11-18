@@ -35,7 +35,28 @@ checks here are marketing's: scripts, claims, brand and the audience.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-18 · First promo ("Aim is earned", posted 2026-10-23): TikTok 1,117
+  views, average watch 6.06s of 24s, 3.9% to the end, most viewers gone at
+  0:01; about half its search traffic was people typing "vercel.app" from the
+  caption. Instagram 1,987 views, 9 profile visits, 9 follows. TikTok viewers
+  72.5% Ireland; age data starts at 18 so 13-17s are invisible
+  (`docs/agent-os/marketing/results.md`). **Rules:** the hook in the first
+  second is the job; "link in bio", never a web address to type; judge reach
+  to under-18s by sign-ups, not TikTok's age chart.
+- 2026-11-18 · Browser research (`docs/agent-os/trends/ads.md`, 18 Nov lines):
+  training videos with a text promise and a make count get 100K+ likes while
+  app promos (ours and rivals') get under 1.5K; Irish basketball on TikTok is
+  small (100 to 14K) and local; rival viral clips (HomeCourt game mode, Ball
+  AI tripod-in-shot) showed the counter, make sounds and a 1-minute game; their
+  comments ask "free?", "paywall?", "Play Store?". Rival Shotcheck pitches the
+  same "phone courtside counts makes and misses"; rival Meta ads are short
+  tests that stopped. **Rules:** script training videos with the app inside,
+  not app ads; show the make sounds and the timed challenge Deadeye already
+  has; answer "free?" on screen ("Free to start"); lead with what is ours
+  (Ireland, effort, streaks), not "counts makes and misses" alone; stay organic,
+  no paid ads yet; no weekly sound tracking (pick a Commercial Music Library
+  track per video) and no weekly Creative Center check (no basketball data).
+  No "on Android" or Play Store line until the listing is live (STATUS S3).
 
 ## Checklist before the founder sees a video or post
 
