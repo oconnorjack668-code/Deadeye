@@ -1,5 +1,7 @@
 # Deadeye promo v2: plan for approval
 
+> **Drill count, 2026-11-18:** this plan and the shipped video say 150 drills. The app now has 168 (`DRILL_COUNT` in `src/lib/plans.ts`: 150 in migration 00013 plus 18 in 00048). Any new cut or post says 168, never 150.
+
 Status: shipped 2026-10-20. This file is the plan as approved; what shipped changed in review:
 
 - **The final is the first promo with voice** (`../promo-classic`), not the new build in this folder. The user preferred the first promo's look once it had a voice. It keeps the first promo's footage, tracker graphics and end card, with: the logo sting after the first shot cut, new captions over the old ones (timed to the voice), "Train smarter" replaced by the real programmes screen, a watermark and a light grade.

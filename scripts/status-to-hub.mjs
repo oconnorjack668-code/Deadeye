@@ -57,17 +57,43 @@ function cells(row) {
     .map((c) => c.trim());
 }
 
-/** The rows of the "## Open" table: [{ id, what, owner, since, checked }]. */
+/**
+ * The rows of the "## Open" table: [{ id, next, what, owner, since, checked }].
+ * Columns are found by their header names, so one can be added later.
+ */
 export function openRows(status) {
   const start = status.search(/^## Open\s*$/m);
   if (start < 0) throw new Error('docs/STATUS.md has no "## Open" section');
   const rest = status.slice(start).split('\n').slice(1);
   const end = rest.findIndex((l) => /^## /.test(l));
-  const lines = (end < 0 ? rest : rest.slice(0, end)).filter((l) => /^\|\s*S\d+\s*\|/.test(l));
-  return lines.map((l) => {
-    const [id, what = '', owner = '', since = '', checked = ''] = cells(l);
-    return { id, what, owner, since, checked };
-  });
+  const section = end < 0 ? rest : rest.slice(0, end);
+  const header = section.find((l) => /^\|\s*Id\s*\|/i.test(l));
+  const names = header ? cells(header).map((h) => h.toLowerCase()) : ['id', 'what', 'owner', 'since', 'last checked'];
+  const col = (row, name) => (names.indexOf(name) >= 0 ? row[names.indexOf(name)] ?? '' : '');
+  return section
+    .filter((l) => /^\|\s*S\d+\s*\|/.test(l))
+    .map((l) => {
+      const row = cells(l);
+      return {
+        id: col(row, 'id'),
+        next: col(row, 'next step'),
+        what: col(row, 'what'),
+        owner: col(row, 'owner'),
+        since: col(row, 'since'),
+        checked: col(row, 'last checked'),
+      };
+    });
+}
+
+/**
+ * Which part of the to-do list a card sits in: "live" (a pull request to
+ * approve), "decide" (an idea or a choice for the founder), "yours" (a job
+ * only the founder can do), "agents" (an agent does it next).
+ */
+export function groupOf(call, owner = '') {
+  if (call.kind === 'merge') return 'live';
+  if (/decides/i.test(owner) || /^(Decide|Say|Idea)\b/.test(call.title)) return 'decide';
+  return call.agent === 'founder' ? 'yours' : 'agents';
 }
 
 /** Title: the first clause of the item, cut at a word boundary. */
@@ -92,8 +118,12 @@ function agentOf(owner) {
 /** One hub task card for one STATUS row. */
 export function callOf(row) {
   const text = plain(row.what);
-  const title = titleOf(row.what);
-  let detail = text.startsWith(title.replace(/\.\.\.$/, '')) ? text.slice(title.replace(/\.\.\.$/, '').length) : text;
+  const next = plain(row.next || '');
+  // The Next step column is the card's title; a row without one falls back to
+  // the first clause of What.
+  const title = next || titleOf(row.what);
+  const lead = title.replace(/\.\.\.$/, '');
+  let detail = !next && text.startsWith(lead) ? text.slice(lead.length) : text;
   detail = detail.replace(/^[\s:.;,-]+/, '').trim();
   if (detail.length > 600) detail = detail.slice(0, 597).replace(/\s+\S*$/, '') + '...';
   const checked = plain(row.checked);
@@ -111,6 +141,7 @@ export function callOf(row) {
   call.link = pr ? `${REPO}/pull/${pr[1]}` : `${REPO}/blob/main/docs/STATUS.md`;
   const due = row.what.match(/\bby (\d{4}-\d{2}-\d{2})\b/);
   if (due) call.due = due[1];
+  call.group = groupOf(call, row.owner);
   return call;
 }
 
@@ -125,6 +156,7 @@ export function prCallOf(pr) {
     onApprove: `The next Claude Code session merges PR #${pr.number} if its checks are green and it is up to date with main.`,
     link: pr.html_url || `${REPO}/pull/${pr.number}`,
     words: `merge ${pr.number}`,
+    group: 'live',
   };
 }
 
