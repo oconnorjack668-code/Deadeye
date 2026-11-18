@@ -355,6 +355,15 @@
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/116",
       "onApprove": "It moves to In progress. Tell Claude when it has run and the smoke test passed, then mark it Done.",
       "title": "Run migration 00065 now #116 is merged"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Merged 20:50 UTC before the check finished. Safety BLOCK, so a follow-up fix PR is needed: the privacy policy must name the 4 new markers and drop \"No page tracking\" (privacy/page.tsx:135-140). typegen, tsc, eslint and 1709 tests pass. No migrations or env vars.",
+      "id": "merge-126",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/126",
+      "title": "PR #126 (Today first step): ALREADY MERGED, privacy fix needed",
+      "words": "merge 126"
     }
   ],
   "clubs": {
@@ -567,12 +576,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #121, 15 Nov) is running (checked 17 Nov).",
+      "detail": "Live and up to date: the latest version (PR #128, 17 Nov) is running (checked 18 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors in the last 24 hours (checked 17 Nov). The age check lookup blip from earlier days did not come back.",
+      "detail": "No errors in the last 24 hours (checked 18 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -627,6 +636,51 @@
   ],
   "log": [
     {
+      "at": "2026-11-18T08:10:00Z",
+      "text": "Morning check: no errors in the last 24 hours, live site is the newest version (PR #128) and ready, 3 open pull requests all green. All quiet.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T21:30:00Z",
+      "text": "PR #127 (agent knowledge fixes, S40) merged at 20:55 UTC at the checked head d25f3da (safety PASS, checks green). Merge call removed.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T20:55:19Z",
+      "text": "PR #127 re-checked after main (#126) was merged in (head d25f3da): safety PASS, typegen, tsc, eslint and tests pass, no migrations or env vars. Reply merge 127 once the checks workflow is green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T21:20:00Z",
+      "text": "PR #126 merged at 20:50 UTC, before its check landed. Check comment posted: safety BLOCK (privacy text misses the Today and Video AI markers, and says \"No page tracking\"), checks green. Needs a small fix/ PR for the privacy text.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-17T21:10:00Z",
+      "text": "PR #126 (Today first step) checked at a3d88b0: safety BLOCK (privacy text misses the new Today and Video AI markers), all checks green, no migrations or env vars. Not ready to merge.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-17T21:00:00Z",
+      "text": "PR #127 re-checked after main was merged in (head 93358bd): safety PASS, all checks green, no migrations or env vars. Ready: reply merge 127.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T20:50:00Z",
+      "text": "PR #125 (save retry fix, S39) merged at 20:46 UTC. Merge call removed; no new check needed.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T14:05:00Z",
+      "text": "PR #127 (agent knowledge fixes, S40) checked: safety PASS, all checks green, no migrations or env vars. Ready: reply merge 127.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-17T09:58:00Z",
+      "text": "PR #125 (save retry fix, S39) checked: safety PASS, all checks green, no migrations or env vars. Ready: reply merge 125.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-17T08:10:13Z",
       "text": "Morning check: live site up to date (PR #121, ready). No errors in the last 24 hours, no crash. 3 open pull requests, all checks green.",
       "tone": "ok"
@@ -680,51 +734,6 @@
       "at": "2026-11-13T16:30:00Z",
       "text": "Learning digest: 26 new lessons this week (video editor 15, marketing 3, designer 2, release checker 2, support triage 2, player outreach 1, safety reviewer 1). No research due.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-13T08:10:00Z",
-      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 2 open pull requests, checks green: #95 (agent runs) ready, #87 clashes with main. Nothing urgent.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-12T10:11:23Z",
-      "text": "Marketing mid-week: weekend posts drafted (screen videos and a Story, no people). Landing fix closed. Last week's calendar and founder posts replaced by the weekend call. No new post numbers yet.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-12T08:10:00Z",
-      "text": "Morning check: 0 errors in 24h, live site up to date (PR #94). 1 open pull request (#87, docs only, checks green, clashes with main). Nothing urgent.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-11T11:00:00Z",
-      "text": "PR 86 re-checked at d936be0 (credits links added): safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-11T10:40:00Z",
-      "text": "PR 86 checked: safety PASS, types and lint pass, no migrations or env vars. Ready for merge 86.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-11T08:10:00Z",
-      "text": "Morning check: 0 errors in 24h, live site up to date, 2 open pull requests (docs only, checks green). Nothing needs you.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-10T08:10:00Z",
-      "text": "Morning check: 0 errors in 24h, live site up to date, 1 open pull request (docs only, checks green). Nothing needs you.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T15:40:00Z",
-      "text": "PR check ran on PR #80 (landing demo copy): safety passed, checks passed.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T16:00:00Z",
-      "text": "PR 79 checked: safety PASS, types pass, no migrations or env vars. Ready for merge 79.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -741,7 +750,7 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-17T08:10:13Z",
+  "updatedAt": "2026-11-18T08:10:00Z",
   "updatedBy": "Morning check",
   "version": 1
 }
