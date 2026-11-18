@@ -22,7 +22,7 @@ file). Newest first, each with the date, what happened, and the rule.
 
 - 2026-11-16 · E6 review. (1) I passed F2 and F3 (plays and film, 13-14
   Nov) although they added five `EVENT_NAMES` that the privacy page's closed
-  list of app steps never named. The builder found it building E6 (S40).
+  list of app steps never named. The builder found it building E6 (S45).
   (2) My E3 verdict (25 Oct) said "the repo must stay private". The repo is
   public (GitHub API, 16 Nov), so the 1-to-4 counts in the funnel step rows
   were published for three weeks; PR #97 grouped only the route table. Rule:
@@ -127,7 +127,7 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] **Every app step is named.** A branch that adds to `EVENT_NAMES`
       (`src/lib/events.ts`) names each new step in plain words in the privacy
       clause "A few steps you reach in the app", and the clause still matches
-      its own "no page tracking" style promises (E6, S40).
+      its own "no page tracking" style promises (E6, S45).
 - [ ] **Public counts, every table.** Run the under-5 check on every table
       `src/lib/agentCounts.ts` writes (funnel steps as well as routes), and
       check the repo's visibility (`gh api repos/<owner>/<repo>`) instead of

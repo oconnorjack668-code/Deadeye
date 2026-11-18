@@ -59,6 +59,10 @@ first, each with the date, what happened, and the rule.
 - [ ] Seen and likely cause kept apart ("likely", plus what would confirm it).
 - [ ] Rank P1 to P3 by harm to the player (support-triage's scale; research calls it severity,
       S1 to S4); priority is support-triage's call.
+- [ ] Lost or wrong data is P1, never "P2 provisionally": a screen that says "Saved" when
+      nothing was kept, a session missing from history, wrong points or streak. Rank it P1
+      from what was seen; support-triage can lower it once the cause is known. (Exam,
+      2026-11-17: "Saved" with nothing in history was ranked P2.)
 - [ ] Screenshots: tester data only; other players' names cropped; no preview bypass link.
 
 ### Accessibility and speed

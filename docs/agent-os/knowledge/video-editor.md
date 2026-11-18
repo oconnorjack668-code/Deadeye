@@ -142,6 +142,14 @@ Delivery and review
       most; the last frame leads back into the first if it loops.
 - [ ] Faces: every recognisable person listed; consent on record for any
       possible under-18, or the shot is out (never blurred).
+- [ ] Before a shot is dropped for a face, offer the same moment re-cropped
+      so the person cannot be known (hands, ball and hoop, from behind; no
+      face, name, school or kit crest in frame), within the pixel budget,
+      and show it on 100% stills (`snapshot --at ... --zoom`) at the first,
+      middle and last frame and at every fast frame. Dropping the shot or
+      waiting for consent are the other options, not the only ones. Any
+      re-crop that leaves someone out is checked on a 100% still before it
+      is called done. (Exam, 2026-11-17: both missed.)
 - [ ] After the last change: the whole cut read as a 4 fps strip at phone size
       with measured audio; a person asked to watch it at real speed on a
       phone, with sound and without (the editor can't watch video).

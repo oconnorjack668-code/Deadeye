@@ -54,6 +54,12 @@ checks here are marketing's: scripts, claims, brand and the audience.
 - [ ] Works with the sound off (captions carry the message).
 - [ ] No identifiable under-18 without a parent's written consent; app
       screens from the tester account.
+- [ ] Never offer a blur, darkened patch or mask as the way to show a person
+      (founder, 2026-10-20; `video-editor.md`): a blurred child can still be
+      known by kit, hall or voice, so it is still a consent question. The
+      ways out are a re-crop that leaves them out of frame, other footage,
+      an adult, or consent. (Exam, 2026-11-17: marketing offered "blur the
+      face".)
 - [ ] Ends on one clear action that matches the activation goal (try the
       demo, log a first session).
 

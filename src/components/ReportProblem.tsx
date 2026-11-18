@@ -108,7 +108,8 @@ export function ReportProblem({
       </label>
       {/* Many players are under 18: ask for the problem, not for them */}
       <p className="text-sm text-zinc-500">
-        We see the page you are on and your type of device. Please leave out your name, address and phone number.
+        We see the page you are on and your type of device. Please leave out your name, email, phone number, address, school
+        and club.
       </p>
       {error && (
         <p role="alert" className="text-sm font-semibold text-red-400">

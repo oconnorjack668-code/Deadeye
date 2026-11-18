@@ -32,7 +32,7 @@ open the dashboard. Nothing changes on screen. It shows on `/admin/funnel` and i
 
 ## Status changes
 - Closed: none
-- Opened: S39, S40
+- Opened: S44, S45 (first written as S39, S40; renumbered 18 Nov, main had used those ids)
 
 ## Gotchas
 - The main copy of `docs/agent-os/backlog.md` still has the older E6 idea; the NEXT version is on `agent-os`,

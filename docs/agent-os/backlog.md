@@ -230,11 +230,11 @@ Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-
   5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
   under 30 players. Guardrail: no change players can see; first sessions not lower than 3.
 - Safety: PASS WITH NOTES (2026-11-16, head ab80f98; no BLOCK). Findings, most urgent first, all FIX SOON:
-  (1) S40, already on main, not this branch: `src/app/privacy/page.tsx:135-141` presents the recorded steps as
+  (1) S45, already on main, not this branch: `src/app/privacy/page.tsx:135-141` presents the recorded steps as
   a complete list but leaves out the five Plays and Film steps (`play_opened`, `play_quiz_done`, `play_drawn`,
   `film_opened`, `film_done`, live since F2 and F3, 13-14 Nov). Its purpose, "where new players get stuck", also does
   not cover them. This breaks GDPR Art 5(1)(a) and Art 12(1) and DPC Fundamental 6 (transparency for children);
-  E3 was blocked for the same gap. Fix: the founder approves one clause covering E6 and S40 together (suggested
+  E3 was blocked for the same gap. Fix: the founder approves one clause covering E6 and S45 together (suggested
   text below); merge it in this branch or the same day.
   (2) Pre-existing, made slightly worse by E6: `src/lib/agentCounts.ts:150-156` prints every funnel step count,
   including 1 to 4 in the "Joined in 7 days" column, into a file in a public repo (GitHub visibility checked
