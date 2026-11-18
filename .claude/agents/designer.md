@@ -11,7 +11,8 @@ skills:
   - design:design-handoff
   - frontend-design:frontend-design
   - marketing:brand-review
-model: inherit
+model: sonnet
+effort: high
 memory: project
 hooks:
   PreToolUse:

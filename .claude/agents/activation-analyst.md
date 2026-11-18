@@ -10,7 +10,8 @@ skills:
   - data:statistical-analysis
   - product-tracking-skills:product-tracking-audit-current-tracking
   - design:user-research
-model: inherit
+model: opus
+effort: medium
 memory: project
 hooks:
   PreToolUse:
