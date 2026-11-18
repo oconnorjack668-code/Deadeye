@@ -11,6 +11,17 @@ summary), `weak`/`practitioner`; `dated` = over ~2 years.
 - 2026-11-11 · Set up because no new players have signed up since 24 Oct. Rule: the job is
   players who log a first session; a route is kept or dropped on that, not on visits.
 
+- 2026-11-18 · Founding Competition brief. Rules: never "second prize" or "came second" (banned
+  practice under EU consumer law), say "everyone who entered gets 25% off"; under-18s enter only
+  with a parent or guardian's permission and under-18 winners are reached through a parent; reach
+  players through friends the founder knows, coaches, parents and the founder's own posts only.
+  Checklist line: a competition message states free entry, the parent rule, the close date and the
+  rules link, and has no countdown or "last chance". Draft: `outreach/2026-11-18-competition-outreach.md`.
+  Same day, update: winners are judged on useful feedback by two adults, not a random draw (skill
+  competition, prize-cap reasons); say "judged", never "draw". Read the rules file before drafting
+  and never invent an entry step: I first wrote a "start with Feedback:" workaround that the real
+  `/competition` page made unnecessary.
+
 ## Lessons from results
 
 What the outcome of earlier work taught (see "Results review" in the agent file). Newest

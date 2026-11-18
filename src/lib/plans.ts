@@ -106,10 +106,18 @@ export const WHY_PRO_COSTS: Array<{ title: string; text: string }> = [
  * (docs/sales/deadeye-club-plans.html, printed to public/deadeye-club-plans.pdf)
  * carries the same numbers: change both together. Paid club plans are not on
  * sale yet, so the page says they open soon.
+ *
+ * Every plan is priced per year (decided 2026-11-18): seasons differ between
+ * clubs and countries, and players train most in the offseason. The Club plan
+ * is one flat price for up to 8 teams; below 6 teams, Team Passes cost less.
  */
 export const CLUB_PLANS: Array<{ name: string; price: string; alt: string; detail: string }> = [
   { name: 'Coach Free', price: '€0', alt: 'always', detail: 'One team: codes, assignments, coach home and club board' },
-  { name: 'Team Pass', price: '€149.99', alt: 'per season, or €19.99 a month', detail: 'Every player on the team gets Pro, up to 15' },
-  { name: 'Club plan', price: '€99.99', alt: 'per team per season, or €11.99 a month', detail: 'Team Pass for every team, from 4 teams, one bill' },
+  { name: 'Team Pass', price: '€179', alt: 'a year, or €19.99 a month', detail: 'Every player on the team gets Pro, up to 15' },
+  { name: 'Club plan', price: '€899', alt: 'a year for up to 8 teams, then €89 a team', detail: 'Team Pass for every team, one bill. Best value from 6 teams' },
 ];
 export const CLUB_PLANS_PDF = '/deadeye-club-plans.pdf';
+
+/** The founding club offer, quoted whole wherever it appears (homepage, /clubs, the sheet). */
+export const FOUNDING_CLUB_OFFER =
+  'Founding club offer: our first 3 clubs are free until 31 January 2027, then pay €59.99 per team per year for as long as they stay subscribed. Closes 31 December 2026.';
