@@ -80,7 +80,9 @@ Done when you hold the fact, or STATUS and the index show no session covers it.
    Founder's decision, 2026-11-18: sessions self-merge docs-only STATUS PRs
    so the record reaches main within minutes. If the merge fails (conflict
    with another session's STATUS edit), rebase on main, keep both edits,
-   and merge again; never leave it for the founder.
+   and merge again; never leave it for the founder. Once it is merged,
+   rebuild Deadeye HQ's to-do list from it (`docs/agent-os/hub/README.md`,
+   "The to-do list comes from STATUS"): the founder reads the list there.
 
 Done when every commit and decision of the session is in the handoff, every
 item the session opened or closed is reflected in STATUS, the index has its
