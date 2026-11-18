@@ -8,7 +8,7 @@ import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 14, 2026';
+const LAST_UPDATED = 'November 18, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -133,11 +133,14 @@ export default function PrivacyPage() {
             </li>
             <li>
               A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
-              gave there (at a court, or not right now), playing the sample clip, opening the shot logger and pressing
-              Finish in it, and opening, starting and finishing the shot tracker. We also note when you turn training
-              reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id,
-              only to see where new players get stuck so we can fix it. No page tracking, no device details, nothing shared with
-              anyone. Deleting your account deletes them straight away.
+              gave there (at a court, or not right now), playing the sample clip, and, before your first session, which
+              link you tap on the Today card (log shots, track with the camera, or your program). Opening the Video AI
+              page, opening the shot tracker, setting it up, starting and finishing it, and saving its result. Opening the shot logger and
+              pressing Finish in it. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
+              and, if you coach, saving a play you drew. We also note when you turn training reminders on, or change your
+              reminder days while they are on. Kept for 90 days, with your account id, only to see where new players get
+              stuck so we can fix it. Only these steps are noted, not every page you visit; no device details, nothing
+              shared with anyone. Deleting your account deletes them straight away.
             </li>
             <li>
               If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
