@@ -6,6 +6,12 @@ Last refreshed: 2026-11-13 (marketing's scan, written in by the lead with the fo
 
 **Gaps this week (2026-11-13).** TikTok Creative Center needs a TikTok for Business login: in a browser, Top Ads (UK, 30 days) showed 4 unrelated ads then "Log in to access all Top Ads", and Trends redirects to a login-only "TikTok One Creative Suite". So no Top Ads, rising sounds or hashtag counts are below, and no numbers are made up. Meta Ad Library does load in a browser (see Rival apps). To fill the TikTok gap the founder logs in to Creative Center (free business account) and pastes Trend Discovery (UK, 7 days, Sports).
 
+**Checked logged in (2026-11-18, founder's business account, in a browser).** Creative Center is no use for basketball now:
+- Trends has Hashtag and Video only; Songs is gone and Creator says "Coming soon". Ireland is not a region; the UK is the nearest.
+- UK, 7 days, Sports & Outdoor shows just 5 hashtags, none basketball: #nationsleague (17.9M views), #pochettino (14.7M), #merabdvalishvili (34.7M), #usmannurmagomedov (21.8M), #cheltenham (3.7M).
+- Top Ads, UK, 30 days: "basketball" finds no ads; "fitness app" finds only unrelated games and shopping ads.
+- **Take:** stop checking Creative Center each week. For sounds, use the TikTok app's sound picker on the business account (the Commercial Music Library a brand may use). For formats, watch what basketball creators and rival apps post (Meta Ad Library below) and the founder's own results.
+
 ## TikTok and Instagram formats, newest first
 
 - 2026-11 · **Reveal carousel**: 4 to 5 photos telling a story, the last shows what really happened · about 5 swipes · clip-based original sound · its sound went from 174K to 408K videos in six days; the swipe makes you want the end · [SocialPilot, 27 Oct to 10 Nov 2026](https://www.socialpilot.co/blog/tiktok-trends) · **Take:** a photo carousel of a session (court, hoop, phone propped up) with the real session number on the last slide. Works as a TikTok photo post and an Instagram carousel.
