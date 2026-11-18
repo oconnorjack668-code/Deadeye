@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Deadeye HQ</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -142,6 +143,12 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 .status-line { font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .linkbtn { border: 0; background: none; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: 13px; padding: 2px; }
 .empty { padding: 26px; text-align: center; color: var(--muted); border: 1px dashed var(--line-2); border-radius: 14px; font-size: 14px; }
+.group-h { display: flex; align-items: baseline; gap: 10px; margin: 14px 2px 2px; }
+.group-h:first-child { margin-top: 0; }
+.group-h h2 { font-size: 15px; }
+.group-h span { font-size: 13px; color: var(--quiet); }
+.fresh { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--quiet); }
+.fresh.stale { color: var(--warn); font-weight: 600; }
 
 /* Lists */
 .rows { display: grid; }
@@ -258,7 +265,8 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
         <div class="stack">
           <section class="card">
             <div class="head"><div><h2>Needs your decision</h2><p class="sub">Approve to say yes. Then mark it Done when it's finished, or Later to push it to next week.</p></div><a class="btn sm" href="#todo">All to-dos</a></div>
-            <div class="tasks" id="home-waiting" style="margin-top:14px"></div>
+            <div class="fresh" id="home-fresh" style="margin-top:10px"></div>
+            <div class="tasks" id="home-waiting" style="margin-top:12px"></div>
           </section>
           <section class="card" id="home-progress-card">
             <div class="head"><div><h2>In progress</h2><p class="sub">Things you approved. Mark them Done when they're finished.</p></div></div>
@@ -275,7 +283,8 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
 
     <!-- To-do -->
     <section class="page" data-page="todo" hidden>
-      <div class="head"><div class="hello"><h1>To-do</h1><p>Everything that needs you. Approve says yes, Done means it's finished, Later moves it to next week. Add a note to tell the agent anything.</p></div></div>
+      <div class="head"><div class="hello"><h1>To-do</h1><p>Everything open in the status file, plus code waiting to go live. Approve says yes, Done means it's finished, Later moves it to next week. Add a note to tell the agent anything.</p></div></div>
+      <div class="fresh" id="todo-fresh"></div>
       <div class="tabs" id="todo-tabs" role="group" aria-label="Filter to-dos"></div>
       <div class="tasks" id="todo-list"></div>
     </section>
@@ -334,7 +343,24 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
   const icon = (n) => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ""}</svg>`;
   const PAGES = [["home", "Home"], ["todo", "To-do"], ["growth", "Growth"], ["agents", "Agents"], ["outreach", "Clubs and content"], ["ask", "Chat"]];
   const BAR = ["home", "todo", "growth", "agents", "ask"];
-  const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", "video-editor": "Video editor", designer: "Designer", "player-outreach": "Player outreach", "qa-tester": "QA tester", founder: "You" };
+  const AGENT = { "activation-analyst": "Activation analyst", builder: "Builder", "safety-reviewer": "Safety reviewer", "release-checker": "Release checker", "support-triage": "Support triage", marketing: "Marketing", "club-growth": "Club growth", "video-editor": "Video editor", designer: "Designer", "player-outreach": "Player outreach", "qa-tester": "QA tester", Lead: "Claude Code", founder: "You" };
+  // To-do groups, in the order they are shown (group is set by scripts/status-to-hub.mjs)
+  const GROUPS = [["live", "Ready to go live", "Code that's built and checked. Approve to merge it."], ["yours", "Your jobs", "Only you can do these."], ["decide", "Ideas and choices", "Say yes, no or which one."], ["agents", "Waiting on an agent", "An agent does these next. Approve to say go ahead."]];
+  const groupOf = (c) => c.group || (c.kind === "merge" ? "live" : c.agent === "founder" ? "yours" : "agents");
+  const rank = (c) => GROUPS.findIndex(g => g[0] === groupOf(c));
+  // Overdue and soonest-due first, then the order STATUS lists them in
+  const byUrgency = (a, b) => (a.due ? daysTo(a.due) : 9999) - (b.due ? daysTo(b.due) : 9999);
+  const ordered = (list) => list.map((c, i) => [c, i]).sort((x, y) => rank(x[0]) - rank(y[0]) || byUrgency(x[0], y[0]) || x[1] - y[1]).map(x => x[0]);
+  // How old the to-do list is: rebuilt from STATUS after every merge and by the hub worker at 09:00 and 19:00
+  function freshness(box) {
+    if (!box || !snap?.updatedAt) return;
+    const hrs = (Date.now() - parse(snap.updatedAt)) / 3600000;
+    const ago = hrs < 1 ? `${Math.max(1, Math.round(hrs * 60))} minutes ago` : hrs < 48 ? `${Math.round(hrs)} hour${Math.round(hrs) === 1 ? "" : "s"} ago` : `${Math.round(hrs / 24)} days ago`;
+    box.className = "fresh" + (hrs > 24 ? " stale" : "");
+    box.textContent = hrs > 24
+      ? `This list was last updated ${ago}, so it may be out of date. It refreshes at 09:00 and 19:00, or ask Claude Code to rebuild it.`
+      : `Updated ${ago} from the status file and GitHub.`;
+  }
   const STATUS = { approved: ["In progress", "info"], done: ["Done", "good"], later: ["Later", "neutral"] };
   let snap = null, decisions = {}, progress = {}, db = null, sample = null, canWrite = false, todoFilter = "waiting";
   const PSTATE = { queued: ["Queued", "neutral"], working: ["Working on it", "info"], done: ["Finished", "good"], blocked: ["Blocked", "bad"] };
@@ -412,7 +438,8 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
     st.append(g, p, c);
 
     const w = $("home-waiting"); w.replaceChildren();
-    const wl = snap.calls.filter(c => stateOf(c) === "waiting").slice(0, 4);
+    freshness($("home-fresh"));
+    const wl = ordered(snap.calls.filter(c => stateOf(c) === "waiting")).slice(0, 4);
     if (!wl.length) w.appendChild(el("div", "empty", "Nothing waiting. Your agents are working."));
     wl.forEach(c => w.appendChild(taskCard(c)));
     const more = snap.calls.filter(c => stateOf(c) === "waiting").length - wl.length;
@@ -512,10 +539,16 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
     const tabs = $("todo-tabs"); tabs.replaceChildren();
     groups.forEach(([id, label]) => { const n = snap.calls.filter(c => stateOf(c) === id).length; const b = el("button"); b.type = "button"; b.setAttribute("aria-pressed", String(todoFilter === id));
       b.append(document.createTextNode(label), el("span", "n num", String(n))); b.onclick = () => { todoFilter = id; renderTodo(); }; tabs.appendChild(b); });
+    freshness($("todo-fresh"));
     const list = $("todo-list"); list.replaceChildren();
-    const items = snap.calls.filter(c => stateOf(c) === todoFilter);
+    const items = ordered(snap.calls.filter(c => stateOf(c) === todoFilter));
     if (!items.length) list.appendChild(el("div", "empty", { waiting: "Nothing needs a decision.", approved: "Nothing in progress.", later: "Nothing pushed to later.", done: "Nothing finished yet this week." }[todoFilter]));
-    items.forEach(c => list.appendChild(taskCard(c)));
+    GROUPS.forEach(([id, label, hint]) => {
+      const inGroup = items.filter(c => groupOf(c) === id);
+      if (!inGroup.length) return;
+      const h = el("div", "group-h"); h.append(el("h2", null, `${label} (${inGroup.length})`), el("span", null, hint)); list.appendChild(h);
+      inGroup.forEach(c => list.appendChild(taskCard(c)));
+    });
   }
 
   /* Growth */
@@ -596,7 +629,7 @@ h2 { font-size: 17px; font-weight: 700; letter-spacing: -.01em; }
   function openChat(q) { location.hash = "#ask"; setTimeout(() => { const t = $("ask-q"); t.value = q; t.focus(); }, 50); }
   function context() {
     return `You are the assistant inside "Deadeye HQ", the private hub of Deadeye's founder. Deadeye is a basketball training app for players aged 13+ in Ireland, run by one founder with seven AI agents. Today is ${new Date().toISOString().slice(0, 10)}.
-How the hub works: each to-do (a "call") is waiting until the founder presses Approve (then it's approved, shown as In progress), Done (finished) or Later (next week). Approved tasks are picked up by the hub worker, a cloud agent that runs every hour from 08:00 to 22:00 Irish time; it writes its progress per task (queued, working, done, blocked, with steps). Scheduled runs: weekly loop Mondays 09:00, morning check daily 08:00, marketing Thursdays 10:00, learning digest Fridays 16:00, clubs monthly. Code changes go live only when merged; the founder says "merge N" to Claude Code or approves it here and Claude merges it in the next chat.
+How the hub works: each to-do (a "call") is waiting until the founder presses Approve (then it's approved, shown as In progress), Done (finished) or Later (next week). The to-do list is built from the status file (docs/STATUS.md, one card per S item, titled with its next step) and the open pull requests; to add or close a to-do, the status file changes, never the hub. Approved tasks are picked up by the hub worker, a cloud agent that runs at 09:00 and 19:00 Irish time and also rebuilds the list; it writes its progress per task (queued, working, done, blocked, with steps). Scheduled runs: weekly loop Mondays 09:00, morning check daily 08:00, marketing Thursdays 10:00, learning digest Fridays 16:00, clubs monthly. Code changes go live only when merged; the founder says "merge N" to Claude Code or approves it here and Claude merges it in the next chat.
 Rules: answer only from the data below; plain, friendly English; short (under 150 words) unless asked for a draft; no headings. Name the exact task, number or date. Never invent numbers or progress. If something hasn't started, say when it will. Never suggest contacting a child directly. Use the tools only when the founder clearly asks you to change a task; say what you changed.
 DATA: ${JSON.stringify({ snapshot: snap, decisions, progress })}`;
   }
@@ -653,3 +686,5 @@ DATA: ${JSON.stringify({ snapshot: snap, decisions, progress })}`;
   })();
 })();
 </script>
+
+</body></html>
