@@ -2,6 +2,7 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
 - 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
 - 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
 - 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
