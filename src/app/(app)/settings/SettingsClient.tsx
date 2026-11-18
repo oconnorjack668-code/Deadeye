@@ -86,6 +86,7 @@ export function SettingsClient({
   coachSetUp = false,
   homeClub = null,
   heardFrom = null,
+  competitionOpen = false,
 }: {
   email: string | null;
   plan: string;
@@ -98,6 +99,8 @@ export function SettingsClient({
   version: string;
   /** Has a coach profile (00047): coach setup is done */
   coachSetUp?: boolean;
+  /** The founding competition still takes entries (src/lib/competition.ts) */
+  competitionOpen?: boolean;
   /** "Your club", built on the server; shown straight after Account */
   homeClub?: React.ReactNode;
   /** The optional sign-up answer (src/lib/heardFrom.ts), already checked against the list */
@@ -576,18 +579,29 @@ export function SettingsClient({
           Privacy Policy <ChevronRight className="h-4 w-4 text-zinc-500" />
         </Link>
         <ReportProblem
+          chooseKind
           className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-zinc-100 hover:bg-zinc-900"
           panelClassName="px-4 py-3"
           label={
             <>
               <span>
-                Report a problem
-                <span className="block text-xs text-zinc-500">The tracker got a shot wrong, or something does not work</span>
+                Send feedback or report a problem
+                <span className="block text-xs text-zinc-500">What you like, what you would change, an idea, or something that does not work</span>
               </span>
               <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
             </>
           }
         />
+        {/* The founding competition's entry is feedback too, so it sits beside it (00067) */}
+        {competitionOpen && (
+          <Link href="/competition" className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
+            <span>
+              Founding competition
+              <span className="block text-xs text-zinc-500">Tell us what you think: 10 players win Pro for life</span>
+            </span>
+            <ChevronRight className="h-4 w-4 flex-shrink-0 text-zinc-500" />
+          </Link>
+        )}
         {supportEmail && (
           <a href={`mailto:${supportEmail}?subject=Deadeye%20support`} className="flex items-center justify-between px-4 py-3 text-sm text-zinc-100 hover:bg-zinc-900">
             Contact support <ChevronRight className="h-4 w-4 text-zinc-500" />

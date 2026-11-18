@@ -33,7 +33,7 @@ file). Newest first, each with the date, what happened, and the rule.
       and those parents see coach posts. Never says or hints that BI approves Deadeye.
 - [ ] Features and prices checked against the app, `/pro` and
       `docs/sales/deadeye-club-plans.html`; founding offer quoted whole (first 3 clubs,
-      4+ teams, free to 31 Jan 2027, then €59.99 a team a season, closes 31 Dec 2026).
+      4+ teams, free to 31 Jan 2027, then €59.99 a team a year, closes 31 Dec 2026).
 - [ ] No pressure, no "everyone else has signed up", no fake deadlines, no rival named.
 - [ ] Follow-up planned: at most two, about a week apart, then stop. The founder sends.
 - [ ] Timing checked against the season calendar below.
@@ -48,6 +48,19 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] No exports, club-wide view of children's data or sharing with a school promised;
       any such request goes to the founder.
 - [ ] Adds almost no admin for the coach; the founder offers to help set teams up.
+
+### Competition and prize drafts (added 2026-11-18)
+
+- [ ] Never says "second prize", "runner-up" or "you have won" to non-winners; says "everyone
+      who entered gets 25% off" (EU unfair-practices blacklist, Consumer Protection Act 2007).
+- [ ] Competition is judged on feedback (decided 2026-11-18), so never write "draw", "random"
+      or "luck". Prize total still checked against the Gaming and Lotteries (Amendment) Act
+      2019 cap (about EUR 2,500 for a promotional draw, per one law-firm summary; verify) and
+      the founder told to take legal advice. Entry is free and no review is asked for.
+- [ ] Entry links come from the current rules file (`/competition`, "Enter my club"), and use
+      deadeye.ie only once the domain is live.
+- [ ] Contact only to club officials and parents; winners under 18 reached through a parent.
+- [ ] Prize and discount only promised once billing can honour them.
 
 ## Research
 

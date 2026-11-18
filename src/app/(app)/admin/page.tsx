@@ -8,7 +8,7 @@ import { notFound } from 'next/navigation';
 import { checkIsOwner } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { PageHeader } from '@/components/layout/PageHeader';
-import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Megaphone, Shield, Users, Crosshair, Clock } from 'lucide-react';
+import { ShieldAlert, Bug, Gauge, ChevronRight, Filter, MessageSquareWarning, PlayCircle, Trophy, Megaphone, Shield, Users, Crosshair, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Owner tools - Deadeye' };
@@ -78,11 +78,11 @@ export default async function AdminPage() {
     {
       href: '/admin/errors#reports',
       icon: MessageSquareWarning,
-      title: 'Player reports',
+      title: 'Player feedback and reports',
       desc:
         'problem' in reports
           ? 'Run 00038_player_reports.sql in the Supabase SQL editor to turn these on'
-          : 'Problems players tell you about from Settings or the crash screen',
+          : 'Feedback, ideas and problems players send from Settings or the crash screen',
       badge: 'count' in reports && reports.count > 0 ? `${reports.count} new` : null,
       tile: 'bg-amber-600/20',
       iconColor: 'text-amber-400',
@@ -95,6 +95,15 @@ export default async function AdminPage() {
       badge: 'count' in crashes && crashes.count > 0 ? `${crashes.count} open` : null,
       tile: 'bg-red-600/20',
       iconColor: 'text-red-400',
+    },
+    {
+      href: '/admin/competition',
+      icon: Trophy,
+      title: 'Founding competition',
+      desc: 'Entries to judge with names hidden, parent emails still to send, winners and CSV export',
+      badge: null,
+      tile: 'bg-orange-600/20',
+      iconColor: 'text-orange-400',
     },
     {
       href: '/admin/cron-runs',

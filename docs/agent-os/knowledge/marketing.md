@@ -14,6 +14,14 @@ patches, stills, loudness, the edit lessons from the first promos) lives in
 `video-editor.md` in this folder; the video-editor runs it. The lessons and
 checks here are marketing's: scripts, claims, brand and the audience.
 
+- 2026-11-18 · Founder brief for the shooting series (`2026-11-18-shooting-series.md`):
+  one recurring question, real numbers with a day count, bad days kept, 4 posts a
+  week not daily, same video on both apps, `#DeadeyeDaily` plus 3 to 5 specific
+  tags, competition line in a few posts only. **Rules:** a series repeats one
+  session (Day 1, 7, 14) so the answer is fair; never stage a bad day; the founder
+  is under 18, so faceless unless a parent consents in writing; "every shot" is
+  the founder's habit, never what the app does; competition and prize lines go to
+  safety-reviewer and stay off posts until the rules page is live.
 - 2026-11-09 · The founder thinks the tracker's make/miss and streak visuals look
   unpolished (the flame covers the number). **Rule:** until the redesign ships,
   never make the flame or MAKE/MISS banners the hero; lean on the real shot, the

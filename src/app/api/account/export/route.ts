@@ -72,6 +72,8 @@ const USER_TABLES = [
   'club_suggestions',
   // Hoops measured with the shot tracker, kept with the account (00055)
   'saved_rims',
+  // Founding competition entries, with the feedback written for them (00067)
+  'competition_entries',
 ] as const;
 
 // Browser push keys are secrets, not personal data worth handing out
@@ -80,6 +82,7 @@ const STRIP_COLUMNS: Record<string, string[]> = {
   push_subscriptions: ['p256dh', 'auth'],
   age_checks: ['request_token', 'confirm_token'],
   profile_photos: ['approval_token'],
+  competition_entries: ['parent_token', 'club_key', 'winner'],
 };
 
 export async function GET() {

@@ -8,6 +8,7 @@ import { asMeasurementSystem } from '@/lib/units';
 import { hasPro, planLabel } from '@/lib/entitlements';
 import { isTestAccount } from '@/lib/testAccounts';
 import { normaliseHeardFrom } from '@/lib/heardFrom';
+import { entriesOpen } from '@/lib/competition';
 import { SettingsClient } from './SettingsClient';
 import { ResetTesterCard } from './ResetTesterCard';
 import { HomeClubCard } from './HomeClubCard';
@@ -59,6 +60,7 @@ export default async function SettingsPage() {
 
         {profile ? (
           <SettingsClient
+            competitionOpen={entriesOpen()}
             email={user.email}
             plan={plan}
             initial={{
