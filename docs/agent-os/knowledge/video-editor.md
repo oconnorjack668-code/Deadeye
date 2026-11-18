@@ -83,8 +83,15 @@ How posted videos did, as rules. Before each video, read
 something about the edit (hook, length, voice, captions, music). Under about
 1,000 views it is a "hint", not a rule; compare within one platform only.
 
-- None yet: the first promo (results 2026-11-09) has views and likes but no
-  retention, link taps or post dates, so nothing about the edit can be read.
+- 2026-11-18 · First promo on TikTok (1,117 views, 24s): average watch 6.06s,
+  3.9% watched to the end, and TikTok says most viewers stopped at 0:01. A first
+  read from one video, past 1,000 views. **Rule:** the first second decides the
+  video. Frame 0 is a shot already in the air or dropping through the net with
+  the count on screen, never a lead-in, logo or setup. Judge each of the three
+  openings on "would I swipe at 0:01?" before anything else.
+- 2026-11-18 · Same post: about half the searches that found it were
+  "vercel.app", people typing the caption link. **Rule:** the end card says
+  "link in bio", not a web address to type.
 
 ## Checklist before the founder sees a video
 
