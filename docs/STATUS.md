@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-17 (#125, #126, #127 merged: S39 and S40 closed; S42 Today card read and S43 sign-up answer idea opened; S11 updated with 16 Nov counts)
+Last updated: 2026-11-18 (agent models: #129 merged, each agent has its own model and effort; S44 opened to watch the first runs)
 
 ## Rules
 
@@ -32,6 +32,7 @@ Last updated: 2026-11-17 (#125, #126, #127 merged: S39 and S40 closed; S42 Today
 
 | Id | What | Owner | Since | Last checked |
 | --- | --- | --- | --- | --- |
+| S44 | Agent model split (#129, merged 18 Nov): agents no longer all run on Opus. Opus: safety-reviewer and video-editor (high), builder and activation-analyst (medium). Sonnet: release-checker, qa-tester, support-triage, designer (high); marketing, club-growth, player-outreach (medium). Table and reasons: `docs/agent-os/README.md`, Models. After the next weekly run and the next video cut, check each agent's output against its last run; if one is worse, move it up one step (effort first, then model) and note it there. | Lead | 2026-11-18 | 2026-11-18: merged; no run on the new models yet |
 | S42 | Today card read (#126, live 17 Nov): new players see one "Log shots" button; markers `today_log_tapped`, `today_track_tapped`, `today_program_tapped`, `video_opened` show which way in they take (`/admin/funnel`, Today card group). Read once two weeks of new signups have had 7 days (about 8 Dec): did the share of setup-finished players reaching a first session rise from 3 of 27? Under 30 players it is a hint. | Activation-analyst | 2026-11-17 | 2026-11-17: live as the tester, tapping the camera link wrote today_track_tapped, video_opened and tracker_opened |
 | S43 | Idea from player-outreach (17 Nov exam): add a fixed sign-up answer "An online community (Reddit, Discord, a forum)", so those routes stop landing in "Somewhere else". A fixed answer only, never a named community or person. Builder change; safety-reviewer reads it first; activation-analyst decides when. | Founder decides | 2026-11-17 | 2026-11-17: idea only |
 | S41 | Idea from the founder (17 Nov): a "blur my face" option in Settings for under-18 players. Assumed to mean a player's own choice for clips and share cards they make in the app, not blur as a fix in Deadeye's own promo videos (that would change the founder's 2026-10-20 no-blur rule; founder to say if that was meant). Needs: what it blurs (share cards, saved clips, coach-visible video), a designer mockup, then safety-reviewer (a blurred child can still be recognised by kit, hall or voice, so it is extra protection, never a stand-in for consent). | Founder decides, then designer | 2026-11-17 | 2026-11-17: no blur feature in the app today |
@@ -59,6 +60,7 @@ Last updated: 2026-11-17 (#125, #126, #127 merged: S39 and S40 closed; S42 Today
 
 ## Recently done (do not raise again)
 
+- 2026-11-18 · Each agent has its own model and effort (were all Opus via inherit): PR #129 merged (`12fc3c9`) on the founder's word, checks green. Split based on Anthropic's published model guidance and measurements; video-editor on Opus high at the founder's request. Follow-up check: S44.
 - 2026-11-17 · S39 closed: saves never lose a session on retry or when the phone cannot keep it. PR #125 merged (`2654c24`) on the founder's word; 1705 tests green.
 - 2026-11-17 · Today card for new players (one "Log shots" button, quiet camera and program links, four new markers) and the report form asking players to leave out email, school and club: PR #126 merged (`a8a9dc1`) on the founder's word. Also fixes the 13 Nov QA P3 (Today's 32px nested buttons). Checked live as the tester after a fresh onboarding (player and coach, test team "Deadeye Test Team", code TW6BBR, no players): the card shows, and the camera tap wrote its markers. Read is S42.
 - 2026-11-17 · S40 closed: the 10 partial exam cases fixed in the agents' knowledge files, PR #127 merged (`0202da3`). Re-run: 9 of 10 pass; player-outreach case 3 still partial only because Reddit blocks automated reading of community rules.
