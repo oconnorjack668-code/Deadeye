@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-18 · hq-status-sync · STATUS from main, self-merged STATUS PRs, HQ built from STATUS → [handoff](2026-11-18-hq-status-sync.md)
 - 2026-11-18 · agent-models · Each agent gets its own model and effort (#129); S44 → [handoff](2026-11-18-agent-models.md)
 - 2026-11-17 · exam-followups · Save fix, Today first step, agent fixes live (#125-127); S42, S43 → [handoff](2026-11-17-exam-followups.md)
 - 2026-11-17 · agent-exams-baseline · First exams for all 11 agents: 39/49 pass, 0 fail; S39, S40 opened → [handoff](2026-11-17-agent-exams-baseline.md)
@@ -33,4 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
 - 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
 - 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
-- 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)

@@ -6,7 +6,7 @@ Code chat; Codex reads it via `AGENTS.md`) and updates it before it ends
 (`.claude/skills/handoff/SKILL.md`). Handoffs are history: an "Open" line in
 an old handoff is what was open *that day*, not now.
 
-Last updated: 2026-11-18 (HQ next steps, groups and freshness line live, #141; S9 closed)
+Last updated: 2026-11-18 (session: STATUS hook reads main, docs-only STATUS PRs self-merge, Deadeye HQ to-do list built from STATUS with Next step column and groups; S9, S14, S17, S46 closed; S47, S48 opened; handoff 2026-11-18-hq-status-sync)
 
 ## Rules
 
@@ -62,6 +62,8 @@ Last updated: 2026-11-18 (HQ next steps, groups and freshness line live, #141; S
 
 ## Recently done (do not raise again)
 
+- 2026-11-18 · Docs-only STATUS and handoff PRs are merged by the session itself once checks pass; anything touching code, migrations, config or skills still waits for the founder (founder's decision). Handoff skill step 6 and `AGENTS.md`; the Codex copy `.agents/skills/handoff/SKILL.md` was the pre-STATUS version and now matches. PR #135 (`c69acb4`).
+- 2026-11-18 · SessionStart hook prints `origin/main`'s STATUS and warns when the checkout is behind main (the main checkout sat 31+ commits behind on an old branch, so a session listed S35 as open after it closed). `AGENTS.md` tells Codex the same. PR #133 (`8f51541`).
 - 2026-11-18 · S9 closed: `docs/brand/promo-video/PLAN.md` has a dated note that the app has 168 drills (`DRILL_COUNT`) and new cuts say 168; the shipped plan itself is left as recorded. PR #141 merged (`c690b20`), which also added the Next step column, grouped to-dos and the freshness line to Deadeye HQ.
 - 2026-11-18 · S14 closed: the PR check routine fires on PRs; it ran on #137 at 12:46 UTC and posted its safety and checks comment.
 - 2026-11-18 · S17 closed: `OPENAI_API_KEY` is no longer in Vercel (env list read), and `src/proxy.ts` refreshes sessions through `getClaims()` in `src/lib/supabase/middleware.ts`, the current Supabase pattern.
