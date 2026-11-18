@@ -2,6 +2,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import type { Database } from './types';
+import { freshTokenFetch } from './fresh-token-fetch';
 
 export async function createClient() {
   const cookieStore = await cookies();
@@ -9,6 +10,8 @@ export async function createClient() {
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder_anon_key';
 
   return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    // Waits out the database API turning a just-refreshed token away (see fresh-token-fetch)
+    global: { fetch: freshTokenFetch() },
     cookies: {
       getAll() {
         return cookieStore.getAll();
