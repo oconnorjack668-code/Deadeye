@@ -147,6 +147,12 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] **Offers and prizes for under-18s go through a parent.** Discount or
       prize emails and winner contact go to the approving parent; posts aimed
       at players carry no discount line (ASAI 7.5(c), 7.7).
+- [ ] **Prize promos a child can see** (homepage, posts, cards): prizes may
+      be shown, but the closing date and the parent rule sit in the main text,
+      not small print (ASAI 7.7(c), (f)); the entry steps are stated; a
+      headline says how many win ("10 players win"), not "Win"; "for life" or
+      similar is qualified as the rules define it (7.7(g)); shown only while
+      `entriesOpen()` (homepage card review, 2026-11-18).
 
 ## Research
 

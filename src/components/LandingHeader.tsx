@@ -51,6 +51,10 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
           : 'text-zinc-400 hover:text-white'
     );
 
+  // Its own page, not a section here, so it is a link that never shows as active
+  const clubsLinkClass =
+    'whitespace-nowrap rounded-full border border-orange-500/50 px-3 py-1.5 text-sm font-semibold text-orange-300 hover:bg-orange-600/15';
+
   return (
     <header className="sticky top-0 z-20 border-b border-zinc-900 bg-zinc-950/90 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
@@ -65,6 +69,9 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
                 {s.label}
               </a>
             ))}
+            <Link href="/clubs" className={clubsLinkClass}>
+              For clubs
+            </Link>
           </nav>
           {signedIn ? (
             <Link href="/dashboard" className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500">
@@ -85,10 +92,18 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
       {/* Phones and small tablets: the same sections as a strip that scrolls sideways */}
       <nav aria-label="Sections" className="border-t border-zinc-900/80 md:hidden">
         <div className="mx-auto flex max-w-5xl gap-1.5 overflow-x-auto px-4 py-2 [scrollbar-width:none]">
-          {LANDING_SECTIONS.map((s) => (
-            <a key={s.id} href={`#${s.id}`} className={linkClass(s.id)} aria-current={active === s.id ? 'true' : undefined}>
-              {s.label}
-            </a>
+          {/* For clubs second, so it is on screen without scrolling the strip */}
+          {LANDING_SECTIONS.map((s, i) => (
+            <React.Fragment key={s.id}>
+              <a href={`#${s.id}`} className={linkClass(s.id)} aria-current={active === s.id ? 'true' : undefined}>
+                {s.label}
+              </a>
+              {i === 0 && (
+                <Link href="/clubs" className={clubsLinkClass}>
+                  For clubs
+                </Link>
+              )}
+            </React.Fragment>
           ))}
         </div>
       </nav>
