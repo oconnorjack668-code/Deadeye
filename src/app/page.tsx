@@ -425,17 +425,20 @@ export default async function Home() {
               <p className="mt-3 text-sm text-zinc-400">
                 Paid club plans open soon, and coaching a team is free today. Every plan is priced by the year. {FOUNDING_CLUB_OFFER}
               </p>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <Link
+                  href="/clubs"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 text-base font-bold text-zinc-950 hover:bg-orange-400"
+                >
+                  <Users className="h-5 w-5" /> Deadeye for clubs
+                </Link>
                 <a
                   href={CLUB_PLANS_PDF}
                   download
-                  className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-bold text-zinc-950 hover:bg-orange-400"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-zinc-700 px-5 text-sm font-semibold text-zinc-200 hover:bg-zinc-900"
                 >
                   <Download className="h-4 w-4" /> Club pricing sheet (PDF)
                 </a>
-                <Link href="/clubs" className="text-sm font-semibold text-orange-300 underline">
-                  Deadeye for clubs
-                </Link>
                 {contactEmail && (
                   <a href={`mailto:${contactEmail}?subject=Deadeye%20for%20our%20club`} className="text-sm font-semibold text-orange-300 underline">
                     Email us about your club
