@@ -105,8 +105,10 @@ something about the edit (hook, length, voice, captions, music). Under about
   unless marketing has checked it that day.
 - 2026-11-18 · Founder: the tripod-in-shot look is one idea, not the format
   for every video, and there is no tripod yet (one is coming). **Rule:** never
-  lock onto one format. Offer two or three different formats per brief that
-  fit the footage the founder actually has: phone propped on a bag or bottle
+  lock onto one format. Every brief gets several different ideas (at least
+  three), ranked, with the best one or two marked "Recommended" and one line
+  on why (the results and research behind it). All must fit the footage the
+  founder actually has: phone propped on a bag or bottle
   with the count on screen, a screen recording of the session result, a friend
   filming, a "Day N" series, session 1 vs session 10, a reveal carousel. The
   tripod-in-shot version is an option once the founder says the tripod has

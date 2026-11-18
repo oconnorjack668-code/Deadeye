@@ -53,8 +53,10 @@ file). Newest first, each with the date, what happened, and the rule.
   tests that stopped. **Rules:** script training videos with the app inside,
   not app ads; show the make sounds and the timed challenge Deadeye already
   has; the tripod-in-shot look is one format among several, not the default
-  (founder, 2026-11-18: no tripod yet, one coming), so each weekly plan offers
-  varied formats that fit the footage the founder can film now; answer "free?" on screen ("Free to start"); lead with what is ours
+  (founder, 2026-11-18: no tripod yet, one coming). Founder, 2026-11-18:
+  always give several ideas (at least three) for every post, script or plan,
+  ranked, with the best one or two marked "Recommended" and one line on why;
+  all must fit the footage the founder can film now; answer "free?" on screen ("Free to start"); lead with what is ours
   (Ireland, effort, streaks), not "counts makes and misses" alone; stay organic,
   no paid ads yet; no weekly sound tracking (pick a Commercial Music Library
   track per video) and no weekly Creative Center check (no basketball data).
