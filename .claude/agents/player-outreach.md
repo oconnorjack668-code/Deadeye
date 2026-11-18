@@ -10,7 +10,8 @@ skills:
   - marketing:draft-content
   - product-management:brainstorm
   - humanizer:humanizer
-model: inherit
+model: sonnet
+effort: medium
 memory: project
 hooks:
   PreToolUse:

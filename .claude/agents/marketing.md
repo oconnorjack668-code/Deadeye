@@ -13,7 +13,8 @@ skills:
   - product-management:brainstorm
   - searchfit-seo:content-strategy
   - humanizer:humanizer
-model: inherit
+model: sonnet
+effort: medium
 memory: project
 hooks:
   PreToolUse:

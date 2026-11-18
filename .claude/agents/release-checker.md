@@ -6,7 +6,7 @@ skills:
   - release-checker-playbook
   - engineering:deploy-checklist
   - engineering:code-review
-model: inherit
+model: sonnet
 effort: high
 memory: project
 hooks:

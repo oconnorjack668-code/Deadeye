@@ -8,7 +8,8 @@ skills:
   - engineering:incident-response
   - engineering:code-review
   - product-management:synthesize-research
-model: inherit
+model: sonnet
+effort: high
 memory: project
 hooks:
   PreToolUse:

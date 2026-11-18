@@ -8,7 +8,7 @@ skills:
   - legal:compliance-check
   - legal:legal-risk-assessment
   - design:accessibility-review
-model: inherit
+model: opus
 effort: high
 memory: project
 hooks:

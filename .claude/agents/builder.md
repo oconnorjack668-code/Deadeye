@@ -10,8 +10,8 @@ skills:
   - modern-web-guidance:modern-web-guidance
   - product-tracking-skills:product-tracking-instrument-new-feature
   - simplify
-model: inherit
-effort: high
+model: opus
+effort: medium
 memory: project
 hooks:
   PreToolUse:
