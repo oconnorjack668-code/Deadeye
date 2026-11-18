@@ -1,10 +1,13 @@
 // src/app/(app)/admin/errors/page.tsx
-// Owner-only viewer for what goes wrong: problems players report themselves
-// (/api/reports, 00038) and crash reports (/api/errors and src/instrumentation.ts).
+// Owner-only viewer for what goes wrong: feedback, ideas and problems players
+// send themselves (/api/reports, 00038, kind from 00067) and crash reports (/api/errors and src/instrumentation.ts).
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import Link from 'next/link';
 import { checkIsOwner } from '@/lib/auth';
+import { REPORT_KINDS } from '@/lib/reportKinds';
+import type { ReportKind } from '@/lib/supabase/types';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Bug, CheckCircle2 } from 'lucide-react';
 import { reportsForAgents } from '@/lib/redact';
@@ -28,6 +31,8 @@ interface ErrorRow {
 interface ReportRow {
   id: string;
   created_at: string;
+  /** Missing before 00067 runs: everything was a problem then */
+  kind?: ReportKind;
   message: string;
   context: string | null;
   url: string | null;
@@ -83,8 +88,16 @@ function device(userAgent: string | null): string {
   return 'other';
 }
 
-export default async function AdminErrorsPage() {
+const KIND_STYLE: Record<ReportKind, string> = {
+  feedback: 'bg-emerald-600/20 text-emerald-300',
+  idea: 'bg-cyan-600/20 text-cyan-300',
+  problem: 'bg-amber-600/20 text-amber-300',
+};
+
+export default async function AdminErrorsPage({ searchParams }: { searchParams: Promise<{ [key: string]: string | string[] | undefined }> }) {
   if (!(await checkIsOwner())) notFound();
+  const wanted = (await searchParams).kind;
+  const kindFilter = REPORT_KINDS.find((k) => k.id === wanted)?.id ?? null;
 
   let rows: ErrorRow[] = [];
   let loadError: string | null = null;
@@ -105,12 +118,10 @@ export default async function AdminErrorsPage() {
   let reports: ReportRow[] = [];
   let reportsError: string | null = null;
   try {
-    const { data, error } = await createAdminClient()
-      .from('player_reports')
-      .select('id, created_at, message, context, url, user_agent')
-      .eq('resolved', false)
-      .order('created_at', { ascending: false })
-      .limit(200);
+    // '*' rather than naming kind, so the list still loads before 00067 runs
+    let query = createAdminClient().from('player_reports').select('*').eq('resolved', false);
+    if (kindFilter) query = query.eq('kind', kindFilter);
+    const { data, error } = await query.order('created_at', { ascending: false }).limit(200);
     if (error) reportsError = error.message;
     reports = (data || []) as ReportRow[];
   } catch (e) {
@@ -156,18 +167,35 @@ export default async function AdminErrorsPage() {
         {/* Player reports first: each is one person who took the time to say
             what went wrong, so they are listed one by one, never grouped */}
         <section id="reports" className="scroll-mt-4 space-y-2">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-400">Player reports</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-400">Player feedback and reports</h2>
+          <nav aria-label="Show" className="flex flex-wrap gap-2">
+            {[{ id: null, label: 'All' }, ...REPORT_KINDS].map((k) => (
+              <Link
+                key={k.id ?? 'all'}
+                href={k.id ? `/admin/errors?kind=${k.id}#reports` : '/admin/errors#reports'}
+                aria-current={kindFilter === k.id ? 'page' : undefined}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold ${kindFilter === k.id ? 'bg-orange-600 text-white' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'}`}
+              >
+                {k.label}
+              </Link>
+            ))}
+          </nav>
           {(reports.length > 0 || list.length > 0) && <CopyForAgents text={agentText} />}
           {reportsError ? (
             <p className="rounded-xl border border-amber-600/40 bg-amber-600/10 p-3 text-sm text-amber-200">
               Could not load player reports: {reportsError}. Has migration 00038_player_reports.sql been run in Supabase?
             </p>
           ) : reports.length === 0 ? (
-            <p className="text-sm text-zinc-500">No new reports. Players send them from Settings, or from the crash screen.</p>
+            <p className="text-sm text-zinc-500">
+              {kindFilter ? 'Nothing new of this kind.' : 'Nothing new. Players send these from Settings, or from the crash screen.'}
+            </p>
           ) : (
             reports.map((r) => (
               <div key={r.id} className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4">
-                <p className="whitespace-pre-wrap break-words text-sm text-zinc-100">{r.message}</p>
+                <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${KIND_STYLE[r.kind ?? 'problem']}`}>
+                  {REPORT_KINDS.find((k) => k.id === (r.kind ?? 'problem'))?.label}
+                </span>
+                <p className="mt-2 whitespace-pre-wrap break-words text-sm text-zinc-100">{r.message}</p>
                 {r.context && <p className="mt-2 break-words text-sm text-zinc-400">{r.context}</p>}
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm text-zinc-500">

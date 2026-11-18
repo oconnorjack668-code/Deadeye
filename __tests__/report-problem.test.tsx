@@ -73,6 +73,32 @@ describe('ReportProblem', () => {
     expect(box.value).toBe('Offline at the court');
   });
 
+  it('in Settings, starts on Feedback, lets the player pick Idea, and sends the kind (00067)', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 201 }));
+    render(<ReportProblem chooseKind label="Send feedback or report a problem" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Send feedback or report a problem' }));
+    expect((screen.getByRole('radio', { name: 'Feedback' }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole('textbox', { name: 'What do you think of Deadeye?' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('radio', { name: 'Idea' }));
+    const box = screen.getByRole('textbox', { name: 'What should Deadeye do next?' });
+    fireEvent.change(box, { target: { value: 'A free throw challenge' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+    expect(await screen.findByText('Thanks. We read every message.')).toBeTruthy();
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(JSON.parse(init.body as string)).toEqual({ message: 'A free throw challenge', url: '/video', kind: 'idea' });
+  });
+
+  it('sends no kind from the crash screen, so it stays a problem', async () => {
+    fetchMock.mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 201 }));
+    const box = open();
+    expect(screen.queryByRole('radio')).toBeNull();
+    fireEvent.change(box, { target: { value: 'Crashed' } });
+    submit();
+    await screen.findByText('Thanks. We read every report.');
+    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect('kind' in JSON.parse(init.body as string)).toBe(false);
+  });
+
   it('closes again on Cancel', () => {
     open();
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));

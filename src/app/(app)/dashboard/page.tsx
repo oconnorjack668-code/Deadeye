@@ -11,7 +11,8 @@ import { calculateDashboardMetrics, getShootingByZone, rankZones } from '@/lib/d
 import { getRecentZoneTotals } from '@/lib/player-activity';
 import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
 import { ProNote } from '@/components/ProGate';
-import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity, ChevronDown } from 'lucide-react';
+import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity, ChevronDown, Trophy } from 'lucide-react';
+import { entriesOpen } from '@/lib/competition';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -289,6 +290,15 @@ export default async function DashboardPage() {
             heads-up in the last week of a founding member's free months. Under
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
+
+        {/* The founding competition, as one quiet line like the squad line: only
+            after the first log, which is when a player can enter (00067) */}
+        {!firstRun && entriesOpen() && (
+          <Link href="/competition" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200">
+            <Trophy className="h-4 w-4 flex-shrink-0 text-orange-400" />
+            <span className="min-w-0">Founding competition: tell us what you think, 10 players win Pro for life</span>
+          </Link>
+        )}
 
         {/* Only for a player who follows the founder, once there is a post */}
         {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}

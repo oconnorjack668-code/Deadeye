@@ -10,3 +10,5 @@ Every contact is the founder's.
 | Wexford Blazers (Wexford Basketball Club) | Wexford | Girls and boys U9 to U18, men's and ladies' senior | talking | Through the founder | Agree a trial start date and the head coach; no coach has set up in the app yet (counts 2026-11-09) | Founder | 2026-11-09 |
 | Enniscorthy Basketball Club | Wexford | Underage from age 7 (club Facebook page); other levels to check | target | Club Facebook page (public) | Founder decides whether to send the draft in `2026-11-09-clubs.md` | Founder | 2026-11-09 |
 | Gorey Basketball Club | Wexford | U10, U12, U14 training 2026/27 (club website); others to check | target | Club website contact page | Founder decides whether to send the draft in `2026-11-09-clubs.md` | Founder | 2026-11-09 |
+
+Note 2026-11-18: a competition outreach pack is drafted in `2026-11-18-competition-outreach.md`. No stage changes; nothing sent. It waits on the legal check in `founding-competition-rules.md`.

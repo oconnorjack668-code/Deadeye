@@ -73,6 +73,21 @@ describe('POST /api/reports', () => {
     ]);
   });
 
+  it('stores feedback and ideas with their kind, and leaves a problem to the column default (00067)', async () => {
+    expect((await send({ message: 'Love the streaks', kind: 'feedback' })).status).toBe(201);
+    expect((await send({ message: 'Add a free throw drill', kind: 'idea' })).status).toBe(201);
+    expect((await send({ message: 'Button does nothing', kind: 'problem' })).status).toBe(201);
+    expect(inserted.map((r) => r.kind)).toEqual(['feedback', 'idea', undefined]);
+    expect('kind' in inserted[2]).toBe(false);
+  });
+
+  it('refuses a kind it does not know', async () => {
+    const { status, body } = await send({ message: 'Hello', kind: 'spam' });
+    expect(status).toBe(400);
+    expect(body.error).toMatch(/feedback, idea or problem/);
+    expect(inserted).toHaveLength(0);
+  });
+
   it('refuses anyone signed out, and stores nothing', async () => {
     user = null;
     const { status, body } = await send({ message: 'Broken' });

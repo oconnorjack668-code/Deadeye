@@ -55,6 +55,10 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/.well-known') ||
     pathname.startsWith('/account-deletion') ||
     pathname === '/install' ||
+    // The clubs page only: /clubs/<id> is a club board and needs an account
+    pathname === '/clubs' ||
+    // The founding competition: what it is and the rules, before any account
+    pathname === '/competition' ||
     pathname === '/api/errors' ||
     // A parent approving an under-16 has no account; the token in the link is the access
     pathname.startsWith('/parents/') ||

@@ -1,4 +1,4 @@
-Skills: all 5 loaded (2026-11-13 review of PR #97)
+Skills: all 5 loaded (2026-11-18 review of worktree-pricing-yearly-clubs)
 
 # Safety reviewer findings
 
@@ -132,6 +132,42 @@ when a better source arrives, rather than adding beside it.
   "just" must not shrink a price; no asking children for personal data
   without parental permission. **For Deadeye:** Pro upsells, founding offers
   and promos are covered. [ASAI Code: Children](https://adstandards.ie/code/children/), 2024, regulator (self-regulatory).
+
+### Competitions and prizes for children
+
+- ASAI Children s.7.7, promotions "addressed to or likely to attract
+  children": a prominent closing date (f); make clear that parental
+  permission is required where expensive prizes or incentives might cause
+  conflict between children and parents (c); never exaggerate the value of
+  prizes or the chances of winning (g); allow enough time to take part (d).
+  s.7.6(c): do not ask children for personal information about themselves or
+  their families without a parent's permission. s.7.5(c): no appeal to
+  children to persuade parents to buy. **For Deadeye:** every competition
+  post or line a child can see says free entry, the parent rule and the close
+  date; a discount ("25% off") is a buy-prompt, so it goes to parents and
+  adults, not into posts aimed at players. Asking a 16/17 year old for a
+  parent's email is a family detail: keep it to the one field the parent gate
+  needs. [ASAI Code: Children](https://adstandards.ie/code/children/), read 2026-11-18, regulator (self-regulatory).
+- Google Play, Ratings and reviews policy: "Don't offer rewards or incentives
+  for ratings or reviews"; its example is a discount in return for a high
+  rating. **For Deadeye:** a prize for private feedback is outside it, but
+  only while nothing ties the prize or the 25% to a Play rating: no Play
+  review prompt on or after `/competition`, and no "leave a review too" in any
+  message. [Google Play policy](https://support.google.com/googleplay/android-developer/answer/9898684), read 2026-11-18, platform rule (benchmark).
+- GDPR Art 14: when personal data comes from someone other than the person
+  (a parent's email typed by a child), that person must be told, at the
+  latest in the first message: who the controller is, why, how long it is
+  kept, their rights and where the data came from (Art 14(2)(f), 14(3)(b)).
+  **For Deadeye:** every email to a parent a child named says "X gave us your
+  address", how long it is kept, links the privacy page, and says what to do
+  if you are not their parent. [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj), 2016, law.
+- Irish digital age of consent (s.31) covers consent as a lawful basis, not
+  competition rules. A parent check for 16 and 17 year olds in a prize
+  promotion is a safeguarding and fairness choice, so its strength can be
+  proportionate to what is at stake (an entry and a free plan), with a
+  stronger check before a prize is given. Reasoning from the DPA 2018 s.31
+  finding above, 2026, practitioner judgement **(legal advice)** if a cash or
+  high-value prize is ever offered.
 
 ### AI with minors
 
