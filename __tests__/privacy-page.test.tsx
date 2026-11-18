@@ -44,4 +44,15 @@ describe('the privacy page', () => {
     expect(text).toMatch(/nobody but you sees your notes on clips/);
     expect(text).toMatch(/film clips play from YouTube/);
   });
+
+  it('names the Today card taps and the other noted steps, and no longer says "No page tracking" (#126, S46)', () => {
+    const { container } = render(<PrivacyPage />);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toMatch(/which link you tap on the Today card \(log shots, track with the camera, or your program\)/);
+    expect(text).toMatch(/Opening the Video AI page/);
+    expect(text).toMatch(/Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip/);
+    expect(text).toMatch(/saving a play you drew/);
+    expect(text).toMatch(/Only these steps are noted, not every page you visit/);
+    expect(text).not.toMatch(/No page tracking/);
+  });
 });
