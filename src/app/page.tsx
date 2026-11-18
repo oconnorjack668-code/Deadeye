@@ -36,6 +36,7 @@ import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FOUNDING_CLUB_OFFER, FREE_PLAN
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
 import { getFoundingOffer } from '@/lib/foundingServer';
+import { entriesOpen } from '@/lib/competition';
 
 export const dynamic = 'force-dynamic';
 
@@ -148,6 +149,8 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
 
 export default async function Home() {
   const signedIn = !!(await getCurrentUser());
+  // The founding competition, only while COMPETITION_LIVE is on and before it closes
+  const competitionOpen = entriesOpen();
 
   const [{ monthly, yearly, founder }, offer] = await Promise.all([proPriceLabels(), getFoundingOffer()]);
   const proPrice = [monthly, yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
@@ -194,6 +197,15 @@ export default async function Home() {
             <a href="#try-it" className="mt-3 inline-block text-sm font-semibold text-orange-400 hover:text-orange-300">
               Watch it track real shots, right here ↓
             </a>
+            {competitionOpen && (
+              <Link
+                href="/competition"
+                className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-full border border-orange-500/50 bg-orange-500/10 px-4 py-2 text-sm font-semibold text-orange-200 hover:bg-orange-500/15"
+              >
+                <Trophy className="h-4 w-4 flex-shrink-0" />
+                <span>Founding competition: tell us what to improve and help shape Deadeye. Closes 31 December</span>
+              </Link>
+            )}
             {offer.open && (
               <a
                 href="#pricing"
