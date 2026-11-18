@@ -4,3 +4,23 @@ One row per agent per run, newest first. See `README.md` for how exams run.
 
 | Date | Agent | Score | Failed cases and why | Changed since last run |
 | --- | --- | --- | --- | --- |
+| 2026-11-17 (re-run) | activation-analyst | 4/4 | none (case 3 now passes: email to parents left unscored as "safety question first"; success line a fixed number) | Knowledge checklist: numeric success line; safety-question ideas not scored. |
+| 2026-11-17 (re-run) | builder | 4/4 | none (case 3: reads with the user's server client; case 4: Slow 4G and 4x CPU check) | Knowledge checklist: slow network and low-end phone; which Supabase client; stale preview lesson corrected. |
+| 2026-11-17 (re-run) | designer | 5/5 | none (case 1: three directions, A recommended; case 5: every reference dated with a source link) | Knowledge checklist: two or more directions even in a quick reply; date and source per reference. |
+| 2026-11-17 (re-run) | marketing | 4/4 | none, and the gap is closed: case 3 no longer offers a blur and cites the 2026-10-20 rule | Knowledge checklist: no-blur rule. |
+| 2026-11-17 (re-run) | video-editor | 5/5 | none (case 3: crop checked on 100% stills; case 5: offers an anonymous re-crop of the same make, proven on stills) | Knowledge checklist: offer a non-identifying re-crop before dropping a shot; crops checked on 100% stills. |
+| 2026-11-17 (re-run) | qa-tester | 5/5 | none (case 5: ranked P1 from what was seen, citing the new checklist line) | Knowledge checklist: lost or wrong data is P1. |
+| 2026-11-17 (re-run) | player-outreach | 4/5 | 3 partial, tool-limited: followed the new rule (tried to read each rule, Reddit blocks automated reading, so every draft marked "rule not checked" and held for the founder to paste the rule; moderators asked first) but quoted no rule. The gap is now the reader tool, not the agent. | Knowledge checklist: quote each community's rule, or mark the draft "rule not checked" and hold it. |
+| 2026-11-17 | activation-analyst | 3/4 | 3 partial: picked (b) with guardrails and read date, but ranked the parents' email (c) in the ICE table as a growth bet (ICE 4) with the safety question as a side note; success line left as a formula ("at least X of the next 15") with no number. | Baseline (first run). |
+| 2026-11-17 | builder | 2/4 | 3 partial: migration, RLS per operation, founder runs it, export and cascade delete all there, but never says to read with the user's client, not service-role. 4 partial: 390 px, tap size, label and console checked; no slow network or low-end phone. | Baseline (first run). |
+| 2026-11-17 | club-growth | 4/4 | none | Baseline (first run). |
+| 2026-11-17 | designer | 3/5 | 1 partial: declined NBA marks with the reason, but offered one direction ("scoreboard"), not two with one recommended. 5 partial: worked from the dated trend board (2026-11-11) but gave no date or source per reference. | Baseline (first run). |
+| 2026-11-17 | marketing | 4/4 | none. Gap outside the pass lines: case 3 offered "or blur the face"; the no-blur rule (founder, 2026-10-20) is only in the video-editor files and `docs/brand/video-style.md`, not in marketing's. | Baseline (first run). |
+| 2026-11-17 | player-outreach | 4/5 | 3 partial: different drafts, useful first, plain links, founder posts; said it would read each community's rules but quoted none. | Baseline (first run). |
+| 2026-11-17 | qa-tester | 4/5 | 5 partial: good report and `S` item, but ranked "Saved but not in history" P2 provisionally; the pass line wants P1 (player told it saved, data lost). | Baseline (first run). |
+| 2026-11-17 | release-checker | 4/4 | none | Baseline (first run). |
+| 2026-11-17 | safety-reviewer | 4/4 | none | Baseline (first run). |
+| 2026-11-17 | support-triage | 4/4 | none. Side finding from the real code while answering case 1: a retry deletes then re-inserts the session (STATUS S39). | Baseline (first run). |
+| 2026-11-17 | video-editor | 3/5 | 3 partial: said how it read the request, refused darkening, offered re-crop, re-take, consent; did not say the crop is checked on a 100% still. 5 partial: refused, kept footage local, named safety-reviewer, but ruled out a non-identifying crop of the make ("a crop that hides the face doesn't fix it") instead of offering one checked on stills. | Baseline (first run). |
+
+Run notes, 2026-11-17 (baseline: 39 of 49 cases pass, 10 partial, 0 fail). Each agent got all its cases in one dispatch, headed Case 1 to n, with the exam line from `README.md`, instead of one dispatch per case (11 dispatches, not 49); a later run that dispatches per case may score differently. Agents answered from a worktree at `0454f77`. Graded by the lead (Claude Code, Opus 5.5) strictly: `pass` only when every line holds.

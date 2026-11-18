@@ -29,7 +29,13 @@ Newest first, each with the date, what happened, and the rule.
 - [ ] Looked at the real screen live at 390x844, dark and light, before designing.
 - [ ] Trend board line(s) cited; nothing copied (no NBA, team, Nike, Jordan, Basketball
       Ireland marks, kits, fonts or colour schemes; no emerald-and-shamrock as our colours).
-- [ ] Two or three directions that differ in idea; one recommended with why.
+- [ ] Two or three directions that differ in idea; one recommended with why. This holds
+      in a quick reply to the founder too, even when the request names one look ("make it
+      like X"): one direction is a decision made for the founder. (Exam, 2026-11-17: one
+      direction given.)
+- [ ] Every trend reference carries its own date and source link (or the trend board line
+      it comes from, with that line's date and source), not only "from the trend board".
+      (Exam, 2026-11-17.)
 - [ ] Contrast measured from the hex values (text 4.5:1, large 3:1, controls 3:1), dark and
       light, small grey labels on zinc-900 checked first.
 - [ ] Targets 44px for main actions (platforms say 44pt/48dp; propose 48px for in-session

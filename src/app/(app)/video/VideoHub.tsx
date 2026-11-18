@@ -1,8 +1,9 @@
 // src/app/(app)/video/VideoHub.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { track } from '@/lib/events';
 import { FilmTagger } from '@/components/video/FilmTagger';
 import { ClipUploader } from '@/components/video/ClipUploader';
 import { VideoAIFeedback, type ShootingSummary } from '@/components/video/VideoAIFeedback';
@@ -51,6 +52,12 @@ export function VideoHub({
   const [formKey, setFormKey] = useState(0);
   const [shooting, setShooting] = useState<ShootingSummary | null>(null);
   const [mechanics, setMechanics] = useState<ShotMechanics | null>(null);
+
+  // Reaching this page is its own step: tracker_opened only fires once the
+  // tracker mounts, so a player who arrived and left was invisible
+  useEffect(() => {
+    track('video_opened');
+  }, []);
 
   return (
     <div className="space-y-5">
