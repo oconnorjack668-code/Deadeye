@@ -92,6 +92,27 @@ something about the edit (hook, length, voice, captions, music). Under about
 - 2026-11-18 · Same post: about half the searches that found it were
   "vercel.app", people typing the caption link. **Rule:** the end card says
   "link in bio", not a web address to type.
+- 2026-11-18 · Browser research (`docs/agent-os/trends/ads.md`, 18 Nov lines):
+  basketball training videos with a text promise on frame 0 and a make count
+  get 100K+ likes; app promos get under 1.5K; the two rival clips that went
+  viral (29K and 33K likes) showed the phone on its tripod in the shot with the
+  count live, make sounds, and a 1-minute game against a clock. **Rules:**
+  (1) cut it as a training video with the app inside it, never as an app ad;
+  (2) frame 0 is a promise in big type over action, with the real count from
+  the footage ("47 of 100"); (3) keep Deadeye's own make sound audible in the
+  mix; (4) a timed challenge clip keeps the clock on screen; (5) "Free to
+  start" and the name on the end card; no platform claim (Android, Play Store)
+  unless marketing has checked it that day.
+- 2026-11-18 · Founder: the tripod-in-shot look is one idea, not the format
+  for every video, and there is no tripod yet (one is coming). **Rule:** never
+  lock onto one format. Every brief gets several different ideas (at least
+  three), ranked, with the best one or two marked "Recommended" and one line
+  on why (the results and research behind it). All must fit the footage the
+  founder actually has: phone propped on a bag or bottle
+  with the count on screen, a screen recording of the session result, a friend
+  filming, a "Day N" series, session 1 vs session 10, a reveal carousel. The
+  tripod-in-shot version is an option once the founder says the tripod has
+  arrived, never a requirement.
 
 ## Checklist before the founder sees a video
 
