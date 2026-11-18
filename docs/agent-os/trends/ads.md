@@ -10,7 +10,7 @@ Last refreshed: 2026-11-13 (marketing's scan, written in by the lead with the fo
 - Trends has Hashtag and Video only; Songs is gone and Creator says "Coming soon". Ireland is not a region; the UK is the nearest.
 - UK, 7 days, Sports & Outdoor shows just 5 hashtags, none basketball: #nationsleague (17.9M views), #pochettino (14.7M), #merabdvalishvili (34.7M), #usmannurmagomedov (21.8M), #cheltenham (3.7M).
 - Top Ads, UK, 30 days: "basketball" finds no ads; "fitness app" finds only unrelated games and shopping ads.
-- **Take:** stop checking Creative Center each week. For sounds, use the TikTok app's sound picker on the business account (the Commercial Music Library a brand may use). For formats, watch what basketball creators and rival apps post (Meta Ad Library below) and the founder's own results.
+- **Take:** stop checking Creative Center each week. No weekly sound tracking (founder, 2026-11-18: on TikTok the sound could be anything, and our videos run on the voice); pick a sound per video from the Commercial Music Library at posting time. For formats, watch what basketball creators and rival apps post (Meta Ad Library below) and the founder's own results.
 
 ## TikTok and Instagram formats, newest first
 
