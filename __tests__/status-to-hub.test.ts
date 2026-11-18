@@ -46,6 +46,27 @@ describe('scripts/status-to-hub.mjs', () => {
     expect(calls[2].detail).toMatch(/Last checked: 2026-11-11\./);
   });
 
+  it('uses the Next step column as the title, keeps What as the detail, and sorts cards into groups', () => {
+    const withNext = `## Open
+
+| Id | Next step | What | Owner | Since | Last checked |
+| --- | --- | --- | --- | --- | --- |
+| S1 | Sign the DPIA with your mam | Sign the DPIA (\`docs/legal/dpia.md\`, section 7) with the account holder. | Founder | 2026-11-07 | 2026-11-13 |
+| S43 | Decide whether to add an online community answer | Idea from player-outreach: a fixed sign-up answer. | Founder decides | 2026-11-17 | 2026-11-17 |
+| S47 | Marketing rewrites the Play listing | The listing says TRACK EVERY SHOT. | Marketing | 2026-11-09 | 2026-11-18 |
+
+## Recently done
+`;
+    const rows = openRows(withNext);
+    expect(rows[0]).toMatchObject({ id: 'S1', next: 'Sign the DPIA with your mam', owner: 'Founder', checked: '2026-11-13' });
+    const calls = rows.map(callOf);
+    expect(calls[0]).toMatchObject({ title: 'Sign the DPIA with your mam', group: 'yours' });
+    expect(calls[0].detail).toMatch(/^Sign the DPIA \(docs\/legal\/dpia\.md, section 7\) with the account holder\./);
+    expect(calls[1].group).toBe('decide');
+    expect(calls[2].group).toBe('agents');
+    expect(prCallOf({ number: 5, title: 't' }).group).toBe('live');
+  });
+
   it('names an idea by what it is, not who had it', () => {
     expect(titleOf('Idea from the founder (17 Nov): a "blur my face" option in Settings. More text.')).toBe('Idea: A "blur my face" option in Settings');
   });
