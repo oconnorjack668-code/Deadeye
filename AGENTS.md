@@ -38,8 +38,12 @@ instead.
   memory notes. Claude Code gets main's copy automatically at session start;
   Codex must open it. For history, `docs/handoffs/INDEX.md`. When a session
   ends, update STATUS and write a handoff, following
-  `.claude/skills/handoff/SKILL.md`. Never tell the founder an item is open
-  or broken from an old handoff without checking it is still true.
+  `.claude/skills/handoff/SKILL.md`. Put them in a docs-only pull request
+  (only `docs/STATUS.md` and `docs/handoffs/`) and merge it yourself once
+  its checks pass, so the next chat sees it; a PR that touches anything
+  else waits for the founder (founder's decision, 2026-11-18). Never tell
+  the founder an item is open or broken from an old handoff without
+  checking it is still true.
 - Agent OS: activation work (the weekly funnel loop, its backlog, its agents
   and their permissions) runs from `docs/agent-os/README.md`. Read it before
   taking a backlog item.
