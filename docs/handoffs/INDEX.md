@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-18 · competition-homepage · 00067 applied, #144 merged, competition on, homepage prize card and For clubs (#146, #148); S49 closed → [handoff](2026-11-18-competition-homepage.md)
 - 2026-11-18 · pricing-clubs-competition · Yearly club prices, /clubs, feedback, competition behind switch (#144); S49-S51 → [handoff](2026-11-18-pricing-clubs-competition.md)
 - 2026-11-18 · hq-status-sync · STATUS from main, self-merged STATUS PRs, HQ built from STATUS → [handoff](2026-11-18-hq-status-sync.md)
 - 2026-11-18 · agent-models · Each agent gets its own model and effort (#129); S44 → [handoff](2026-11-18-agent-models.md)
