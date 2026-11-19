@@ -69,6 +69,19 @@ offline first, and turn reminders back on."
    stopgap with Resend: host `smtp.resend.com`, port `465`, username
    `resend`, password = the Resend API key, sender `no-reply@deadeye.ie`,
    name `Deadeye`.
+   Then Authentication → Emails → Templates, so email links work in any
+   browser (Supabase's default link only signs the player in if they open it
+   in the browser they signed up in; the Gmail app or another phone fails).
+   In each template below, replace `{{ .ConfirmationURL }}` in the link with
+   the address shown, and save:
+   - **Confirm signup**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
+   - **Reset password**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/update-password`
+   - **Change email address**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email_change&next=/settings`
+   Do this only after the app change that reads these links (`src/lib/authLink.ts`)
+   is live, or every link fails.
 6. **Redeploy** in Vercel (Deployments → latest → Redeploy). New variables
    only reach new deployments.
 7. Check: sign up a new test account and confirm the email arrives from
