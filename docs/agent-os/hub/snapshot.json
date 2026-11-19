@@ -220,6 +220,24 @@
     },
     {
       "agent": "founder",
+      "detail": "Instagram/TikTok series \"Can I become a better shooter by tracking every shot?\": 8 posts over 2 weeks from 23 Nov, faceless by default (the founder is under 18; face or voice needs a parent's written consent), sessions recorded on the tester account. Plan: docs/agent-os/marketing/2026-11-18-shooting-series.md (on PR #144's branch until merged). Check #DeadeyeDaily and #DeadEye in each app before using them. Competition lines (posts 4, 7, 8) only once S50 is done. Last checked: 2026-11-18: plan written, safety-reviewer passed it.",
+      "group": "yours",
+      "id": "S51",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/144",
+      "title": "Film the first shooting-series post on Mon 23 Nov"
+    },
+    {
+      "agent": "founder",
+      "detail": "Founding competition (judged on most useful feedback, not a draw; 10 players win Pro for life, 1 club a year of the Club plan; every entrant 25% off; closes 31 Dec 2026). Built behind COMPETITION_LIVE, off by default (PR #144). Before turning it on: (1) a solicitor confirms the judged route and lawful basis (prize-draw cap concern is in the rules doc's founder box); (2) LEGAL_NAME/LEGAL_ADDRESS (the parent, as promoter) set in Vercel; (3) competition row in docs/legal/dpia.md (added 18 Nov in #144: data row, R14, action 8; still needs signing, S1); (4) Resend working on the new domain (S3)... Last checked: 2026-11-18: COMPETITION_LIVE=1 set by the founder; live /competition shows \"Sign up free to enter\" and the promoter; homepage prize card (\"10 players win Deadeye Pro for life\", safety-reviewer wording) live via #148. Still not confirmed: (1) solicitor, (3) DPIA signed, (4) Resend on deadeye.ie (until then under-18 entries wait as pending; send from /admin/competition), (5) second judge.",
+      "group": "yours",
+      "id": "S50",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/144",
+      "title": "Finish the pre-launch steps (competition is already on)"
+    },
+    {
+      "agent": "founder",
       "detail": "Next video idea from marketing: a 60-second makes challenge, filmed from behind by the founder or another adult, phone on a bag, nobody else in the hall (S10). Approve it or pick another; marketing then writes the script. The other idea (the first promo with three openings) is dropped: the founder is not using that video, its quality is not good enough (18 Nov). Last checked: 2026-11-18: moved from HQ.",
       "group": "decide",
       "id": "S48",
@@ -451,26 +469,49 @@
       "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
     },
     {
-      "agent": "release-checker",
-      "detail": "Safety PASS (optional: add free entry + parent rule to banner); typegen, tsc, eslint, 1790 tests green. No migrations or env vars.",
-      "group": "live",
-      "id": "pr-146",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/146",
-      "onApprove": "The next Claude Code session merges PR #146 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #146: Homepage: link to the founding competition while entries are open",
-      "words": "merge 146"
+      "agent": "marketing",
+      "group": "agents",
+      "id": "mkt-wknd-fri20",
+      "kind": "approve",
+      "title": "Pick Friday's founder post in the app",
+      "detail": "Weekend 20 to 22 Nov, warm-up for the shooting series. Recommended: \"Two weeks, starting Monday\" (invites players to log one session this weekend). Others: the Focus Finder post (16 Nov), or \"Log it by hand\" (16 Nov). Text in docs/agent-os/marketing/2026-11-19-weekend.md.",
+      "options": [
+        "Two weeks, starting Monday",
+        "Focus Finder",
+        "Log it by hand"
+      ],
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
+      "onApprove": "You post the picked text in Owner tools, Founder posts on Fri 20. Marketing records it in ideas.md next run."
     },
     {
-      "agent": "release-checker",
-      "detail": "Safety PASS on af4cbd6 (competition card goes live on merge: confirm 2nd judge named and parent emails send first); typegen, tsc, eslint, 1790 tests green. No migrations or env vars.",
-      "group": "live",
-      "id": "pr-148",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/148",
-      "onApprove": "The next Claude Code session merges PR #148 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #148: Homepage: clubs button, For clubs menu link, competition prize card",
-      "words": "merge 148"
+      "agent": "marketing",
+      "group": "agents",
+      "id": "mkt-wknd-sat21",
+      "kind": "approve",
+      "title": "Pick Saturday's post (Day 0 carousel recommended)",
+      "detail": "Recommended: Day 0 carousel, 4 photos of an empty court + the tester account's 5-spot 3s screen, \"Starts Monday\". Others: Session reveal carousel (spends the first number before Day 1), or Two taps a spot (screen only, if no court time). Nobody in shot, no signage, location off. Script in 2026-11-19-weekend.md.",
+      "options": [
+        "Day 0 carousel",
+        "Session reveal carousel",
+        "Two taps a spot"
+      ],
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
+      "onApprove": "You take the photos and post on Sat 21 (TikTok 11:00, IG 12:00). Marketing records it next run."
+    },
+    {
+      "agent": "marketing",
+      "group": "agents",
+      "id": "mkt-wknd-sun22",
+      "kind": "approve",
+      "title": "Pick Sunday's Instagram Story",
+      "detail": "Recommended: \"Guess my Day 1 score\" slider, link sticker, answer on Monday (brings viewers back for Day 1). Others: \"Free throws or 3s on Day 3?\" poll (only if you follow the vote), or \"Log Saturday's session yet?\". Text in 2026-11-19-weekend.md.",
+      "options": [
+        "Guess my Day 1 score",
+        "Free throws or 3s on Day 3?",
+        "Log Saturday's session yet?"
+      ],
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
+      "onApprove": "You post the Story on Sun 22 at 17:00. Marketing records it next run."
     }
   ],
   "clubs": {
@@ -562,22 +603,22 @@
   "film": {
     "days": [
       {
-        "day": "Fri 13",
-        "post": "Log it before you forget (screen video) + founder post",
-        "where": "TikTok 17:00 · Reel 17:30"
+        "day": "Fri 20",
+        "post": "Founder post in the app: \"Two weeks, starting Monday\" (or Focus Finder / Log it by hand)",
+        "where": "In the app"
       },
       {
-        "day": "Sat 14",
-        "post": "One IQ question, quiz sticker",
-        "where": "IG Story 12:00"
+        "day": "Sat 21",
+        "post": "Day 0 carousel: 4 photos of an empty court + the 5-spot 3s screen, \"Starts Monday\"",
+        "where": "TikTok photo post 11:00 · IG carousel 12:00"
       },
       {
-        "day": "Sun 15",
-        "post": "Find the hoop for me (screen video, empty hoop); IQ answer",
-        "where": "TikTok 11:00 · Reel 12:00 · Story 17:00"
+        "day": "Sun 22",
+        "post": "Story: \"Guess my Day 1 score\" slider + link sticker; answer Monday",
+        "where": "IG Story 17:00 · 19:00"
       }
     ],
-    "experiment": "Paused until the promo opening is picked: one promo, three openings, keep the one with the best 6-second hold once each has about 1,000 views."
+    "experiment": "Shooting series from Mon 23 Nov: opening A (action first) vs B (number first), alternating; read on average watch time and the 3-second hold. Under about 1,000 views it is a hint."
   },
   "funnel": {
     "history": [
@@ -743,6 +784,16 @@
   ],
   "log": [
     {
+      "at": "2026-11-19T10:03:45Z",
+      "text": "Marketing mid-week: weekend 20 to 22 Nov drafted as the shooting series warm-up (founder post, Day 0 carousel, Story guess). Three picks waiting for you. No marketing decisions in the hub, no new numbers since 18 Nov.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T09:02:05Z",
+      "text": "To-do list rebuilt from STATUS (main d50872a): 28 open (1 pull requests), 2 new, 2 gone since the last update.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-19T08:15:00Z",
       "text": "Morning check: no errors on the live site in the last 24 hours; the live site is running the newest version (PR #149) and is ready; 1 pull request open (#95), checks green.",
       "tone": "ok"
@@ -770,11 +821,6 @@
     {
       "at": "2026-11-18T22:42:20Z",
       "text": "PR #146 check on 82b11f4: safety PASS (banner wording suggestion), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T19:21:14Z",
-      "text": "To-do list rebuilt from STATUS (main f0bf644): 26 open (1 pull requests), 0 new, 0 gone since the last update.",
       "tone": "ok"
     },
     {
@@ -836,11 +882,6 @@
       "at": "2026-11-17T21:20:00Z",
       "text": "PR #126 merged at 20:50 UTC, before its check landed. Check comment posted: safety BLOCK (privacy text misses the Today and Video AI markers, and says \"No page tracking\"), checks green. Needs a small fix/ PR for the privacy text.",
       "tone": "warn"
-    },
-    {
-      "at": "2026-11-17T21:10:00Z",
-      "text": "PR #126 (Today first step) checked at a3d88b0: safety BLOCK (privacy text misses the new Today and Video AI markers), all checks green, no migrations or env vars. Not ready to merge.",
-      "tone": "warn"
     }
   ],
   "scoreboard": {
@@ -857,6 +898,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-19T08:15:00Z",
-  "updatedBy": "Morning check"
+  "updatedAt": "2026-11-19T10:03:45Z",
+  "updatedBy": "Marketing mid-week"
 }
