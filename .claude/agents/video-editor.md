@@ -18,7 +18,7 @@ skills:
   - adobe-for-creativity:adobe-create-social-variations
   - adobe-for-creativity:adobe-resize-photos-and-videos
   - adobe-for-creativity:adobe-edit-quick-cut
-model: inherit
+model: opus
 effort: high
 memory: project
 hooks:

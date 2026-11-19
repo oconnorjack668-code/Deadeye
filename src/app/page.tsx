@@ -32,10 +32,11 @@ import { LandingHeader } from '@/components/LandingHeader';
 import { LandingDemo } from '@/components/LandingDemo';
 import { StandaloneRedirect } from '@/components/StandaloneRedirect';
 import { getCurrentUser } from '@/lib/auth';
-import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
+import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FOUNDING_CLUB_OFFER, FREE_PLAN, PRO_PLAN, PRO_PRICE_FALLBACK, WHY_PRO_COSTS } from '@/lib/plans';
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
 import { getFoundingOffer } from '@/lib/foundingServer';
+import { CLOSING_TEXT, entriesOpen } from '@/lib/competition';
 
 export const dynamic = 'force-dynamic';
 
@@ -148,6 +149,8 @@ function faqItems(proPrice: string): Array<{ q: string; a: string }> {
 
 export default async function Home() {
   const signedIn = !!(await getCurrentUser());
+  // The founding competition, only while COMPETITION_LIVE is on and before it closes
+  const competitionOpen = entriesOpen();
 
   const [{ monthly, yearly, founder }, offer] = await Promise.all([proPriceLabels(), getFoundingOffer()]);
   const proPrice = [monthly, yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
@@ -194,6 +197,33 @@ export default async function Home() {
             <a href="#try-it" className="mt-3 inline-block text-sm font-semibold text-orange-400 hover:text-orange-300">
               Watch it track real shots, right here ↓
             </a>
+            {/* The founding competition, with what can be won and the key
+                conditions side by side (ASAI 7.7: free, age, parent's OK,
+                area, closing date). No discount or prices here: the
+                homepage reaches 13-year-olds. */}
+            {competitionOpen && (
+              <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-orange-500/50 bg-gradient-to-br from-orange-600/20 via-zinc-900/80 to-zinc-900/80 p-5 text-left">
+                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-300">
+                  <Trophy className="h-4 w-4 flex-shrink-0" /> Founding competition · free to enter · closes 31 December 2026
+                </p>
+                <h2 className="mt-2 text-2xl font-black text-white">10 players win Deadeye Pro for life</h2>
+                <p className="mt-2 text-base text-zinc-200">
+                  Make a free account, log one training session and tell us one thing you liked and one thing you would
+                  change. The most useful feedback wins, judged by two adults, not a draw. 1 club also wins a year of the
+                  Club plan free. Under 18? A parent or guardian approves your entry by email.
+                </p>
+                <Link
+                  href="/competition"
+                  className="mt-4 flex h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-bold text-zinc-950 hover:bg-orange-400"
+                >
+                  See how to enter
+                </Link>
+                <p className="mt-3 text-xs text-zinc-400">
+                  Free to enter, no purchase needed. Ages 13 and over, Republic of Ireland. &quot;Pro for life&quot; means Pro
+                  for as long as Deadeye offers a Pro plan. Closes at {CLOSING_TEXT}.
+                </p>
+              </div>
+            )}
             {offer.open && (
               <a
                 href="#pricing"
@@ -399,7 +429,7 @@ export default async function Home() {
               <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-300">
                 <Users className="h-4 w-4" /> For clubs and teams
               </p>
-              <h3 className="mt-1 text-xl font-black text-white">Every player on Pro, for less than €1 a month each</h3>
+              <h3 className="mt-1 text-xl font-black text-white">Every player on Pro, from under €1 a month each</h3>
               <ul className="mt-4 grid gap-3 sm:grid-cols-3">
                 {CLUB_PLANS.map((p) => (
                   <li key={p.name} className="rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
@@ -411,14 +441,19 @@ export default async function Home() {
                 ))}
               </ul>
               <p className="mt-3 text-sm text-zinc-400">
-                Paid club plans open soon, and coaching a team is free today. Founding club offer: our first 3 clubs are free until
-                31 January 2027, then pay €59.99 per team per season for as long as they stay subscribed. Closes 31 December 2026.
+                Paid club plans open soon, and coaching a team is free today. Every plan is priced by the year. {FOUNDING_CLUB_OFFER}
               </p>
-              <div className="mt-4 flex flex-wrap items-center gap-3">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                <Link
+                  href="/clubs"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-6 text-base font-bold text-zinc-950 hover:bg-orange-400"
+                >
+                  <Users className="h-5 w-5" /> Deadeye for clubs
+                </Link>
                 <a
                   href={CLUB_PLANS_PDF}
                   download
-                  className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-4 py-2.5 text-sm font-bold text-zinc-950 hover:bg-orange-400"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-zinc-700 px-5 text-sm font-semibold text-zinc-200 hover:bg-zinc-900"
                 >
                   <Download className="h-4 w-4" /> Club pricing sheet (PDF)
                 </a>

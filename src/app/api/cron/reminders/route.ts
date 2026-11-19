@@ -14,6 +14,7 @@ import { olderThanDays, UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
 import { FOUNDING_REMINDER_DAYS } from '@/lib/founding';
 import { pruneOldRoutineImports } from '@/lib/routineImport';
 import { clearExpiredHeardFrom } from '@/lib/heardFrom-server';
+import { applyCompetitionRetention } from '@/lib/competition-server';
 
 async function removeUnapprovedAccounts(admin: ReturnType<typeof createAdminClient>): Promise<number> {
   const { data: waiting, error } = await admin
@@ -83,6 +84,14 @@ async function run(request: Request) {
     return { cleared: 0, failed: -1 };
   });
 
+  // Housekeeping: founding competition entries (00067). Parent links go at
+  // closing, parent names and emails after the offer ends, and every entry
+  // 6 months after that, as the rules and privacy policy say
+  const competition = await applyCompetitionRetention(admin).catch((err) => {
+    console.error('Competition entry clean-up failed', err);
+    return { step: 'failed' as const, failed: -1 };
+  });
+
   // Housekeeping: under-16 accounts no parent approved, or whose parent withdrew
   // approval, are deleted after UNAPPROVED_ACCOUNT_DAYS (00036)
   const removed = await removeUnapprovedAccounts(admin).catch((err) => {
@@ -90,14 +99,14 @@ async function run(request: Request) {
     return 0;
   });
 
-  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed, heardFrom }, { status: 503 });
+  if (!pushConfigured()) return Response.json({ error: 'VAPID keys missing', removed, heardFrom, competition }, { status: 503 });
 
   const { data: prefs, error } = await admin
     .from('notification_preferences')
     .select('user_id, reminder_enabled, push_enabled, reminder_days, timezone, last_reminded_on')
     .eq('reminder_enabled', true)
     .eq('push_enabled', true);
-  if (error) return Response.json({ error: error.message }, { status: 500 });
+  if (error) return Response.json({ error: error.message, competition }, { status: 500 });
 
   // A locked under-16 (00036) cannot open the app, so a nudge to train in it is noise
   const { data: locked } = await admin
@@ -158,7 +167,7 @@ async function run(request: Request) {
     return 0;
   });
 
-  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, heardFrom, foundingReminders });
+  return Response.json({ checked: prefs?.length || 0, sent, skipped, removed, heardFrom, foundingReminders, competition });
 }
 
 export const GET = withCronLog('reminders', run);

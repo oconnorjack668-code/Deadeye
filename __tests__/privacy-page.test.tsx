@@ -44,4 +44,26 @@ describe('the privacy page', () => {
     expect(text).toMatch(/nobody but you sees your notes on clips/);
     expect(text).toMatch(/film clips play from YouTube/);
   });
+
+  it('says what a competition entry keeps, why, and when it is deleted (00067)', () => {
+    const { container } = render(<PrivacyPage />);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toMatch(/founding competition: your entry, the feedback you write for it and, for players under 18, the parent or guardian's email/);
+    expect(text).toMatch(/judge the competition, contact winners \(through a parent for under-18s\) and send the 25% offer/);
+    expect(text).toMatch(/parent names and emails are deleted after the offer closes on 31 March 2027, and the entry list is deleted 6 months after that \(by 30 September 2027\)/);
+    expect(text).toMatch(/they read entries with names hidden/);
+    expect(text).toMatch(/For players under 18 the offer is emailed to their parent or guardian, not to them/);
+    expect(text).toMatch(/Feedback, ideas and problem reports/);
+  });
+
+  it('names the Today card taps and the other noted steps, and no longer says "No page tracking" (#126, S46)', () => {
+    const { container } = render(<PrivacyPage />);
+    const text = (container.textContent ?? '').replace(/\s+/g, ' ');
+    expect(text).toMatch(/which link you tap on the Today card \(log shots, track with the camera, or your program\)/);
+    expect(text).toMatch(/Opening the Video AI page/);
+    expect(text).toMatch(/Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip/);
+    expect(text).toMatch(/saving a play you drew/);
+    expect(text).toMatch(/Only these steps are noted, not every page you visit/);
+    expect(text).not.toMatch(/No page tracking/);
+  });
 });

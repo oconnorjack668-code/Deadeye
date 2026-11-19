@@ -79,9 +79,12 @@ run does; it skips 8v and exams.
    in `talking`, `trial` or `active`, and on the first Monday of each month
    in any case. Done when its plan exists.
 8c. Update the hub: `docs/agent-os/hub/snapshot.json` and its `hub/snapshot`
-   document, with this run's numbers, calls (one per pull request, approval
-   and founder job), agents, backlog, clubs, film, log and learn
-   (`docs/agent-os/hub/README.md`). Commit it with step 7's changes.
+   document, with this run's numbers, agents, backlog, clubs, film, log and
+   learn (`docs/agent-os/hub/README.md`). Never write its to-do list (`calls`)
+   by hand: put every pull request, approval and founder job in
+   `docs/STATUS.md` as an `S<n>` row, then rebuild the list with
+   `node scripts/status-to-hub.mjs` once that STATUS change is on main.
+   Commit it with step 7's changes.
 Peer review runs inside the steps above (table below). Pass the reviewer
 only the work to review and its own agent file's "Peer review" lines; send
 its findings back to the author once, then move on.

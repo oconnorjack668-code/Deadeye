@@ -14,6 +14,10 @@ export type PlanType = 'free' | 'pro' | 'owner';
 export type AgeBracket = '13' | '14-17' | '18-22' | '23-30' | '30+';
 export type AppMode = 'playing' | 'coaching';
 export type ConsentStatus = 'not_needed' | 'pending' | 'approved' | 'withdrawn';
+/** What a player sent from Settings or the crash screen (00067) */
+export type ReportKind = 'feedback' | 'idea' | 'problem';
+/** A founding competition entry (00067) */
+export type EntryStatus = 'valid' | 'pending_parent' | 'declined';
 export type BasketballPosition = 'PG' | 'SG' | 'SF' | 'PF' | 'C' | 'G' | 'F' | 'multi';
 export type DominantHand = 'left' | 'right' | 'ambidextrous';
 export type PlayingLevel = 'beginner' | 'intermediate' | 'advanced' | 'elite' | 'college_pro';
@@ -1690,6 +1694,7 @@ export interface Database {
           url: string | null;
           user_agent: string | null;
           resolved: boolean;
+          kind: ReportKind;
         };
         Insert: {
           id?: string;
@@ -1700,8 +1705,51 @@ export interface Database {
           url?: string | null;
           user_agent?: string | null;
           resolved?: boolean;
+          kind?: ReportKind;
         };
         Update: { resolved?: boolean };
+        Relationships: [];
+      };
+      competition_entries: {
+        Row: {
+          id: string;
+          user_id: string;
+          kind: 'player' | 'club';
+          team_id: string | null;
+          club_name: string | null;
+          club_key: string | null;
+          club_knows: boolean | null;
+          feedback: string;
+          status: EntryStatus;
+          parent_name: string | null;
+          parent_email: string | null;
+          parent_token: string | null;
+          parent_token_sent_at: string | null;
+          parent_decided_at: string | null;
+          winner: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          kind: 'player' | 'club';
+          team_id?: string | null;
+          club_name?: string | null;
+          club_key?: string | null;
+          club_knows?: boolean | null;
+          feedback: string;
+          status: EntryStatus;
+          parent_name?: string | null;
+          parent_email?: string | null;
+          parent_token?: string | null;
+          parent_token_sent_at?: string | null;
+          parent_decided_at?: string | null;
+          winner?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database['public']['Tables']['competition_entries']['Insert']>;
         Relationships: [];
       };
       cron_runs: {

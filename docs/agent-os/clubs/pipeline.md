@@ -12,3 +12,5 @@ Every contact is the founder's.
 | Gorey Basketball Club | Wexford | U10, U12, U14 training 2026/27 (club website); others to check | target | Club website contact page | On hold: oldest team U14 includes 12 year olds and Deadeye is 13+. Do not send; re-check the website for an U15+ team next season | Club-growth | 2027-09-01 |
 | Kilkenny Stars | Kilkenny | Academy U6 to U10, competitive underage teams (18 in 2023/24), senior ladies (club website) | target | Club website contact page (kilkennystars.clubzap.com) | Draft in `2026-11-16-clubs.md`; founder decides and sends, after the Blazers date is set | Founder | 2026-11-30 |
 | Carlow Basketball Club | Carlow | About 320 players from age 5 to senior men and women (local news, Sep 2025) | target | Club Facebook or Instagram page (named in local news) | Confirm current teams on the club's own page before any draft (next run) | Club-growth | 2026-11-23 |
+
+Note 2026-11-18: a competition outreach pack is drafted in `2026-11-18-competition-outreach.md`. No stage changes; nothing sent. It waits on the legal check in `founding-competition-rules.md`.

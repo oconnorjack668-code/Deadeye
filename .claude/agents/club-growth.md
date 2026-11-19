@@ -12,7 +12,8 @@ skills:
   - sales:competitive-intelligence
   - product-management:write-spec
   - marketing:campaign-plan
-model: inherit
+model: sonnet
+effort: medium
 memory: project
 hooks:
   PreToolUse:

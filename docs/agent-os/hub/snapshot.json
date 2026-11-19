@@ -208,162 +208,269 @@
   ],
   "calls": [
     {
-      "agent": "marketing",
-      "detail": "Fri: a screen video of logging a session without a court, plus a founder post in the app. Sat: one question from the IQ section as a Story quiz. Sun: a screen video of \"Find the hoop for me\" at an empty hoop. No people in any of them, so no consent is needed. Full drafts in docs/agent-os/marketing/2026-11-12-weekend.md.",
-      "due": "2026-11-13",
-      "id": "mkt-weekend",
-      "kind": "approve",
-      "onApprove": "Marketing writes each post in full, ready for you to record and post yourself.",
-      "title": "Weekend posts, Fri 13 to Sun 15"
+      "agent": "release-checker",
+      "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-95",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/95",
+      "onApprove": "The next Claude Code session merges PR #95 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #95: Agent OS: scheduled runs (hub snapshots, drafts)",
+      "words": "merge 95"
     },
     {
-      "agent": "marketing",
-      "detail": "1. A 60-second makes challenge, filmed from behind by you or an adult, with the phone on a bag and nobody else in the hall. 2. The promo with three openings, once you pick A, B or C and the clip with a face is cleared or cut.",
-      "id": "mkt-next-ideas",
-      "kind": "approve",
-      "onApprove": "Marketing scripts both for Monday's plan and hands them to the video editor.",
-      "title": "Next week's first two video ideas"
-    },
-    {
-      "agent": "marketing",
-      "detail": "The same 24.5-second promo with three different first 3 seconds. A: the live count ticking. B: the first make, 1/1. C: \"Do you count your makes in your head?\". Pick one before approving.",
-      "id": "mkt-openings",
-      "kind": "approve",
-      "onApprove": "Marketing builds this week's posts around the opening you picked.",
-      "options": [
-        "A",
-        "B",
-        "C"
-      ],
-      "title": "Pick the promo opening to test first"
-    },
-    {
-      "agent": "marketing",
-      "detail": "Marketing can't see whether the 23 Oct promo went out. Views, follows and bio link taps per post, from TikTok and Instagram.",
-      "id": "mkt-analytics",
+      "agent": "founder",
+      "detail": "Next video idea from marketing: a 60-second makes challenge, filmed from behind by the founder or another adult, phone on a bag, nobody else in the hall (S10). Approve it or pick another; marketing then writes the script. The other idea (the first promo with three openings) is dropped: the founder is not using that video, its quality is not good enough (18 Nov). Last checked: 2026-11-18: moved from HQ.",
+      "group": "decide",
+      "id": "S48",
       "kind": "task",
-      "onApprove": "It moves to In progress. Paste the numbers to Claude in a chat, then mark it Done.",
-      "title": "Share how your posts did"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Say yes or no to a 60-second makes challenge as the next video"
     },
     {
-      "agent": "club-growth",
-      "detail": "Agree a head coach (18+, Garda vetting confirmed), one team (U12 to U14 avoids the 16 and 17 parent gap), a start date and a decision date. To finish before December it needs to start by 16 Nov.",
-      "due": "2026-11-16",
-      "id": "club-blazers",
-      "kind": "task",
-      "onApprove": "Club growth writes your call notes and the trial checklist this week.",
-      "title": "Agree the Wexford Blazers trial"
-    },
-    {
-      "agent": "club-growth",
-      "detail": "Two short emails are drafted. Club growth suggests sending them after the Blazers date is set.",
-      "id": "club-outreach",
+      "agent": "marketing",
+      "detail": "Google Play listing words: docs/play-store/README.md still says \"TRACK EVERY SHOT\" (the tracker cannot promise every shot) and uses emoji; it should follow the same rules as posts (docs/agent-os/knowledge/marketing.md). #86 fixed only the short description. Marketing rewrites it before the Play Store listing goes up (S3). Last checked: 2026-11-18: README read, line 31.",
+      "group": "agents",
+      "id": "S47",
       "kind": "approve",
-      "onApprove": "Club growth finalises both emails for you to send once the Blazers date is agreed.",
-      "title": "Emails to Enniscorthy BC and Gorey BC"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
+      "onApprove": "Marketing picks this up in the next session and records the result in STATUS (S47).",
+      "title": "Marketing rewrites the Play Store listing without \"every shot\" or emoji"
     },
     {
-      "agent": "club-growth",
-      "detail": "Needed before an U16 to U18 team can trial: parents of 16 and 17 year olds would get the same read-only view of coach posts. Parent emails are personal data, so the wording is your call.",
-      "id": "c4-consent",
-      "kind": "task",
-      "onApprove": "Club growth and the safety reviewer draft the wording for you to edit and approve.",
-      "title": "Parent consent wording for 16 and 17 year olds"
+      "agent": "Lead",
+      "detail": "Profile photo sometimes shows the emoji (founder, 18 Nov). Cause in Supabase edge logs: right after a session refresh the database API answers the first query with 401 PGRST303 \"JWT issued at future\" for 1 to 2 seconds (15 Nov 13:41 and 14:54, 16 Nov 00:32; the same token worked milliseconds later). The photo lookup swallowed it and showed the emoji; the same hit on profiles or age_checks loses those for that load. Fix merged 18 Nov in #134: both Supabase clients wait 1 s and retry that one error (src/lib/supabase/fresh-token-fetch.ts). After merge: re-run the edge-log query for 401s on... Last checked: 2026-11-18: #134 merged; logs not checked yet.",
+      "group": "agents",
+      "id": "S45",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/134",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S45).",
+      "title": "Check the logs show the profile photo fix working"
+    },
+    {
+      "agent": "Lead",
+      "detail": "Agent model split (#129, merged 18 Nov): agents no longer all run on Opus. Opus: safety-reviewer and video-editor (high), builder and activation-analyst (medium). Sonnet: release-checker, qa-tester, support-triage, designer (high); marketing, club-growth, player-outreach (medium). Table and reasons: docs/agent-os/README.md, Models. After the next weekly run and the next video cut, check each agent's output against its last run; if one is worse, move it up one step (effort first, then model) and note it there. Last checked: 2026-11-18: merged; no run on the new models yet.",
+      "group": "agents",
+      "id": "S44",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/129",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S44).",
+      "title": "After the next weekly run, compare each agent's work with its last run"
     },
     {
       "agent": "activation-analyst",
-      "detail": "21 of 24 players finished setup but never logged a session. Ask 5 of them what they expected, what stopped them, and what would make them open it after training.",
-      "id": "e0",
-      "kind": "task",
-      "onApprove": "The activation analyst writes the message for you to send, and a place to paste the answers.",
-      "title": "Ask 5 players why they stopped"
-    },
-    {
-      "agent": "safety-reviewer",
-      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that. Google Play's data safety form asks the same questions, so this comes before the Play Store.",
-      "id": "dpia",
-      "kind": "task",
-      "onApprove": "It moves to In progress until it's signed.",
-      "title": "Read and sign the data protection assessment"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan. The Play Store app waits for the domain.",
-      "due": "2027-01-08",
-      "id": "billing",
-      "kind": "task",
-      "onApprove": "Claude walks you through deadeye.ie step by step the next time you chat.",
-      "title": "Set up deadeye.ie, email and Stripe payments"
-    },
-    {
-      "agent": "marketing",
-      "detail": "The ready-made listing in docs/play-store/README.md says \"Track every shot\" (the tracker can't promise every shot) and uses emoji. It should follow the same rules as your posts.",
-      "id": "play-listing",
+      "detail": "Today card read (#126, live 17 Nov): new players see one \"Log shots\" button; markers today_log_tapped, today_track_tapped, today_program_tapped, video_opened show which way in they take (/admin/funnel, Today card group). Read once two weeks of new signups have had 7 days (about 8 Dec): did the share of setup-finished players reaching a first session rise from 3 of 27? Under 30 players it is a hint. Last checked: 2026-11-17: live as the tester, tapping the camera link wrote today_track_tapped, video_opened and tracker_opened.",
+      "group": "agents",
+      "id": "S42",
       "kind": "approve",
-      "onApprove": "Marketing rewrites the listing and it comes back here for you to check before the Play Store step.",
-      "title": "Fix the Google Play listing words"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Do this once deadeye.ie is live and the data protection assessment is signed. The app wraps the website, so site updates reach it automatically. Your parent opens the Google Play developer account ($25, once). The App Store waits until iPhone players ask for it.",
-      "id": "play-store",
-      "kind": "task",
-      "onApprove": "Once deadeye.ie is live, Claude builds the Android app on the new address and walks you through Play Console, following docs/play-store/README.md.",
-      "title": "Publish Deadeye on Google Play (after the domain)"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS (founder-only page, no player data); tsc and typegen pass, no migrations or env vars. Two small notes in the PR comment.",
-      "id": "merge-79",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/79",
-      "title": "Merge PR 79: hub chat that acts on tasks, live progress",
-      "words": "merge 79"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS; typegen, tsc, eslint pass; no migrations, no env vars.",
-      "id": "merge-80",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/80",
-      "title": "Merge PR #80: landing demo says \"makes and misses\"",
-      "words": "merge 80"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS (copy and credits links only, head d936be0); typegen, tsc, eslint pass; no migrations, no env vars.",
-      "id": "merge-86",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
-      "title": "Merge PR #86: overclaim wording fixed site-wide",
-      "words": "merge 86"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS (3 notes: totals by subtraction, Plays live before S1); typegen, tsc, eslint, 1654 tests pass; migrations 00060-00064 (check they are live); FILM_LIVE stays off until S1 is signed.",
-      "id": "merge-112",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
-      "title": "Merge PR #112: Film and Plays on the IQ tab",
-      "words": "merge 112"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "PR #116 merged (head 74d4b16, the one that passed safety and checks). Once the new deploy is live: Supabase SQL editor, run supabase/migrations/00065_attempts_server_written.sql, then the two checks in its header (both false). Then a role quiz and a Film clip with the tester account. Steps 4 to 7 of the PR comment checklist.",
-      "id": "run-00065",
-      "kind": "task",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/116",
-      "onApprove": "It moves to In progress. Tell Claude when it has run and the smoke test passed, then mark it Done.",
-      "title": "Run migration 00065 now #116 is merged"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Merged 20:50 UTC before the check finished. Safety BLOCK, so a follow-up fix PR is needed: the privacy policy must name the 4 new markers and drop \"No page tracking\" (privacy/page.tsx:135-140). typegen, tsc, eslint and 1709 tests pass. No migrations or env vars.",
-      "id": "merge-126",
-      "kind": "merge",
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/126",
-      "title": "PR #126 (Today first step): ALREADY MERGED, privacy fix needed",
-      "words": "merge 126"
+      "onApprove": "Activation-analyst picks this up in the next session and records the result in STATUS (S42).",
+      "title": "Read the Today card numbers around 8 Dec"
+    },
+    {
+      "agent": "founder",
+      "detail": "Idea from player-outreach (17 Nov exam): add a fixed sign-up answer \"An online community (Reddit, Discord, a forum)\", so those routes stop landing in \"Somewhere else\". A fixed answer only, never a named community or person. Builder change; safety-reviewer reads it first; activation-analyst decides when. Last checked: 2026-11-17: idea only.",
+      "group": "decide",
+      "id": "S43",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Decide whether to add \"An online community\" as a sign-up answer"
+    },
+    {
+      "agent": "founder",
+      "detail": "Idea from the founder (17 Nov): a \"blur my face\" option in Settings for under-18 players. Assumed to mean a player's own choice for clips and share cards they make in the app, not blur as a fix in Deadeye's own promo videos (that would change the founder's 2026-10-20 no-blur rule; founder to say if that was meant). Needs: what it blurs (share cards, saved clips, coach-visible video), a designer mockup, then safety-reviewer (a blurred child can still be recognised by kit, hall or voice, so it is extra protection, never a stand-in for consent). Last checked: 2026-11-17: no blur feature in the app today.",
+      "group": "decide",
+      "id": "S41",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Say what \"blur my face\" should blur, so the designer can draw it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker speed, merged and live 14 Nov: #113 (a7e98ba) half speed when an upload loses frames; #115 (34b12cd) live camera frames cropped on the graphics chip; #118 (9d84e81) uploads decoded with WebCodecs; #119 (d86f0ad) plays the clip instead if decoding scores nothing in 8 s; #120 (d34f1f4) the service worker no longer serves stale tracker workers. Founder, on a phone: reload the app once (to pick up the new service worker), then upload a clip (\"Checking every frame of the clip, without playing it\", faster than the clip's length) and do a short live session (calls should arrive; before... Last checked: 2026-11-14: live site, Chrome, tester: 20 s upload decoded in under 7 s, 3/3 right.",
+      "group": "yours",
+      "id": "S38",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/113",
+      "title": "On your phone: reload the app, upload a clip, do a short live session"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker accuracy, merged 14 Nov in #108 (70ac521), with the four runs that lost calls accepted by the founder: bench 535 to 595 of 656, hold-out clip 5 120 to 133 of 174. Founder: try it in a real session on a phone; /admin/tracker should show fewer switched and never-called shots as sessions are saved. Last checked: 2026-11-14: merged.",
+      "group": "yours",
+      "id": "S37",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/108",
+      "title": "Use the tracker in a real session on your phone"
+    },
+    {
+      "agent": "founder",
+      "detail": "Sign the DPIA (docs/legal/dpia.md, section 7) with the account holder, then its 7 open actions (action 7, routine import, is done apart from S21). Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions), and Focus Finder AI plans (PR #103). From its safety review: section 1 row (free text, picked weaknesses, position, level, make rates, IQ scores, coach read counts, setup goals; team age group, level, size; contract plus parent consent for 13-15; plan kept for the account's life, text not kept, provider 30 days); R5 support line now shown in the browser; R11... Last checked: 2026-11-13: still DRAFT; sign-up answer row and R8 added on PR #97.",
+      "group": "yours",
+      "id": "S1",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/103",
+      "title": "Sign the data protection assessment (DPIA) with your mam"
+    },
+    {
+      "agent": "founder",
+      "detail": "Hoop model credits (ml/rim-detector/ATTRIBUTION.md): rim-finding shipped 3 Nov, CC BY needs the credit. Done: ballllls, X-Basket, basketball-computer-vision (links added 11 Nov). Missing: the page link for Basketball Shot Tracking (311 images, CC BY 4.0, classes ball, rim, backboard; the Colab file was Basketball Shot Tracking.coco.zip). Not found by the founder or by web search. If it cannot be found, ask whether to drop that dataset and retrain. Last checked: 2026-11-11: 3 of 4 linked.",
+      "group": "yours",
+      "id": "S2",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Find the link for the last hoop dataset, or say drop it and retrain"
+    },
+    {
+      "agent": "founder",
+      "detail": "Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (docs/founder-setup-guide.md); then the Play Store. Last checked: 2026-11-09.",
+      "due": "2027-01-08",
+      "group": "yours",
+      "id": "S3",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Buy deadeye.ie, then set up Resend, then Stripe (Pro live by 8 Jan)"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). Last checked: 2026-11-11.",
+      "group": "yours",
+      "id": "S5",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Get consent for the two people in the Tuesday video, then post it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Promo numbers: views, likes, profile visits, follows, retention and audience for TikTok and Instagram are in docs/agent-os/marketing/results.md (18 Nov, #131). Still missing: link taps per platform and the TikTok post date. Last checked: 2026-11-18: results.md on main read.",
+      "group": "yours",
+      "id": "S6",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/131",
+      "title": "Add link taps per platform and the TikTok post date to the results"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker visuals (PR #99): try them on a phone in a real session, inline and full screen sideways; only checked on stills from the sample clip so far. Also decide whether \"N in a row\" should show at phone size (it is left out there when it would cover the full-screen button). Last checked: 2026-11-13.",
+      "group": "yours",
+      "id": "S27",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/99",
+      "title": "Try the tracker visuals on your phone and decide on \"N in a row\""
+    },
+    {
+      "agent": "founder",
+      "detail": "New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. Last checked: 2026-11-11.",
+      "group": "yours",
+      "id": "S10",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Film new clips for posts: phone on a bag, nobody else in the hall"
+    },
+    {
+      "agent": "founder",
+      "detail": "Getting players in. Counts 16 Nov (docs/agent-os/data/2026-11-16-funnel.md on the agent-os branch): 35 joined, 27 finished setup, 3 logged a first session; 2 joined in the last 7 days (both set up, 0 first sessions). Not started by the founder (18 Nov): the Wexford Blazers next step (agree a head coach and start date, dated 9 Nov in docs/agent-os/clubs/pipeline.md), the Enniscorthy and Gorey drafts (2026-11-09-clubs.md), and all three outreach routes in docs/agent-os/outreach/routes.md (E0 messages, local media, FDYS: all drafted, none sent). Last checked: 2026-11-18: founder says the Blazers trial and the two club emails are not started; the 13-15 Nov weekend posts were never made.",
+      "group": "yours",
+      "id": "S11",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Pick one to start: Blazers trial, the two club emails, or messaging 5 players"
+    },
+    {
+      "agent": "founder",
+      "detail": "Hoop finder: retry with the live camera on a phone (Chrome's permission bubble blocked it in testing). Last checked: unconfirmed since 2026-11-03.",
+      "group": "yours",
+      "id": "S13",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Try \"Find the hoop for me\" with the live camera on your phone"
+    },
+    {
+      "agent": "founder",
+      "detail": "Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. Last checked: 2026-11-11.",
+      "group": "decide",
+      "id": "S15",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Decide whether to add Sentry to catch app errors"
+    },
+    {
+      "agent": "Lead",
+      "detail": "agents/skills/agent-os/ in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. Last checked: 2026-11-18: being regenerated by Codex in the main checkout (staged, not committed).",
+      "group": "agents",
+      "id": "S16",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S16).",
+      "title": "Check Codex's new copy of the agent-os skill when it lands"
+    },
+    {
+      "agent": "founder",
+      "detail": "Read the C4 parent-consent draft (backlog C4: parents of 16 and 17 year olds can see coach posts). Last checked: 2026-11-11: still idea in the backlog.",
+      "group": "yours",
+      "id": "S19",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Read the parent consent draft for 16 and 17 year olds"
+    },
+    {
+      "agent": "founder",
+      "detail": "US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. Last checked: 2026-11-11: raised by the safety re-review.",
+      "group": "decide",
+      "id": "S21",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Get a legal answer on AI data going to the US, then note it in the DPIA"
+    },
+    {
+      "agent": "founder",
+      "detail": "Trend board TikTok gap. Done 13 Nov: docs/agent-os/trends/ads.md filled from marketing's scan (written in by the lead on the founder's word; the agent's write was blocked by the older guard in the main checkout, fixed once the main checkout is pulled) plus the Meta Ad Library, Ireland, read in a browser. Left: TikTok Creative Center (Top Ads, Trend Discovery) needs a TikTok for Business login; the founder logs in (free) and pastes UK Trend Discovery, Sports, 7 days, or marketing keeps working without it. Last checked: 2026-11-13: board written; TikTok login gap.",
+      "group": "yours",
+      "id": "S32",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Log in to TikTok Creative Center (free), or tell marketing to skip it"
+    },
+    {
+      "agent": "designer",
+      "detail": "FDYS poster (outreach plan, route 3): safety-reviewer reads it before it is printed: QR to the plain address only, no identifiable under-18s. Not drafted yet (designer). Last checked: 2026-11-13: poster not made.",
+      "group": "agents",
+      "id": "S33",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "onApprove": "Designer, then safety-reviewer picks this up in the next session and records the result in STATUS (S33).",
+      "title": "Designer makes the FDYS poster, then the safety reviewer checks it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Film and Plays (docs/plans/film-and-plays.md), merged in #112 and live: Plays (36 library plays, editor, role quiz, team playbook, assigning) is open to everyone. Film (39 starter clips, all free; YouTube does not allow charging for embedded video) is open to players: the founder set FILM_LIVE=true (Production) on 14 Nov and every production deploy since has it (checked 18 Nov: latest is #131, 8298a8e). It went live before the DPIA was signed. Founder: (1) sign the DPIA (S1; rows for plays and film, YouTube as a recipient, R12, R13 added 14 Nov), planned for 19 Nov; if that slips, set... Last checked: 2026-11-18: Vercel env FILM_LIVE (Production, created 14 Nov) and production deploys checked; Film open to players. 2026-11-14: live as the tester: /plays lists the library (12 free), a play animates through its 6 steps, /film shows \"Film is on the way\"; DB has 36 plays, 39 published free clips, 2 packs.",
+      "group": "yours",
+      "id": "S36",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
+      "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS (optional: add free entry + parent rule to banner); typegen, tsc, eslint, 1790 tests green. No migrations or env vars.",
+      "group": "live",
+      "id": "pr-146",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/146",
+      "onApprove": "The next Claude Code session merges PR #146 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #146: Homepage: link to the founding competition while entries are open",
+      "words": "merge 146"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS on af4cbd6 (competition card goes live on merge: confirm 2nd judge named and parent emails send first); typegen, tsc, eslint, 1790 tests green. No migrations or env vars.",
+      "group": "live",
+      "id": "pr-148",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/148",
+      "onApprove": "The next Claude Code session merges PR #148 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #148: Homepage: clubs button, For clubs menu link, competition prize card",
+      "words": "merge 148"
     }
   ],
   "clubs": {
@@ -576,12 +683,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #128, 17 Nov) is running (checked 18 Nov).",
+      "detail": "Live and up to date: the latest version (PR #149, 18 Nov) is running (checked 19 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors in the last 24 hours (checked 18 Nov).",
+      "detail": "No errors in the last 24 hours (checked 19 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -591,7 +698,7 @@
       "status": "warn"
     },
     {
-      "detail": "3 open, checks green on all: PR #117 (status notes), PR #95 (agent scheduled runs) and PR #87 (handoff notes), all docs only.",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs), docs only.",
       "name": "Code changes",
       "status": "ok"
     }
@@ -636,6 +743,81 @@
   ],
   "log": [
     {
+      "at": "2026-11-19T08:15:00Z",
+      "text": "Morning check: no errors on the live site in the last 24 hours; the live site is running the newest version (PR #149) and is ready; 1 pull request open (#95), checks green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:18:00Z",
+      "text": "PR #148 re-check on af4cbd6 (For clubs moved second in phone menu): safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:15:10Z",
+      "text": "PR #148 re-check on d0e1c6f (adds competition prize card): safety PASS with notes, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:14:43Z",
+      "text": "PR #148 check on d0e1c6f: safety PASS (prize card hidden until COMPETITION_LIVE; separate note on the old only-N-left offer pill), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:09:36Z",
+      "text": "PR #148 check on bf46a84: safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T22:42:20Z",
+      "text": "PR #146 check on 82b11f4: safety PASS (banner wording suggestion), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T19:21:14Z",
+      "text": "To-do list rebuilt from STATUS (main f0bf644): 26 open (1 pull requests), 0 new, 0 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:50:00Z",
+      "text": "PR #141 check on 9f1f38e: safety PASS, all checks green (typegen, tsc, eslint, 8/8 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:07:00Z",
+      "text": "PR #139 check on 5ae723e (main merged in): safety PASS, all checks green (typegen, tsc, eslint, 7/7 tests, full suite 1721 passed). No migrations or env vars. It was already merged at 13:04 UTC, so no merge card was added.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:15:00Z",
+      "text": "PR #139 (HQ to-do list built from STATUS and open PRs) merged to main at 13:04 UTC. Its merge call is cleared.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:10:00Z",
+      "text": "PR #137 (privacy page names the Today card taps, S46) merged to main at 13:01 UTC. Its merge call is cleared.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:02:12Z",
+      "text": "PR #137 re-checked on 9b87eab after the merge from main: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:05:00Z",
+      "text": "PR #139 (HQ to-do list built from STATUS) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 139.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T12:55:00Z",
+      "text": "PR #137 (privacy page names the Today card taps, S46) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T12:36:33Z",
+      "text": "To-do list checked against GitHub and the database: removed 6 finished items (PRs 79, 80, 86 and 112 merged, migration 00065 run, post results shared on 18 Nov). PR 126 is live but its privacy page fix is still to do, so that is now its own task.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-18T08:10:00Z",
       "text": "Morning check: no errors in the last 24 hours, live site is the newest version (PR #128) and ready, 3 open pull requests all green. All quiet.",
       "tone": "ok"
@@ -659,81 +841,6 @@
       "at": "2026-11-17T21:10:00Z",
       "text": "PR #126 (Today first step) checked at a3d88b0: safety BLOCK (privacy text misses the new Today and Video AI markers), all checks green, no migrations or env vars. Not ready to merge.",
       "tone": "warn"
-    },
-    {
-      "at": "2026-11-17T21:00:00Z",
-      "text": "PR #127 re-checked after main was merged in (head 93358bd): safety PASS, all checks green, no migrations or env vars. Ready: reply merge 127.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T20:50:00Z",
-      "text": "PR #125 (save retry fix, S39) merged at 20:46 UTC. Merge call removed; no new check needed.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T14:05:00Z",
-      "text": "PR #127 (agent knowledge fixes, S40) checked: safety PASS, all checks green, no migrations or env vars. Ready: reply merge 127.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T09:58:00Z",
-      "text": "PR #125 (save retry fix, S39) checked: safety PASS, all checks green, no migrations or env vars. Ready: reply merge 125.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T08:10:13Z",
-      "text": "Morning check: live site up to date (PR #121, ready). No errors in the last 24 hours, no crash. 3 open pull requests, all checks green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-16T08:20:00Z",
-      "text": "Morning check: live site up to date (PR #121, ready). 1 small error (age check lookup, clock difference, P2, same as yesterday), no crash. 3 open pull requests, all checks green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-15T08:09:24Z",
-      "text": "Morning check: live site up to date (PR #121, ready). 1 small error (age check lookup, clock difference, P2), no crash. 3 open pull requests, all checks green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T15:20:00Z",
-      "text": "PR #116 merged (head 74d4b16, the commit that passed safety and checks). Merge call replaced with one task: run migration 00065 once the deploy is live.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T15:10:00Z",
-      "text": "PR #116 checked (Plays switch and server-written scores, head 74d4b16): safety PASS, all checks green. Run 00065 only after the merge is live. Ready for merge 116.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T14:29:00Z",
-      "text": "PR #112 checked (Film and Plays, head 96600f2): safety PASS with 3 notes, all checks green. 5 migrations to confirm, FILM_LIVE stays off. Ready for merge 112.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T13:45:00Z",
-      "text": "PR #110 merged (head 5519311, the commit that passed safety and checks). Merge call removed; nothing for you to do.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T13:35:00Z",
-      "text": "PR #110 checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 110.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T04:40:00Z",
-      "text": "PR #107 merged (head 3557110, the commit that passed safety and checks). Merge call removed; nothing for you to do.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-14T04:30:00Z",
-      "text": "PR #107 checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 107.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-13T16:30:00Z",
-      "text": "Learning digest: 26 new lessons this week (video editor 15, marketing 3, designer 2, release checker 2, support triage 2, player outreach 1, safety reviewer 1). No research due.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -750,7 +857,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-18T08:10:00Z",
-  "updatedBy": "Morning check",
-  "version": 1
+  "updatedAt": "2026-11-19T08:15:00Z",
+  "updatedBy": "Morning check"
 }

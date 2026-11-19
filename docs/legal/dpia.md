@@ -40,6 +40,7 @@ Deadeye is for players from 13, so most users are under 18.
 | Film: saved clips (`film_saves`), private notes on a clip (`film_notes`, free text up to 500 characters, only the player can read them), film attempts (score and answers, `film_attempts`) | Player | Learning to read the game from film (IQ tab) | Contract | Account life. A head coach sees done and score for film set for their team, never the answers or notes, until 90 days after the due date |
 | Coach film packs (`film_packs` with an owner) | Coach | Grouping library clips to set for a team | Contract | Until the coach deletes them or the account |
 | Sign-up answer: where they heard about Deadeye (optional, one of 9 fixed answers, no free text) | Player, from 13 (before parent approval too) | Which outreach routes bring players who train; counts only | Legitimate interest (player can clear it in Settings) | 12 months after sign-up (daily job), or until cleared or the account is deleted |
+| Founding competition entries (`competition_entries`): entry, feedback (30-2000 characters), status, club name and team for club entries; for under-18s the parent or guardian's name and email (copied from the account approval for under-16s, typed by the player for 16 and 17 year olds) and a link token; a winner mark. Feedback kind on reports (`player_reports.kind`) | Player from 13, coach; parent or guardian of an under-18 entrant | Judging the competition (two adult judges, names hidden), asking a parent's permission, contacting winners through a parent, emailing the 25% offer (to the parent for under-18s) | Legitimate interest (to confirm with a solicitor; contract or consent may fit better, S50) | Link tokens cleared at closing (1 Jan 2027); parent names and emails cleared after 31 Mar 2027; all entries deleted after 30 Sep 2027 (daily job). Cascades with the account |
 
 Processors: Supabase (database, files), Vercel (hosting), Anthropic (AI coach:
 receives profile and training numbers, never name, email, photo or video;
@@ -95,6 +96,7 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
 | R11 | A screenshot or pasted message carries other people's details (names, faces, phone numbers, other children) or the player's own to the AI provider | Medium | Low-medium | Sent only when the player chooses; shrunk on the phone; no account id; not stored by Deadeye; provider deletes within 30 days; a line on the screen asks players to crop out names and faces; the model is told not to copy names or numbers; stops when AI is off | Low |
 | R12 | A third-party video player (YouTube) tracks a child's viewing | Medium | Medium | Nothing loads from YouTube or Google before a tap, and the card says "This plays from YouTube; YouTube sees that you watched it"; youtube-nocookie; no likes, subscribes or other YouTube actions; official channels only; named on the privacy page and the parents page; the rest of a lesson or drill works without playing the video. YouTube still receives IP and device details after the tap | Low-medium |
 | R13 | Coaches monitor players too closely, or players feel pressured by film and play homework | Medium | Medium | Only head coaches (18+, not assistants) see results, and only done and score for film or plays they set, from the moment each was set, until 90 days after the due date; team answer totals only once 3 or more players have answered, so a small group cannot give away one player's pick; never the answers, the spots picked or private notes; teammates see nothing; no leaderboards or share cards for scores; a line on screen tells the player what the coach sees; no overdue pushes and no copy naming who has not done it; no comments or free-text coach feedback (that waits for C4 and parent visibility) | Low |
+| R14 | Founding competition: an under-18 enters without a parent knowing, a 16 or 17 year old types their own second address as the parent, prizes or discounts pressure children, or a stranger gets a parent's email | Medium | Medium | Off until the founder sets `COMPETITION_LIVE`; under-18 entries count only after a parent approves by emailed link; under-16s use the account's approving parent; 16-17s must tick that the email is not theirs, and their own account email is refused; the link is never shown to the player and the token is not in their data or export; the email says where the address came from, how long it is kept, and what to do if you are not the parent; under-18 winners confirmed with a parent by phone or in person; the 25% offer goes to parents of under-18s, never to the child; no prizes or prices in posts aimed at players; judged on feedback, not a draw; only the owner reads entries, CSV without parent emails | Low |
 
 ## 4. Open actions
 
@@ -130,6 +132,12 @@ Likelihood and severity: low, medium, high. Residual is after the measures.
    before 2026-11-11: none to tell; the founder confirmed on 2026-11-11 that
    no under-16 had signed up, so every parent approval is given on the
    updated parent page, which names routine import.
+
+8. **R14, founding competition (before `COMPETITION_LIVE=1`):** a solicitor
+   confirms the judged competition (not a promotional draw under the Gaming
+   and Lotteries Act 2019) and the lawful basis; `LEGAL_NAME` and
+   `LEGAL_ADDRESS` set to the parent as promoter; the second judge named and
+   told never to receive the CSV with names. Rules: `docs/sales/founding-competition-rules.md`.
 
 ## 5. Consultation
 

@@ -1,4 +1,4 @@
-Skills: all 5 loaded (2026-11-16 E6 review)
+Skills: all 5 loaded (2026-11-18 review of worktree-pricing-yearly-clubs)
 
 # Safety reviewer findings
 
@@ -133,6 +133,42 @@ when a better source arrives, rather than adding beside it.
   without parental permission. **For Deadeye:** Pro upsells, founding offers
   and promos are covered. [ASAI Code: Children](https://adstandards.ie/code/children/), 2024, regulator (self-regulatory).
 
+### Competitions and prizes for children
+
+- ASAI Children s.7.7, promotions "addressed to or likely to attract
+  children": a prominent closing date (f); make clear that parental
+  permission is required where expensive prizes or incentives might cause
+  conflict between children and parents (c); never exaggerate the value of
+  prizes or the chances of winning (g); allow enough time to take part (d).
+  s.7.6(c): do not ask children for personal information about themselves or
+  their families without a parent's permission. s.7.5(c): no appeal to
+  children to persuade parents to buy. **For Deadeye:** every competition
+  post or line a child can see says free entry, the parent rule and the close
+  date; a discount ("25% off") is a buy-prompt, so it goes to parents and
+  adults, not into posts aimed at players. Asking a 16/17 year old for a
+  parent's email is a family detail: keep it to the one field the parent gate
+  needs. [ASAI Code: Children](https://adstandards.ie/code/children/), read 2026-11-18, regulator (self-regulatory).
+- Google Play, Ratings and reviews policy: "Don't offer rewards or incentives
+  for ratings or reviews"; its example is a discount in return for a high
+  rating. **For Deadeye:** a prize for private feedback is outside it, but
+  only while nothing ties the prize or the 25% to a Play rating: no Play
+  review prompt on or after `/competition`, and no "leave a review too" in any
+  message. [Google Play policy](https://support.google.com/googleplay/android-developer/answer/9898684), read 2026-11-18, platform rule (benchmark).
+- GDPR Art 14: when personal data comes from someone other than the person
+  (a parent's email typed by a child), that person must be told, at the
+  latest in the first message: who the controller is, why, how long it is
+  kept, their rights and where the data came from (Art 14(2)(f), 14(3)(b)).
+  **For Deadeye:** every email to a parent a child named says "X gave us your
+  address", how long it is kept, links the privacy page, and says what to do
+  if you are not their parent. [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj), 2016, law.
+- Irish digital age of consent (s.31) covers consent as a lawful basis, not
+  competition rules. A parent check for 16 and 17 year olds in a prize
+  promotion is a safeguarding and fairness choice, so its strength can be
+  proportionate to what is at stake (an entry and a free plan), with a
+  stronger check before a prize is given. Reasoning from the DPA 2018 s.31
+  finding above, 2026, practitioner judgement **(legal advice)** if a cash or
+  high-value prize is ever offered.
+
 ### AI with minors
 
 - Anthropic: services with minor users must disclose the AI and follow
@@ -200,20 +236,6 @@ when a better source arrives, rather than adding beside it.
   form) **(legal advice)** on whether a non-unique, first-party code is a
   risk the founder can accept.
   [EDPB 2/2023 v2](https://edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf), 2024, regulator.
-- EDPB Guidelines 2/2023 v2 (Oct 2024), paras 32-33 and 52-53: if an entity
-  "instructs the browser of the user to send asynchronous requests with the
-  targeted information" through JavaScript, that is gaining access under
-  Art 5(3). Information produced on the device and then sent to a server is
-  also covered: being made locally "does not preclude" Art 5(3). **For
-  Deadeye:** every `track()` step (`src/lib/events.ts`), including E6's
-  `dashboard_seen`, is a browser-sent event that rides on the login cookie.
-  On this reading it sits inside Art 5(3). Counting is not strictly necessary,
-  so it would need consent unless an exemption applies. Recording the step on
-  the server, from the page request the player already made, avoids the
-  instruction-to-send point. Whether a first-party, once-a-day step in a
-  logged-in app is a risk the founder can accept needs a solicitor
-  **(legal advice)**.
-  [EDPB 2/2023 v2](https://edpb.europa.eu/system/files/2024-10/edpb_guidelines_202302_technical_scope_art_53_eprivacydirective_v2_en_0.pdf), 2024, regulator.
 - Irish DPC cookie guidance (April 2020): analytics cookies are not strictly
   necessary and need GDPR-standard consent; no pre-ticked boxes; first-party
   analytics are "low risk" and unlikely to be an enforcement priority, but
@@ -243,25 +265,6 @@ when a better source arrives, rather than adding beside it.
   [Revenue SDC protocol](https://revenue.ie/en/corporate/documents/statistics/about/statistical-disclosure-control.pdf), 2019, regulator (Irish public body);
   [ICO anonymisation guidance summary](https://www.rpclegal.com/snapshots/data-protection/summer-2025/ico-publishes-new-guidance-on-anonymisation-and-pseudonymisation/), 2025, practitioner (of benchmark).
 
-### Press and promotion (added 2026-11-16)
-
-- Press Council of Ireland Code of Practice, Principle 9 (Children): papers
-  must take particular care when seeking or presenting information or comment
-  about a child under 16; the Ombudsman has upheld complaints over a child's
-  images and over details that identified children. The Code is under review
-  (2025-2026). **For Deadeye:** the paper is bound, not us, but an under-18
-  founder's name, age, town and photo should reach a paper only with a
-  parent copied and agreeing first, and any court meeting with a parent there.
-  [Press Council Handbook 2025](https://pressombudsman.ie/wp-content/uploads/2026/01/Handbook-2025-Code-of-Practice-of-the-Press-Council-of-Ireland.pdf), 2025, regulator (press self-regulation).
-- ASAI Code, Promotional Marketing Practices 5.22-5.28 (page dated Jan 2024):
-  "free" only if the consumer pays nothing beyond unavoidable costs (5.22);
-  where an offer covers several items and only some are free, say what is free
-  and what must be paid for (5.26); 5.7 asks special care for promotions
-  addressed to children. **For Deadeye:** "Free to start" is safe; "a free
-  app" or "it's free" about a screen that holds Pro items is not, so say what
-  is free ("the list and every drill").
-  [ASAI Promotional Marketing Practices](https://adstandards.ie/code/promotional-marketing-practices/), 2024, regulator (self-regulatory).
-
 ## Open questions
 
 - Does a new AI use need fresh consent from parents who approved before it
@@ -286,12 +289,5 @@ when a better source arrives, rather than adding beside it.
   be used without consent, given EDPB 2/2023 paras 49-51 and the DPC's "low
   priority" line on first-party analytics? Asked by PR #97 (2026-11-13).
   **(legal advice)**
-- Film questions: a head coach writes an answer to one player, seen by all
-  head coaches and an under-16's parent, but no parent of a 16-17 year old.
-  Is that within BI's policy for coaches of minors (groups including other
-  adults, parent copied) when a team has one head coach? Asked 2026-11-16.
-- Do browser-sent app steps (`track()`, EDPB 2/2023 para 33) need ePrivacy
-  consent, or is moving them to the server (recorded from the page request) the
-  fix? Asked by the E6 review (2026-11-16). **(legal advice)**
 - Next research: AI Act Art. 5 (exploiting age), a DPC or EDPB text on push
   notifications, Sport Ireland's online safeguarding text.

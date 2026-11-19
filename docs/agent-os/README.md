@@ -160,6 +160,31 @@ GitHub enforces the main line: with branch protection on `main` (pull
 request required, `checks` must pass, no force pushes), nothing reaches the
 live app without a pull request and green checks, whoever pushes.
 
+## Models
+
+Each agent's `model:` and `effort:` lines (founder, 2026-11-18) put Opus
+where mistakes cost most and Sonnet, at half Opus's price, everywhere else.
+The split follows Anthropic's published guidance and measurements
+(platform.claude.com, "Choosing the right model" and "Optimizing for cost
+and intelligence"), not tests on Deadeye's own work.
+
+| Agent | Model, effort | Why |
+| --- | --- | --- |
+| safety-reviewer | Opus, high | Finding defects drops sharply at low effort; child safety |
+| builder | Opus, medium | Production code; Opus leads Sonnet on coding and the tests catch misses |
+| activation-analyst | Opus, medium | Picks what gets built; a wrong pick wastes the week |
+| video-editor | Opus, high | Founder wants the best videos; long builds and judging stills |
+| release-checker | Sonnet, high | Mostly runs tsc, lint and tests; results are checkable |
+| qa-tester | Sonnet, high | Long browser runs and screenshots |
+| support-triage | Sonnet, high | Builder and safety-reviewer check its findings later |
+| designer | Sonnet, high | Image and content work; the founder approves |
+| marketing, club-growth, player-outreach | Sonnet, medium | Drafts the founder approves |
+
+No agent uses Haiku: none of these jobs is simple and checkable enough.
+Fable is not a default; pick it by hand (`/model fable`) for a rare very
+hard job. If an agent's work gets worse, move it up one step (effort
+first, then model) and note the change here.
+
 ## Files
 
 - `backlog.md`: the experiments, ranked. The single source of truth for what gets built.

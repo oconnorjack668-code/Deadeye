@@ -1,10 +1,12 @@
 // src/app/api/reports/route.ts
-// Problems players report themselves (Report a problem in Settings, and on the
-// crash screen). Stored in player_reports (00038); the owner reads them at
-// /admin/errors. Unlike /api/errors this needs a signed-in player: it is free
+// What players tell us themselves: feedback, ideas and problems (Send feedback
+// or report a problem in Settings, and Report a problem on the crash screen).
+// The kind is stored with it (00067), problem when none is sent. Stored in
+// player_reports (00038); the owner reads them at /admin/errors. Unlike /api/errors this needs a signed-in player: it is free
 // text, and an open form on the website would collect spam rather than bugs.
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { parseReportKind } from '@/lib/reportKinds';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,7 +25,9 @@ export async function POST(request: Request) {
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   const message = clip(body?.message, 1000);
-  if (!message) return Response.json({ error: 'Tell us what went wrong first.' }, { status: 400 });
+  if (!message) return Response.json({ error: 'Write something first.' }, { status: 400 });
+  const kind = parseReportKind(body?.kind);
+  if (!kind) return Response.json({ error: 'Choose feedback, idea or problem.' }, { status: 400 });
 
   const admin = createAdminClient();
   const since = new Date(Date.now() - 86_400_000).toISOString();
@@ -45,6 +49,9 @@ export async function POST(request: Request) {
     context: clip(body?.context, 300),
     url: clip(body?.url, 500),
     user_agent: clip(request.headers.get('user-agent'), 300),
+    // Left to the column default (problem) when it is one, so a crash-screen
+    // report still saves if this code is live before migration 00067 runs
+    ...(kind === 'problem' ? {} : { kind }),
   });
   if (error) return Response.json({ error: 'Your report could not be sent. Please try again.' }, { status: 500 });
   return Response.json({ ok: true }, { status: 201 });
