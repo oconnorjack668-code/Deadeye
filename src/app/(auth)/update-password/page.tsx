@@ -1,8 +1,9 @@
 // src/app/(auth)/update-password/page.tsx
 // The page that actually sets a new password. Both reset entry points - the
 // "Forgot password?" link on /login and "Email me a reset link" in Settings -
-// send their email link to /auth/callback?next=/update-password, so the code is
-// exchanged for a session before the player lands here.
+// send their email link to /auth/callback?next=/update-password, so the code (or
+// the token_hash from the Supabase template, src/lib/authLink.ts) is exchanged
+// for a session before the player lands here.
 //
 // It is deliberately NOT in middleware's isAuthPath list: reaching it requires a
 // session, which is exactly the proof that the emailed link was genuine. An
