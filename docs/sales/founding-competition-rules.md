@@ -24,7 +24,7 @@ Free to enter. No purchase needed. Nobody pays anything to enter, to win or to c
 
 ## 1. Who runs it
 
-Deadeye (the "promoter"), operated by `[LEGAL_NAME], [LEGAL_ADDRESS]`. Questions: getdeadeye@gmail.com. The app is at https://deadeyeapp.vercel.app, and the page for clubs is https://deadeyeapp.vercel.app/clubs.
+Deadeye (the "promoter"), operated by `[LEGAL_NAME], [LEGAL_ADDRESS]`. Questions: hello@deadeye.ie. The app is at https://deadeye.ie, and the page for clubs is https://deadeye.ie/clubs.
 
 ## 2. Who can enter
 
@@ -100,7 +100,7 @@ Everyone who enters, and does not win, gets **25% off their first year**. This i
 ## 10. Your data
 
 - Your feedback is used to improve the app. It is read by the two judges (the promoter and one other adult), with names hidden.
-- Entry details come from your Deadeye account and your feedback. They are handled under the [privacy notice](https://deadeyeapp.vercel.app/privacy). Nothing is sold and nothing is shared for advertising.
+- Entry details come from your Deadeye account and your feedback. They are handled under the [privacy notice](https://deadeye.ie/privacy). Nothing is sold and nothing is shared for advertising.
 - The entry list is used to judge the competition, to contact winners and to send the section 8 offer. It is deleted 6 months after the offer closes.
 - You can ask to see or delete your data any time (email above, or delete your account in the app).
 
