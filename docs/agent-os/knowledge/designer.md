@@ -1,6 +1,6 @@
 # Designer knowledge
 
-Last researched: 2026-11-11 (about 70 sources: 6 peer-reviewed, 34 official, 14 industry, 17 practitioner)
+Last researched: 2026-11-20 (visual trends and design-system direction, about 12 new sources, see `findings/designer.md`); the children's-design and accessibility research is from 2026-11-11 (about 70 sources: 6 peer-reviewed, 34 official, 14 industry, 17 practitioner)
 
 Read `README.md` here for how this file works. Strength: `strong` (peer-reviewed with a
 good sample, or the official rule itself), `moderate` (small study, or a large industry
@@ -26,6 +26,12 @@ Newest first, each with the date, what happened, and the rule.
   plainer; never remove colour, icons or depth only for consistency. Where `docs/design.md` blocks a
   vibrant, premium look, propose the change to it with mockups for the founder to approve instead of
   designing down to it.
+- 2026-11-20 · Visual-direction pitch: a script that renders each page, hides the text, and measures every line
+  against the pixels behind it (`design/mockups/2026-11-20-direction-contrast.mjs`) caught failures I
+  could not see (grey text over an orange glow, a number box crossing a gauge ring). Rule: measure on pixels, trim
+  the sampled box to the glyph core (the font box is taller than the letters), and give vivid backgrounds a
+  dark plate under text. Also: `clip-path` shapes clip the focus ring, so a chamfered button needs another focus
+  style; glass needs a 30% dark underlay or grey text fails over bright ember.
 - 2026-11-20 · Screen review: the tester's session lived on the old address and was gone after
   the move to deadeye.ie, so no signed-in screen could be screenshotted. Rule: before a review
   run, open the live address and check the tester is signed in; if not, say so first. Also: a
@@ -39,6 +45,11 @@ Newest first, each with the date, what happened, and the rule.
 ## Checklist
 
 ### Every design
+
+- [ ] Side by side with today's screen: nothing is plainer, greyer or smaller on icons, colour or depth
+      than before. A fix that removes colour or detail is not a fix. (Founder, 2026-11-20.)
+- [ ] Contrast measured on the rendered pixels, including text over footage:
+      `design/mockups/2026-11-20-direction-contrast.mjs <page.html>`, not eyeballed.
 
 - [ ] Looked at the real screen live at 390x844, dark and light, before designing.
 - [ ] Trend board line(s) cited; nothing copied (no NBA, team, Nike, Jordan, Basketball

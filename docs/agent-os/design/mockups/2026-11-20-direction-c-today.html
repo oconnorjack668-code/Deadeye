@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadeye visual direction C (Glass): today</title>
+<!-- Designer proposal 2026-11-20, draft only. Direction C: Glass. Made-up data. Not built, not in docs/design.md.
+     Fonts: Google Fonts (OFL). Icons: Phosphor (MIT). Footage frame (watch page): local file, consent confirmed by the founder, do not upload. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080C;--ember1:#FFA14A;--ember2:#FF4E2B;--text:#FFFFFF;--mut:rgba(255,255,255,.86);--mint:#34D399;--rose:#FB7185;--ice:#9AD0FF;--ink:#160A04;--amber:#FFC46B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{width:390px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--text);font-weight:500;-webkit-font-smoothing:antialiased}
+.ph{width:1em;height:1em;flex:none;display:block}
+.screen{position:relative;width:390px;min-height:844px;overflow:hidden;background:var(--bg)}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
+.z{position:relative;z-index:1}
+.pad{padding:0 16px}
+.disp{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.018em;word-spacing:.08em;line-height:1;font-variation-settings:'opsz' 72}
+.num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.03em;word-spacing:.08em;font-variant-numeric:tabular-nums;line-height:.92;font-variation-settings:'opsz' 96}
+.cap{font-size:13px;font-weight:600;color:var(--mut)}
+.small{font-size:14px;line-height:1.5;color:var(--mut)}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),rgba(8,8,12,.32);border:1px solid rgba(255,255,255,.17);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);border-radius:26px;box-shadow:0 20px 44px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.28)}
+.pill{border-radius:999px}
+.tile{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:26px;color:var(--ember1);background:linear-gradient(150deg,rgba(255,255,255,.2),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.2);box-shadow:0 0 22px rgba(255,110,40,.38),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;border:0;border-radius:18px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.01em;color:var(--ink);background:linear-gradient(135deg,#FFB35C,#FF7433 55%,#FF5A2E);box-shadow:0 12px 32px rgba(255,92,40,.5),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(160,40,0,.25)}
+.btn .ph{font-size:24px}
+.btn2{color:var(--text);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));border:1.5px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);height:50px}
+.nav{position:absolute;left:12px;right:12px;bottom:12px;height:68px;border-radius:34px;display:flex;align-items:center;padding:0 6px;z-index:5}
+.nav a{flex:1;height:54px;border-radius:27px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-size:12px;font-weight:700}
+.nav a .ph{font-size:24px}
+.nav a.on{color:#fff;background:linear-gradient(160deg,rgba(255,150,70,.35),rgba(255,80,40,.18));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 22px rgba(255,100,40,.35)}
+.nav a.on .ph{color:var(--ember1)}
+.fab{position:absolute;right:20px;bottom:92px;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:var(--ink);font-size:28px;z-index:6;background:linear-gradient(135deg,#FFB35C,#FF5A2E);box-shadow:0 14px 34px rgba(255,92,40,.6),inset 0 1px 0 rgba(255,255,255,.6)}
+.medal{border-radius:50%;display:grid;place-items:center;position:relative}
+.medal.lock{width:54px;height:54px;font-size:22px;color:rgba(255,255,255,.7);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px dashed rgba(255,255,255,.4)}
+.medal.bronze{background:radial-gradient(circle at 30% 25%,#FFE0B0 0,#E39A52 32%,#B2561E 68%,#7A3410 100%);color:#3A1604;box-shadow:0 0 0 3px rgba(255,255,255,.14),0 0 0 6px rgba(255,150,70,.18),0 0 40px rgba(255,120,40,.55),inset 0 2px 0 rgba(255,255,255,.55),inset 0 -6px 12px rgba(80,20,0,.4)}
+.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#FFB35C,#FF5A2E);box-shadow:0 0 14px rgba(255,100,40,.8)}
+</style>
+</head>
+<body>
+<div class="screen"><div class="blob" style="left:-90px;top:120px;width:280px;height:280px;background:rgba(255,40,70,.50)"></div>
+<div class="blob" style="right:-110px;top:-60px;width:320px;height:320px;background:rgba(255,120,30,.55)"></div>
+<div class="blob" style="right:-60px;top:560px;width:260px;height:260px;background:rgba(110,80,255,.26)"></div>
+ <header class="pad z" style="display:flex;align-items:center;gap:12px;padding-top:20px;padding-bottom:16px">
+  <img src="../../../../public/logo.png" width="46" height="46" alt="" style="filter:drop-shadow(0 6px 16px rgba(255,50,60,.55))">
+  <div style="flex:1"><div class="disp" style="font-size:30px">Hey Sam</div><div class="cap" style="margin-top:4px">Level 1 · Rookie</div></div>
+  <div class="glass pill" style="padding:9px 14px;border-radius:999px;display:flex;gap:6px;align-items:center"><span style="font-size:18px;color:var(--ember1)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M96,240l16-80L48,136,160,16,144,96l64,24Z" opacity="0.2"/><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></svg></span><span style="font-weight:700;font-size:14px">0 XP</span></div>
+ </header>
+
+ <section class="pad z">
+  <div class="glass" style="padding:22px 20px 20px;overflow:hidden;border-radius:30px">
+   <div style="position:absolute;right:-30px;top:-34px;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,rgba(255,130,50,.55),rgba(255,70,40,.0) 68%)"></div>
+   <div style="position:absolute;right:-16px;top:10px;font-size:150px;color:#FFAA60;transform:rotate(-14deg);filter:drop-shadow(0 0 30px rgba(255,110,40,.75))"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M60,195.88h0l.12.12ZM60,60h0a96.43,96.43,0,0,0,0,135.88,96.09,96.09,0,0,0,28-67.94A96.09,96.09,0,0,0,60,60Zm136,0h0a96.43,96.43,0,0,0,0,135.88A96.43,96.43,0,0,0,196,60Zm0,135.88.12.12-.12-.12Z" opacity="0.2"/><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM40.37,136H79.63A87.2,87.2,0,0,1,60,183.83,87.54,87.54,0,0,1,40.37,136ZM136,120V40.37a87.59,87.59,0,0,1,48.68,20.37A103.06,103.06,0,0,0,160.3,120Zm-16,0H95.7A103.06,103.06,0,0,0,71.32,60.74,87.59,87.59,0,0,1,120,40.37Zm-40.37,0H40.37A87.54,87.54,0,0,1,60,72.17,87.2,87.2,0,0,1,79.63,120ZM95.7,136H120v79.63a87.59,87.59,0,0,1-48.68-20.37A103.09,103.09,0,0,0,95.7,136Zm40.3,0h24.3a103.09,103.09,0,0,0,24.38,59.26A87.59,87.59,0,0,1,136,215.63Zm40.37,0h39.26A87.54,87.54,0,0,1,196,183.83,87.2,87.2,0,0,1,176.37,136Zm0-16A87.2,87.2,0,0,1,196,72.17,87.54,87.54,0,0,1,215.63,120Z"/></svg></div>
+   <div class="glass pill" style="display:inline-flex;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:700;position:relative">Today</div>
+   <h1 class="disp" style="font-size:40px;line-height:1;margin:14px 0 10px;max-width:215px;position:relative">Log your first shots</h1>
+   <p class="small" style="max-width:210px;margin-bottom:20px;position:relative">About five minutes. Every shot builds your chart.</p>
+   <div style="display:grid;gap:10px;position:relative">
+    <button class="btn"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M230.14,70.54,185.46,25.85a20,20,0,0,0-28.29,0L33.86,149.17A19.85,19.85,0,0,0,28,163.31V208a20,20,0,0,0,20,20H92.69a19.86,19.86,0,0,0,14.14-5.86L230.14,98.82a20,20,0,0,0,0-28.28ZM91,204H52V165l84-84,39,39ZM192,103,153,64l18.34-18.34,39,39Z"/></svg>Log shots</button>
+    <button class="btn btn2"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,64H176L160,40H96L80,64H48A16,16,0,0,0,32,80V192a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V80A16,16,0,0,0,208,64ZM128,168a36,36,0,1,1,36-36A36,36,0,0,1,128,168Z" opacity="0.2"/><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V80a8,8,0,0,1,8-8H80a8,8,0,0,0,6.66-3.56L100.28,48h55.43l13.63,20.44A8,8,0,0,0,176,72h32a8,8,0,0,1,8,8ZM128,88a44,44,0,1,0,44,44A44.05,44.05,0,0,0,128,88Zm0,72a28,28,0,1,1,28-28A28,28,0,0,1,128,160Z"/></svg>Track with camera</button>
+   </div>
+  </div>
+ </section>
+
+ <section class="pad z" style="margin-top:16px">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+   
+   <div class="glass" style="padding:14px 12px 14px;border-radius:22px">
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M176,128a48,48,0,1,1-48-48A48,48,0,0,1,176,128Z" opacity="0.2"/><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32l-96,96a8,8,0,0,1-11.32-11.32l27.72-27.72a40,40,0,1,0,17.87,31.09,8,8,0,1,1,16-.9,56,56,0,1,1-22.38-41.65L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg></div>
+    <div class="num" style="font-size:42px;margin-top:12px;text-shadow:0 0 24px rgba(255,130,60,.35)">0</div>
+    <div class="cap" style="margin-top:6px;font-size:13px">Makes</div>
+   </div>
+   <div class="glass" style="padding:14px 12px 14px;border-radius:22px">
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,144a80,80,0,0,1-160,0c0-30.57,14.42-58.26,31-80l33,32,26.27-72C159.86,41.92,208,88.15,208,144Z" opacity="0.2"/><path d="M183.89,153.34a57.6,57.6,0,0,1-46.56,46.55A8.75,8.75,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68ZM216,144a88,88,0,0,1-176,0c0-27.92,11-56.47,32.66-84.85a8,8,0,0,1,11.93-.89l24.12,23.41,22-60.41a8,8,0,0,1,12.63-3.41C165.21,36,216,84.55,216,144Zm-16,0c0-46.09-35.79-85.92-58.21-106.33L119.52,98.74a8,8,0,0,1-13.09,3L80.06,76.16C64.09,99.21,56,122,56,144a72,72,0,0,0,144,0Z"/></svg></div>
+    <div class="num" style="font-size:42px;margin-top:12px;text-shadow:0 0 24px rgba(255,130,60,.35)">0</div>
+    <div class="cap" style="margin-top:6px;font-size:13px">Day streak</div>
+   </div>
+   <div class="glass" style="padding:14px 12px 14px;border-radius:22px">
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,64V208H32V48H208A16,16,0,0,1,224,64Z" opacity="0.2"/><path d="M232,208a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V48a8,8,0,0,1,16,0V156.69l50.34-50.35a8,8,0,0,1,11.32,0L128,132.69,180.69,80H160a8,8,0,0,1,0-16h40a8,8,0,0,1,8,8v40a8,8,0,0,1-16,0V91.31l-58.34,58.35a8,8,0,0,1-11.32,0L96,123.31l-56,56V200H224A8,8,0,0,1,232,208Z"/></svg></div>
+    <div class="num" style="font-size:42px;margin-top:12px;text-shadow:0 0 24px rgba(255,130,60,.35)">--</div>
+    <div class="cap" style="margin-top:6px;font-size:13px">Accuracy</div>
+   </div>
+  </div>
+  <p class="small" style="margin-top:10px">Your first session fills these in.</p>
+ </section>
+
+ <section class="pad z" style="margin-top:14px;padding-bottom:166px">
+  <div class="glass" style="padding:16px;border-radius:26px">
+   <div style="display:flex;align-items:center;gap:14px">
+    <div style="position:relative;width:64px;height:64px"><svg width="64" height="64" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="rg64" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFB35C"/><stop offset="1" stop-color="#FF4E2B"/></linearGradient></defs>
+  <circle cx="32" cy="32" r="28.5" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="7"/>
+  <circle cx="32" cy="32" r="28.5" fill="none" stroke="url(#rg64)" stroke-width="7" stroke-linecap="round" stroke-dasharray="3.6 179.1" transform="rotate(-90 32 32)"/></svg><div class="num" style="position:absolute;inset:0;display:grid;place-items:center;font-size:26px">1</div></div>
+    <div style="flex:1"><div class="disp" style="font-size:22px">Level 1 Rookie</div><div class="small" style="margin-top:4px;line-height:1.35">60 XP to Level 2. Your first session is worth 20 XP and a badge.</div></div>
+   </div>
+   <div style="display:flex;margin-top:14px">
+    
+    <div style="flex:1;display:grid;justify-items:center;gap:7px;text-align:center"><div class="medal lock"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,96V208a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H208A8,8,0,0,1,216,96Z" opacity="0.2"/><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></div><div class="cap" style="font-size:12px">First Session</div></div>
+    <div style="flex:1;display:grid;justify-items:center;gap:7px;text-align:center"><div class="medal lock"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,96V208a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H208A8,8,0,0,1,216,96Z" opacity="0.2"/><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></div><div class="cap" style="font-size:12px">Heating Up</div></div>
+    <div style="flex:1;display:grid;justify-items:center;gap:7px;text-align:center"><div class="medal lock"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,96V208a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V96a8,8,0,0,1,8-8H208A8,8,0,0,1,216,96Z" opacity="0.2"/><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Z"/></svg></div><div class="cap" style="font-size:12px">First 100</div></div>
+   </div>
+  </div>
+ </section>
+ <div class="fab" aria-label="Log"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></svg></div>
+ <nav class="nav glass" aria-label="Main">
+ <a class="on"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,120v96H152V152H104v64H40V120a8,8,0,0,1,2.34-5.66l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,216,120Z" opacity="0.2"/><path d="M219.31,108.68l-80-80a16,16,0,0,0-22.62,0l-80,80A15.87,15.87,0,0,0,32,120v96a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V160h32v56a8,8,0,0,0,8,8h64a8,8,0,0,0,8-8V120A15.87,15.87,0,0,0,219.31,108.68ZM208,208H160V152a8,8,0,0,0-8-8H104a8,8,0,0,0-8,8v56H48V120l80-80,80,80Z"/></svg>Home</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M60,195.88h0l.12.12ZM60,60h0a96.43,96.43,0,0,0,0,135.88,96.09,96.09,0,0,0,28-67.94A96.09,96.09,0,0,0,60,60Zm136,0h0a96.43,96.43,0,0,0,0,135.88A96.43,96.43,0,0,0,196,60Zm0,135.88.12.12-.12-.12Z" opacity="0.2"/><path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24ZM40.37,136H79.63A87.2,87.2,0,0,1,60,183.83,87.54,87.54,0,0,1,40.37,136ZM136,120V40.37a87.59,87.59,0,0,1,48.68,20.37A103.06,103.06,0,0,0,160.3,120Zm-16,0H95.7A103.06,103.06,0,0,0,71.32,60.74,87.59,87.59,0,0,1,120,40.37Zm-40.37,0H40.37A87.54,87.54,0,0,1,60,72.17,87.2,87.2,0,0,1,79.63,120ZM95.7,136H120v79.63a87.59,87.59,0,0,1-48.68-20.37A103.09,103.09,0,0,0,95.7,136Zm40.3,0h24.3a103.09,103.09,0,0,0,24.38,59.26A87.59,87.59,0,0,1,136,215.63Zm40.37,0h39.26A87.54,87.54,0,0,1,196,183.83,87.2,87.2,0,0,1,176.37,136Zm0-16A87.2,87.2,0,0,1,196,72.17,87.54,87.54,0,0,1,215.63,120Z"/></svg>Hoops</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M96,64V192a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H88A8,8,0,0,1,96,64Zm96-8H168a8,8,0,0,0-8,8V192a8,8,0,0,0,8,8h24a8,8,0,0,0,8-8V64A8,8,0,0,0,192,56Z" opacity="0.2"/><path d="M248,120h-8V88a16,16,0,0,0-16-16H208V64a16,16,0,0,0-16-16H168a16,16,0,0,0-16,16v56H104V64A16,16,0,0,0,88,48H64A16,16,0,0,0,48,64v8H32A16,16,0,0,0,16,88v32H8a8,8,0,0,0,0,16h8v32a16,16,0,0,0,16,16H48v8a16,16,0,0,0,16,16H88a16,16,0,0,0,16-16V136h48v56a16,16,0,0,0,16,16h24a16,16,0,0,0,16-16v-8h16a16,16,0,0,0,16-16V136h8a8,8,0,0,0,0-16ZM32,168V88H48v80Zm56,24H64V64H88V192Zm104,0H168V64h24V175.83c0,.06,0,.11,0,.17s0,.12,0,.17V192Zm32-24H208V88h16Z"/></svg>Gym</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M96,240l16-80L48,136,160,16,144,96l64,24Z" opacity="0.2"/><path d="M215.79,118.17a8,8,0,0,0-5-5.66L153.18,90.9l14.66-73.33a8,8,0,0,0-13.69-7l-112,120a8,8,0,0,0,3,13l57.63,21.61L88.16,238.43a8,8,0,0,0,13.69,7l112-120A8,8,0,0,0,215.79,118.17ZM109.37,214l10.47-52.38a8,8,0,0,0-5-9.06L62,132.71l84.62-90.66L136.16,94.43a8,8,0,0,0,5,9.06l52.8,19.8Z"/></svg>Train</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,124a48,48,0,0,1-32,45.27h0V176a40,40,0,0,1-80,0,40,40,0,0,1-80,0v-6.73h0a48,48,0,0,1,0-90.54V72a40,40,0,0,1,80,0,40,40,0,0,1,80,0v6.73A48,48,0,0,1,240,124Z" opacity="0.2"/><path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"/></svg>IQ</a>
+</nav>
+</div>
+</body>
+</html>
