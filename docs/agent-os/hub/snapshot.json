@@ -4,49 +4,49 @@
       "ask": "Ask the activation analyst why players who finish setup never log a session, using this week's funnel.",
       "id": "activation-analyst",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 0,
+      "lessons": 2,
       "name": "Activation analyst",
       "num": 1,
       "output": "Report: biggest drop is setup to first session (21 of 24). E4 marked NEXT, E5 and E6 added.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Lead. Reads the funnel, picks the one experiment marked NEXT.",
       "schedule": "Mondays 09:00",
       "skills": "fixed",
-      "sources": 30
+      "sources": 32
     },
     {
       "ask": "Ask the builder to fix the three follow-up notes on E4 in a small PR.",
       "id": "builder",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 13,
+      "lessons": 16,
       "name": "Builder",
       "num": 2,
       "output": "Built E4 on exp/E4-dashboard-reminder (PR #74).",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Builds the NEXT experiment on its own branch, with tests.",
       "schedule": "Mondays, after the analyst",
       "skills": "fixed",
-      "sources": 27
+      "sources": 36
     },
     {
       "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds.",
       "id": "safety-reviewer",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 1,
+      "lessons": 4,
       "name": "Safety reviewer",
       "num": 3,
       "output": "E4: PASS with three non-blocking notes.",
-      "researched": "2026-11-11",
+      "researched": "2026-11-18",
       "role": "Checks every branch for under-18s, parents, personal data and messages.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 28
+      "sources": 36
     },
     {
       "ask": "Ask the release checker for the after-deploy checklist for PR #74.",
       "id": "release-checker",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 9,
+      "lessons": 10,
       "name": "Release checker",
       "num": 4,
       "output": "E4 checklist: no migration, no env vars, 5 checks after deploy.",
@@ -60,21 +60,21 @@
       "ask": "Ask support triage to check last night's live errors in Vercel.",
       "id": "support-triage",
       "lastRun": "2026-11-09T14:14:00Z",
-      "lessons": 7,
+      "lessons": 8,
       "name": "Support triage",
       "num": 5,
       "output": "Morning check: 0 live errors, deploy READY, no P1.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Reads problem and crash reports, finds the cause, ranks fixes.",
       "schedule": "Daily 08:00 (morning check)",
       "skills": "fixed",
-      "sources": 24
+      "sources": 28
     },
     {
       "ask": "Ask marketing to script the 5-spot challenge video shot by shot.",
       "id": "marketing",
       "lastRun": "2026-11-09T12:16:00Z",
-      "lessons": 6,
+      "lessons": 10,
       "name": "Marketing",
       "num": 6,
       "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.",
@@ -82,13 +82,13 @@
       "role": "TikTok and Instagram ideas, scripts and posts. Drafts only.",
       "schedule": "Mondays, and Thursdays 10:00",
       "skills": "fixed",
-      "sources": 50
+      "sources": 55
     },
     {
       "ask": "Ask club growth to prep me for a call with the Wexford Blazers coach.",
       "id": "club-growth",
       "lastRun": "2026-11-09T12:17:00Z",
-      "lessons": 0,
+      "lessons": 2,
       "name": "Club growth",
       "num": 7,
       "output": "Blazers trial plan and call prep; Enniscorthy and Gorey drafts; C4 added.",
@@ -102,7 +102,7 @@
       "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
       "id": "video-editor",
       "lastRun": "2026-11-10T12:14:00Z",
-      "lessons": 19,
+      "lessons": 23,
       "name": "Video editor",
       "num": 8,
       "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
@@ -130,7 +130,7 @@
       "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
       "id": "player-outreach",
       "lastRun": null,
-      "lessons": 1,
+      "lessons": 4,
       "name": "Player outreach",
       "num": 10,
       "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
@@ -144,7 +144,7 @@
       "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
       "id": "qa-tester",
       "lastRun": null,
-      "lessons": 1,
+      "lessons": 3,
       "name": "QA tester",
       "num": 11,
       "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
@@ -209,17 +209,6 @@
   "calls": [
     {
       "agent": "release-checker",
-      "detail": "Opened 2026-11-19 from docs/support-email-deadeye-ie. Check its safety verdict and checks on GitHub before approving.",
-      "group": "live",
-      "id": "pr-150",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/150",
-      "onApprove": "The next Claude Code session merges PR #150 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #150: Sales docs: hello@deadeye.ie and deadeye.ie links",
-      "words": "merge 150"
-    },
-    {
-      "agent": "release-checker",
       "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
       "group": "live",
       "id": "pr-95",
@@ -240,7 +229,7 @@
     },
     {
       "agent": "founder",
-      "detail": "Founding competition (judged on most useful feedback, not a draw; 10 players win Pro for life, 1 club a year of the Club plan; every entrant 25% off; closes 31 Dec 2026). Built behind COMPETITION_LIVE, off by default (PR #144). Before turning it on: (1) a solicitor confirms the judged route and lawful basis (prize-draw cap concern is in the rules doc's founder box); (2) LEGAL_NAME/LEGAL_ADDRESS (the parent, as promoter) set in Vercel; (3) competition row in docs/legal/dpia.md (added 18 Nov in #144: data row, R14, action 8; still needs signing, S1); (4) Resend working on the new domain (S3)... Last checked: 2026-11-18: COMPETITION_LIVE=1 set by the founder; live /competition shows \"Sign up free to enter\" and the promoter; homepage prize card (\"10 players win Deadeye Pro for life\", safety-reviewer wording) live via #148. Still not confirmed: (1) solicitor, (3) DPIA signed, (4) Resend on deadeye.ie (until then under-18 entries wait as pending; send from /admin/competition), (5) second judge.",
+      "detail": "Founding competition (judged on most useful feedback, not a draw; 10 players win Pro for life, 1 club a year of the Club plan; every entrant 25% off; closes 31 Dec 2026). Built behind COMPETITION_LIVE, off by default (PR #144). Before turning it on: (1) a solicitor confirms the judged route and lawful basis (prize-draw cap concern is in the rules doc's founder box); (2) LEGAL_NAME/LEGAL_ADDRESS (the parent, as promoter) set in Vercel; (3) competition row in docs/legal/dpia.md (added 18 Nov in #144: data row, R14, action 8; still needs signing, S1); (4) Resend working on the new domain (S3)... Last checked: 2026-11-18: COMPETITION_LIVE=1 set by the founder; live /competition shows \"Sign up free to enter\" and the promoter; homepage prize card (\"10 players win Deadeye Pro for life\", safety-reviewer wording) live via #148. Still not confirmed: (1) solicitor, (3) DPIA signed, (5) second judge. 2026-11-20: (4) done 2026-11-20: parent emails send from hello@deadeye.ie (S52 closed); no competition entries yet.",
       "group": "yours",
       "id": "S50",
       "kind": "task",
@@ -352,13 +341,13 @@
     },
     {
       "agent": "founder",
-      "detail": "Billing: deadeye.ie, then Resend, then Stripe Pro live by 2027-01-08; club billing by 2027-02-01 (docs/founder-setup-guide.md); then the Play Store. Last checked: 2026-11-09.",
+      "detail": "Billing: Stripe Pro live by 2027-01-08. Every field to fill in, step by step (sandbox A-E, live F), is in docs/handoffs/2026-11-20-pricing-stripe.md (\"Stripe steps\"); the founder does it with their mam, who holds the account (18+) and the payout IBAN. Choices already made: Pick what you need (not Managed Payments), subscriptions and invoices, no Collect tax yet, prices tax-inclusive, free week added by the app. Club billing by 2027-02-01 (ask Claude by mid-December); then the Play Store (docs/play-store/README.md). Last checked: 2026-11-20: sandbox account started; waiting until the founder is with their mam to enter the details.",
       "due": "2027-01-08",
       "group": "yours",
       "id": "S3",
       "kind": "task",
       "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
-      "title": "Buy deadeye.ie, then set up Resend, then Stripe (Pro live by 8 Jan)"
+      "title": "Stripe Pro live by 8 Jan (domain and email done)"
     },
     {
       "agent": "founder",
@@ -712,51 +701,66 @@
   ],
   "learn": [
     {
-      "agent": "designer",
-      "date": "2026-11-13",
-      "latest": "Review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from stills at one size.",
-      "lessons": 2
-    },
-    {
       "agent": "video-editor",
-      "date": "2026-11-11",
-      "latest": "Follow the playbook: a real voice first, or a synthetic one the founder picked; captions from the voice track's transcript; registry effects before hand-built ones; a planned music bed; one finished, checked cut.",
-      "lessons": 19
-    },
-    {
-      "agent": "safety-reviewer",
-      "date": "2026-11-11",
-      "latest": "When I ask for a retention, I say it must run on a schedule, not on the player's next use.",
-      "lessons": 1
-    },
-    {
-      "agent": "player-outreach",
-      "date": "2026-11-11",
-      "latest": "The job is players who log a first session; a route is kept or dropped on that, not on visits.",
-      "lessons": 1
+      "date": "2026-11-18",
+      "latest": "The first second decides the video. Frame 0 is a shot already in the air or dropping through the net with the count on screen, never a lead-in, logo or setup.",
+      "lessons": 23
     },
     {
       "agent": "marketing",
-      "date": "2026-11-09",
-      "latest": "Until the redesign ships, never make the flame or MAKE/MISS banners the hero; lean on the real shot, the ball going in, the numbers and the slow-mo replay.",
-      "lessons": 6
+      "date": "2026-11-18",
+      "latest": "A series repeats one session (Day 1, 7, 14) so the answer is fair; never stage a bad day.",
+      "lessons": 10
     },
     {
-      "agent": "release-checker",
-      "date": "2026-11-07",
-      "latest": "Every variable in .env.example that the changed code reads must be confirmed as set in Vercel Production, by name, before merge.",
-      "lessons": 9
+      "agent": "player-outreach",
+      "date": "2026-11-18",
+      "latest": "Never \"second prize\" or \"came second\" (banned practice under EU consumer law), say \"everyone who entered gets 25% off\".",
+      "lessons": 4
+    },
+    {
+      "agent": "builder",
+      "date": "2026-11-16",
+      "latest": "Every new EVENT_NAMES entry is named in the privacy page's \"A few steps you reach in the app\" clause in the same branch.",
+      "lessons": 16
+    },
+    {
+      "agent": "safety-reviewer",
+      "date": "2026-11-16",
+      "latest": "A condition I set is checked as a fact today, and if it is false it becomes a finding with a fix, not a note.",
+      "lessons": 4
+    },
+    {
+      "agent": "activation-analyst",
+      "date": "2026-11-16",
+      "latest": "A bet's success line is a number of players out of a counted denominator, and the screen it changes must already have a marker, or the item adds one.",
+      "lessons": 2
     }
   ],
   "log": [
     {
-      "at": "2026-11-20T08:15:00Z",
-      "text": "Morning check: no errors in the last 24 hours. Live site is the latest version (PR #151). 2 pull requests open, both green. Nothing needs you.",
+      "at": "2026-11-20T16:15:27Z",
+      "text": "Learning digest: 24 new lessons (video editor 4, marketing 4, builder 3, safety reviewer 3, player outreach 3, activation analyst 2, club growth 2, QA tester 2, support triage 1). No research due.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-19T19:02:04Z",
-      "text": "To-do list rebuilt from STATUS (main fa10238): 29 open (2 pull requests), 1 new, 4 gone since the last update.",
+      "at": "2026-11-20T10:58:45Z",
+      "text": "To-do list rebuilt from STATUS (main 7f4c652): 28 open (1 pull requests), 0 new, 1 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-20T10:41:00Z",
+      "text": "PR #156 was merged before its check finished: the \"unlimited\" Pro wording (safety BLOCK) is live. Fix needs a new fix/ branch. Checks all pass.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-20T10:45:00Z",
+      "text": "PR #156 (pricing guards) checked: safety BLOCK, \"unlimited\" still on 5 screens. All checks pass. Back to builder.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-20T08:15:00Z",
+      "text": "Morning check: no errors in the last 24 hours. Live site is the latest version (PR #151). 2 pull requests open, both green. Nothing needs you.",
       "tone": "ok"
     },
     {
@@ -833,21 +837,6 @@
       "at": "2026-11-18T12:55:00Z",
       "text": "PR #137 (privacy page names the Today card taps, S46) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T12:36:33Z",
-      "text": "To-do list checked against GitHub and the database: removed 6 finished items (PRs 79, 80, 86 and 112 merged, migration 00065 run, post results shared on 18 Nov). PR 126 is live but its privacy page fix is still to do, so that is now its own task.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T08:10:00Z",
-      "text": "Morning check: no errors in the last 24 hours, live site is the newest version (PR #128) and ready, 3 open pull requests all green. All quiet.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T21:30:00Z",
-      "text": "PR #127 (agent knowledge fixes, S40) merged at 20:55 UTC at the checked head d25f3da (safety PASS, checks green). Merge call removed.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -864,6 +853,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-20T08:15:00Z",
-  "updatedBy": "Morning check"
+  "updatedAt": "2026-11-20T16:15:27Z",
+  "updatedBy": "Learning digest"
 }
