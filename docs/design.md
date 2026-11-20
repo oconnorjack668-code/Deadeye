@@ -8,8 +8,11 @@ written out, and this file changes once the founder approves (founder, 2026-11-2
 
 ## The look
 
-Dark by default with a light theme (below), quiet zinc surfaces, one orange for what to do next, heavy type for the numbers that
-matter. A training tool, not a SaaS landing page.
+Dark by default with a light theme (below), one orange for what to do next, heavy type for the numbers that matter. The aim
+(founder, 2026-11-20): professional, futuristic and vibrant, with high-quality icons and type, so a player thinks "wow, this app
+looks cool". Never plain for its own sake. A training tool, not a SaaS landing page. The visual direction (A Arena, B HUD,
+C Glass: `docs/agent-os/design/2026-11-20-visual-direction.md`) is the founder's pick; until then, the blocks below are what the
+app uses today.
 
 ## Building blocks
 
@@ -23,8 +26,8 @@ Use `src/components/ui/` first: `Button`, `Card`, `Badge`, `Alert`, `Input`, `Se
 | Pills, avatars, dots | `rounded-full` |
 | Primary button | `<Button>` (orange-600, `rounded-xl`, `h-11`, the 44px touch target) |
 | Secondary action | `<Button variant="secondary">` or `outline`; plain text links for the least important |
-| Font | Geist sans (body), Geist mono only for code-like values |
-| Icons | `lucide-react` only, `h-4 w-4` inline or `h-5 w-5` in buttons |
+| Font | Geist sans (body), Geist mono for data. A display font for headings and big numbers is allowed (chosen with the visual direction) |
+| Icons | `lucide-react` today. A higher-quality set (for example Phosphor bold/duotone, MIT) is allowed once chosen with the visual direction; one set per screen |
 
 ## Type
 
@@ -39,7 +42,7 @@ One scale, so a new screen never picks a size by eye (Tailwind names, px):
 - Section label: `text-xs font-semibold uppercase tracking-wider text-zinc-400`.
 - Body: `text-sm text-zinc-300`. Secondary: `text-sm text-zinc-400`; `text-zinc-500` for the
   quietest text (hints, timestamps). `text-zinc-600` is never text: it is under 3:1.
-- No serif fonts. No gradient text.
+- No gradient on text someone has to read. One display size above 48px is allowed for result numbers and share cards.
 
 ## Contrast
 
@@ -145,11 +148,20 @@ Adapted from the community Unslop UI skill, trimmed to what applies here.
 - **Claims the tracker can't back.** Copy says "counts your makes and misses", not "every"
   (see `docs/agent-os/marketing/2026-10-23-first-promo.md`).
 
+## Loosened 2026-11-20
+
+The founder loosened the quiet rules below (2026-11-20). Allowed now, used with care: icon tiles
+(one consistent style), gradients (hero cards, the main button, progress fills and rings), glow
+(the main button, active icons, rings; never on body text), a display font and a bigger display
+number size. Still out: emoji as UI, gradient on readable text, stacked blur, cards inside cards,
+the generic SaaS look, and anything that fails the contrast or touch-target rules. Where the list
+below still says "don't", read it as "only on purpose, in the chosen visual direction".
+
 ## Before you ship a screen
 
 - [ ] Checked at phone width (Playwright screenshot or a real phone)
 - [ ] One obvious next action, in orange
 - [ ] Colours match the table above
 - [ ] Every card in a stack has a gap below it
-- [ ] No new icon tiles (the `PageHeader` one is the exception), emoji, glow, gradient text or nested cards
+- [ ] Tiles, glow and gradients only in the chosen direction's style; no emoji as UI, gradient on readable text or nested cards
 - [ ] Works with `prefers-reduced-motion`
