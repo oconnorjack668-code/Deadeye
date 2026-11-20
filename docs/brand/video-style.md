@@ -111,7 +111,9 @@ least 1.5 s. The numbers, if any, are small and come before the card.
 ## Avoid
 
 - Darkened, blurred or patched areas over footage, full-frame dark washes and
-  vignettes added to make text readable (the plate does that).
+  vignettes added to make text readable (the plate does that). Exception
+  (founder, 2026-11-20): a tight blur on sponsor banners, third-party logos
+  or the faces of people who are not the focus.
 - Overlays the app didn't draw that look like tracking (lines, rings, trails),
   unless placed from the tracker's own data and checked on stills.
 - The streak flame and the MAKE/MISS banners as the hero, until the tracker
