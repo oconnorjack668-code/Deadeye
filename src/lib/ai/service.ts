@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { awaitingParentApproval, checkIsOwner, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
 import { getConfiguredAI, AINotConfiguredError } from './config';
+import { overDailyLimit, PRO_REPORT_LIMIT_MESSAGE, PRO_REPORTS_PER_DAY, REPORT_WINDOW_MS } from './fairUse';
 import type { CoachingEvidence, CoachingOutput } from './provider';
 import type { Database } from '@/lib/supabase/types';
 import { aiReportsLeft, creditMonth, FREE_MONTHLY_AI_REPORTS, hasPro, type PlanFields } from '@/lib/entitlements';
@@ -60,7 +61,18 @@ export async function reserveCredit(userId: string): Promise<'unlimited' | 'rese
     .maybeSingle();
   if (error) throw new AICoachError('Could not load your AI credits.', 500);
 
-  if (await hasUnlimitedCredits(sub)) return 'unlimited';
+  if (await checkIsOwner()) return 'unlimited';
+  if (hasPro(sub)) {
+    // Pro's daily ceiling (src/lib/ai/fairUse.ts): every report lands in ai_reports
+    const { count, error: countError } = await supabase
+      .from('ai_reports')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .gte('created_at', new Date(Date.now() - REPORT_WINDOW_MS).toISOString());
+    if (countError) throw new AICoachError('Could not check your AI reports.', 500);
+    if (overDailyLimit(count, PRO_REPORTS_PER_DAY)) throw new AICoachError(PRO_REPORT_LIMIT_MESSAGE, 429);
+    return 'unlimited';
+  }
 
   // A balance from an earlier month is this month's allowance refilled. The
   // refill and the spend are one write, guarded on the old balance and period,

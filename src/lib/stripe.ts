@@ -69,6 +69,27 @@ export function trialEndFor(foundingProUntil: string | null | undefined, now: Da
   return Math.floor(end / 1000);
 }
 
+/** Days free for a player's first Pro subscription (founder's decision, 2026-11-20). */
+export const PRO_TRIAL_DAYS = 7;
+
+/**
+ * The free time a new subscription starts with. A founding member inside
+ * their free months keeps those (trial_end). Anyone else gets PRO_TRIAL_DAYS
+ * once: never a founding member (they already had free months) and never
+ * subscribed before, so cancelling and re-subscribing does not restart it.
+ */
+export function trialFor(input: {
+  foundingProUntil: string | null | undefined;
+  foundingClaimed: boolean;
+  hadSubscription: boolean;
+  now?: Date;
+}): { trial_end: number } | { trial_period_days: number } | null {
+  const end = trialEndFor(input.foundingProUntil, input.now);
+  if (end) return { trial_end: end };
+  if (input.foundingClaimed || input.hadSubscription) return null;
+  return { trial_period_days: PRO_TRIAL_DAYS };
+}
+
 type OurStatus ='active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete';
 
 /** Maps a Stripe subscription status onto the subscriptions.status CHECK values. */

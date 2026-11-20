@@ -76,7 +76,7 @@ export function VideoAIFeedback({ shooting, mechanics }: { shooting: ShootingSum
             Get AI feedback
           </Button>
           <p className="text-sm text-zinc-500">
-            On Free this uses one of your {FREE_MONTHLY_AI_REPORTS} AI reports for the month. Unlimited with Pro.
+            On Free this uses one of your {FREE_MONTHLY_AI_REPORTS} AI reports for the month. No monthly allowance with Pro.
           </p>
           {error && <p className="text-sm text-red-400">{error}</p>}
         </>

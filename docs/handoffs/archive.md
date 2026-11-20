@@ -2,6 +2,10 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 3 → [handoff](2026-11-03-tracker-accuracy-bench.md)
+- 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
+- 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
+- 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
 - 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
 - 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
 - 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)

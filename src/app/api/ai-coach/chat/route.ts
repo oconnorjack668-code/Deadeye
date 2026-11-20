@@ -2,7 +2,9 @@
 // AI Coach chat: answers questions using the player's own training data.
 // Pro/owner: unlimited. Free: FREE_CHAT_PER_DAY messages per day (no credits used).
 // Messages are stored by the server (players can read/clear but not write them).
-import { getCurrentUser, awaitingParentApproval, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
+import { getCurrentUser, awaitingParentApproval, checkIsOwner, PARENT_APPROVAL_NEEDED } from '@/lib/auth';
+import { hasPro } from '@/lib/entitlements';
+import { overDailyLimit, PRO_CHAT_LIMIT_MESSAGE, PRO_CHAT_PER_DAY } from '@/lib/ai/fairUse';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { needsSupportLine, SUPPORT_LINE, withSupportLine } from '@/lib/ai/safety';
@@ -75,9 +77,13 @@ export async function POST(request: Request) {
   const used = usedToday || 0;
   if (!unlimited && used >= FREE_CHAT_PER_DAY) {
     return Response.json(
-      { error: `You've used your ${FREE_CHAT_PER_DAY} free questions today. Come back tomorrow, or get unlimited chat with Deadeye Pro.`, limit: true },
+      { error: `You've used your ${FREE_CHAT_PER_DAY} free questions today. Come back tomorrow, or get up to ${PRO_CHAT_PER_DAY} a day with Deadeye Pro.`, limit: true },
       { status: 402 }
     );
+  }
+  // Pro's daily ceiling (src/lib/ai/fairUse.ts); the owner account has none
+  if (unlimited && hasPro(sub) && !(await checkIsOwner()) && overDailyLimit(used, PRO_CHAT_PER_DAY)) {
+    return Response.json({ error: PRO_CHAT_LIMIT_MESSAGE, limit: true }, { status: 429 });
   }
 
   const context = await buildPlayerContext(supabase, user.id);

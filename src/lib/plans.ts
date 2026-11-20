@@ -26,6 +26,7 @@
 // unlimited AI, the one thing that costs money every time it runs.
 import { FREE_MONTHLY_AI_REPORTS } from './entitlements';
 import { FREE_CHAT_PER_DAY } from './ai/chat';
+import { PRO_CHAT_PER_DAY } from './ai/fairUse';
 import { FREE_COACH_PLAYS, FREE_PLAYBOOK_TEAMS, PRO_PLAYBOOK_TEAMS } from './plays/limits';
 
 /** Drills in the library: 150 in 00013 and 18 in 00048. __tests__/plans.test.ts counts them. */
@@ -60,10 +61,10 @@ export const FREE_PLAN: Plan = {
 
 export const PRO_PLAN: Plan = {
   name: 'Pro',
-  tagline: 'Your own coach, with no limits',
+  tagline: 'Your own coach, every day',
   features: [
-    'Unlimited AI coaching on every session and video',
-    'Unlimited questions to your AI coach, plus a weekly AI report',
+    'AI coaching on every session and video, with no monthly allowance',
+    `Up to ${PRO_CHAT_PER_DAY} questions to your AI coach a day, plus a weekly AI report`,
     'Every training program, built around a goal or your position',
     'Every Basketball IQ section, with all lessons and quizzes',
     'Every play in the library, each with a quiz on your role',
@@ -118,6 +119,11 @@ export const CLUB_PLANS: Array<{ name: string; price: string; alt: string; detai
 ];
 export const CLUB_PLANS_PDF = '/deadeye-club-plans.pdf';
 
-/** The founding club offer, quoted whole wherever it appears (homepage, /clubs, the sheet). */
+/**
+ * The founding club offer, quoted whole wherever it appears (homepage, /clubs, the sheet).
+ * The founding price lasts 2 years after the free months, then the club moves to
+ * the normal plans (founder's decision, 2026-11-20: a price for life locked the
+ * first clubs at about 33c a player a month for good).
+ */
 export const FOUNDING_CLUB_OFFER =
-  'Founding club offer: our first 3 clubs are free until 31 January 2027, then pay €59.99 per team per year for as long as they stay subscribed. Closes 31 December 2026.';
+  'Founding club offer: our first 3 clubs are free until 31 January 2027, then pay €59.99 per team per year for 2 years, until 31 January 2029. Closes 31 December 2026.';
