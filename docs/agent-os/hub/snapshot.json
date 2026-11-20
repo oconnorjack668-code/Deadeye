@@ -209,6 +209,17 @@
   "calls": [
     {
       "agent": "release-checker",
+      "detail": "Opened 2026-11-19 from docs/support-email-deadeye-ie. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-150",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/150",
+      "onApprove": "The next Claude Code session merges PR #150 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #150: Sales docs: hello@deadeye.ie and deadeye.ie links",
+      "words": "merge 150"
+    },
+    {
+      "agent": "release-checker",
       "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
       "group": "live",
       "id": "pr-95",
@@ -467,51 +478,6 @@
       "kind": "task",
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
       "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
-    },
-    {
-      "agent": "marketing",
-      "group": "agents",
-      "id": "mkt-wknd-fri20",
-      "kind": "approve",
-      "title": "Pick Friday's founder post in the app",
-      "detail": "Weekend 20 to 22 Nov, warm-up for the shooting series. Recommended: \"Two weeks, starting Monday\" (invites players to log one session this weekend). Others: the Focus Finder post (16 Nov), or \"Log it by hand\" (16 Nov). Text in docs/agent-os/marketing/2026-11-19-weekend.md.",
-      "options": [
-        "Two weeks, starting Monday",
-        "Focus Finder",
-        "Log it by hand"
-      ],
-      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
-      "onApprove": "You post the picked text in Owner tools, Founder posts on Fri 20. Marketing records it in ideas.md next run."
-    },
-    {
-      "agent": "marketing",
-      "group": "agents",
-      "id": "mkt-wknd-sat21",
-      "kind": "approve",
-      "title": "Pick Saturday's post (Day 0 carousel recommended)",
-      "detail": "Recommended: Day 0 carousel, 4 photos of an empty court + the tester account's 5-spot 3s screen, \"Starts Monday\". Others: Session reveal carousel (spends the first number before Day 1), or Two taps a spot (screen only, if no court time). Nobody in shot, no signage, location off. Script in 2026-11-19-weekend.md.",
-      "options": [
-        "Day 0 carousel",
-        "Session reveal carousel",
-        "Two taps a spot"
-      ],
-      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
-      "onApprove": "You take the photos and post on Sat 21 (TikTok 11:00, IG 12:00). Marketing records it next run."
-    },
-    {
-      "agent": "marketing",
-      "group": "agents",
-      "id": "mkt-wknd-sun22",
-      "kind": "approve",
-      "title": "Pick Sunday's Instagram Story",
-      "detail": "Recommended: \"Guess my Day 1 score\" slider, link sticker, answer on Monday (brings viewers back for Day 1). Others: \"Free throws or 3s on Day 3?\" poll (only if you follow the vote), or \"Log Saturday's session yet?\". Text in 2026-11-19-weekend.md.",
-      "options": [
-        "Guess my Day 1 score",
-        "Free throws or 3s on Day 3?",
-        "Log Saturday's session yet?"
-      ],
-      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-19-weekend.md",
-      "onApprove": "You post the Story on Sun 22 at 17:00. Marketing records it next run."
     }
   ],
   "clubs": {
@@ -724,12 +690,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #149, 18 Nov) is running (checked 19 Nov).",
+      "detail": "Live and up to date: the latest version (PR #151, 19 Nov) is running (checked 20 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors in the last 24 hours (checked 19 Nov).",
+      "detail": "No errors in the last 24 hours (checked 20 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -739,7 +705,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open, checks green: PR #95 (agent scheduled runs), docs only.",
+      "detail": "2 open, checks green: PR #150 (sales docs, new email and web address) and PR #95 (agent scheduled runs), docs only.",
       "name": "Code changes",
       "status": "ok"
     }
@@ -784,13 +750,23 @@
   ],
   "log": [
     {
-      "at": "2026-11-19T10:03:45Z",
-      "text": "Marketing mid-week: weekend 20 to 22 Nov drafted as the shooting series warm-up (founder post, Day 0 carousel, Story guess). Three picks waiting for you. No marketing decisions in the hub, no new numbers since 18 Nov.",
+      "at": "2026-11-20T08:15:00Z",
+      "text": "Morning check: no errors in the last 24 hours. Live site is the latest version (PR #151). 2 pull requests open, both green. Nothing needs you.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-19T09:02:05Z",
-      "text": "To-do list rebuilt from STATUS (main d50872a): 28 open (1 pull requests), 2 new, 2 gone since the last update.",
+      "at": "2026-11-19T19:02:04Z",
+      "text": "To-do list rebuilt from STATUS (main fa10238): 29 open (2 pull requests), 1 new, 4 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T14:25:00Z",
+      "text": "PR #151 (email links in any browser) checked: safety PASS, all checks pass. Merge, then change 3 Supabase email templates.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T10:03:45Z",
+      "text": "Marketing mid-week: weekend 20 to 22 Nov drafted as the shooting series warm-up (founder post, Day 0 carousel, Story guess). Three picks waiting for you. No marketing decisions in the hub, no new numbers since 18 Nov.",
       "tone": "ok"
     },
     {
@@ -872,16 +848,6 @@
       "at": "2026-11-17T21:30:00Z",
       "text": "PR #127 (agent knowledge fixes, S40) merged at 20:55 UTC at the checked head d25f3da (safety PASS, checks green). Merge call removed.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T20:55:19Z",
-      "text": "PR #127 re-checked after main (#126) was merged in (head d25f3da): safety PASS, typegen, tsc, eslint and tests pass, no migrations or env vars. Reply merge 127 once the checks workflow is green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-17T21:20:00Z",
-      "text": "PR #126 merged at 20:50 UTC, before its check landed. Check comment posted: safety BLOCK (privacy text misses the Today and Video AI markers, and says \"No page tracking\"), checks green. Needs a small fix/ PR for the privacy text.",
-      "tone": "warn"
     }
   ],
   "scoreboard": {
@@ -898,6 +864,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-19T10:03:45Z",
-  "updatedBy": "Marketing mid-week"
+  "updatedAt": "2026-11-20T08:15:00Z",
+  "updatedBy": "Morning check"
 }
