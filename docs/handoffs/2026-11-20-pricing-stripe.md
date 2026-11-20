@@ -1,6 +1,6 @@
 # Pricing check, Pro guards, Stripe setup steps (2026-11-20)
 
-Agent: Claude Code, Opus 5.5 · Commits: c20da7a (merge of #156) · PR: #156 · Status: shipped; Stripe waits for the founder and his mam (S3)
+Agent: Claude Code, Opus 5.5 · Commits: c20da7a (merge of #156) · PR: #156 · Status: shipped; Stripe waits for the founder and their mam (S3)
 
 ## Outcome
 Prices checked against the market and kept: Pro €6.99/month, €49.99/year, founder €4.99/month. #156 (live, build c20da7a) added a Pro AI fair-use limit (50 coach questions a day, 20 AI reports in 24 h, owner exempt), a 7-day free trial on a player's first Pro subscription, and a 2-year end to the founding club price (until 31 Jan 2029). Stripe sandbox account started; the rest needs the founder's mam (account holder, 18+).
