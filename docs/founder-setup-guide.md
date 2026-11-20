@@ -143,7 +143,7 @@ Not built yet. Ask Claude to start it by **mid-December**. It needs:
 yearly club prices in Stripe (all plans are per year since 18 Nov 2026:
 Team Pass €179 a year or €19.99 a month; Club plan €899 a year for up to 8
 teams plus €89 a year for each extra team; founding clubs €59.99 per team per
-year or €6.99 a month), Pro for a whole team, invoices a club treasurer can
+year or €6.99 a month, for 2 years until 31 January 2029), Pro for a whole team, invoices a club treasurer can
 pay (card or SEPA), and a short club agreement. A year runs 12 months from the
 day a club starts. Prices and the founding club offer are in
 `docs/sales/deadeye-club-plans.html` and `src/lib/plans.ts`. The founding

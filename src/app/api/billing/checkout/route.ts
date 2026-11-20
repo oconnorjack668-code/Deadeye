@@ -2,7 +2,7 @@
 // Starts a Stripe Checkout for Deadeye Pro (monthly or yearly).
 import { getCurrentUser } from '@/lib/auth';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getStripe, monthlyPriceFor, priceIdFor, stripeConfigured, trialEndFor } from '@/lib/stripe';
+import { getStripe, monthlyPriceFor, priceIdFor, stripeConfigured, trialFor } from '@/lib/stripe';
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
@@ -26,15 +26,23 @@ export async function POST(request: Request) {
   const isFoundingMember = !!sub?.founding_claimed_at;
   const price = interval === 'month' ? monthlyPriceFor(isFoundingMember) : priceIdFor('year');
   if (!price) return Response.json({ error: `The ${interval}ly plan is not available.` }, { status: 400 });
-  const trialEnd = trialEndFor(sub?.founding_pro_until);
-
   // One Stripe customer per player, remembered on their subscription row
   let customerId: string | null = sub?.stripe_customer_id || null;
-  if (!customerId) {
+  let hadSubscription = false;
+  if (customerId) {
+    // Any earlier subscription, even a cancelled one, uses up the free week
+    const earlier = await stripe.subscriptions.list({ customer: customerId, status: 'all', limit: 1 });
+    hadSubscription = earlier.data.length > 0;
+  } else {
     const customer = await stripe.customers.create({ email: user.email || undefined, metadata: { user_id: user.id } });
     customerId = customer.id;
     await admin.from('subscriptions').update({ stripe_customer_id: customerId }).eq('user_id', user.id);
   }
+  const trial = trialFor({
+    foundingProUntil: sub?.founding_pro_until,
+    foundingClaimed: isFoundingMember,
+    hadSubscription,
+  });
 
   const origin = new URL(request.url).origin;
   const session = await stripe.checkout.sessions.create({
@@ -44,7 +52,7 @@ export async function POST(request: Request) {
     line_items: [{ price, quantity: 1 }],
     subscription_data: {
       metadata: { user_id: user.id, ...(isFoundingMember ? { founding_member: 'true' } : {}) },
-      ...(trialEnd ? { trial_end: trialEnd } : {}),
+      ...(trial ?? {}),
     },
     allow_promotion_codes: true,
     success_url: `${origin}/pro?success=1`,
