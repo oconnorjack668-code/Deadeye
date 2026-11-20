@@ -17,6 +17,15 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-20 · Founder on the screen review mockups: "some of the design changes make some pages look
+  simpler and less professional. The UI designs should be professional, futuristic, vibrant, high quality
+  icons, nice looking text font. A user should think wow this app looks cool." The review leaned on
+  `docs/design.md`'s quiet rules (one orange, no glow, no gradient, no icon tiles, lucide only, Geist) and
+  stripped colour and detail out. **Rule:** the target is "wow, this app looks cool" to a 13-19 year old,
+  not minimal. Fix real problems (contrast, wrong words, bugs, touch targets) without making a screen
+  plainer; never remove colour, icons or depth only for consistency. Where `docs/design.md` blocks a
+  vibrant, premium look, propose the change to it with mockups for the founder to approve instead of
+  designing down to it.
 - 2026-11-20 · Screen review: the tester's session lived on the old address and was gone after
   the move to deadeye.ie, so no signed-in screen could be screenshotted. Rule: before a review
   run, open the live address and check the tester is signed in; if not, say so first. Also: a
