@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { safeAppPath } from '@/lib/safePath';
+import { authLinkErrorMessage } from '@/lib/authLink';
 import { rememberInvite } from '@/lib/friends';
 import { rememberTeamInvite } from '@/lib/coachSide';
 
@@ -25,11 +26,9 @@ function LoginContent() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(
-    queryError === 'auth_callback_failed'
-      ? 'Verification link expired or invalid. Please sign in or request a new link.'
-      : null
-  );
+  // A confirm link opened in another browser: good news, not a failure
+  const confirmedNotice = queryError === 'link_other_browser' ? authLinkErrorMessage(queryError) : null;
+  const [error, setError] = useState<string | null>(confirmedNotice ? null : authLinkErrorMessage(queryError));
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
@@ -85,6 +84,11 @@ function LoginContent() {
 
           <form onSubmit={handleLogin}>
             <CardContent className="space-y-4">
+              {confirmedNotice && !error && (
+                <Alert variant="success" title="Email confirmed">
+                  {confirmedNotice}
+                </Alert>
+              )}
               {error && (
                 <Alert variant="error" title="Sign in failed">
                   {error}
