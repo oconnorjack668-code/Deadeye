@@ -3,7 +3,7 @@
 // founding member sees their free months and the founder price.
 import React from 'react';
 import { requireUser, getCurrentSubscription, checkIsOwner } from '@/lib/auth';
-import { getStripe, proPriceLabels, stripeConfigured, trialEndFor } from '@/lib/stripe';
+import { getStripe, PRO_TRIAL_DAYS, proPriceLabels, stripeConfigured, trialEndFor } from '@/lib/stripe';
 import { withdrawalDeadline, withinWithdrawalPeriod } from '@/lib/withdrawal';
 import { hasPro } from '@/lib/entitlements';
 import { foundingState } from '@/lib/founding';
@@ -52,6 +52,9 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
   const listPrice = [prices.monthly, prices.yearly].filter(Boolean).join(' or ') || PRO_PRICE_FALLBACK;
   const trialEnd = trialEndFor(subscription?.founding_pro_until);
   const chargeFrom = isFounder && trialEnd ? formatDay(new Date(trialEnd * 1000)) : null;
+  // The checkout decides for sure (it asks Stripe for earlier subscriptions);
+  // this only hides the line from anyone who has subscribed before
+  const freeWeek = configured && !isPaying && !isFounder && !isOwner && !subscription?.stripe_subscription_id;
 
   return (
     <div className="flex-1 overflow-auto">
@@ -137,6 +140,11 @@ export default async function ProPage({ searchParams }: { searchParams: Promise<
             isFounder={isFounder}
             chargeFrom={chargeFrom}
           />
+        )}
+        {freeWeek && (
+          <p className="text-sm text-zinc-300">
+            Your first {PRO_TRIAL_DAYS} days are free. Cancel before then from Manage subscription and you pay nothing.
+          </p>
         )}
         {withdrawBy && <WithdrawFromContract deadline={withdrawBy} />}
 

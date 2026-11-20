@@ -359,7 +359,7 @@ export default async function Home() {
           <div className="mx-auto max-w-3xl">
             <h2 className="text-center text-3xl font-black tracking-tight text-white">Free to start</h2>
             <p className="mx-auto mt-3 max-w-xl text-center text-zinc-400">
-              Start training for free. Go Pro when you want your own AI coach with no limits.
+              Start training for free. Go Pro when you want your own AI coach every day.
             </p>
             <div className="mt-10 grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-6">

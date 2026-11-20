@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { CHAT_STARTERS, FREE_CHAT_PER_DAY, MAX_CHAT_MESSAGE } from '@/lib/ai/chat';
+import { PRO_CHAT_PER_DAY } from '@/lib/ai/fairUse';
 import { parseCoachText, parseInline } from '@/lib/ai/coachText';
 import { Send, Sparkles, Trash2 } from 'lucide-react';
 
@@ -217,7 +218,7 @@ export function CoachChat({ initial, remaining: initialRemaining }: { initial: C
         </form>
         <div className="max-w-3xl mx-auto px-4 pb-2 flex justify-between text-xs text-zinc-500">
           <span>
-            {remaining === null ? 'Unlimited with Pro' : `${remaining} of ${FREE_CHAT_PER_DAY} free questions left today`} · Not medical advice
+            {remaining === null ? `Up to ${PRO_CHAT_PER_DAY} a day with Pro` : `${remaining} of ${FREE_CHAT_PER_DAY} free questions left today`} · Not medical advice
           </span>
           {messages.length > 0 && (
             <button type="button" onClick={() => void clearChat()} className="flex items-center gap-1 hover:text-zinc-300">
