@@ -9,10 +9,9 @@ written out, and this file changes once the founder approves (founder, 2026-11-2
 ## The look
 
 Dark by default with a light theme (below), one orange for what to do next, heavy type for the numbers that matter. The aim
-(founder, 2026-11-20): professional, futuristic and vibrant, with high-quality icons and type, so a player thinks "wow, this app
-looks cool". Never plain for its own sake. A training tool, not a SaaS landing page. The visual direction (A Arena, B HUD,
-C Glass: `docs/agent-os/design/2026-11-20-visual-direction.md`) is the founder's pick; until then, the blocks below are what the
-app uses today.
+(founder, 2026-11-20): sleek, professional, simple and easy to use, so a player thinks "wow, this is well made". Today's look
+is the base. Modern touches (a glow, a gradient, a richer colour, a better icon) go only where they clearly improve that part,
+never as a theme over everything; bright colour where colour is needed. A training tool, not a SaaS landing page.
 
 ## Building blocks
 
@@ -150,10 +149,10 @@ Adapted from the community Unslop UI skill, trimmed to what applies here.
 
 ## Loosened 2026-11-20
 
-The founder loosened the quiet rules below (2026-11-20). Allowed now, used with care: icon tiles
-(one consistent style), gradients (hero cards, the main button, progress fills and rings), glow
-(the main button, active icons, rings; never on body text), a display font and a bigger display
-number size. Still out: emoji as UI, gradient on readable text, stacked blur, cards inside cards,
+The founder loosened the quiet rules below (2026-11-20), for use in small doses where they
+clearly improve a part, not across the app: icon tiles (one consistent style), a gradient on a hero
+card or progress fill, a soft glow on one key number or action, a display font for big numbers,
+a bigger display number size. The founder turned down three full restyles the same day as too much. Still out: emoji as UI, gradient on readable text, stacked blur, cards inside cards,
 the generic SaaS look, and anything that fails the contrast or touch-target rules. Where the list
 below still says "don't", read it as "only on purpose, in the chosen visual direction".
 
@@ -163,5 +162,5 @@ below still says "don't", read it as "only on purpose, in the chosen visual dire
 - [ ] One obvious next action, in orange
 - [ ] Colours match the table above
 - [ ] Every card in a stack has a gap below it
-- [ ] Tiles, glow and gradients only in the chosen direction's style; no emoji as UI, gradient on readable text or nested cards
+- [ ] Tiles, glow and gradients only where they clearly improve that part; the screen still looks simple; no emoji as UI, gradient on readable text or nested cards
 - [ ] Works with `prefers-reduced-motion`

@@ -2,6 +2,8 @@ Skills: all 8 loaded
 
 # A new visual direction for Deadeye: three options · 2026-11-20
 
+> **Turned down by the founder, 2026-11-20:** all three were "too much" and "didn't look professional at all"; the founder prefers today's look. Kept for the record only. Do not build from this doc. The direction now: today's look, polished, with modern touches only where they improve a part (`knowledge/designer.md`, newest lesson; `docs/design.md`, The look).
+
 **Problem.** The founder (20 Nov): the screen-review mockups made pages "simpler and less professional"; the app should be "professional, futuristic, vibrant, high quality icons, nice looking text font", so a player thinks "wow this app looks cool". The review designed down to the quiet rules in `docs/design.md` (one orange, no glow, no gradient, no icon tiles, lucide only, Geist). **For:** 13 to 19 year old players, first on the screens that decide activation: Today for a new player, the result after the first session (D2), and Watch it back (D1). Draft; nothing is built, shared or in `docs/design.md`.
 
 The real fixes in the review still stand (contrast, plain words, the SMTP text, the NBA placeholder, touch targets, the sideways scroll). This doc changes how the same screens look and what they hold, never what they fix. Every mockup below keeps the content of the earlier D2/D6/D1 proposals and adds colour, depth, icons and motion.

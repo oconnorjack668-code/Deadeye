@@ -17,6 +17,16 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-20 (later) · Founder on the three directions (Arena, HUD, Glass): "too much", "didn't look
+  professional at all", "I prefer the old look". What was meant: "futuristic" only slightly, only where
+  it improves a part; "vibrant" means bright, nice colour where colour is needed, not everywhere; "cool"
+  means "wow, it's well made and looks professional", not mega bright or sci-fi. The app should be
+  "sleek and professional as well as simplistic and easy to interact with"; a player must never be
+  confused. **Rule:** start from today's look and polish it. Keep screens simple and clear; add a modern
+  touch (a glow on one key number, a better icon, a gradient on one hero card, a richer colour for a
+  make) only where it clearly improves that part, never as a theme over everything. Judge every mockup
+  side by side with today's screen: it must look more finished and professional, never busier. This
+  overrides the earlier 2026-11-20 lesson below where they differ.
 - 2026-11-20 · Founder on the screen review mockups: "some of the design changes make some pages look
   simpler and less professional. The UI designs should be professional, futuristic, vibrant, high quality
   icons, nice looking text font. A user should think wow this app looks cool." The review leaned on
@@ -46,8 +56,9 @@ Newest first, each with the date, what happened, and the rule.
 
 ### Every design
 
-- [ ] Side by side with today's screen: nothing is plainer, greyer or smaller on icons, colour or depth
-      than before. A fix that removes colour or detail is not a fix. (Founder, 2026-11-20.)
+- [ ] Side by side with today's screen: it looks more polished and professional, never plainer and
+      never busier. A fix that removes useful colour is not a fix; a touch that adds noise is not
+      either. Simple and easy to use first. (Founder, 2026-11-20.)
 - [ ] Contrast measured on the rendered pixels, including text over footage:
       `design/mockups/2026-11-20-direction-contrast.mjs <page.html>`, not eyeballed.
 

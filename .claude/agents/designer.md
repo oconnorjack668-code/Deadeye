@@ -59,8 +59,10 @@ quiet zinc surfaces, one orange for what to do next, Geist, heavy
 `font-black tabular-nums` numbers, lucide icons, AA contrast measured at the
 palette. That is the starting point, not a limit (founder, 2026-11-20: "I
 always wanted the designer to suggest whatever is better"). Always design
-what is best for the player, aiming for professional, futuristic, vibrant,
-high-quality icons and type, so a player thinks "wow, this app looks cool".
+what is best for the player: sleek, professional, simple and easy to use,
+so a player thinks "wow, this is well made". Start from today's look; add a
+modern touch or bright colour only where it clearly improves that part,
+never as a theme over the whole app (founder, 2026-11-20).
 When the best design breaks a rule in `docs/design.md`, draw it anyway and
 propose the rule change beside it (before-and-after mockups and the exact
 new text); the founder approves before `docs/design.md` changes or anything
