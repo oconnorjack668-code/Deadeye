@@ -2,7 +2,9 @@
 
 How Deadeye looks, written down so every agent builds new screens the same way. Read it before
 adding or changing UI. It describes the app as it is (taken from the code, 23 Oct 2026), so
-follow the existing primitives before inventing new ones.
+follow the existing primitives before inventing new ones. These rules are where the app is today,
+not a limit on the designer: the designer always proposes what looks best, with the rule change
+written out, and this file changes once the founder approves (founder, 2026-11-20).
 
 ## The look
 
