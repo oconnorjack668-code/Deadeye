@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en-IE" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Watch it back, three directions</title>
+<!-- Designer mockup, draft only. Uses the app's own Tailwind v4 classes and src/app/theme.css, so the builder can lift it. Made-up data, no real player. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
+<style type="text/tailwindcss">
+@theme {
+  --color-zinc-500: #8b8b94;
+  --color-orange-600: oklch(55.3% 0.195 38.402);
+  --color-emerald-600: oklch(50.8% 0.118 165.612);
+  --font-sans: 'Geist', system-ui, sans-serif;
+}
+</style>
+<link rel="stylesheet" href="../../../../src/app/theme.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: 'Geist', system-ui, sans-serif; background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  .frame { width: 880px; margin: 0; }
+  .mx-auto { margin-left: 0 !important; margin-right: 0 !important; }
+</style>
+</head>
+<body>
+<div class="mx-auto px-6 py-6" style="width:880px"><h1 class="mb-1 text-xl font-black tracking-tight text-white">Watch it back: three directions</h1><p class="mb-5 text-sm text-zinc-400">Wireframes at phone width. A is recommended.</p>
+  <div class="flex gap-6">
+    <div style="width:260px"><p class="mb-2 text-sm font-semibold text-white">A. Player in the page (recommended)</p><div class="space-y-1.5 rounded-2xl border border-zinc-800 bg-zinc-950 p-2" style="height:560px"><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:44px">Verdict</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-white bg-zinc-900 text-white" style="height:190px">PLAYER: picture, pins, controls, edit strip</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:110px">Shot list (▶ plays in the player)</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:60px">Quality, recheck, breakdown</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:60px">Export, reel, Save</div></div></div>
+    <div style="width:260px"><p class="mb-2 text-sm font-semibold text-white">B. Full screen first, list in a sheet</p><div class="space-y-1.5 rounded-2xl border border-zinc-800 bg-zinc-950 p-2" style="height:560px"><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-white bg-zinc-900 text-white" style="height:250px">Picture fills the screen, HUD on it</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-500 text-zinc-300" style="height:40px">Pins and controls over the picture</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-dashed border-zinc-600 text-zinc-300" style="height:120px">Bottom sheet: drag up for the shot list</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:60px">Verdict, quality, Save under the sheet</div></div></div>
+    <div style="width:260px"><p class="mb-2 text-sm font-semibold text-white">C. Extend the pop-up replay</p><div class="space-y-1.5 rounded-2xl border border-zinc-800 bg-zinc-950 p-2" style="height:560px"><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:44px">Verdict</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:110px">Shot list, each ▶ opens a pop-up</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-500 text-zinc-300" style="height:40px">New button: "Watch the whole clip"</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-dashed border-white bg-zinc-900 text-white" style="height:180px">Pop-up player covers the page: pins, Make, Miss</div><div class="flex items-center justify-center rounded-lg border px-2 text-center text-xs border-zinc-700 text-zinc-400" style="height:60px">Quality, Save</div></div></div>
+  </div></div>
+</body>
+</html>

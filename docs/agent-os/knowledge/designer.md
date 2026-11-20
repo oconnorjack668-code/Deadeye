@@ -17,6 +17,11 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-20 · Screen review: the tester's session lived on the old address and was gone after
+  the move to deadeye.ie, so no signed-in screen could be screenshotted. Rule: before a review
+  run, open the live address and check the tester is signed in; if not, say so first. Also: a
+  headless Chrome driven over the DevTools protocol (device metrics 390x844, prefers-color-scheme
+  emulated) gives true phone dark and light shots without the extension window.
 - 2026-11-13 · Tracker S8 review: the builder's 640 px stills looked right, but at 390 px inline
   and in the 9:16 export the MAKE/MISS call clipped and covered the "Fix rim" and full-screen buttons.
   Rule: review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from

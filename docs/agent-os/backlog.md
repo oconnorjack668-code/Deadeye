@@ -232,3 +232,48 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Safety: pending (safety-reviewer: minors, parent emails, privacy text).
 - Founder checklist: pending.
 - Result:
+
+## D1 · "Watch it back" on the tracker review · idea (designer drawing, 2026-11-20)
+- Hypothesis: since #118 an uploaded clip is checked frame by frame without playing (`clipDecoder.ts`), which is quicker and more accurate, but the player never sees the tracking. The founder (20 Nov): a player "can't see the video tracking the makes and misses and it can't see if the tracker is making a mistake because it's not watching playback". Review today has a per-shot replay (`ShotReplay`), Make/Miss toggles, Unclear buttons, and "Add make / Add miss" with no time; shots the tracker never saw can only be found by watching the clip somewhere else.
+- Change: a "Watch it back" player on the review step (`src/components/video/ShotTracker.tsx`) that plays the whole clip with the same MAKE/MISS and count drawn from the run's `OverlayTimeline` (`overlayTimeline.ts`, `overlayArt.ts`, as `TrackerVideoExport` does). Tap pauses; paused on a called shot, one tap flips it; paused elsewhere, "Add a make here" / "Add a miss here" adds a shot at that time (so it can be replayed and charted). Decode mode stays as it is. Mockup first: `docs/agent-os/design/` (designer, 2026-11-20); founder approves before build.
+- Signal: share of uploaded-clip sessions where the player corrects or adds a shot, and "Tracker got this wrong?" reports per upload; trust is the aim, not a funnel step.
+- Safety: pending (no new data expected: the clip stays on the phone).
+- Founder checklist: pending.
+- Result:
+
+## Screen review items (designer, 2026-11-20)
+
+From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadeye.ie, player and coach as far as an under-18 tester goes). Each is `idea` until the founder approves the mockup; the ranked list in that doc has the files and full spec. Safety: pending on each. Founder checklist: pending.
+
+## D2 · Show the result after the first save · idea
+- Hypothesis: after a first log the player sees a green "First session logged! +20 XP" card that never shows their 6/10 or 60%, then a cyan invite card; the payoff of logging is hidden.
+- Change: result screen with the score, one orange "Go again", an equal "Done for today", a quiet "Share this result" (review #1, mockup D).
+- Signal: second session within 7 days of the first.
+
+## D3 · Rewrite "Check your email" · idea
+- Hypothesis: every confirming sign-up lands on a page that says "verify with SMTP in production", with no resend and no "wrong email".
+- Change: two plain steps, "Send it again" (`auth.resend`, 60 s cooldown), "Wrong email? Start again" (review #2, mockup B). `src/app/(auth)/verify-email/page.tsx`.
+- Signal: sign-up to confirmed account.
+
+## D4 · Setup for Irish players · idea
+- Hypothesis: setup asks age again with brackets that skip 13 live, uses US words (High School, Varsity, NCAA, Defense), imperial units, small right-aligned Next, and keeps the tab bar.
+- Change: review #3 (the doc names a mockup E; it was not drawn, so the designer draws it before this is approved). `src/app/(app)/onboarding/page.tsx`, `src/lib/focusAreas.ts`. Founder decision: shorten setup.
+- Signal: started setup to finished setup.
+
+## D5 · Sign-up and sign-in form, control borders · idea
+- Hypothesis: the name placeholder is a real NBA player ("Jordan Clarkson", `signup/page.tsx:131`), labels are all-caps jargon, and input borders measure 1.55:1 (3:1 needed).
+- Change: review #4 and #5 (mockup B): "e.g. Sam", plain labels, `border-zinc-500/70` in `Input.tsx` and `Select.tsx`.
+- Signal: landing to account created.
+
+## D6 · Today for a new player · idea
+- Hypothesis: a new player's Today shows the founding Pro offer and a "Starting steps" row that repeats the Today card before any log; the main button is 32 px; "1 days", "1 zones".
+- Change: review #6 (mockup C). Founder decision: Pro offer timing (recommend none before the first log).
+- Signal: finished setup to first session (read with S42).
+
+## D7 · Share cards to the brand · idea
+- Change: review #7 (mockup D): 1080 x 1920 plus 1080 x 1350, Geist Black numbers, name off by default, drop "AI BASKETBALL TRAINER". `src/app/api/share/[kind]/route.tsx`.
+- Signal: shares per session saved.
+
+## D8 · Fix the sideways scroll on six hubs · idea
+- Change: Hoops, Gym, Train, Plays, Film and IQ scroll sideways by about 52 px from the `PageHeader` glow; `overflow-x-clip` on its wrapper (review #8). `src/components/layout/PageHeader.tsx`. Bug fix, can skip the mockup step.
+- Signal: none; polish.
