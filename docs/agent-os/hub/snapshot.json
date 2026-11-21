@@ -209,6 +209,28 @@
   "calls": [
     {
       "agent": "release-checker",
+      "detail": "Opened 2026-11-20 from design/watch-back-and-screen-review. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-160",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/160",
+      "onApprove": "The next Claude Code session merges PR #160 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #160: Designs: Watch it back (D1) and full screen review (D2-D8)",
+      "words": "merge 160"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Opened 2026-11-20 from docs/blur-rule-2026-11-20. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-158",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
+      "onApprove": "The next Claude Code session merges PR #158 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #158: Blur rule: banners, logos and background faces may be blurred",
+      "words": "merge 158"
+    },
+    {
+      "agent": "release-checker",
       "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
       "group": "live",
       "id": "pr-95",
@@ -217,6 +239,16 @@
       "onApprove": "The next Claude Code session merges PR #95 if its checks are green and it is up to date with main.",
       "title": "Merge PR #95: Agent OS: scheduled runs (hub snapshots, drafts)",
       "words": "merge 95"
+    },
+    {
+      "agent": "Next agent that merges",
+      "detail": "Blur rule narrowed (founder, 20 Nov): sponsor banners, third-party logos and the faces of people who are not the focus (rebounder, background) may be blurred; no darkened patches, caption strips or blurring the main subject; a blur is not consent for an under-18. Updates the video-editor and marketing knowledge, video style, video-editor agent and skill, critic panel, tools note and exam case 3. Founder approved it to go in with the next merge, so whoever merges next merges #158 too. Codex's uncommitted copy .agents/skills/video-editor-playbook/SKILL.md still says never blur: bring it in... Last checked: 2026-11-20: PR open, docs and agent files only.",
+      "group": "agents",
+      "id": "S54",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
+      "onApprove": "Next agent that merges picks this up in the next session and records the result in STATUS (S54).",
+      "title": "Merge PR #158 together with the next PR that merges"
     },
     {
       "agent": "founder",
@@ -238,7 +270,7 @@
     },
     {
       "agent": "founder",
-      "detail": "Next video idea from marketing: a 60-second makes challenge, filmed from behind by the founder or another adult, phone on a bag, nobody else in the hall (S10). Approve it or pick another; marketing then writes the script. The other idea (the first promo with three openings) is dropped: the founder is not using that video, its quality is not good enough (18 Nov). Last checked: 2026-11-18: moved from HQ.",
+      "detail": "Next video idea from marketing: a 60-second makes challenge, filmed from behind by the founder or another adult, phone on a bag, nobody else in the hall (S10). Approve it or pick another; marketing then writes the script. The other idea (the first promo with three openings) is dropped: the founder is not using that video, its quality is not good enough (18 Nov). Last checked: 2026-11-20: new footage 20261118_174626.mp4 (Deadeye shooting videos folder, 2:18, from behind, rebounder consent confirmed, founder's name on shirt fine) suits it; recommended to the founder, no yes yet.",
       "group": "decide",
       "id": "S48",
       "kind": "task",
@@ -679,12 +711,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #151, 19 Nov) is running (checked 20 Nov).",
+      "detail": "Live and up to date: the latest version (PR #159, 20 Nov) is running (checked 21 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors in the last 24 hours (checked 20 Nov).",
+      "detail": "No new errors since 10:08 on 20 Nov. The 3 parent-email failures that morning came before the sender address was fixed; emails send now (checked 21 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -694,7 +726,7 @@
       "status": "warn"
     },
     {
-      "detail": "2 open, checks green: PR #150 (sales docs, new email and web address) and PR #95 (agent scheduled runs), docs only.",
+      "detail": "3 open, checks green: PR #160 (screen designs), PR #158 (blur rule) and PR #95 (agent scheduled runs), docs only.",
       "name": "Code changes",
       "status": "ok"
     }
@@ -739,13 +771,18 @@
   ],
   "log": [
     {
-      "at": "2026-11-20T16:15:27Z",
-      "text": "Learning digest: 24 new lessons (video editor 4, marketing 4, builder 3, safety reviewer 3, player outreach 3, activation analyst 2, club growth 2, QA tester 2, support triage 1). No research due.",
+      "at": "2026-11-21T08:09:19Z",
+      "text": "Morning check: live site up to date (PR #159). 3 parent-email errors on 20 Nov, all before the sender fix; nothing new. 3 pull requests open, all green.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-20T10:58:45Z",
-      "text": "To-do list rebuilt from STATUS (main 7f4c652): 28 open (1 pull requests), 0 new, 1 gone since the last update.",
+      "at": "2026-11-20T19:02:06Z",
+      "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 3 new, 0 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-20T16:15:27Z",
+      "text": "Learning digest: 24 new lessons (video editor 4, marketing 4, builder 3, safety reviewer 3, player outreach 3, activation analyst 2, club growth 2, QA tester 2, support triage 1). No research due.",
       "tone": "ok"
     },
     {
@@ -832,11 +869,6 @@
       "at": "2026-11-18T13:05:00Z",
       "text": "PR #139 (HQ to-do list built from STATUS) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 139.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T12:55:00Z",
-      "text": "PR #137 (privacy page names the Today card taps, S46) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -853,6 +885,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-20T16:15:27Z",
-  "updatedBy": "Learning digest"
+  "updatedAt": "2026-11-21T08:09:19Z",
+  "updatedBy": "Morning check"
 }
