@@ -1,6 +1,6 @@
 # Activation analyst knowledge
 
-Last researched: 2026-11-07
+Last researched: 2026-11-16
 
 Rules for this file: `README.md`. Strength: **strong** (meta-analysis, large
 trial), **moderate** (one trial or field study), **practitioner**, **official**.
@@ -15,7 +15,17 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16: E4 shipped with a Signal of "the `reminder_set` count" and no
+  marker on the dashboard where its card sits, so after a week it can neither
+  win nor lose (0 reminders, out of an unknown number who saw it). Rule: a
+  bet's success line is a number of players out of a counted denominator, and
+  the screen it changes must already have a marker, or the item adds one.
+- 2026-11-16: E1 to E4 (10-22 to 11-09) reached at most 3 real players
+  between them: signups stopped 10-24 to 11-08, and nothing showed whether
+  stalled players come back to the screens we changed. Confidence calls
+  cannot be judged yet. Rule: before picking `NEXT`, estimate how many players
+  will see the change before its read date; under 5, pick a screen every new
+  player sees, or measure reach first.
 
 ## Checklist
 
@@ -54,6 +64,10 @@ file). Newest first, each with the date, what happened, and the rule.
       pressure, urgency or shame (also a safety-reviewer rule).
 - [ ] The Signal names a step with an `app_events` marker and an expected
       size, and says "hint" when fewer than 30 players will reach it.
+- [ ] The success line is "x of the next n" with n counted by a marker on
+      the changed screen (no marker, no bet), plus a read date.
+- [ ] Reach check: how many players will see this before the read date?
+      Under 5: choose a screen every new player sees, or measure reach first.
 - [ ] The success line is a number written before the build ("at least 6 of
       the next 15 new players open the tracker within 7 days"), set from the
       current rate. A formula with X in it is not a success line.

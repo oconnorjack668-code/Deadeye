@@ -4,49 +4,49 @@
       "ask": "Ask the activation analyst why players who finish setup never log a session, using this week's funnel.",
       "id": "activation-analyst",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 0,
+      "lessons": 2,
       "name": "Activation analyst",
       "num": 1,
       "output": "Report: biggest drop is setup to first session (21 of 24). E4 marked NEXT, E5 and E6 added.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Lead. Reads the funnel, picks the one experiment marked NEXT.",
       "schedule": "Mondays 09:00",
       "skills": "fixed",
-      "sources": 30
+      "sources": 32
     },
     {
       "ask": "Ask the builder to fix the three follow-up notes on E4 in a small PR.",
       "id": "builder",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 13,
+      "lessons": 16,
       "name": "Builder",
       "num": 2,
       "output": "Built E4 on exp/E4-dashboard-reminder (PR #74).",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Builds the NEXT experiment on its own branch, with tests.",
       "schedule": "Mondays, after the analyst",
       "skills": "fixed",
-      "sources": 23
+      "sources": 36
     },
     {
       "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds.",
       "id": "safety-reviewer",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 0,
+      "lessons": 4,
       "name": "Safety reviewer",
       "num": 3,
       "output": "E4: PASS with three non-blocking notes.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-18",
       "role": "Checks every branch for under-18s, parents, personal data and messages.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 19
+      "sources": 36
     },
     {
       "ask": "Ask the release checker for the after-deploy checklist for PR #74.",
       "id": "release-checker",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 9,
+      "lessons": 10,
       "name": "Release checker",
       "num": 4,
       "output": "E4 checklist: no migration, no env vars, 5 checks after deploy.",
@@ -54,41 +54,41 @@
       "role": "Types, lint, tests, migrations, env vars, and your step-by-step checklist.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 16
+      "sources": 18
     },
     {
       "ask": "Ask support triage to check last night's live errors in Vercel.",
       "id": "support-triage",
       "lastRun": "2026-11-09T14:14:00Z",
-      "lessons": 7,
+      "lessons": 8,
       "name": "Support triage",
       "num": 5,
       "output": "Morning check: 0 live errors, deploy READY, no P1.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-16",
       "role": "Reads problem and crash reports, finds the cause, ranks fixes.",
       "schedule": "Daily 08:00 (morning check)",
       "skills": "fixed",
-      "sources": 24
+      "sources": 28
     },
     {
       "ask": "Ask marketing to script the 5-spot challenge video shot by shot.",
       "id": "marketing",
       "lastRun": "2026-11-09T12:16:00Z",
-      "lessons": 8,
+      "lessons": 10,
       "name": "Marketing",
       "num": 6,
       "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.",
-      "researched": "2026-11-07",
+      "researched": "2026-11-09",
       "role": "TikTok and Instagram ideas, scripts and posts. Drafts only.",
       "schedule": "Mondays, and Thursdays 10:00",
       "skills": "fixed",
-      "sources": 33
+      "sources": 55
     },
     {
       "ask": "Ask club growth to prep me for a call with the Wexford Blazers coach.",
       "id": "club-growth",
       "lastRun": "2026-11-09T12:17:00Z",
-      "lessons": 0,
+      "lessons": 2,
       "name": "Club growth",
       "num": 7,
       "output": "Blazers trial plan and call prep; Enniscorthy and Gorey drafts; C4 added.",
@@ -102,21 +102,21 @@
       "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
       "id": "video-editor",
       "lastRun": "2026-11-10T12:14:00Z",
-      "lessons": 15,
+      "lessons": 23,
       "name": "Video editor",
       "num": 8,
       "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
-      "researched": "2026-11-10",
+      "researched": "2026-11-11",
       "role": "Cuts marketing's scripts and the founder's footage into finished TikTok and Reels videos. Never posts.",
       "schedule": "On request, local only",
       "skills": "fixed",
-      "sources": 55
+      "sources": 84
     },
     {
       "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
       "id": "designer",
       "lastRun": null,
-      "lessons": 1,
+      "lessons": 2,
       "name": "Designer",
       "num": 9,
       "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
@@ -124,13 +124,13 @@
       "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
       "schedule": "On request, and before any screen change is built",
       "skills": "new",
-      "sources": 70
+      "sources": 68
     },
     {
       "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
       "id": "player-outreach",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 4,
       "name": "Player outreach",
       "num": 10,
       "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
@@ -144,7 +144,7 @@
       "ask": "Ask the QA tester to check the live app on a phone screen and tell me what's broken.",
       "id": "qa-tester",
       "lastRun": null,
-      "lessons": 0,
+      "lessons": 3,
       "name": "QA tester",
       "num": 11,
       "output": "Set up 11 Nov. Nine main journeys to walk each run with the tester account.",
@@ -208,116 +208,297 @@
   ],
   "calls": [
     {
-      "agent": "builder",
-      "detail": "The reminders card shows Mon/Wed/Fri as suggested days until you switch reminders on, says what is still missing after each change, and only counts reminders that can actually arrive. The automatic check passed: safety OK, all 1,029 tests pass, no database changes.",
-      "id": "pr-77",
+      "agent": "release-checker",
+      "detail": "Opened 2026-11-20 from design/watch-back-and-screen-review. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-160",
       "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/77",
-      "onApprove": "Claude merges it the next time you chat (if the checks are still green) and it goes live about a minute later. To do it straight away, tell Claude \"merge 77\".",
-      "title": "E4 follow-ups are ready to go live"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/160",
+      "onApprove": "The next Claude Code session merges PR #160 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #160: Designs: Watch it back (D1) and full screen review (D2-D8)",
+      "words": "merge 160"
     },
     {
       "agent": "release-checker",
-      "detail": "The tester account already has a session, so the new reminders card is hidden for it (correctly). In the app: Settings, Reset to a new player, type RESET and the tester password. Claude isn't allowed to type passwords.",
-      "id": "e4-live",
+      "detail": "Opened 2026-11-20 from docs/blur-rule-2026-11-20. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-158",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
+      "onApprove": "The next Claude Code session merges PR #158 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #158: Blur rule: banners, logos and background faces may be blurred",
+      "words": "merge 158"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
+      "group": "live",
+      "id": "pr-95",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/95",
+      "onApprove": "The next Claude Code session merges PR #95 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #95: Agent OS: scheduled runs (hub snapshots, drafts)",
+      "words": "merge 95"
+    },
+    {
+      "agent": "Next agent that merges",
+      "detail": "Blur rule narrowed (founder, 20 Nov): sponsor banners, third-party logos and the faces of people who are not the focus (rebounder, background) may be blurred; no darkened patches, caption strips or blurring the main subject; a blur is not consent for an under-18. Updates the video-editor and marketing knowledge, video style, video-editor agent and skill, critic panel, tools note and exam case 3. Founder approved it to go in with the next merge, so whoever merges next merges #158 too. Codex's uncommitted copy .agents/skills/video-editor-playbook/SKILL.md still says never blur: bring it in... Last checked: 2026-11-20: PR open, docs and agent files only.",
+      "group": "agents",
+      "id": "S54",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
+      "onApprove": "Next agent that merges picks this up in the next session and records the result in STATUS (S54).",
+      "title": "Merge PR #158 together with the next PR that merges"
+    },
+    {
+      "agent": "founder",
+      "detail": "Instagram/TikTok series \"Can I become a better shooter by tracking every shot?\": 8 posts over 2 weeks from 23 Nov, faceless by default (the founder is under 18; face or voice needs a parent's written consent), sessions recorded on the tester account. Plan: docs/agent-os/marketing/2026-11-18-shooting-series.md (on PR #144's branch until merged). Check #DeadeyeDaily and #DeadEye in each app before using them. Competition lines (posts 4, 7, 8) only once S50 is done. Last checked: 2026-11-18: plan written, safety-reviewer passed it.",
+      "group": "yours",
+      "id": "S51",
       "kind": "task",
-      "onApprove": "It moves to In progress. After the reset, tell Claude \"check E4 live\" and it tests the card in Chrome.",
-      "title": "Reset the tester account so Claude can check E4 live"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/144",
+      "title": "Film the first shooting-series post on Mon 23 Nov"
     },
     {
-      "agent": "marketing",
-      "detail": "The same 24.5-second promo with three different first 3 seconds. A: the live count ticking. B: the first make, 1/1. C: \"Do you count your makes in your head?\". Pick one before approving.",
-      "id": "mkt-openings",
-      "kind": "approve",
-      "onApprove": "Marketing builds this week's posts around the opening you picked.",
-      "options": [
-        "A",
-        "B",
-        "C"
-      ],
-      "title": "Pick the promo opening to test first"
-    },
-    {
-      "agent": "marketing",
-      "detail": "Mon promo, Tue Story poll, Wed \"log it in 20 seconds\", Thu 5-spot challenge (needs filming), Fri promo with a second opening, Sat IQ question, Sun round-up. Full plan under Clubs and content.",
-      "id": "mkt-week",
-      "kind": "approve",
-      "onApprove": "Marketing writes every post in full, ready for you to copy and post yourself.",
-      "title": "This week's posting calendar"
-    },
-    {
-      "agent": "marketing",
-      "detail": "1. You can log a session without a court in about 20 seconds. 2. This week's 5-spot challenge. Remove \"I read every one\" if that isn't true.",
-      "id": "mkt-founder-posts",
-      "kind": "approve",
-      "onApprove": "Marketing finalises both posts for you to paste into Owner tools, Founder posts.",
-      "title": "Two founder posts for players in the app"
-    },
-    {
-      "agent": "marketing",
-      "detail": "The demo paragraph still says \"every\", which the tracker can't promise. It should say \"counts your makes and misses\".",
-      "id": "mkt-landing-every",
-      "kind": "approve",
-      "onApprove": "The builder makes the one-line fix and it comes back here as code ready to go live.",
-      "title": "Fix \"count every make and miss\" on the landing page"
-    },
-    {
-      "agent": "marketing",
-      "detail": "Marketing can't see whether the 23 Oct promo went out. Views, follows and bio link taps per post, from TikTok and Instagram.",
-      "id": "mkt-analytics",
+      "agent": "founder",
+      "detail": "Founding competition (judged on most useful feedback, not a draw; 10 players win Pro for life, 1 club a year of the Club plan; every entrant 25% off; closes 31 Dec 2026). Built behind COMPETITION_LIVE, off by default (PR #144). Before turning it on: (1) a solicitor confirms the judged route and lawful basis (prize-draw cap concern is in the rules doc's founder box); (2) LEGAL_NAME/LEGAL_ADDRESS (the parent, as promoter) set in Vercel; (3) competition row in docs/legal/dpia.md (added 18 Nov in #144: data row, R14, action 8; still needs signing, S1); (4) Resend working on the new domain (S3)... Last checked: 2026-11-18: COMPETITION_LIVE=1 set by the founder; live /competition shows \"Sign up free to enter\" and the promoter; homepage prize card (\"10 players win Deadeye Pro for life\", safety-reviewer wording) live via #148. Still not confirmed: (1) solicitor, (3) DPIA signed, (5) second judge. 2026-11-20: (4) done 2026-11-20: parent emails send from hello@deadeye.ie (S52 closed); no competition entries yet.",
+      "group": "yours",
+      "id": "S50",
       "kind": "task",
-      "onApprove": "It moves to In progress. Paste the numbers to Claude in a chat, then mark it Done.",
-      "title": "Share how your posts did"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/144",
+      "title": "Finish the pre-launch steps (competition is already on)"
     },
     {
-      "agent": "club-growth",
-      "detail": "Agree a head coach (18+, Garda vetting confirmed), one team (U12 to U14 avoids the 16 and 17 parent gap), a start date and a decision date. To finish before December it needs to start by 16 Nov.",
-      "due": "2026-11-16",
-      "id": "club-blazers",
+      "agent": "founder",
+      "detail": "Next video idea from marketing: a 60-second makes challenge, filmed from behind by the founder or another adult, phone on a bag, nobody else in the hall (S10). Approve it or pick another; marketing then writes the script. The other idea (the first promo with three openings) is dropped: the founder is not using that video, its quality is not good enough (18 Nov). Last checked: 2026-11-20: new footage 20261118_174626.mp4 (Deadeye shooting videos folder, 2:18, from behind, rebounder consent confirmed, founder's name on shirt fine) suits it; recommended to the founder, no yes yet.",
+      "group": "decide",
+      "id": "S48",
       "kind": "task",
-      "onApprove": "Club growth writes your call notes and the trial checklist this week.",
-      "title": "Agree the Wexford Blazers trial"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Say yes or no to a 60-second makes challenge as the next video"
     },
     {
-      "agent": "club-growth",
-      "detail": "Two short emails are drafted. Club growth suggests sending them after the Blazers date is set.",
-      "id": "club-outreach",
+      "agent": "marketing",
+      "detail": "Google Play listing words: docs/play-store/README.md still says \"TRACK EVERY SHOT\" (the tracker cannot promise every shot) and uses emoji; it should follow the same rules as posts (docs/agent-os/knowledge/marketing.md). #86 fixed only the short description. Marketing rewrites it before the Play Store listing goes up (S3). Last checked: 2026-11-18: README read, line 31.",
+      "group": "agents",
+      "id": "S47",
       "kind": "approve",
-      "onApprove": "Club growth finalises both emails for you to send once the Blazers date is agreed.",
-      "title": "Emails to Enniscorthy BC and Gorey BC"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/86",
+      "onApprove": "Marketing picks this up in the next session and records the result in STATUS (S47).",
+      "title": "Marketing rewrites the Play Store listing without \"every shot\" or emoji"
     },
     {
-      "agent": "club-growth",
-      "detail": "Needed before an U16 to U18 team can trial: parents of 16 and 17 year olds would get the same read-only view of coach posts. Parent emails are personal data, so the wording is your call.",
-      "id": "c4-consent",
-      "kind": "task",
-      "onApprove": "Club growth and the safety reviewer draft the wording for you to edit and approve.",
-      "title": "Parent consent wording for 16 and 17 year olds"
+      "agent": "Lead",
+      "detail": "Profile photo sometimes shows the emoji (founder, 18 Nov). Cause in Supabase edge logs: right after a session refresh the database API answers the first query with 401 PGRST303 \"JWT issued at future\" for 1 to 2 seconds (15 Nov 13:41 and 14:54, 16 Nov 00:32; the same token worked milliseconds later). The photo lookup swallowed it and showed the emoji; the same hit on profiles or age_checks loses those for that load. Fix merged 18 Nov in #134: both Supabase clients wait 1 s and retry that one error (src/lib/supabase/fresh-token-fetch.ts). After merge: re-run the edge-log query for 401s on... Last checked: 2026-11-18: #134 merged; logs not checked yet.",
+      "group": "agents",
+      "id": "S45",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/134",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S45).",
+      "title": "Check the logs show the profile photo fix working"
+    },
+    {
+      "agent": "Lead",
+      "detail": "Agent model split (#129, merged 18 Nov): agents no longer all run on Opus. Opus: safety-reviewer and video-editor (high), builder and activation-analyst (medium). Sonnet: release-checker, qa-tester, support-triage, designer (high); marketing, club-growth, player-outreach (medium). Table and reasons: docs/agent-os/README.md, Models. After the next weekly run and the next video cut, check each agent's output against its last run; if one is worse, move it up one step (effort first, then model) and note it there. Last checked: 2026-11-18: merged; no run on the new models yet.",
+      "group": "agents",
+      "id": "S44",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/129",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S44).",
+      "title": "After the next weekly run, compare each agent's work with its last run"
     },
     {
       "agent": "activation-analyst",
-      "detail": "21 of 24 players finished setup but never logged a session. Ask 5 of them what they expected, what stopped them, and what would make them open it after training.",
-      "id": "e0",
-      "kind": "task",
-      "onApprove": "The activation analyst writes the message for you to send, and a place to paste the answers.",
-      "title": "Ask 5 players why they stopped"
+      "detail": "Today card read (#126, live 17 Nov): new players see one \"Log shots\" button; markers today_log_tapped, today_track_tapped, today_program_tapped, video_opened show which way in they take (/admin/funnel, Today card group). Read once two weeks of new signups have had 7 days (about 8 Dec): did the share of setup-finished players reaching a first session rise from 3 of 27? Under 30 players it is a hint. Last checked: 2026-11-17: live as the tester, tapping the camera link wrote today_track_tapped, video_opened and tracker_opened.",
+      "group": "agents",
+      "id": "S42",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/126",
+      "onApprove": "Activation-analyst picks this up in the next session and records the result in STATUS (S42).",
+      "title": "Read the Today card numbers around 8 Dec"
     },
     {
-      "agent": "safety-reviewer",
-      "detail": "docs/legal/dpia.md is a draft. Read it with your mam, correct anything wrong, and sign it. It has 6 follow-up actions after that.",
-      "id": "dpia",
+      "agent": "founder",
+      "detail": "Idea from player-outreach (17 Nov exam): add a fixed sign-up answer \"An online community (Reddit, Discord, a forum)\", so those routes stop landing in \"Somewhere else\". A fixed answer only, never a named community or person. Builder change; safety-reviewer reads it first; activation-analyst decides when. Last checked: 2026-11-17: idea only.",
+      "group": "decide",
+      "id": "S43",
       "kind": "task",
-      "onApprove": "It moves to In progress until it's signed.",
-      "title": "Read and sign the data protection assessment"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Decide whether to add \"An online community\" as a sign-up answer"
     },
     {
-      "agent": "release-checker",
-      "detail": "In order: the deadeye.ie domain, then Resend for email, then Stripe Pro (docs/founder-setup-guide.md, parts 1 to 5). Pro payments must be live by 8 Jan.",
+      "agent": "founder",
+      "detail": "Idea from the founder (17 Nov): a \"blur my face\" option in Settings for under-18 players. Assumed to mean a player's own choice for clips and share cards they make in the app, not blur as a fix in Deadeye's own promo videos (that would change the founder's 2026-10-20 no-blur rule; founder to say if that was meant). Needs: what it blurs (share cards, saved clips, coach-visible video), a designer mockup, then safety-reviewer (a blurred child can still be recognised by kit, hall or voice, so it is extra protection, never a stand-in for consent). Last checked: 2026-11-17: no blur feature in the app today.",
+      "group": "decide",
+      "id": "S41",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Say what \"blur my face\" should blur, so the designer can draw it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker speed, merged and live 14 Nov: #113 (a7e98ba) half speed when an upload loses frames; #115 (34b12cd) live camera frames cropped on the graphics chip; #118 (9d84e81) uploads decoded with WebCodecs; #119 (d86f0ad) plays the clip instead if decoding scores nothing in 8 s; #120 (d34f1f4) the service worker no longer serves stale tracker workers. Founder, on a phone: reload the app once (to pick up the new service worker), then upload a clip (\"Checking every frame of the clip, without playing it\", faster than the clip's length) and do a short live session (calls should arrive; before... Last checked: 2026-11-14: live site, Chrome, tester: 20 s upload decoded in under 7 s, 3/3 right.",
+      "group": "yours",
+      "id": "S38",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/113",
+      "title": "On your phone: reload the app, upload a clip, do a short live session"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker accuracy, merged 14 Nov in #108 (70ac521), with the four runs that lost calls accepted by the founder: bench 535 to 595 of 656, hold-out clip 5 120 to 133 of 174. Founder: try it in a real session on a phone; /admin/tracker should show fewer switched and never-called shots as sessions are saved. Last checked: 2026-11-14: merged.",
+      "group": "yours",
+      "id": "S37",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/108",
+      "title": "Use the tracker in a real session on your phone"
+    },
+    {
+      "agent": "founder",
+      "detail": "Sign the DPIA (docs/legal/dpia.md, section 7) with the account holder, then its 7 open actions (action 7, routine import, is done apart from S21). Add the marketing footage pipeline (stills go to Anthropic in Claude Code sessions), and Focus Finder AI plans (PR #103). From its safety review: section 1 row (free text, picked weaknesses, position, level, make rates, IQ scores, coach read counts, setup goals; team age group, level, size; contract plus parent consent for 13-15; plan kept for the account's life, text not kept, provider 30 days); R5 support line now shown in the browser; R11... Last checked: 2026-11-13: still DRAFT; sign-up answer row and R8 added on PR #97.",
+      "group": "yours",
+      "id": "S1",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/103",
+      "title": "Sign the data protection assessment (DPIA) with your mam"
+    },
+    {
+      "agent": "founder",
+      "detail": "Hoop model credits (ml/rim-detector/ATTRIBUTION.md): rim-finding shipped 3 Nov, CC BY needs the credit. Done: ballllls, X-Basket, basketball-computer-vision (links added 11 Nov). Missing: the page link for Basketball Shot Tracking (311 images, CC BY 4.0, classes ball, rim, backboard; the Colab file was Basketball Shot Tracking.coco.zip). Not found by the founder or by web search. If it cannot be found, ask whether to drop that dataset and retrain. Last checked: 2026-11-11: 3 of 4 linked.",
+      "group": "yours",
+      "id": "S2",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Find the link for the last hoop dataset, or say drop it and retrain"
+    },
+    {
+      "agent": "founder",
+      "detail": "Billing: Stripe Pro live by 2027-01-08. Every field to fill in, step by step (sandbox A-E, live F), is in docs/handoffs/2026-11-20-pricing-stripe.md (\"Stripe steps\"); the founder does it with their mam, who holds the account (18+) and the payout IBAN. Choices already made: Pick what you need (not Managed Payments), subscriptions and invoices, no Collect tax yet, prices tax-inclusive, free week added by the app. Club billing by 2027-02-01 (ask Claude by mid-December); then the Play Store (docs/play-store/README.md). Last checked: 2026-11-20: sandbox account started; waiting until the founder is with their mam to enter the details.",
       "due": "2027-01-08",
-      "id": "billing",
+      "group": "yours",
+      "id": "S3",
       "kind": "task",
-      "onApprove": "Claude walks you through deadeye.ie step by step the next time you chat.",
-      "title": "Set up deadeye.ie, email and Stripe payments"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Stripe Pro live by 8 Jan (domain and email done)"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tuesday video v4: parent/adult consent for the shooter and the bystander in clip 16761, then post with a TikTok/Meta library sound (AI label if the AI voice is used). Last checked: 2026-11-11.",
+      "group": "yours",
+      "id": "S5",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Get consent for the two people in the Tuesday video, then post it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Promo numbers: views, likes, profile visits, follows, retention and audience for TikTok and Instagram are in docs/agent-os/marketing/results.md (18 Nov, #131). Still missing: link taps per platform and the TikTok post date. Last checked: 2026-11-18: results.md on main read.",
+      "group": "yours",
+      "id": "S6",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/131",
+      "title": "Add link taps per platform and the TikTok post date to the results"
+    },
+    {
+      "agent": "founder",
+      "detail": "Tracker visuals (PR #99): try them on a phone in a real session, inline and full screen sideways; only checked on stills from the sample clip so far. Also decide whether \"N in a row\" should show at phone size (it is left out there when it would cover the full-screen button). Last checked: 2026-11-13.",
+      "group": "yours",
+      "id": "S27",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/99",
+      "title": "Try the tracker visuals on your phone and decide on \"N in a row\""
+    },
+    {
+      "agent": "founder",
+      "detail": "New filming for posts: phone in shot on a bag, head height, not facing windows, nobody else in the hall, a girl player for some posts. Last checked: 2026-11-11.",
+      "group": "yours",
+      "id": "S10",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Film new clips for posts: phone on a bag, nobody else in the hall"
+    },
+    {
+      "agent": "founder",
+      "detail": "Getting players in. Counts 16 Nov (docs/agent-os/data/2026-11-16-funnel.md on the agent-os branch): 35 joined, 27 finished setup, 3 logged a first session; 2 joined in the last 7 days (both set up, 0 first sessions). Not started by the founder (18 Nov): the Wexford Blazers next step (agree a head coach and start date, dated 9 Nov in docs/agent-os/clubs/pipeline.md), the Enniscorthy and Gorey drafts (2026-11-09-clubs.md), and all three outreach routes in docs/agent-os/outreach/routes.md (E0 messages, local media, FDYS: all drafted, none sent). Last checked: 2026-11-18: founder says the Blazers trial and the two club emails are not started; the 13-15 Nov weekend posts were never made.",
+      "group": "yours",
+      "id": "S11",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Pick one to start: Blazers trial, the two club emails, or messaging 5 players"
+    },
+    {
+      "agent": "founder",
+      "detail": "Hoop finder: retry with the live camera on a phone (Chrome's permission bubble blocked it in testing). Last checked: unconfirmed since 2026-11-03.",
+      "group": "yours",
+      "id": "S13",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Try \"Find the hoop for me\" with the live camera on your phone"
+    },
+    {
+      "agent": "founder",
+      "detail": "Error tracking: Sentry is not in the app, so support-triage has only Vercel errors (kept about an hour on Hobby). Adding Sentry needs a backlog item and a safety review. Last checked: 2026-11-11.",
+      "group": "decide",
+      "id": "S15",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Decide whether to add Sentry to catch app errors"
+    },
+    {
+      "agent": "Lead",
+      "detail": "agents/skills/agent-os/ in the main checkout is an untracked, outdated Codex copy of the agent-os skill: regenerate or delete. Last checked: 2026-11-18: being regenerated by Codex in the main checkout (staged, not committed).",
+      "group": "agents",
+      "id": "S16",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S16).",
+      "title": "Check Codex's new copy of the agent-os skill when it lands"
+    },
+    {
+      "agent": "founder",
+      "detail": "Read the C4 parent-consent draft (backlog C4: parents of 16 and 17 year olds can see coach posts). Last checked: 2026-11-11: still idea in the backlog.",
+      "group": "yours",
+      "id": "S19",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Read the parent consent draft for 16 and 17 year olds"
+    },
+    {
+      "agent": "founder",
+      "detail": "US transfer for AI data: sources disagree on whether Anthropic is on the EU-US Data Privacy Framework list. Its DPA's EU SCCs cover the transfer either way; record a check of dataprivacyframework.gov or a short transfer impact assessment in the DPIA (action 7). Applies to every AI feature, not only routine import. Last checked: 2026-11-11: raised by the safety re-review.",
+      "group": "decide",
+      "id": "S21",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Get a legal answer on AI data going to the US, then note it in the DPIA"
+    },
+    {
+      "agent": "founder",
+      "detail": "Trend board TikTok gap. Done 13 Nov: docs/agent-os/trends/ads.md filled from marketing's scan (written in by the lead on the founder's word; the agent's write was blocked by the older guard in the main checkout, fixed once the main checkout is pulled) plus the Meta Ad Library, Ireland, read in a browser. Left: TikTok Creative Center (Top Ads, Trend Discovery) needs a TikTok for Business login; the founder logs in (free) and pastes UK Trend Discovery, Sports, 7 days, or marketing keeps working without it. Last checked: 2026-11-13: board written; TikTok login gap.",
+      "group": "yours",
+      "id": "S32",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "title": "Log in to TikTok Creative Center (free), or tell marketing to skip it"
+    },
+    {
+      "agent": "designer",
+      "detail": "FDYS poster (outreach plan, route 3): safety-reviewer reads it before it is printed: QR to the plain address only, no identifiable under-18s. Not drafted yet (designer). Last checked: 2026-11-13: poster not made.",
+      "group": "agents",
+      "id": "S33",
+      "kind": "approve",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "onApprove": "Designer, then safety-reviewer picks this up in the next session and records the result in STATUS (S33).",
+      "title": "Designer makes the FDYS poster, then the safety reviewer checks it"
+    },
+    {
+      "agent": "founder",
+      "detail": "Film and Plays (docs/plans/film-and-plays.md), merged in #112 and live: Plays (36 library plays, editor, role quiz, team playbook, assigning) is open to everyone. Film (39 starter clips, all free; YouTube does not allow charging for embedded video) is open to players: the founder set FILM_LIVE=true (Production) on 14 Nov and every production deploy since has it (checked 18 Nov: latest is #131, 8298a8e). It went live before the DPIA was signed. Founder: (1) sign the DPIA (S1; rows for plays and film, YouTube as a recipient, R12, R13 added 14 Nov), planned for 19 Nov; if that slips, set... Last checked: 2026-11-18: Vercel env FILM_LIVE (Production, created 14 Nov) and production deploys checked; Film open to players. 2026-11-14: live as the tester: /plays lists the library (12 free), a play animates through its 6 steps, /film shows \"Film is on the way\"; DB has 36 plays, 39 published free clips, 2 packs.",
+      "group": "yours",
+      "id": "S36",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
+      "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
     }
   ],
   "clubs": {
@@ -360,10 +541,6 @@
       "label": "Work with one agent for a whole session"
     },
     {
-      "cmd": "check E4 live",
-      "label": "Have Claude test E4 on the live site (after the reset)"
-    },
-    {
       "cmd": "/handoff",
       "label": "Wrap up a session and write the handoff"
     }
@@ -395,6 +572,11 @@
       "title": "Founding club offer closes"
     },
     {
+      "date": "2026-12-31",
+      "detail": "After deadeye.ie is live and the assessment is signed",
+      "title": "Aim: Deadeye on Google Play"
+    },
+    {
       "date": "2027-01-08",
       "detail": "Founding members' free Pro starts ending from about 20 Jan",
       "title": "Stripe Pro payments live"
@@ -408,42 +590,22 @@
   "film": {
     "days": [
       {
-        "day": "Mon 9",
-        "post": "Promo, opening A",
-        "where": "TikTok 17:00 · Reel 18:00"
+        "day": "Fri 20",
+        "post": "Founder post in the app: \"Two weeks, starting Monday\" (or Focus Finder / Log it by hand)",
+        "where": "In the app"
       },
       {
-        "day": "Tue 10",
-        "post": "Demo on a phone, poll: do you count your makes?",
-        "where": "IG Story 18:00"
+        "day": "Sat 21",
+        "post": "Day 0 carousel: 4 photos of an empty court + the 5-spot 3s screen, \"Starts Monday\"",
+        "where": "TikTok photo post 11:00 · IG carousel 12:00"
       },
       {
-        "day": "Wed 11",
-        "post": "Log it in 20 seconds, no court",
-        "where": "TikTok 17:00 · Reel 17:30"
-      },
-      {
-        "day": "Thu 12",
-        "post": "5-spot challenge (needs filming)",
-        "where": "TikTok 17:30 · Reel 18:00"
-      },
-      {
-        "day": "Fri 13",
-        "post": "Promo, opening B or C",
-        "where": "TikTok 17:00 · Reel 18:00"
-      },
-      {
-        "day": "Sat 14",
-        "post": "Film IQ: one question",
-        "where": "IG Story"
-      },
-      {
-        "day": "Sun 15",
-        "post": "Challenge round-up, counts only",
-        "where": "IG Story 17:00"
+        "day": "Sun 22",
+        "post": "Story: \"Guess my Day 1 score\" slider + link sticker; answer Monday",
+        "where": "IG Story 17:00 · 19:00"
       }
     ],
-    "experiment": "One promo, three openings. Keep the opening with the best 6-second hold once each has about 1,000 views."
+    "experiment": "Shooting series from Mon 23 Nov: opening A (action first) vs B (number first), alternating; read on average watch time and the 3-second hold. Under about 1,000 views it is a hint."
   },
   "funnel": {
     "history": [
@@ -549,12 +711,12 @@
       "status": "ok"
     },
     {
-      "detail": "Running E4 (PR #74). Deploy ready.",
+      "detail": "Live and up to date: the latest version (PR #159, 20 Nov) is running (checked 21 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "0 errors in the last 24 hours. 0 problem or crash reports open.",
+      "detail": "No new errors since 10:08 on 20 Nov. The 3 parent-email failures that morning came before the sender address was fixed; emails send now (checked 21 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -564,97 +726,149 @@
       "status": "warn"
     },
     {
-      "detail": "1 open (#77), checks passed. Every agent pull request is checked automatically.",
+      "detail": "3 open, checks green: PR #160 (screen designs), PR #158 (blur rule) and PR #95 (agent scheduled runs), docs only.",
       "name": "Code changes",
       "status": "ok"
     }
   ],
   "learn": [
     {
+      "agent": "video-editor",
+      "date": "2026-11-18",
+      "latest": "The first second decides the video. Frame 0 is a shot already in the air or dropping through the net with the count on screen, never a lead-in, logo or setup.",
+      "lessons": 23
+    },
+    {
       "agent": "marketing",
-      "date": "2026-11-07",
-      "latest": "Check the whole video yourself, frame by frame where things move, before the founder sees it. Show a finished cut, not a draft to proofread.",
-      "lessons": 8
+      "date": "2026-11-18",
+      "latest": "A series repeats one session (Day 1, 7, 14) so the answer is fair; never stage a bad day.",
+      "lessons": 10
+    },
+    {
+      "agent": "player-outreach",
+      "date": "2026-11-18",
+      "latest": "Never \"second prize\" or \"came second\" (banned practice under EU consumer law), say \"everyone who entered gets 25% off\".",
+      "lessons": 4
     },
     {
       "agent": "builder",
-      "date": "2026-11-03",
-      "latest": "Build locally with Turbopack (plain next build), never --webpack; run any worker on the live site before calling it done.",
-      "lessons": 13
+      "date": "2026-11-16",
+      "latest": "Every new EVENT_NAMES entry is named in the privacy page's \"A few steps you reach in the app\" clause in the same branch.",
+      "lessons": 16
     },
     {
-      "agent": "release-checker",
-      "date": "2026-11-07",
-      "latest": "Every variable in .env.example that the changed code reads must be confirmed in Vercel Production by name.",
-      "lessons": 9
+      "agent": "safety-reviewer",
+      "date": "2026-11-16",
+      "latest": "A condition I set is checked as a fact today, and if it is false it becomes a finding with a fix, not a note.",
+      "lessons": 4
     },
     {
-      "agent": "support-triage",
-      "date": "2026-11-07",
-      "latest": "Silent failures (cron, push, email) never arrive as reports. Read /admin/cron-runs and the counts too.",
-      "lessons": 7
+      "agent": "activation-analyst",
+      "date": "2026-11-16",
+      "latest": "A bet's success line is a number of players out of a counted denominator, and the screen it changes must already have a marker, or the item adds one.",
+      "lessons": 2
     }
   ],
   "log": [
     {
-      "at": "2026-11-09T14:58:00Z",
-      "text": "PR check ran on PR #77 (E4 follow-ups): safety PASS, tsc, eslint and tests pass, comment posted.",
+      "at": "2026-11-21T08:09:19Z",
+      "text": "Morning check: live site up to date (PR #159). 3 parent-email errors on 20 Nov, all before the sender fix; nothing new. 3 pull requests open, all green.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-09T14:42:00Z",
-      "text": "PR #75 merged: this week's report, marketing plan, club plan and backlog are on main.",
+      "at": "2026-11-20T19:02:06Z",
+      "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 3 new, 0 gone since the last update.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-09T14:40:00Z",
-      "text": "PR #74 merged and live: E4 reminders card on the dashboard.",
+      "at": "2026-11-20T16:15:27Z",
+      "text": "Learning digest: 24 new lessons (video editor 4, marketing 4, builder 3, safety reviewer 3, player outreach 3, activation analyst 2, club growth 2, QA tester 2, support triage 1). No research due.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-09T14:34:00Z",
-      "text": "PR check ran itself on PR #74's new commits: safety PASS, tsc, eslint and tests pass, comment posted.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T14:14:00Z",
-      "text": "Morning check: 0 runtime errors in 24h, production READY on newest main commit, 3 open PRs none red. No P1.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:55:00Z",
-      "text": "Plugin check: campaign-plan, draft-outreach, metrics-review and analyze all load in the cloud.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:32:00Z",
-      "text": "PR #73 merged and live: sign-in cookies kept on redirects.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T12:28:00Z",
-      "text": "Weekly re-run finished: PR #74 (E4) and PR #75 (report and plans) opened.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-09T09:05:00Z",
-      "text": "Weekly run could not push (403): this week's first run was lost.",
-      "tone": "bad"
-    },
-    {
-      "at": "2026-11-09T08:43:00Z",
-      "text": "Counts job saved this week's funnel.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-07T16:28:00Z",
-      "text": "Training reminders work again (push keys added).",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-10-24T12:00:00Z",
-      "text": "Last new player joined.",
+      "at": "2026-11-20T10:41:00Z",
+      "text": "PR #156 was merged before its check finished: the \"unlimited\" Pro wording (safety BLOCK) is live. Fix needs a new fix/ branch. Checks all pass.",
       "tone": "warn"
+    },
+    {
+      "at": "2026-11-20T10:45:00Z",
+      "text": "PR #156 (pricing guards) checked: safety BLOCK, \"unlimited\" still on 5 screens. All checks pass. Back to builder.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-20T08:15:00Z",
+      "text": "Morning check: no errors in the last 24 hours. Live site is the latest version (PR #151). 2 pull requests open, both green. Nothing needs you.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T14:25:00Z",
+      "text": "PR #151 (email links in any browser) checked: safety PASS, all checks pass. Merge, then change 3 Supabase email templates.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T10:03:45Z",
+      "text": "Marketing mid-week: weekend 20 to 22 Nov drafted as the shooting series warm-up (founder post, Day 0 carousel, Story guess). Three picks waiting for you. No marketing decisions in the hub, no new numbers since 18 Nov.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-19T08:15:00Z",
+      "text": "Morning check: no errors on the live site in the last 24 hours; the live site is running the newest version (PR #149) and is ready; 1 pull request open (#95), checks green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:18:00Z",
+      "text": "PR #148 re-check on af4cbd6 (For clubs moved second in phone menu): safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:15:10Z",
+      "text": "PR #148 re-check on d0e1c6f (adds competition prize card): safety PASS with notes, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:14:43Z",
+      "text": "PR #148 check on d0e1c6f: safety PASS (prize card hidden until COMPETITION_LIVE; separate note on the old only-N-left offer pill), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T23:09:36Z",
+      "text": "PR #148 check on bf46a84: safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T22:42:20Z",
+      "text": "PR #146 check on 82b11f4: safety PASS (banner wording suggestion), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:50:00Z",
+      "text": "PR #141 check on 9f1f38e: safety PASS, all checks green (typegen, tsc, eslint, 8/8 tests). No migrations or env vars. Comment posted on the PR.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:07:00Z",
+      "text": "PR #139 check on 5ae723e (main merged in): safety PASS, all checks green (typegen, tsc, eslint, 7/7 tests, full suite 1721 passed). No migrations or env vars. It was already merged at 13:04 UTC, so no merge card was added.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:15:00Z",
+      "text": "PR #139 (HQ to-do list built from STATUS and open PRs) merged to main at 13:04 UTC. Its merge call is cleared.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:10:00Z",
+      "text": "PR #137 (privacy page names the Today card taps, S46) merged to main at 13:01 UTC. Its merge call is cleared.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:02:12Z",
+      "text": "PR #137 re-checked on 9b87eab after the merge from main: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-18T13:05:00Z",
+      "text": "PR #139 (HQ to-do list built from STATUS) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 139.",
+      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -671,7 +885,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-11T19:30:00Z",
-  "updatedBy": "Claude (new agents)",
-  "version": 1
+  "updatedAt": "2026-11-21T08:09:19Z",
+  "updatedBy": "Morning check"
 }

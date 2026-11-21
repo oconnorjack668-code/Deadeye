@@ -1,6 +1,6 @@
 # Support triage knowledge
 
-Last researched: 2026-11-07
+Last researched: 2026-11-16
 
 Read `README.md` in this folder for how this file works.
 
@@ -44,7 +44,11 @@ Newest first. Seeded 2026-11-07 from real failures in the handoffs.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16 · First run with a results review: no earlier support report existed in `reports/`, so
+  nothing to check. The weekly "Crash reports open" count includes owner and test accounts and every
+  crash ever left open (`agent-counts/route.ts:28`), so a jump after a night of live debugging is
+  most likely the founder's own. **Rule:** read the crash count as "includes our own tests" until it
+  is split; compare it with the funnel steps (owner and test left out) for the same page.
 
 ## Checklist before the founder sees a triage report
 
@@ -64,6 +68,8 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] Each fix ticket names the phone check the founder must run and says whether the fix is proven
       in a browser or only in a test.
 - [ ] No name, email, id or identifying quote copied anywhere.
+- [ ] Crash count read against the funnel (it includes owner and test accounts) and against the
+      merge times of the night before.
 
 ## Research
 

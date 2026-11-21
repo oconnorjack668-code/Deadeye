@@ -1,6 +1,6 @@
 # Builder knowledge
 
-Last researched: 2026-11-14 (YouTube IFrame API, developer policies, oEmbed)
+Last researched: 2026-11-16 (recording a funnel step from the client: Next prefetching, React effects)
 
 Read `README.md` in this folder for how this file works. Stack then: Next.js
 16.4.2, React 19.2.8, eslint-plugin-react-hooks 7.1.1, Vitest 5 + jsdom.
@@ -77,6 +77,16 @@ in brackets).
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-16 · The privacy page lists the recorded app steps as a closed
+  list. E3 added steps without naming them and safety review blocked it
+  (`3207e06`, 25 Oct); F2 and F3 then added `play_opened`, `play_quiz_done`,
+  `play_drawn`, `film_opened` and `film_done` and the clause still names none
+  of them (found building E6; left for the founder, S45). **Rule:** every new
+  `EVENT_NAMES` entry is named in the privacy page's "A few steps you reach
+  in the app" clause in the same branch, with a line in
+  `__tests__/privacy-page.test.tsx`; quote the wording change in the reply
+  for the founder to approve.
+
 - 2026-11-14 · Plays (00061) and Film (00062) marked quiz answers on the
   server, but still granted players INSERT on `play_quiz_attempts` and
   `film_attempts`, so anyone could post any score straight to the Supabase API
@@ -131,6 +141,9 @@ file). Newest first, each with the date, what happened, and the rule.
       the player asks for it; a YouTube video goes through `TapToLoadYouTube`
       (or `FilmClipPlayer`, which shares its tap card); the privacy page names
       whoever receives data.
+- [ ] A new `EVENT_NAMES` step: in `docs/funnel-counts.sql`, in `funnel.ts`
+      (admin page and weekly counts), and named in the privacy page's app-steps
+      clause with a privacy-page test; fired from a client effect.
 - [ ] A `'use server'` file exports only async functions: constants and
       helpers live in `src/lib/` (caught on F3 before it shipped).
 - [ ] Camera/video: `playsInline` + `muted`, tracks stopped on unmount, each

@@ -128,6 +128,18 @@ when a better source arrives, rather than adding beside it.
   **Deadeye:** friend and team features fit why teens open apps.
   [source](https://www.ofcom.org.uk/media-use-and-attitudes/media-habits-children/children-and-parents-media-use-and-attitudes-report-2025), 2025, official (UK).
 
+### Setting the target
+
+- A survey of 500+ products (2022) put average activation at 34% and the
+  median at 25% (SaaS: 36% and 30%); definitions differ by product, so it is
+  a rough guide. **Deadeye:** 40% in 7 days is above the median, a fair
+  stretch, but only readable with about 30 players a cohort.
+  [source](https://www.lennysnewsletter.com/i/77646597/vi-sales-outreach), 2022, practitioner.
+- Userpilot's 2024 report on 62 B2B SaaS companies: average 37.5%, median
+  37%. B2B, so weak for a teen sports app; no consumer or fitness benchmark
+  with a stated method was found (2026-11-16 search).
+  [source](https://userpilot.com/saas-product-metrics/), 2024, practitioner.
+
 ### Reading small numbers
 
 - For rates from small samples use the adjusted Wald interval (add about
@@ -154,6 +166,8 @@ when a better source arrives, rather than adding beside it.
 - What first session feels like a win to a 13 to 17 player: 5 minutes,
   25 shots, one drill? No research found on this.
 - Do club or coach-invited players activate faster than solo signups?
+- A consumer or fitness activation benchmark with a stated method (Amplitude's
+  benchmark report may have one; its page was not reachable on 2026-11-16).
 - Most streak, reminder and leaderboard trials are on adults; look for
   teen trials next.
 - What the DPC's Fundamentals for children say about nudges, streaks and

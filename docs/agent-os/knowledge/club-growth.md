@@ -16,7 +16,15 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-16: safety-reviewer blocked the clubs plan: Gorey's draft pitched U10 and U12 teams and
+  the fallback trial team was U13, but Deadeye is 13 and over; the DSCO facts said teammates see
+  nothing (the team page shows each teammate's weekly totals, streak and game averages) and left
+  out film questions. Rule: check the 13+ minimum before pitching any team (an U14 team includes
+  12 year olds), and check every DSCO fact against the code before it goes in a plan.
+- 2026-11-16: the Wexford Blazers trial aimed "by 16 Nov" passed with 0 coaches set up; no head
+  coach or kick-off night had been named, and the club sat in `talking` 25 days. Rule: a trial
+  date counts only with a named head coach (role), a kick-off training night and the DSCO told;
+  ask for all three together and write a pause date into the pipeline.
 
 ## Checklist
 
@@ -40,6 +48,9 @@ file). Newest first, each with the date, what happened, and the rule.
 
 ### Trial plans
 
+- [ ] Every team pitched or trialled is one where all players are 13 or over (U15 and older).
+- [ ] Each DSCO fact checked against the code (team page, film questions, coach views, AI data).
+- [ ] The start is a training night with a named head coach (role) and a pause date if it slips.
 - [ ] One team first: head coach as champion, a committee contact (chair or underage
       coordinator) who knows it is running, and the DSCO told in writing before players join.
 - [ ] Two or three success criteria readable from the Monday counts, and a decision date.

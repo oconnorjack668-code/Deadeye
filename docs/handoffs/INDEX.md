@@ -13,6 +13,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-17 · exam-followups · Save fix, Today first step, agent fixes live (#125-127); S42, S43 → [handoff](2026-11-17-exam-followups.md)
 - 2026-11-17 · agent-exams-baseline · First exams for all 11 agents: 39/49 pass, 0 fail; S39, S40 opened → [handoff](2026-11-17-agent-exams-baseline.md)
 - 2026-11-17 · s35-lesson-videos · 5 dead lesson videos replaced; 00066 applied live, #124 merged → [handoff](2026-11-17-s35-lesson-videos.md)
+- 2026-11-16 · e6-dashboard-seen · dashboard_seen marker for no-session players, on exp branch for review → [handoff](2026-11-16-e6-dashboard-seen.md)
 - 2026-11-14 · tracker-speed · Uploads decoded not played (every frame, ~3x faster); camera off main thread (#113 #115 #118) → [handoff](2026-11-14-tracker-speed.md)
 - 2026-11-14 · tracker-accuracy-steady-slow · Bench 81.6% to 90.7%, hold-out 69% to 76%; steadier, slow phones (#108) → [handoff](2026-11-14-tracker-accuracy-steady-slow.md)
 - 2026-11-14 · film-and-plays-live · Plays live for all; Film built, closed until S1; #112 → [handoff](2026-11-14-film-and-plays-live.md)
