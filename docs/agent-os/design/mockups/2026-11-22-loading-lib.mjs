@@ -26,24 +26,10 @@ export async function fontCss() {
   return parts.join('\n');
 }
 
-// The Deadeye ball, redrawn as SVG from public/icon-512.png (red ball, dark ring, crosshair, two seams).
-// An approximation for the prototype: the builder uses the real asset (see the doc, "Build").
-let uid = 0;
+// The Deadeye ball: the faithful SVG redraw of the logo (docs/agent-os/design/logo/), in its own square box.
+import { VARIANTS, parts } from '../logo/2026-11-22-logo-lib.mjs';
 export function ball() {
-  const id = `g${++uid}`;
-  return `<svg viewBox="0 0 690 690" width="100%" height="100%" aria-hidden="true" focusable="false">
-<defs><linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="0" y1="40" x2="0" y2="650"><stop offset="0" stop-color="#ff4352"/><stop offset="1" stop-color="#d1121f"/></linearGradient>
-<clipPath id="${id}c"><circle cx="345" cy="345" r="306"/></clipPath></defs>
-<circle cx="345" cy="345" r="322" fill="#7d0d18"/>
-<circle cx="345" cy="345" r="306" fill="url(#${id})"/>
-<g clip-path="url(#${id}c)">
-<circle cx="345" cy="345" r="196" fill="#121214"/>
-<circle cx="345" cy="345" r="92" fill="url(#${id})"/>
-<path d="M78 170 C205 262 222 428 78 520" fill="none" stroke="#0a0a0b" stroke-width="46"/>
-<path d="M612 170 C485 262 468 428 612 520" fill="none" stroke="#0a0a0b" stroke-width="46"/>
-<rect x="322" y="0" width="46" height="690" fill="#0a0a0b"/>
-<rect x="0" y="322" width="690" height="46" fill="#0a0a0b"/>
-</g></svg>`;
+  return parts(VARIANTS.faithful, 'b').ball;
 }
 
 /** Page shell: a 390x844 phone column, font inside, replay and reduced-motion controls (hidden when capturing). */
@@ -83,7 +69,7 @@ ${tools ? `<div class="tools"><button type="button" id="replay">Replay</button><
   if(location.search.indexOf('cap')>-1) root.classList.add('cap');
   if(location.search.indexOf('rm')>-1) root.classList.add('rm');
   var phone=document.getElementById('phone');
-  function play(){root.classList.remove('play','skipped');void phone.offsetWidth;root.classList.add('play');}
+  function play(){root.classList.remove('play','skipped');void phone.offsetWidth;root.classList.add('play');document.querySelectorAll('svg').forEach(function(s){if(s.setCurrentTime){s.setCurrentTime(0);s.unpauseAnimations();}});}
   window.__play=play;
   var rb=document.getElementById('replay'); if(rb) rb.addEventListener('click',play);
   var mb=document.getElementById('rm');

@@ -101,7 +101,7 @@ html.cap .tools{display:none}
   if(location.search.indexOf('cap')>-1) root.classList.add('cap');
   if(location.search.indexOf('rm')>-1) root.classList.add('rm');
   var phone=document.getElementById('phone');
-  function play(){root.classList.remove('play','skipped');void phone.offsetWidth;root.classList.add('play');}
+  function play(){root.classList.remove('play','skipped');void phone.offsetWidth;root.classList.add('play');document.querySelectorAll('svg').forEach(function(s){if(s.setCurrentTime){s.setCurrentTime(0);s.unpauseAnimations();}});}
   window.__play=play;
   var rb=document.getElementById('replay'); if(rb) rb.addEventListener('click',play);
   var mb=document.getElementById('rm');

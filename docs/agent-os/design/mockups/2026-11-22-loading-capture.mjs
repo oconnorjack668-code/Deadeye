@@ -54,7 +54,7 @@ const send = (method, params = {}) => new Promise((res) => {
 const evalJs = (expression) => send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
 
 async function shot(t, out) {
-  await evalJs(`(async()=>{document.getAnimations().forEach(a=>{a.pause();a.currentTime=${t}});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return 1})()`);
+  await evalJs(`(async()=>{document.getAnimations().forEach(a=>{a.pause();a.currentTime=${t}});document.querySelectorAll('svg').forEach(s=>{if(s.pauseAnimations){s.pauseAnimations();s.setCurrentTime(${t}/1000)}});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return 1})()`);
   const s = await send('Page.captureScreenshot', { format: 'png' });
   fs.writeFileSync(out, Buffer.from(s.result.data, 'base64'));
 }
@@ -66,7 +66,7 @@ try {
   await evalJs('document.fonts.ready.then(()=>true)');
   await sleep(300);
   // Restart the animations and pause them in the same tick: finished animations drop out of getAnimations(), so they must not be left to run.
-  await evalJs('window.__play();document.getAnimations().forEach(a=>a.pause());1');
+  await evalJs('window.__play();document.getAnimations().forEach(a=>a.pause());document.querySelectorAll("svg").forEach(s=>s.pauseAnimations&&s.pauseAnimations());1');
   if (process.env.TIMES) {
     // Preview mode: a few stills at chosen times into the temp folder, no video.
     for (const t of process.env.TIMES.split(',')) await shot(Number(t), path.join(os.tmpdir(), `dd-prev-${name}-${t}.png`));
