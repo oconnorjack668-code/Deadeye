@@ -17,6 +17,17 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-20 (notes on the review mockups) · Founder, screen by screen. **Keep or bring back:** the
+  mail icon on "Check your email"; the Deadeye logo and the top menu bar on the website; icons in
+  general, including the Log menu icons ("icons make the app look nicer"). **Liked:** the all-black
+  background; some text moved from red to orange (red reads as something bad); white numbers in the 4
+  Today stat boxes; on the website, proof first and the competition as one row. **Needs more:** the
+  first-session result was "way simpler ... less cool"; it must look appealing and well made. Share and
+  rank cards are too simple, before and after: "a user wants a cool looking share card to flex their
+  score". Today was good; fix text that overlaps or sits too far from what it belongs to. Log menu
+  colours: open (recommended: each row keeps its section's colour). Look: take ideas from Strava without
+  copying it; Deadeye has its own look that feels familiar: sleek, professional, simple, easy to use,
+  while also looking cool.
 - 2026-11-20 (later) · Founder on the three directions (Arena, HUD, Glass): "too much", "didn't look
   professional at all", "I prefer the old look". What was meant: "futuristic" only slightly, only where
   it improves a part; "vibrant" means bright, nice colour where colour is needed, not everywhere; "cool"
