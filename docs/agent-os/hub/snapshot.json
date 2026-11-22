@@ -711,12 +711,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #159, 20 Nov) is running (checked 21 Nov).",
+      "detail": "Live and up to date: the latest version (PR #159, 20 Nov) is running (checked 22 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No new errors since 10:08 on 20 Nov. The 3 parent-email failures that morning came before the sender address was fixed; emails send now (checked 21 Nov).",
+      "detail": "No errors on the live site in the last 24 hours (checked 22 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -726,7 +726,7 @@
       "status": "warn"
     },
     {
-      "detail": "3 open, checks green: PR #160 (screen designs), PR #158 (blur rule) and PR #95 (agent scheduled runs), docs only.",
+      "detail": "3 open, checks green: PR #160 (screen designs), PR #158 (blur rule) and PR #95 (agent scheduled runs), docs only (checked 22 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -771,13 +771,18 @@
   ],
   "log": [
     {
-      "at": "2026-11-21T08:09:19Z",
-      "text": "Morning check: live site up to date (PR #159). 3 parent-email errors on 20 Nov, all before the sender fix; nothing new. 3 pull requests open, all green.",
+      "at": "2026-11-22T08:09:11Z",
+      "text": "Morning check: live site up to date (PR #159). No errors in the last 24 hours. 3 pull requests open, all green.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-20T19:02:06Z",
-      "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 3 new, 0 gone since the last update.",
+      "at": "2026-11-21T19:02:21Z",
+      "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 0 new, 0 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-21T08:09:19Z",
+      "text": "Morning check: live site up to date (PR #159). 3 parent-email errors on 20 Nov, all before the sender fix; nothing new. 3 pull requests open, all green.",
       "tone": "ok"
     },
     {
@@ -885,6 +890,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-21T08:09:19Z",
+  "updatedAt": "2026-11-22T08:09:11Z",
   "updatedBy": "Morning check"
 }
