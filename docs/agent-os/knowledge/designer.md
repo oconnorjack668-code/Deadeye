@@ -8,6 +8,16 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 
 ## Lessons from the founder
 
+- 2026-11-22 · Founder's standard for every design, not only loading: "make the animations smooth and the
+  designs nice and well made looking, not simple and unpolished looking; that applies for every design."
+  Brand is **black and red**: red for the logo and slogans like "AIM IS EARNED", orange for actions.
+  Sleek, professional, easy to understand, looks cool, never busy. **Rule:** motion is transform and
+  opacity only, eased (`var(--ease-deadeye)` or a stated curve), 60 fps, tested on a throttled CPU; a design
+  is shown as a working prototype the founder can watch (HTML plus an MP4 rendered frame by frame), not a
+  still, when motion is the point; plain boxes and bare bars are not finished. Also learned: a CSS-only
+  prototype can be captured exactly by restarting the page's animations, pausing them in the same tick and
+  setting `currentTime` per frame (finished animations drop out of `getAnimations()`, so never wait first).
+  Auto-updating text (a rotating slogan) falls under WCAG 2.2.2: say how it pauses, or change it per visit.
 - 2026-11-11 · The founder wants a designer who knows "from internet research basketball
   trends what looks good and cool". Rule: every design cites the trend board
   (`../trends/visual.md`) and dated sources; never design from memory or taste alone.
@@ -67,6 +77,9 @@ Newest first, each with the date, what happened, and the rule.
 
 ### Every design
 
+- [ ] Motion: transform and opacity only, eased, 60 fps; a watchable prototype or video for anything that moves;
+      still version for reduced motion; any text that changes by itself has a pause or changes per visit.
+      Finished and well made, black and red brand, orange for actions, never busy. (Founder, 2026-11-22.)
 - [ ] Side by side with today's screen: it looks more polished and professional, never plainer and
       never busier. A fix that removes useful colour is not a fix; a touch that adds noise is not
       either. Simple and easy to use first. (Founder, 2026-11-20.)
