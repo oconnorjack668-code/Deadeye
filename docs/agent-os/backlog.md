@@ -267,7 +267,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: review #4 and #5 (mockup B): "e.g. Sam", plain labels, `border-zinc-500/70` in `Input.tsx` and `Select.tsx`.
 - Signal: landing to account created.
 
-## D6 · Today for a new player · idea
+## D6 · Today for a new player · review (exp/D6-today-new-player)
 - Hypothesis: a new player's Today shows the founding Pro offer and a "Starting steps" row that repeats the Today card before any log; the main button is 32 px; "1 days", "1 zones".
 - Change: review #6 (mockup C). Founder decision: Pro offer timing (recommend none before the first log).
 - Signal: finished setup to first session (read with S42).
