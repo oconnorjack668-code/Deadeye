@@ -282,7 +282,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 
 The polish round replaced the first review mockups for D2 to D7 and D1: build from `design/2026-11-22-polish.md` and its `mockups/2026-11-22-polish-*` and `2026-11-22-shotchart-*` files, not the 2026-11-20 ones. Safety and founder checklist: pending on each.
 
-## D9 · Logo C · idea (approved)
+## D9 · Logo C · review (exp/D9-logo-c)
 - Change: replace the app icon and logo files with logo improved C (`design/logo/README.md` lists the `public/` files and how to regenerate them). Sharper at small sizes; works on light backgrounds.
 
 ## D10 · Shot chart v2 · idea (approved)

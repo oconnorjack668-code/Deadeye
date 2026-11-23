@@ -1,6 +1,6 @@
 # Deadeye logo files (22 Nov 2026)
 
-**Decided 2026-11-22 (founder): improved C is the Deadeye logo.** The builder replaces the app icon and logo files later; the designer does not. Until then `public/` still holds the old files.
+**Decided 2026-11-22 (founder): improved C is the Deadeye logo.** The builder replaces the app icon and logo files later; the designer does not. Done on branch `exp/D9-logo-c` (23 Nov 2026): `node scripts/build-app-icons.mjs` rebuilds every `public/` icon, `src/app/favicon.ico`, `public/logo.svg`, `public/logo-mark.svg` and the two SVGs in `docs/brand/` from this folder's `2026-11-22-logo-lib.mjs`; `__tests__/app-icons.test.ts` fails if they fall out of step with it.
 
 Chosen: `2026-11-22-deadeye-logo-improved-c.svg` (lockup with wordmark), `2026-11-22-deadeye-logo-improved-c-mark.svg` (brackets and ball only), and the PNGs `-dark-1024.png` and `-light-1024.png`. The other versions (`faithful`, `improved-a`, `improved-b`) stay here for reference. Board: `2026-11-22-deadeye-logo-comparison.png`.
 
