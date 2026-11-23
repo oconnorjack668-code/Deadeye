@@ -103,12 +103,23 @@ ${withSquare ? [-1, 1].flatMap((sx) => [-1, 1].map((sy) => cornerPath(sx, sy, 19
   const fxKf = (() => {
     let k = '@keyframes ballfx{';
     for (let t = 0; t <= FX_END; t += 20) {
-      const th = -16 * (1 - ease((t - 100) / 800));
       const q = t - END_DROP;
       const sq = q > 0 ? Math.exp(-q / 120) * Math.cos((2 * Math.PI * q) / 300) : 0; // landing squash that settles
-      k += `${f1((t / FX_END) * 100)}%{transform:rotate(${f1(th)}deg) scale(${(1 + 0.05 * sq).toFixed(3)},${(1 - 0.06 * sq).toFixed(3)})}`;
+      k += `${f1((t / FX_END) * 100)}%{transform:scale(${(1 + 0.05 * sq).toFixed(3)},${(1 - 0.06 * sq).toFixed(3)})}`;
     }
     return k + '100%{transform:none}}';
+  })();
+  // Backspin: about 0.83 of a turn over the whole flight, eased out so it slows through the net and comes to rest exactly upright
+  // at the landing. Only the seams, bars and dark disc turn; the face lighting and highlight are separate fixed layers.
+  const SPIN = -300;
+  const spinKf = (() => {
+    let k = '@keyframes spin{';
+    for (let t = 0; t <= END_DROP; t += 16) {
+      const u = Math.min(1, Math.max(0, (t - 100) / (END_DROP - 100 - 20)));
+      const p = 1 - (1 - u) ** 1.8;
+      k += `${f1((t / END_DROP) * 100)}%{transform:rotate(${f1(SPIN * (1 - p))}deg)}`;
+    }
+    return k + '100%{transform:rotate(0deg)}}';
   })();
   const swishCss = (opt) => {
     const total = opt === 1 ? 1800 : 1700;
@@ -134,6 +145,7 @@ ${withSquare ? [-1, 1].flatMap((sx) => [-1, 1].map((sy) => cornerPath(sx, sy, 19
     return `
 ${dropKf}
 ${fxKf}
+${spinKf}
 @keyframes sceneop{0%{opacity:0}13%{opacity:1}${hold}%{opacity:1}${gone}%{opacity:0}100%{opacity:0}}
 @keyframes scenemv{0%{transform:translateY(10px);animation-timing-function:cubic-bezier(.2,0,0,1)}13%{transform:translateY(0)}${hold}%{transform:translateY(0);animation-timing-function:cubic-bezier(.4,0,.6,1)}${gone}%{transform:translateY(-26px)}100%{transform:translateY(-26px)}}
 .scene{position:absolute;left:0;top:0;width:390px;height:300px;pointer-events:none;opacity:0}
@@ -142,7 +154,10 @@ ${fxKf}
 .netl{left:${NX - 110}px;top:0}
 .play .scene{animation:sceneop ${total}ms linear 0ms both,scenemv ${total}ms linear 0ms both}
 .play .ballwrap{animation:drop ${END_DROP}ms linear 0ms both}
+.ball{position:relative}
+.lay{position:absolute;inset:0}
 .play .ball{animation:ballfx ${FX_END}ms linear 0ms both}
+.play .spin{animation:spin ${END_DROP}ms linear 0ms both}
 .play .glow{animation:fade 700ms ease-out ${opt === 1 ? 1180 : 1150}ms backwards}
 ${finish}
 `;
@@ -159,14 +174,14 @@ ${finish}
   <div class="scope">
     <div class="glow"></div>
     ${bks}
-    <div class="ballwrap"><div class="ball">${P.ball}</div></div>
+    <div class="ballwrap"><div class="ball">${P.ballLayers}</div></div>
     <div class="ping"></div>
   </div>
   <div class="word">${P.wordBox}</div>
   <div class="slogan">Aim is earned</div>
 </div>
 <div style="position:absolute;inset:0;z-index:3;pointer-events:none">${sceneFront}</div>`,
-      opt === 1 ? ['.scene', '.ball', '.ballwrap', '.glow', '.bk', '.ping', '.word', '.slogan'] : ['.scene', '.ball', '.ballwrap', '.glow', '.bks', '.ping', '.word', '.slogan'],
+      opt === 1 ? ['.scene', '.spin', '.ball', '.ballwrap', '.glow', '.bk', '.ping', '.word', '.slogan'] : ['.scene', '.spin', '.ball', '.ballwrap', '.glow', '.bks', '.ping', '.word', '.slogan'],
       900,
     );
   };

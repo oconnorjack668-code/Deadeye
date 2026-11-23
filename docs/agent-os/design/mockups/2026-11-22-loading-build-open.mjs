@@ -141,5 +141,5 @@ const SWISH = makeSwish({ D, CY, S, html, brackets, P, f1 });
 
 const w = (n, v) => { fs.writeFileSync(path.join(HERE, `2026-11-22-loading-open-${n}${SUFFIX}.html`), v); console.log('wrote', n + SUFFIX, Math.round(v.length / 1024), 'KB'); };
 w('a-lockon', A);
-if (!process.env.LOGO) { w('b1-swish-settle', SWISH.b1); w('b2-swish-resolve', SWISH.b2); w('c-reticle', C); }
+if (!process.env.LOGO) { w('b2-swish-resolve', SWISH.b2); w('c-reticle', C); }
 console.log({ S, D, ARM, GAP, WW, WH, CY });

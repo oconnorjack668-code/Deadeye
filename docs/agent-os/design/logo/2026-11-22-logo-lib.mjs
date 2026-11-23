@@ -74,10 +74,11 @@ export function bracketPath(v, sx, sy, local = false) {
 }
 
 /** The ball only (ring, face, disc, dot, seams, bars) in its own 0 0 2R 2R box, or in place when inPlace is true. */
-export function ballInner(v, id, inPlace = false) {
+export function ballInner(v, id, inPlace = false, layer = null) {
   const { cx, cy, R, ringT } = v;
   const face = R - ringT;
   const y0 = cy - R, y1 = cy + R;
+  const on = (name) => !layer || layer === name;
   return `<defs>
 <linearGradient id="${id}f" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${y1}">${stops(v.face, y0, y1)}</linearGradient>
 <linearGradient id="${id}r" gradientUnits="userSpaceOnUse" x1="0" y1="${y0}" x2="0" y2="${y1}">${stops(v.ring, y0, y1)}</linearGradient>
@@ -86,16 +87,16 @@ ${v.dotGrad ? `<linearGradient id="${id}o" gradientUnits="userSpaceOnUse" x1="0"
 ${v.highlight ? `<radialGradient id="${id}h" gradientUnits="userSpaceOnUse" cx="${cx - 40}" cy="${cy - 150}" r="210"><stop offset="0" stop-color="#fff" stop-opacity="${v.highlight}"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>` : ''}
 ${v.discEdge ? `<radialGradient id="${id}d" gradientUnits="userSpaceOnUse" cx="${cx}" cy="${cy}" r="${v.disc}"><stop offset="0" stop-color="${v.discFill}"/><stop offset="1" stop-color="#101013"/></radialGradient>` : ''}
 </defs>
-<circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${id}r)"/>
-<circle cx="${cx}" cy="${cy}" r="${face}" fill="url(#${id}f)"/>
-<g clip-path="url(#${id}c)">
-${v.highlight ? `<circle cx="${cx}" cy="${cy}" r="${face}" fill="url(#${id}h)"/>` : ''}
-<circle cx="${cx}" cy="${cy}" r="${v.disc}" fill="${v.discEdge ? `url(#${id}d)` : v.discFill}"${v.discEdge ? ` stroke="${v.discEdge}" stroke-width="3"` : ''}/>
-<circle cx="${cx}" cy="${cy}" r="${v.dot}" fill="url(#${v.dotGrad ? id + 'o' : id + 'f'})"/>
-<g fill="${v.bars}" stroke="${v.bars}" stroke-width="${v.seamBold}" stroke-linejoin="round" transform="translate(${cx} ${cy}) scale(${v.seamScale}) translate(-512 -420)"><path d="${SEAM_D}"/><path d="${SEAM_D}" transform="translate(1024 0) scale(-1 1)"/></g>
+${on('base') ? `<circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${id}r)"/>
+<circle cx="${cx}" cy="${cy}" r="${face}" fill="url(#${id}f)"/>` : ''}
+${layer ? '' : `<g clip-path="url(#${id}c)">`}
+${on('base') && v.highlight ? (layer ? `<g clip-path="url(#${id}c)"><circle cx="${cx}" cy="${cy}" r="${face}" fill="url(#${id}h)"/></g>` : `<circle cx="${cx}" cy="${cy}" r="${face}" fill="url(#${id}h)"/>`) : ''}
+${on('disc') ? `${layer ? `<g clip-path="url(#${id}c)">` : ''}<circle cx="${cx}" cy="${cy}" r="${v.disc}" fill="${v.discEdge ? `url(#${id}d)` : v.discFill}"${v.discEdge ? ` stroke="${v.discEdge}" stroke-width="3"` : ''}/>${layer ? '</g>' : ''}` : ''}
+${on('dot') ? `<circle cx="${cx}" cy="${cy}" r="${v.dot}" fill="url(#${v.dotGrad ? id + 'o' : id + 'f'})"/>` : ''}
+${on('top') ? `${layer ? `<g clip-path="url(#${id}c)">` : ''}<g fill="${v.bars}" stroke="${v.bars}" stroke-width="${v.seamBold}" stroke-linejoin="round" transform="translate(${cx} ${cy}) scale(${v.seamScale}) translate(-512 -420)"><path d="${SEAM_D}"/><path d="${SEAM_D}" transform="translate(1024 0) scale(-1 1)"/></g>
 <rect x="${cx - v.bar / 2}" y="${cy - face}" width="${v.bar}" height="${face * 2}" fill="${v.bars}"/>
-<rect x="${cx - face}" y="${cy - v.bar / 2}" width="${face * 2}" height="${v.bar}" fill="${v.bars}"/>
-</g>`;
+<rect x="${cx - face}" y="${cy - v.bar / 2}" width="${face * 2}" height="${v.bar}" fill="${v.bars}"/>${layer ? '</g>' : ''}` : ''}
+${layer ? '' : '</g>'}`;
 }
 
 /** Full lockup. opts: word (bool), wordColor, bg (colour or null), mark (crop to the mark's own square when false word). */
@@ -130,11 +131,14 @@ export function parts(v, uidTag = 'p') {
   const id = `${uidTag}${++uid}`;
   const r = v.R;
   const ball = `<svg viewBox="${v.cx - r} ${v.cy - r} ${r * 2} ${r * 2}" width="100%" height="100%" aria-hidden="true" focusable="false">${ballInner(v, id)}</svg>`;
+  const box = `viewBox="${v.cx - r} ${v.cy - r} ${r * 2} ${r * 2}" width="100%" height="100%" aria-hidden="true" focusable="false"`;
+  // The ball in four stacked layers so the seams can turn while the lighting stays put: base (ring, face, highlight) and dot stay fixed; disc and seams/bars spin.
+  const ballLayers = ['base', 'disc', 'dot', 'top'].map((l) => `<div class="lay ${l === 'disc' || l === 'top' ? 'spin' : ''}"><svg ${box}>${ballInner(v, id, false, l)}</svg></div>`).join('');
   const corner = (sx, sy) => {
     const g = `${id}k${sx}${sy}`;
     return `<svg viewBox="0 0 ${v.arm} ${v.arm}" width="100%" height="100%" aria-hidden="true" focusable="false"><defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${v.bracket[0]}"/><stop offset="1" stop-color="${v.bracket[1]}"/></linearGradient></defs><path d="${bracketPath(v, sx, sy, true)}" fill="url(#${g})"/></svg>`;
   };
   // The wordmark in its own box (x 237-789, cap 804-905).
   const wordBox = `<svg viewBox="237 804 553 102" width="100%" height="100%" aria-hidden="true" focusable="false"><g fill="#f4f4f5">${WORD.map((d) => `<path d="${d}"/>`).join('')}</g></svg>`;
-  return { ball, corner, wordBox, v };
+  return { ball, ballLayers, corner, wordBox, v };
 }
