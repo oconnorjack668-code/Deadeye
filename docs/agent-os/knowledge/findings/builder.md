@@ -53,6 +53,16 @@ when a better source arrives, rather than adding beside it.
 - **RLS is tested with pgTAP (`supabase test db`).** Deadeye's PGlite checks
   run as superuser and skip RLS (2026-10-21 handoff): policies are untested.
   [Supabase testing](https://supabase.com/docs/guides/database/testing), 2025, official.
+- **Auth email limits: one signup/OTP/recovery email per user per 60 s;
+  the `/resend` endpoint is limited per IP (30 per 5 min by default, shared
+  with sign-ups and sign-ins); the hourly project mail cap is 2 on the built-in
+  mailer and configurable with custom SMTP (Deadeye: Resend).** All answer 429.
+  Read `error.code`, never the message: `over_email_send_rate_limit` (per
+  address, or the hourly cap) and `over_request_rate_limit` (per IP). Deadeye:
+  "Send it again" waits 60 s and maps each code to plain words
+  (`src/lib/resendEmail.ts`, D3). `auth.resend({ type: 'signup', email,
+  options: { emailRedirectTo } })` must use the same redirect as `signUp`.
+  [Supabase rate limits](https://supabase.com/docs/guides/auth/rate-limits), [auth error codes](https://supabase.com/docs/guides/auth/debugging/error-codes), [auth.resend](https://supabase.com/docs/reference/javascript/auth-resend), 2026, official.
 
 ### Testing
 
@@ -146,6 +156,12 @@ when a better source arrives, rather than adding beside it.
   important controls; Deadeye's `h-11` exceeds AA.** Text 4.5:1, large text
   (24px, or 18.5px bold) 3:1, controls 3:1 (1.4.11), no rounding (4.49 fails).
   [W3C target size](https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html), [W3C contrast](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html), 2023, official.
+- **A wide decorative layer (glow, wash) widens a scroll container and the
+  page slides sideways; `overflow-x: clip` stops it without making a new
+  scroll box, and unlike `hidden` it leaves the other axis `visible`.**
+  Baseline widely available (Safari 16+). Deadeye: `PageHeader` (D8); jsdom
+  cannot measure it, so check `scrollWidth` in a 375/390 px iframe.
+  [MDN overflow](https://developer.mozilla.org/en-US/docs/Web/CSS/overflow), 2025, reference.
 
 ## Open questions
 

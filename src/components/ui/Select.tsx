@@ -2,6 +2,7 @@
 import React, { forwardRef, type SelectHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronDown } from 'lucide-react';
+import { FIELD_BORDER, FIELD_LABEL } from './Input';
 
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
@@ -18,7 +19,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label
             htmlFor={selectId}
-            className="block text-xs font-semibold uppercase tracking-wider text-zinc-300"
+            className={FIELD_LABEL}
           >
             {label}
           </label>
@@ -28,7 +29,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={selectId}
             ref={ref}
             className={cn(
-              'flex h-11 w-full appearance-none rounded-xl border border-zinc-700/80 bg-zinc-900/90 px-3.5 py-2 pr-9 text-sm text-zinc-100 transition-colors focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50',
+              'flex h-11 w-full appearance-none rounded-xl border bg-zinc-900/90 px-3.5 py-2 pr-9 text-sm text-zinc-100 transition-colors focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50',
+              FIELD_BORDER,
               error && 'border-red-500 focus:border-red-500 focus:ring-red-500',
               className
             )}

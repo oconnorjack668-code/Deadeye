@@ -1,6 +1,6 @@
 # Builder knowledge
 
-Last researched: 2026-11-14 (YouTube IFrame API, developer policies, oEmbed)
+Last researched: 2026-11-23 (Supabase auth email rate limits and resend; overflow-x clip)
 
 Read `README.md` in this folder for how this file works. Stack then: Next.js
 16.4.2, React 19.2.8, eslint-plugin-react-hooks 7.1.1, Vitest 5 + jsdom.
@@ -30,7 +30,8 @@ in brackets).
   splits unquoted paths; Git Bash rewrites `/route` args; a script's
   run-directly check compared mismatched paths. **Rule:** write files with
   Write/Edit or Node, quote paths, `MSYS_NO_PATHCONV=1`, import a script's
-  function rather than run it. (2026-11-03-rim-finder,
+  function rather than run it. (2026-11-23: worktree files check out with
+  CRLF, so a Node find-and-replace must normalise `\r\n` first or it misses.) (2026-11-03-rim-finder,
   2026-11-01-tracker-upgrades, 2026-10-21-app-review-fixes)
 - 2026-11-03 · Editing tracker source during a bench run corrupted it. **Rule:**
   no edits in `src/lib/video/` while a bench runs. (2026-11-03-tracker-accuracy-bench)

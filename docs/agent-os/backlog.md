@@ -250,7 +250,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: result screen with the score, one orange "Go again", an equal "Done for today", a quiet "Share this result" (review #1, mockup D).
 - Signal: second session within 7 days of the first.
 
-## D3 · Rewrite "Check your email" · idea
+## D3 · Rewrite "Check your email" · review (exp/D8-D3-D5-quick-fixes)
 - Hypothesis: every confirming sign-up lands on a page that says "verify with SMTP in production", with no resend and no "wrong email".
 - Change: two plain steps, "Send it again" (`auth.resend`, 60 s cooldown), "Wrong email? Start again" (review #2, mockup B). `src/app/(auth)/verify-email/page.tsx`.
 - Signal: sign-up to confirmed account.
@@ -262,7 +262,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Mockup (drawn 2026-11-23): `docs/agent-os/design/2026-11-23-setup.md`, pictures `mockups/2026-11-23-setup-step1.png`, `-step2`, `-step3`, `-states`, `-360`. Slim header, no tab bar or search, sticky full-width Next and Finish, metric first, school/club/senior words, "defence", 14 px 44 px chips, no second age question for under-16s and a "16 or 17 / 18 or older" choice for the rest.
 - Build note: `onboarding/page.tsx`, `Navbar.tsx` and `BottomNav.tsx` (hide on `/onboarding`), `focusAreas.ts` (`{ value, label }` lists; keep the stored strings), `profile/page.tsx` (same level and option labels), `ui/Alert.tsx` (14 px). Age brackets need a migration or the no-migration fallback in the doc: **safety-reviewer must read "For safety-reviewer" in the doc before this is `NEXT`.**
 
-## D5 · Sign-up and sign-in form, control borders · idea
+## D5 · Sign-up and sign-in form, control borders · review (exp/D8-D3-D5-quick-fixes)
 - Hypothesis: the name placeholder is a real NBA player ("Jordan Clarkson", `signup/page.tsx:131`), labels are all-caps jargon, and input borders measure 1.55:1 (3:1 needed).
 - Change: review #4 and #5 (mockup B): "e.g. Sam", plain labels, `border-zinc-500/70` in `Input.tsx` and `Select.tsx`.
 - Signal: landing to account created.
@@ -276,7 +276,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: review #7 (mockup D): 1080 x 1920 plus 1080 x 1350, Geist Black numbers, name off by default, drop "AI BASKETBALL TRAINER". `src/app/api/share/[kind]/route.tsx`.
 - Signal: shares per session saved.
 
-## D8 · Fix the sideways scroll on six hubs · idea
+## D8 · Fix the sideways scroll on six hubs · review (exp/D8-D3-D5-quick-fixes)
 - Change: Hoops, Gym, Train, Plays, Film and IQ scroll sideways by about 52 px from the `PageHeader` glow; `overflow-x-clip` on its wrapper (review #8). `src/components/layout/PageHeader.tsx`. Bug fix, can skip the mockup step.
 - Signal: none; polish.
 

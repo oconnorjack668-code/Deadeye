@@ -30,7 +30,11 @@ export function PageHeader({
 }) {
   const t = SECTION_TONES[tone];
   return (
-    <div className="relative mb-5">
+    // overflow-x-clip: the wash is 140% wide, and without the clip it widened
+    // each hub's scroller so the page slid sideways by about 52px on a phone
+    // (screen review #8, backlog D8). `clip`, not `hidden`, so the wash can
+    // still rise above the header and no new scroll container is made.
+    <div className="relative mb-5 overflow-x-clip">
       {/* Soft wash behind the header so the section colour registers without
           tinting the content below it */}
       <div className={`pointer-events-none absolute -top-16 left-1/2 h-40 w-[140%] -translate-x-1/2 rounded-full blur-3xl ${t.glow}`} aria-hidden />

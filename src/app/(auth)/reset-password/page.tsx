@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
-import { ArrowLeft, KeyRound } from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
+import { AuthBrand } from '@/components/AuthBrand';
 
 export default function ResetPasswordPage() {
   const [email, setEmail] = useState('');
@@ -48,14 +49,13 @@ export default function ResetPasswordPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-zinc-950">
       <div className="w-full max-w-md">
+        <AuthBrand />
+
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
           <CardHeader className="space-y-1">
-            <div className="h-12 w-12 rounded-xl bg-red-600/10 border border-red-500/20 flex items-center justify-center mb-2">
-              <KeyRound className="h-6 w-6 text-red-500" />
-            </div>
             <CardTitle className="text-xl">Reset your password</CardTitle>
             <CardDescription>
-              Enter your registered email and we will send you a secure link to reset your password.
+              Enter the email you signed up with and we will send you a link to set a new one.
             </CardDescription>
           </CardHeader>
 
@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
               </Alert>
               <Link href="/login" className="block w-full">
                 <Button variant="secondary" className="w-full">
-                  Return to Sign In
+                  Back to sign in
                 </Button>
               </Link>
             </CardContent>
@@ -82,7 +82,8 @@ export default function ResetPasswordPage() {
                 <Input
                   label="Email"
                   type="email"
-                  placeholder="player@example.com"
+                  icon={Mail}
+                  placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -98,14 +99,14 @@ export default function ResetPasswordPage() {
                   className="w-full"
                   isLoading={isLoading}
                 >
-                  Send Reset Link
+                  Send reset link
                 </Button>
 
                 <Link
                   href="/login"
-                  className="text-xs text-center text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-1 transition-colors"
+                  className="min-h-11 text-sm text-center text-zinc-400 hover:text-zinc-200 flex items-center justify-center gap-1 transition-colors"
                 >
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back to Sign In
+                  <ArrowLeft className="h-4 w-4" /> Back to sign in
                 </Link>
               </CardFooter>
             </form>
