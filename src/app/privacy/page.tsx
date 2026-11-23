@@ -148,7 +148,7 @@ export default function PrivacyPage() {
               gave there (at a court, or not right now), playing the sample clip, and, before your first session, which
               link you tap on the Today card (log shots, track with the camera, or your program). Opening the Video AI
               page, opening the shot tracker, setting it up, starting and finishing it, pressing play on Watch it back, changing, removing or adding a call while watching it back, and saving its result. Opening the shot logger and
-              pressing Finish in it. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
+              pressing Finish in it. Seeing your result after your first session, tapping Go again there, and sharing a result card. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
               and, if you coach, saving a play you drew. We also note when you turn training reminders on, or change your
               reminder days while they are on. Kept for 90 days, with your account id, only to see where new players get
               stuck so we can fix it. Only these steps are noted, not every page you visit; no device details, nothing
