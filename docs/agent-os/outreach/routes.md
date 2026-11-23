@@ -3,7 +3,7 @@
 One row per route. Stage: `idea` · `drafted` · `sent` · `live` · `paused` · `dropped`.
 Judged by first sessions, not visits. Under about 30 players a number is a hint.
 
-Tracking: **no codes in links.** Share the plain address `https://deadeyeapp.vercel.app`. The
+Tracking: **no codes in links.** Share the plain address `https://deadeye.ie` (the old `deadeyeapp.vercel.app` redirects to it, S53). The
 sign-up form asks an optional "Where did you hear about Deadeye?" with fixed answers
 (`HEARD_FROM` in `src/lib/heardFrom.ts`): a friend or teammate, a coach or club, a youth club or
 youth service, TikTok, Instagram, YouTube, radio or a newspaper, a basketball event or camp,
@@ -23,7 +23,7 @@ needs a safety review (fixed answers only, never a person, school or team).
 
 | Route | Type | Where (public link) | Audience | Self-promo rule | Stage | Answer at sign-up | Brought (visits / sign-ups / first sessions) | Next step | Date |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Founder's network (E0) | network | n/a | about 5 players or parents the founder knows | n/a; the founder sends, one at a time | drafted (sent? not confirmed) | A friend or teammate | 16 Nov: 2 answers since 13 Nov, grouped (under 5), 0 first sessions; can't tell which answer | founder sends the 16 Nov version (no "timed drill" claim) plus the follow-up; says which answer the 2 picked on `/admin/funnel` | 2026-11-16 |
+| Founder's network (E0) + competition | network | n/a | about 5 players or parents the founder knows (13 or over, Republic of Ireland for the competition) | n/a; the founder sends, one at a time, never a group | drafted (sent? not confirmed, 23 Nov) | A friend or teammate | 23 Nov: 0 joined in 7 days; other answers under 5 together, 0 first sessions; nothing can be credited | this week's one route: send the 23 Nov competition message to up to 5 known players; founder reports a count sent and what got stuck | 2026-11-23 |
 | Wexford local media | press | [South East Radio contact](https://www.southeastradio.ie/contact-us/); [Wexford People](https://www.wexfordpeople.ie/) | Wexford households, parents of players included | editor decides, nothing paid; a sponsored slot is a labelled ad; a parent agrees to any interview or photo (founder under 18) | drafted (sent? not confirmed) | Radio or a newspaper | - | founder (parent copied) sends the 16 Nov version to South East Radio, then the Wexford People | 2026-11-16 |
 | FDYS youth service | partner (youth centre) | [fdys.ie](https://fdys.ie/) | young people at FDYS projects across Wexford | email the organisation only; its safeguarding rules; nothing collected at a youth night | drafted | A youth club or youth service | - | safety-reviewer reads the email; founder sends; poster (S33, designer then safety-reviewer) only if FDYS says yes | 2026-11-16 |
 | Adult skills trainers | creator type | n/a (by type; channels in the founder's private notes) | adult trainers' followers, Ireland first | public business address only; `#Ad` and TikTok's commercial content setting if anything is given; ask for a Reel as well as a TikTok | idea | TikTok / Instagram / YouTube (one creator route at a time) | - | draft once routes 1 to 3 are sent: "makes in one minute, beat my number" or session 1 vs session 10 | 2026-11-16 |

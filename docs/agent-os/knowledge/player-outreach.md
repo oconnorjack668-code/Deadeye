@@ -27,6 +27,10 @@ summary), `weak`/`practitioner`; `dated` = over ~2 years.
 What the outcome of earlier work taught (see "Results review" in the agent file). Newest
 first, each with the date, what happened, and the rule.
 
+- 2026-11-23 · Week 2: 0 joined in 7 days, still nothing sent (S11), so no route could be credited or dropped. Rule:
+  when drafts have waited two weeks, the plan picks ONE route and the smallest send (one message to up to 5 known
+  players), not three; prefer the route whose answer no other agent's posts share ("A friend or teammate"). Public
+  files: write "under 5", never a count of 1 to 4, and do not repeat earlier small counts.
 - 2026-11-16 · Week 1: 2 players answered the sign-up question (grouped, under 5), 0 first sessions, and nobody
   could say which drafts had been sent, so no route could be credited or dropped. Rule: each plan opens with a
   "sent? on what day?" check for the founder, and a route stays `drafted` until the founder confirms it went out.
