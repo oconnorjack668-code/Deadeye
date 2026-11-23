@@ -156,8 +156,10 @@ the rim, a ring on the ball, a trail) is either the app's own drawing from the
 export or placed from the tracker's data, frame by frame; never a hand-placed
 guess. A registry effect settles how something moves, not where it lands.
 
-- Never: darken, blur or patch an area to hide something; full-frame dark
-  washes or vignettes to make text readable.
+- Never: darken or patch an area to hide something; blur anything except
+  sponsor banners, third-party logos and faces that are not the focus
+  (founder, 2026-11-20); full-frame dark washes or vignettes to make text
+  readable.
 - **Done when** every effect is a registry item or named in the hand-off with
   why none fitted, and each is checked on stills (step 12).
 

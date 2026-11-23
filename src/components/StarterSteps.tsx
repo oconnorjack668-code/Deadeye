@@ -32,7 +32,20 @@ function deviceSnapshot(): string {
   return [installed, readFlag(SAMPLE_TRIED_KEY), readFlag(STARTER_HIDDEN_KEY)].map((b) => (b ? '1' : '0')).join('');
 }
 
-export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone: boolean }) {
+export function StarterSteps({
+  iqDone,
+  shotsDone,
+  shotsInToday = false,
+}: {
+  iqDone: boolean;
+  shotsDone: boolean;
+  /**
+   * The Today card above already asks for the first shots (TodayFirstStep), so
+   * the same ask is not repeated here as a fourth row until it is done (D6).
+   * It still counts towards the four.
+   */
+  shotsInToday?: boolean;
+}) {
   const router = useRouter();
   const device = useSyncExternalStore(noSubscribe, deviceSnapshot, () => null);
   const [hidden, setHidden] = useState(false);
@@ -56,6 +69,8 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
   };
   const count = STARTER_STEPS.filter((s) => done[s.id]).length;
   const allDone = count === STARTER_STEPS.length;
+  const shotsRowInToday = shotsInToday && !done.shots;
+  const rows = shotsRowInToday ? STARTER_STEPS.filter((s) => s.id !== 'shots') : STARTER_STEPS;
 
   function hide() {
     writeFlag(STARTER_HIDDEN_KEY);
@@ -94,7 +109,8 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
         <div>
           <p className="text-xs font-bold uppercase tracking-wider text-amber-300">Starting steps · {count} of 4</p>
           <p className="mt-0.5 text-sm text-zinc-300">
-            Finish all four for a <span className="font-bold text-amber-300">+{STARTER_BONUS_XP} XP</span> bonus.
+            {shotsRowInToday ? 'Finish these and log your first shots' : 'Finish all four'} for a{' '}
+            <span className="font-bold text-amber-300">+{STARTER_BONUS_XP} XP</span> bonus.
           </p>
         </div>
         <button type="button" onClick={hide} aria-label="Hide the starting steps" className="flex-shrink-0 p-1 text-zinc-500 hover:text-zinc-300">
@@ -107,7 +123,7 @@ export function StarterSteps({ iqDone, shotsDone }: { iqDone: boolean; shotsDone
       </div>
 
       <ol className="mt-3 space-y-1.5">
-        {STARTER_STEPS.map((step) =>
+        {rows.map((step) =>
           done[step.id] ? (
             <li key={step.id} className="flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-zinc-500">
               <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-emerald-600">

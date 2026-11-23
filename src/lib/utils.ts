@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** The word for a count: "day" for 1, "days" otherwise (0 days, 2 days). */
+export function plural(count: number, word: string): string {
+  return count === 1 ? word : `${word}s`;
+}
+
 export function formatPercentage(makes: number, attempts: number): string {
   if (attempts <= 0) return '0.0%';
   return `${((makes / attempts) * 100).toFixed(1)}%`;

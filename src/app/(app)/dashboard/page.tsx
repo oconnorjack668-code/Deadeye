@@ -1,12 +1,13 @@
 // src/app/(app)/dashboard/page.tsx
 import React from 'react';
 import { requireUser, getCurrentProfile, getCurrentSubscription, checkIsOwner } from '@/lib/auth';
-import { foundingState, FOUNDING_REMINDER_DAYS } from '@/lib/founding';
+import { foundingState, foundingCardOnToday } from '@/lib/founding';
 import { proPriceLabels } from '@/lib/stripe';
 import { getFoundingOffer } from '@/lib/foundingServer';
 import { FoundingCard } from '@/components/FoundingCard';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
+import { StatCard } from '@/components/StatCard';
+import { plural } from '@/lib/utils';
 import { calculateDashboardMetrics, getShootingByZone, rankZones } from '@/lib/dashboard';
 import { getRecentZoneTotals } from '@/lib/player-activity';
 import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
@@ -40,59 +41,6 @@ export const dynamic = 'force-dynamic';
 export const metadata = {
   title: 'Dashboard - Deadeye',
 };
-
-/**
- * One stat tile. Extracted because the four were hand-written copies that had
- * already drifted apart - the consistency tile ended up with the plain grey
- * badge while the other three were tinted to match their number.
- *
- * The row wraps and the number steps down on small screens: in the two-column
- * phone grid a value like "37.5%" at text-3xl plus its badge is wider than the
- * card, and neither flex child could shrink, so the badge hung out of the side.
- */
-function StatCard({
-  label,
-  value,
-  badge,
-  badgeVariant,
-  valueClass,
-  hint,
-  href,
-  children,
-}: {
-  label: string;
-  value: React.ReactNode;
-  badge: string;
-  badgeVariant: React.ComponentProps<typeof Badge>['variant'];
-  valueClass: string;
-  hint: string;
-  /** Makes the whole card a link. */
-  href?: string;
-  children?: React.ReactNode;
-}) {
-  const card = (
-    <Card className={`border-zinc-800 bg-zinc-900/70 ${href ? 'h-full transition-colors hover:border-zinc-700' : ''}`}>
-      <CardContent className="p-4 md:p-5">
-        <div className="text-xs text-zinc-400 font-semibold uppercase tracking-wider mb-2">{label}</div>
-        <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
-          <span className={`text-2xl sm:text-3xl font-black leading-none ${valueClass}`}>{value}</span>
-          <Badge variant={badgeVariant} className="flex-shrink-0 text-xs sm:text-xs">
-            {badge}
-          </Badge>
-        </div>
-        <div className="text-xs text-zinc-500 mt-2">{hint}</div>
-        {children}
-      </CardContent>
-    </Card>
-  );
-  return href ? (
-    <Link href={href} className="block">
-      {card}
-    </Link>
-  ) : (
-    card
-  );
-}
 
 export default async function DashboardPage() {
   const user = await requireUser();
@@ -153,15 +101,20 @@ export default async function DashboardPage() {
   const latestPost = followedPost && followedPost.id !== notice?.id ? followedPost : null;
   // Shown until the bonus for finishing them is paid; it is in the XP once paid
   const showStarterSteps = achievements.xpParts.bonus === 0;
-  // Nothing logged yet, hoops or gym, and no program on the go
-  const firstRun = metrics.totalSessions === 0 && achievements.stats.totalWorkouts === 0 && !activeProgram;
+  // At least one session logged, hoops or gym
+  const hasLogged = metrics.totalSessions > 0 || achievements.stats.totalWorkouts > 0;
+  // Nothing logged yet and no program on the go
+  const firstRun = !hasLogged && !activeProgram;
+  // Today asks a player with no hoops session to log shots (TodayFirstStep)
+  const todayAsksForShots = !activeProgram && metrics.totalSessions === 0;
   const squadLine = squadActivityLine((squad.data || []) as unknown as FriendRow[]);
   const isPro = hasPro(subscription);
   const [offer, isOwner] = await Promise.all([getFoundingOffer(), checkIsOwner()]);
   const founding = foundingState(subscription, { claimed: offer.claimed, closed: !offer.open, isOwner });
-  // Stripe is only asked for the founder price when the card is going to name it
-  const foundingCardShown =
-    founding.kind === 'can-claim' || (founding.kind === 'active' && founding.daysLeft <= FOUNDING_REMINDER_DAYS);
+  // The offer waits for the first log (founder, 2026-11-23); the rule is
+  // foundingCardOnToday in src/lib/founding.ts. Stripe is only asked for the
+  // founder price when the card is going to name it.
+  const foundingCardShown = foundingCardOnToday(founding, hasLogged);
   const founderPrice = foundingCardShown ? (await proPriceLabels()).founder : null;
   // The all-time chart is Pro; Free shows the last 30 days, which is the
   // part that says what to work on this week anyway
@@ -175,7 +128,9 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 overflow-auto">
-      <div className="p-4 md:p-8 max-w-3xl lg:max-w-6xl mx-auto">
+      {/* pb-28 on a phone: room under the last card for the floating Log
+          button (QuickLog), which otherwise sat on top of it */}
+      <div className="p-4 pb-28 md:p-8 max-w-3xl lg:max-w-6xl mx-auto">
         {/* On a laptop: today's training down the main column, the numbers and
             shortcuts beside it. On a phone: one column, in the order it always
             had. It used to be one column 1,280px wide on a laptop, every card
@@ -226,11 +181,11 @@ export default async function DashboardPage() {
                 {activeProgram.program.name} · Week {activeProgram.next.week}, session {activeProgram.next.day} ·{' '}
                 {activeProgram.next.estimated_minutes} min
               </div>
-              <Link href={`/programs/${activeProgram.program.slug}/day/${activeProgram.next.id}`} className="mt-3 inline-block">
-                <Button variant="primary" size="sm">Start today&apos;s session</Button>
+              <Link href={`/programs/${activeProgram.program.slug}/day/${activeProgram.next.id}`} className="mt-3 block sm:inline-block">
+                <Button variant="primary" className="w-full sm:w-auto">Start today&apos;s session</Button>
               </Link>
             </>
-          ) : !activeProgram && metrics.totalSessions === 0 ? (
+          ) : todayAsksForShots ? (
             // A player who has never logged anything is sent to log shots, the
             // thing the landing page promised, rather than to sign up for a
             // weeks-long program. On 19 Oct 2026, 12 of the 17 players who had
@@ -238,7 +193,7 @@ export default async function DashboardPage() {
             // One button, the other ways in as quiet links, each tap a marker.
             <TodayFirstStep
               programHref={recommendedGoal ? `/programs?goal=${recommendedGoal}` : '/programs'}
-              programLabel={recommendedLabel ? `see ${recommendedLabel.toLowerCase()} programs` : 'follow a program'}
+              programLabel={recommendedLabel ? `See ${recommendedLabel.toLowerCase()} programs` : 'Follow a program'}
             />
           ) : (
             <>
@@ -255,9 +210,10 @@ export default async function DashboardPage() {
                   <span className="font-semibold text-orange-300">{recommendedLabel.toLowerCase()}</span>.
                 </div>
               )}
-              <div className="mt-3 flex flex-wrap gap-2">
+              {/* Default Button size (44px), one above the other on a phone */}
+              <div className="mt-3 grid gap-2 sm:flex sm:flex-wrap">
                 <Link href={recommendedGoal ? `/programs?goal=${recommendedGoal}` : '/programs'}>
-                  <Button variant="primary" size="sm">
+                  <Button variant="primary" className="w-full sm:w-auto">
                     {recommendedLabel
                       ? `See ${recommendedLabel.toLowerCase()} programs`
                       : activeProgram
@@ -266,7 +222,7 @@ export default async function DashboardPage() {
                   </Button>
                 </Link>
                 <Link href="/train/generate">
-                  <Button variant="outline" size="sm">Build a quick workout</Button>
+                  <Button variant="outline" className="w-full sm:w-auto">Build a quick workout</Button>
                 </Link>
               </div>
             </>
@@ -275,7 +231,13 @@ export default async function DashboardPage() {
 
         {/* Straight under Today: three of the four can be done away from a
             court, which is where most new players are (src/lib/starter.ts) */}
-        {showStarterSteps && <StarterSteps iqDone={(iqAnswers.count || 0) > 0} shotsDone={metrics.totalSessions > 0} />}
+        {showStarterSteps && (
+          <StarterSteps
+            iqDone={(iqAnswers.count || 0) > 0}
+            shotsDone={metrics.totalSessions > 0}
+            shotsInToday={todayAsksForShots}
+          />
+        )}
 
         {/* Nobody has saved a session: most players who stalled never saw the
             reminders on the welcome screen. Asks for nothing on load; the card's
@@ -288,8 +250,9 @@ export default async function DashboardPage() {
 
         {/* The founding member offer while it can still be claimed, or the
             heads-up in the last week of a founding member's free months. Under
-            Today, because it is an offer rather than training. */}
-        <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
+            Today, because it is an offer rather than training. The offer waits
+            for the first log (foundingCardOnToday); the Pro page always has it. */}
+        {foundingCardShown && <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />}
 
         {/* The founding competition, as one quiet line like the squad line: only
             after the first log, which is when a player can enter (00067) */}
@@ -390,10 +353,9 @@ export default async function DashboardPage() {
           <StatCard
             label="This week"
             value={metrics.thisWeekSessions}
-            badge="sessions"
+            badge={plural(metrics.thisWeekSessions, 'session')}
             badgeVariant="orange"
-            valueClass="text-orange-400"
-            hint={`Goal: ${metrics.weeklyGoalTarget} days`}
+            hint={`Goal: ${metrics.weeklyGoalTarget} ${plural(metrics.weeklyGoalTarget, 'day')}`}
           >
             <div className="mt-2 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
               <div
@@ -407,9 +369,7 @@ export default async function DashboardPage() {
             label="Shooting %"
             value={`${metrics.shootingPercentage.toFixed(1)}%`}
             badge="career"
-            badgeVariant="brand"
-            valueClass="text-red-400"
-            hint={`${shootingByZone.length} zones tracked`}
+            hint={`${shootingByZone.length} ${plural(shootingByZone.length, 'zone')} tracked`}
           />
 
           {/* A streak that only tells you after it broke is the version of this
@@ -420,9 +380,9 @@ export default async function DashboardPage() {
             label="Streak"
             href="/streak"
             value={metrics.currentStreak}
-            badge="days"
-            badgeVariant={metrics.streakAtRisk ? 'warning' : 'success'}
-            valueClass={metrics.streakAtRisk ? 'text-amber-400' : 'text-emerald-400'}
+            badge={plural(metrics.currentStreak, 'day')}
+            // Colour only where it means something: amber at risk, green safe
+            badgeVariant={metrics.streakAtRisk ? 'warning' : metrics.currentStreak > 0 ? 'success' : 'default'}
             hint={
               metrics.streakAtRisk
                 ? 'Rest day used - train today to keep it'
@@ -440,9 +400,7 @@ export default async function DashboardPage() {
           <StatCard
             label="Consistency"
             value={metrics.consistencyReady ? `${metrics.consistency}%` : metrics.consistencyDays}
-            badge={metrics.consistencyReady ? '30 days' : 'days'}
-            badgeVariant="cyan"
-            valueClass="text-cyan-400"
+            badge={metrics.consistencyReady ? '30 days' : plural(metrics.consistencyDays, 'day')}
             hint={metrics.consistencyReady ? 'Days with any training logged' : 'Your % shows after your first week'}
           />
         </div>
