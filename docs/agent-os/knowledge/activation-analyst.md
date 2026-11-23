@@ -15,6 +15,16 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-23: E6 (a marker, no screen change) passed safety on 11-16 but was
+  bundled with a privacy clause waiting on the founder and a counts-file fix,
+  got no PR, and fell 124 commits behind main. Its 11-30 read became
+  impossible, and meanwhile two more Home changes (#126 live, #162 open)
+  shipped with no "seen" marker either. 0 of 4 bets since 10-22 could be
+  judged on their idea. Rule: a measurement item a decision depends on goes to
+  a PR the day it passes safety, split from anything waiting on approval; if
+  it slips, move its read date in the backlog that day, never the line. And
+  any change to a screen gets its "seen" marker in the same build or first.
+
 - 2026-11-16: E4 shipped with a Signal of "the `reminder_set` count" and no
   marker on the dashboard where its card sits, so after a week it can neither
   win nor lose (0 reminders, out of an unknown number who saw it). Rule: a
@@ -44,6 +54,11 @@ file). Newest first, each with the date, what happened, and the rule.
       no court, unsure what to do), **forgot** (no cue), or **no reason yet**
       (no payoff seen). Each proposed fix says which barrier it targets.
 - [ ] Days from first to second session are reported too.
+- [ ] Counts from 1 to 4 are written "under 5" in reports and the backlog,
+      and no figure is given that lets one be worked out (no "24 lost" next
+      to 27, no range built from it). 0 and 5+ are fine.
+- [ ] Every open bet's read date is checked against whether its change is
+      live on main; not live means move the date today and say so.
 - [ ] If a data file matches the previous one row for row, say so and ask the
       founder to check `/admin/funnel`; when "Joined in 7 days" is 0 there is
       no cohort, so no experiment can be read (11-09: none since 10-24).

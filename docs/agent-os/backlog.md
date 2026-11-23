@@ -57,7 +57,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
      phone has a mode saved.
 - Live check (2026-10-22, founder): merged to main (pull request 18). A new account's first log opens in
   Enter totals; an account that has logged before still opens in Track every shot.
-- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 3 of 27 (11%, 3% to 29%); `log_opened` is 0 all-time, so no player has met the change yet: not enough players yet, stays **kept**.
+- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 3 of 27 (11%, 3% to 29%); `log_opened` is 0 all-time, so no player has met the change yet: not enough players yet, stays **kept**. 2026-11-23 ([report](reports/2026-11-23-activation.md)): unchanged (under 5 of 27), 0 joined in 7 days, `log_opened` still 0: not enough players yet, stays **kept**.
 
 ## E2 · "Trained already? Log it" for players away from a court · kept (shipped 2026-10-25)
 
@@ -89,7 +89,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      today already? Log it by hand" shows under the intro, and opens the logger in Enter totals.
   5. Open Watch the tracker call a session, let it finish: the end card has Open the tracker, Log shots by hand
      and Back to my dashboard.
-- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 0 of 1 who answered "Not right now" and 0 of 2 who finished the sample opened the logger (logger opens 0 all-time). Hint only (3 players); stays **kept**.
+- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 0 of 1 who answered "Not right now" and 0 of 2 who finished the sample opened the logger (logger opens 0 all-time). Hint only (3 players); stays **kept**. 2026-11-23 ([report](reports/2026-11-23-activation.md)): no new answers, logger opens 0; not enough players yet, stays **kept**.
 
 ## E3 · Markers for the welcome answer and the by-hand logger · kept (shipped 2026-10-25)
 
@@ -124,9 +124,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      spot logged. At `/admin/funnel` the new rows show 1 at each step you reached (the page counts players who
      joined in the window, so use a new test account).
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
-- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup. 2026-11-16: `welcome_court` 1 and `welcome_later` 1 from real players, so `track()` records live and the logger's 0 is a real 0. **kept**, confirmed.
+- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup. 2026-11-16: `welcome_court` 1 and `welcome_later` 1 from real players, so `track()` records live and the logger's 0 is a real 0. **kept**, confirmed. 2026-11-23 ([report](reports/2026-11-23-activation.md)): unchanged, **kept**.
 
-## E4 · Training-days reminder on the dashboard for a player with no session · shipped 2026-11-09
+## E4 · Training-days reminder on the dashboard for a player with no session · dropped (shipped 2026-11-09)
 
 Report: [2026-11-09](reports/2026-11-09-activation.md)
 
@@ -192,6 +192,9 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
   7-day); first sessions 3 of 27, unchanged. How many no-session players saw the card is unknown (no dashboard
   marker, so E6). The Signal set no number, so it cannot be called a win or a loss: not enough players yet.
   Final read 2026-11-23 with E6's count if live; keep only if at least 1 player turns reminders on from it.
+  Final read 2026-11-23 ([report](reports/2026-11-23-activation.md)): `reminder_set` 0 (everyone and 7-day), 0 joined in the week, E6 not live, so reach
+  is still unknown. Against its line (at least 1): **dropped**. This judges the card, not reminders in general.
+  The card can stay until D6 or a clean-up removes it; no build needed to drop it now.
 
 ## E5 · Tracker "no shots detected" offers a by-hand log · idea
 
@@ -206,9 +209,19 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Founder checklist: <from release-checker>
 - Result:
 
-## E6 · Marker for a no-session player reaching the dashboard · review (exp/E6-dashboard-seen)
+## E6 · Marker for a no-session player reaching the dashboard · NEXT
 
-Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-09](reports/2026-11-09-activation.md))
+Report: [2026-11-23](reports/2026-11-23-activation.md), [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-09](reports/2026-11-09-activation.md))
+
+- NEXT (2026-11-23): bring `exp/E6-dashboard-seen` (head dbad62f, 124 commits behind main) up to date with main
+  and open the PR. Main has since changed 5 of its 12 files: `privacy/page.tsx` (#137 added the Today card, Video AI
+  page and tracker steps to the clause, so the safety-approved wording must be merged with main's, then re-checked
+  by safety-reviewer and approved by the founder), `funnel.ts` (Today card group), `events.ts`, `dashboard/page.tsx`
+  (#126; PR #162 edits it too: keep E6's change to the `totalSessions === 0` block) and `docs/funnel-counts.sql`.
+  Why it is NEXT: no screen changes; it is the one denominator for E4, the Today card (S42) and D6, and it carries
+  the small-count fix main's counts job still lacks (11-23 file prints a raw 1). Builder fallback if "too big" or
+  the founder's clause approval waits: the `agentCounts.ts` under-5 fix (with its tests) as its own PR first, the
+  marker second. Reach: every older stalled player who opens Home; 0 new signups needed.
 
 - Hypothesis: barrier **forgot**. At least 23 of 27 who finished setup never opened the logger or tracker, and
   nothing shows whether they ever come back. Every dashboard bet (E4, E7) assumes they do; if they don't, only
@@ -226,7 +239,9 @@ Report: [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-
   last updated 16 Nov). No migration, nothing on screen. Branch `exp/E6-dashboard-seen` (code 0e35d1f; docs moved
   to `agent-os`, ab80f98). 1702 tests pass; the new tests fail on main.
 - Signal: `dashboard_seen`, Everyone minus Joined in 7 days = older stalled players coming back. Decision line,
-  set 2026-11-16, read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
+  set 2026-11-16 (unchanged). Read date moved 2026-11-23 because E6 is not live (no data, nothing read): 2026-12-14
+  (files 12-07 and 12-14) if merged by 2026-11-30, otherwise 14 days after merge; the founder reads it on
+  `/admin/funnel` since the public file shows "under 5". Was: read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
   5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
   under 30 players. Guardrail: no change players can see; first sessions not lower than 3.
 - Safety: PASS WITH NOTES (2026-11-16, head ab80f98; no BLOCK). Findings, most urgent first, all FIX SOON:
@@ -314,6 +329,8 @@ Report: [2026-11-16](reports/2026-11-16-activation.md)
 - Signal: tracker opens from no-session players, then first sessions. Success: 3 of the next 10 no-session players
   seen on the dashboard (E6) open the tracker, and at least 1 saves. Guardrail: logger opens do not fall (they are 0)
   and tracker saves per open not below 1 of 4. Hint: under 30. Read 2 weeks after it ships. Needs E6 first.
+  2026-11-23: #126 (live 11-17) went the other way (one "Log shots" button, quiet camera link) and D6 (PR #162)
+  changes the same card. Wait for E6 and the S42 read before building; compare with E11.
 - Safety: <safety-reviewer verdict>
 - Founder checklist: <from release-checker>
 - Result:
@@ -347,6 +364,44 @@ Report: [2026-11-16](reports/2026-11-16-activation.md)
 - Safety: <safety-reviewer verdict> (neutral wording; nothing stored)
 - Founder checklist: <from release-checker>
 - Result:
+
+## E10 · Send a no-session player who never saw the welcome there once · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't** (unsure what to do). 17 of 27 who finished setup did it before the welcome screen
+  existed (10-21); it is the only screen that asks "at a court?" and gives a next step for each answer. They never saw it.
+- Change: on Home, a player with no saved session and no `welcome_seen` row goes to `/welcome` once (a flag on the
+  phone or the profile stops a loop). No new screen.
+- Signal: `welcome_seen` then `welcome_court` / `welcome_later` from players set up before 10-21. Success: at least 5
+  of the next 15 sent there pick an answer, and at least 1 saves a first session within 7 days. Guardrail: Home not
+  skipped twice (no loop); first sessions not lower. Read 14 days after it ships. Reach: needs E6 to show they return.
+- ICE 3/2/4. Safety: <safety-reviewer verdict> · Founder checklist: <from release-checker> · Result:
+
+## E11 · Today's camera link reads "Track a clip from your phone" · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't** (no court now). The quiet camera link reads as "go to a court"; the tracker also takes a
+  video already on the phone. Camera beats logger all-time (under 5 tracker opens vs 0 logger opens).
+- Change: copy only, on `TodayFirstStep.tsx`'s camera link, after D6 (PR #162) merges.
+- Signal: `today_track_tapped` per no-session player seen on Home (E6). Success: 3 of the next 15 seen tap it.
+  Guardrail: `today_log_tapped` not lower. Hint. Read 14 days after it ships. Needs E6.
+- ICE 2/2/5. Safety: <safety-reviewer verdict> (a clip may show other people) · Founder checklist: <from release-checker> · Result:
+
+## E12 · One picture for the rim taps in tracker setup · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't**. About half who open the tracker never start tracking (all-time, under 5 players);
+  the rim taps are the unguided step between `tracker_setup` and `tracker_started`.
+- Change: one still picture above the rim step in `ShotTracker.tsx` ("Tap the left and right edge of the rim").
+- Signal: `tracker_started` per `tracker_setup`. Success: 4 of the next 6 who pick a source start. Guardrail:
+  `tracker_saved` not lower. Hint, tiny reach. Read 14 days after it ships.
+- ICE 2/2/3. Safety: <safety-reviewer verdict> · Founder checklist: <from release-checker> · Result:
+
+Safety question first, not scored (2026-11-23): one email to players who set up and saved nothing, pointing back to
+Home. It messages under-18s; safety-reviewer before it is ranked.
 
 ## S41 · Landing demo stuck on "Starting…" when the clip download fails · idea (P2, found by qa-tester)
 
