@@ -26,10 +26,10 @@ export async function fontCss() {
   return parts.join('\n');
 }
 
-// The Deadeye ball: the faithful SVG redraw of the logo (docs/agent-os/design/logo/), in its own square box.
+// The Deadeye ball: logo C (the founders pick, 22 Nov), redrawn as SVG (docs/agent-os/design/logo/), in its own square box.
 import { VARIANTS, parts } from '../logo/2026-11-22-logo-lib.mjs';
 export function ball() {
-  return parts(VARIANTS.faithful, 'b').ball;
+  return parts(VARIANTS['improved-c'], 'b').ball;
 }
 
 /** Page shell: a 390x844 phone column, font inside, replay and reduced-motion controls (hidden when capturing). */
