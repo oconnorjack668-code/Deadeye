@@ -69,7 +69,8 @@ LIMITS any fix must respect: only real app numbers; no "every shot", "never
 misses", "100%" claims; no identifiable under-18s without a parent's written
 consent; text inside x 140-940, y 270-1250 of 1080x1920; app colours
 (zinc-950, white, zinc grey, orange only for the one action); no music
-without business rights; no blurring; TikTok has no bio link.
+without business rights; no blurring except tight blurs on sponsor banners, third-party logos and
+faces that are not the focus; TikTok has no bio link.
 
 OUTPUT: write [folder]\critique-vN-[name].md with (1) your in-character
 reaction second by second, with the exact moment you'd swipe and the comment
