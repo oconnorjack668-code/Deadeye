@@ -259,6 +259,8 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Hypothesis: setup asks age again with brackets that skip 13 live, uses US words (High School, Varsity, NCAA, Defense), imperial units, small right-aligned Next, and keeps the tab bar.
 - Change: review #3 (the doc names a mockup E; it was not drawn, so the designer draws it before this is approved). `src/app/(app)/onboarding/page.tsx`, `src/lib/focusAreas.ts`. Founder decision: shorten setup.
 - Signal: started setup to finished setup.
+- Mockup (drawn 2026-11-23): `docs/agent-os/design/2026-11-23-setup.md`, pictures `mockups/2026-11-23-setup-step1.png`, `-step2`, `-step3`, `-states`, `-360`. Slim header, no tab bar or search, sticky full-width Next and Finish, metric first, school/club/senior words, "defence", 14 px 44 px chips, no second age question for under-16s and a "16 or 17 / 18 or older" choice for the rest.
+- Build note: `onboarding/page.tsx`, `Navbar.tsx` and `BottomNav.tsx` (hide on `/onboarding`), `focusAreas.ts` (`{ value, label }` lists; keep the stored strings), `profile/page.tsx` (same level and option labels), `ui/Alert.tsx` (14 px). Age brackets need a migration or the no-migration fallback in the doc: **safety-reviewer must read "For safety-reviewer" in the doc before this is `NEXT`.**
 
 ## D5 · Sign-up and sign-in form, control borders · idea
 - Hypothesis: the name placeholder is a real NBA player ("Jordan Clarkson", `signup/page.tsx:131`), labels are all-caps jargon, and input borders measure 1.55:1 (3:1 needed).
