@@ -5,7 +5,7 @@
 // and "Aim is earned" kept red (the brand).
 import React from 'react';
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { PASSWORD_HINT } from '@/lib/validation';
 
 vi.mock('next/link', () => ({
@@ -39,6 +39,24 @@ describe('sign-up form', () => {
     const hintId = password.getAttribute('aria-describedby');
     expect(hintId).toBeTruthy();
     expect(document.getElementById(hintId!)!.textContent).toBe(PASSWORD_HINT);
+  });
+
+  it('links the "agree" error to the checkbox so a screen reader hears it', () => {
+    render(<SignUpPage />);
+    const box = screen.getByRole('checkbox');
+    expect(box.getAttribute('aria-describedby')).toBeNull();
+    expect(box.getAttribute('aria-invalid')).toBeNull();
+
+    fireEvent.change(screen.getByLabelText('Your name or a nickname'), { target: { value: 'Sam' } });
+    fireEvent.change(screen.getByLabelText('Email'), { target: { value: 'sam@example.ie' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'Password1' } });
+    fireEvent.click(screen.getByLabelText(/16 or older/));
+    fireEvent.click(screen.getByRole('button', { name: 'Create account' }));
+
+    const alert = screen.getByRole('alert');
+    expect(alert.textContent).toBeTruthy();
+    expect(box.getAttribute('aria-describedby')).toBe(alert.id);
+    expect(box.getAttribute('aria-invalid')).toBe('true');
   });
 
   it('says "Create account" and drops the old tagline', () => {

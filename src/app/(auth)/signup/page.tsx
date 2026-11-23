@@ -171,6 +171,8 @@ export default function SignUpPage() {
                     <input
                       type="checkbox"
                       checked={termsAccepted}
+                      aria-invalid={errors.termsAccepted ? true : undefined}
+                      aria-describedby={errors.termsAccepted ? 'terms-error' : undefined}
                       onChange={(e) => setTermsAccepted(e.target.checked)}
                       className={`peer h-5 w-5 cursor-pointer appearance-none rounded-md border bg-zinc-900 ${FIELD_BORDER} checked:border-orange-600 checked:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900`}
                     />
@@ -191,7 +193,11 @@ export default function SignUpPage() {
                     </Link>
                   </span>
                 </label>
-                {errors.termsAccepted && <p className="mt-1 text-sm text-red-400">{errors.termsAccepted}</p>}
+                {errors.termsAccepted && (
+                  <p id="terms-error" role="alert" className="mt-1 text-sm text-red-400">
+                    {errors.termsAccepted}
+                  </p>
+                )}
               </div>
             </CardContent>
 
