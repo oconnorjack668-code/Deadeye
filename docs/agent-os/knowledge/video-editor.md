@@ -11,6 +11,13 @@ Look: `docs/brand/video-style.md`. What a video says is marketing's.
 Newest first; they win over research. Includes critic-panel findings the
 founder told us to apply and the video lessons first kept in `marketing.md`.
 
+- 2026-11-20 · Founder changed the 2026-10-20 no-blur rule. **Rule:** a small,
+  tight blur (soft edge, tracked to the object) is allowed on sponsor banners
+  and other third-party logos, and on the faces of people who are not the
+  focus (a rebounder, people in the background). Never blur the main subject;
+  still no darkened bands, blurred strips under captions or washes. A blur is
+  extra privacy, not consent (see the Faces check). Footage
+  `20261118_174626.mp4`: rebounder consent confirmed, "O CONNOR" shirt fine.
 - 2026-11-11 · The founder doesn't like the videos so far: a small free voice
   (Kokoro), hand-timed captions that drifted, no music, a hand-built rim line
   past the hoop, darkened patches, many rounds of fixes. **Rule:** follow the
@@ -69,7 +76,8 @@ founder told us to apply and the video lessons first kept in `marketing.md`.
   overlay is checked at full size on stills, flash, shake and zoom frames too.
 - 2026-10-20 · Captions drifted from the voice; darkened patches hid footage.
   **Rules:** captions follow the voice word for word; never darken or blur a
-  block of footage.
+  block of footage (narrowed 2026-11-20: banners, logos and background faces
+  may be blurred).
 - 2026-10-20 · Shown side by side, the founder preferred the first promo's look
   to a new 32s build. **Rule:** before rebuilding a whole video, show one short
   sample of the new look next to the current one.
@@ -132,7 +140,9 @@ Picture
       line or a sound spans a cut.
 - [ ] Colour matches from shot to shot (`measure look` against neighbours); any
       grade shown to the founder as a graded and ungraded still first.
-- [ ] No darkened, blurred or patched areas; nothing covers footage to hide it.
+- [ ] No darkened or patched areas; the only blurs are tight ones on sponsor
+      banners, third-party logos or faces that are not the focus, checked on
+      stills so they stay on the object as the camera or person moves.
 - [ ] Every overlay, effect and caption checked on stills at full size at each
       change and at fast frames (flash, shake, zoom, whip): it lands on the real
       object and stops where the object stops.
@@ -169,7 +179,8 @@ Delivery and review
 - [ ] End card: red logo, the action, the address in orange, three lines at
       most; the last frame leads back into the first if it loops.
 - [ ] Faces: every recognisable person listed; consent on record for any
-      possible under-18, or the shot is out (never blurred).
+      possible under-18, or the shot is out. A face blur on someone who is
+      not the focus is allowed but does not replace consent.
 - [ ] Before a shot is dropped for a face, offer the same moment re-cropped
       so the person cannot be known (hands, ball and hoop, from behind; no
       face, name, school or kit crest in frame), within the pixel budget,

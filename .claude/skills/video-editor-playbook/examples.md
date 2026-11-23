@@ -92,7 +92,7 @@ Picture
 [x] Cuts on releases: measure cuts found 9 cuts, the beat sheet has 9; times match within 1 frame
 [x] Colour: measure look per shot; beat 3's phone-setup clip was 0.6 stops brighter and warmer
     than clipA; matched with a measured correction; graded/ungraded still sent with the sample
-[x] No darkened, blurred or patched areas
+[x] No darkened or patched areas; blurs only on banners, logos or background faces
 [x] Overlays: snapshot at 31 moments (every caption in/out, every banner, both whips);
     the app's ring stays on the rim in all of them; zoom crops in check-v1\zoom\
 [x] Effects: catalog searched ("highlight the spoken word in a caption");

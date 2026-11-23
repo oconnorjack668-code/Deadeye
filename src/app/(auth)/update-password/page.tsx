@@ -15,8 +15,9 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { updatePasswordSchema } from '@/lib/validation';
-import { Logo } from '@/components/Logo';
+import { Lock } from 'lucide-react';
+import { PASSWORD_HINT, updatePasswordSchema } from '@/lib/validation';
+import { AuthBrand } from '@/components/AuthBrand';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
@@ -78,16 +79,8 @@ export default function UpdatePasswordPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-zinc-950">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        <div className="flex flex-col items-center mb-8 text-center">
-          <Logo size={56} className="mb-3" />
-          <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
-        </div>
+      <div className="w-full max-w-md">
+        <AuthBrand />
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
           <CardHeader className="space-y-1">
@@ -116,8 +109,11 @@ export default function UpdatePasswordPage() {
                 )}
 
                 <Input
-                  label="New password (min 8 chars, 1 uppercase, 1 number)"
+                  label="New password"
+                  id="new-password"
                   type="password"
+                  icon={Lock}
+                  hint={PASSWORD_HINT}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -129,6 +125,7 @@ export default function UpdatePasswordPage() {
                 <Input
                   label="Confirm new password"
                   type="password"
+                  icon={Lock}
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -140,12 +137,12 @@ export default function UpdatePasswordPage() {
 
               <CardFooter className="flex flex-col space-y-3 pt-2">
                 <Button type="submit" variant="primary" size="lg" className="w-full" isLoading={isLoading}>
-                  Save New Password
+                  Save new password
                 </Button>
 
                 <p className="text-sm text-center text-zinc-400">
                   Link stopped working?{' '}
-                  <Link href="/reset-password" className="font-semibold text-red-400 hover:text-red-300 transition-colors">
+                  <Link href="/reset-password" className="font-semibold text-orange-400 underline hover:text-orange-300 transition-colors">
                     Send a new one
                   </Link>
                 </p>

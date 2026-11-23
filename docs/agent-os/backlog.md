@@ -250,7 +250,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: result screen with the score, one orange "Go again", an equal "Done for today", a quiet "Share this result" (review #1, mockup D).
 - Signal: second session within 7 days of the first.
 
-## D3 · Rewrite "Check your email" · idea
+## D3 · Rewrite "Check your email" · review (exp/D8-D3-D5-quick-fixes)
 - Hypothesis: every confirming sign-up lands on a page that says "verify with SMTP in production", with no resend and no "wrong email".
 - Change: two plain steps, "Send it again" (`auth.resend`, 60 s cooldown), "Wrong email? Start again" (review #2, mockup B). `src/app/(auth)/verify-email/page.tsx`.
 - Signal: sign-up to confirmed account.
@@ -259,13 +259,15 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Hypothesis: setup asks age again with brackets that skip 13 live, uses US words (High School, Varsity, NCAA, Defense), imperial units, small right-aligned Next, and keeps the tab bar.
 - Change: review #3 (the doc names a mockup E; it was not drawn, so the designer draws it before this is approved). `src/app/(app)/onboarding/page.tsx`, `src/lib/focusAreas.ts`. Founder decision: shorten setup.
 - Signal: started setup to finished setup.
+- Mockup (drawn 2026-11-23): `docs/agent-os/design/2026-11-23-setup.md`, pictures `mockups/2026-11-23-setup-step1.png`, `-step2`, `-step3`, `-states`, `-360`. Slim header, no tab bar or search, sticky full-width Next and Finish, metric first, school/club/senior words, "defence", 14 px 44 px chips, no second age question for under-16s and a "16 or 17 / 18 or older" choice for the rest.
+- Build note: `onboarding/page.tsx`, `Navbar.tsx` and `BottomNav.tsx` (hide on `/onboarding`), `focusAreas.ts` (`{ value, label }` lists; keep the stored strings), `profile/page.tsx` (same level and option labels), `ui/Alert.tsx` (14 px). Age brackets need a migration or the no-migration fallback in the doc: **safety-reviewer must read "For safety-reviewer" in the doc before this is `NEXT`.**
 
-## D5 · Sign-up and sign-in form, control borders · idea
+## D5 · Sign-up and sign-in form, control borders · review (exp/D8-D3-D5-quick-fixes)
 - Hypothesis: the name placeholder is a real NBA player ("Jordan Clarkson", `signup/page.tsx:131`), labels are all-caps jargon, and input borders measure 1.55:1 (3:1 needed).
 - Change: review #4 and #5 (mockup B): "e.g. Sam", plain labels, `border-zinc-500/70` in `Input.tsx` and `Select.tsx`.
 - Signal: landing to account created.
 
-## D6 · Today for a new player · idea
+## D6 · Today for a new player · review (exp/D6-today-new-player)
 - Hypothesis: a new player's Today shows the founding Pro offer and a "Starting steps" row that repeats the Today card before any log; the main button is 32 px; "1 days", "1 zones".
 - Change: review #6 (mockup C). Founder decision: Pro offer timing (recommend none before the first log).
 - Signal: finished setup to first session (read with S42).
@@ -274,7 +276,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: review #7 (mockup D): 1080 x 1920 plus 1080 x 1350, Geist Black numbers, name off by default, drop "AI BASKETBALL TRAINER". `src/app/api/share/[kind]/route.tsx`.
 - Signal: shares per session saved.
 
-## D8 · Fix the sideways scroll on six hubs · idea
+## D8 · Fix the sideways scroll on six hubs · review (exp/D8-D3-D5-quick-fixes)
 - Change: Hoops, Gym, Train, Plays, Film and IQ scroll sideways by about 52 px from the `PageHeader` glow; `overflow-x-clip` on its wrapper (review #8). `src/components/layout/PageHeader.tsx`. Bug fix, can skip the mockup step.
 - Signal: none; polish.
 
@@ -282,7 +284,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 
 The polish round replaced the first review mockups for D2 to D7 and D1: build from `design/2026-11-22-polish.md` and its `mockups/2026-11-22-polish-*` and `2026-11-22-shotchart-*` files, not the 2026-11-20 ones. Safety and founder checklist: pending on each.
 
-## D9 · Logo C · idea (approved)
+## D9 · Logo C · review (exp/D9-logo-c)
 - Change: replace the app icon and logo files with logo improved C (`design/logo/README.md` lists the `public/` files and how to regenerate them). Sharper at small sizes; works on light backgrounds.
 
 ## D10 · Shot chart v2 · idea (approved)
