@@ -7,6 +7,7 @@ Drafts: [2026-11-19-weekend.md](2026-11-19-weekend.md) (weekend 20 to 22 Nov, mi
 for the 9 Nov items; [2026-10-23-first-promo.md](2026-10-23-first-promo.md) for the older ones.
 Results: [results.md](results.md).
 
+- 2026-11-23 · `idea` · **Week of 23 Nov short list**: Day 1 (50 threes), Day 3 (50 free throws), 60-second makes from the 18 Nov footage (S48, needs safety review). Play Store listing rewrite (S47) drafted. See [2026-11-23-week.md](2026-11-23-week.md).
 - 2026-11-19 · `idea` · **Day 0 carousel**: series trailer, 4 photos of an empty court + the tester's "5-spot 3s" screen, "Starts Monday". Weekend pick for Sat 21 ([2026-11-19-weekend.md](2026-11-19-weekend.md)).
 - 2026-11-19 · `idea` · **Guess my Day 1 score**: IG Story slider, answer on Monday. Weekend pick for Sun 22.
 
