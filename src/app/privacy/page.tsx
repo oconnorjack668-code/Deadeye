@@ -147,7 +147,7 @@ export default function PrivacyPage() {
               A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
               gave there (at a court, or not right now), playing the sample clip, and, before your first session, which
               link you tap on the Today card (log shots, track with the camera, or your program). Opening the Video AI
-              page, opening the shot tracker, setting it up, starting and finishing it, and saving its result. Opening the shot logger and
+              page, opening the shot tracker, setting it up, starting and finishing it, pressing play on Watch it back, changing, removing or adding a call while watching it back, and saving its result. Opening the shot logger and
               pressing Finish in it. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
               and, if you coach, saving a play you drew. We also note when you turn training reminders on, or change your
               reminder days while they are on. Kept for 90 days, with your account id, only to see where new players get
