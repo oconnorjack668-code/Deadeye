@@ -1,7 +1,7 @@
 // src/components/Logo.tsx
-// The Deadeye app icon (public/logo.png, generated from the owner's design).
-// Shown at 36-64px, so pages load a 192px WebP copy (7 KB, sharp on 3x screens) instead of
-// the 256px PNG (92 KB).
+// The Deadeye ball from logo C (public/logo.webp, built by scripts/build-app-icons.mjs).
+// Shown at 36-64px, so pages load the 256px WebP (6 KB, sharp on 3x screens) instead of
+// the PNG (15 KB).
 import React from 'react';
 
 export function Logo({ size = 40, className = '' }: { size?: number; className?: string }) {

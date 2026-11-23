@@ -15,7 +15,10 @@
 // v6 empties the cache of stale worker bootstraps (see the worker note in the
 // fetch handler): installed devices were running the tracker's worker from an
 // old build long after each deploy.
-const CACHE_NAME = 'hoopiq-v6';
+// v7 is for logo C (22 Nov 2026): the precached icon-192 and icon-512 were
+// redrawn under the same names, so installed devices need a new cache to drop
+// the old artwork.
+const CACHE_NAME = 'hoopiq-v7';
 const PAGE_CACHE = 'hoopiq-pages-v1';
 // The hoop finder's model (36 MB), written by its worker (src/lib/video/
 // rimModel.ts). Kept across updates, or every update would download it again.
