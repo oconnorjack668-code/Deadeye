@@ -299,3 +299,53 @@ body {
     height: 4.5rem;
   }
 }
+
+/* The page loader (src/components/brand/PageLoader.tsx; docs/agent-os/design/
+   2026-11-22-loading.md, section 3). One slow light sweep across the skeleton
+   instead of a grey pulse, and a small pill with the spinning logo ball and the
+   visit's slogan that only appears after 400 ms, so a fast page never shows it.
+   Transform and opacity only. Reduced motion: no sweep, no spin. */
+@keyframes deadeye-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+.deadeye-sweep {
+  animation: deadeye-sweep 1.5s ease-in-out infinite;
+}
+@keyframes deadeye-loader-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes deadeye-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.deadeye-loader-in {
+  animation: deadeye-loader-in 240ms var(--ease-deadeye) 400ms backwards;
+}
+@keyframes deadeye-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.deadeye-spin {
+  animation: deadeye-spin 1.1s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .deadeye-sweep {
+    display: none;
+  }
+  .deadeye-spin {
+    animation: none;
+  }
+  .deadeye-loader-in {
+    animation-name: deadeye-fade-in;
+  }
+}

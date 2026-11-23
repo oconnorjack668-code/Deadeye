@@ -290,6 +290,7 @@ The polish round replaced the first review mockups for D2 to D7 and D1: build fr
 ## D10 · Shot chart v2 · review (exp/D10-D2-D7-chart-result-cards)
 - Change: hardwood court, the 13 real zones soft-filled on the classic blue-cold to red-hot scale, one small chip per zone (`design/2026-11-22-polish.md`, Shot chart redesign). `src/components/**/ShotHeatMap.tsx`, `CourtMarkings.tsx`, the share card route.
 
-## D11 · Opening animation, slogans and loaders · idea (approved)
+## D11 · Opening animation, slogans and loaders · review (exp/D11-loading-landing)
+- Built 2026-11-23 with the landing polish: openings, slogans (`src/lib/slogans.ts`), page loader. Not in this branch: the tracker decode screen (its file, `ShotTracker.tsx`, belongs to another builder; `DecodeProgress` still to build).
 - Change: openings A, B2 and C rotating per cold open (0.8 s minimum, tap to skip, never on page changes, reduced-motion still); a new slogan each visit from the founder's picks (`marketing/2026-11-22-slogans.md`); page loader pill after 400 ms; tracker decode screen with tips rotating three times then holding. Spec: `design/2026-11-22-loading.md`.
 - Build: the tracker decode screen is built with D1 on `exp/D1-watch-it-back` (both live in `ShotTracker.tsx`); status review. Openings, slogans and the page loader are separate.

@@ -1,0 +1,203 @@
+/* src/components/brand/opening.css
+   The opening animation (OpeningSplash.tsx). Hidden unless the head script
+   (src/lib/opening.ts) put data-open on <html>. Timings are the designer's
+   prototypes (docs/agent-os/design/mockups/2026-11-22-loading-open-*.html).
+   Only transform and opacity move; B's hoop and net come from
+   /opening/swish.js. Always dark: it joins the phone's splash (#09090b). */
+
+#dd-open {
+  display: none;
+}
+html[data-open] #dd-open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background: #09090b;
+  color: #f4f4f5;
+  /* The opening's own end; the app can end it sooner (OpeningSplashRunner) */
+  animation: dd-open-exit 200ms cubic-bezier(0.4, 0, 1, 1) 1250ms both;
+}
+html[data-open='c'] #dd-open {
+  animation-delay: 1200ms;
+}
+
+/* The drawing is laid out on the 390 x 844 box the prototypes used, centred
+   on the lockup, never cut off at the top on a short phone */
+.dd-open-box {
+  position: absolute;
+  left: 50%;
+  top: max(calc(50% - 390px), -10px);
+  width: 390px;
+  height: 844px;
+  margin-left: -195px;
+}
+.dd-b-host {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.dd-b-front {
+  z-index: 3;
+}
+.dd-open-lock {
+  position: absolute;
+  z-index: 2;
+  left: 78px;
+  top: 218px;
+  width: 234px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dd-open-scope {
+  position: relative;
+  width: 234px;
+  height: 234px;
+}
+.dd-open-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 460px;
+  height: 460px;
+  margin: -230px 0 0 -230px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 36, 54, 0.2) 0%, rgba(255, 36, 54, 0) 62%);
+}
+.dd-open-bks {
+  position: absolute;
+  inset: 0;
+}
+.dd-bk {
+  position: absolute;
+  width: 47px;
+  height: 47px;
+}
+.dd-bk svg,
+.dd-lay svg,
+.dd-open-word svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.dd-bk-tl { left: 0; top: 0; --dx: -1; --dy: -1; }
+.dd-bk-tr { right: 0; top: 0; --dx: 1; --dy: -1; }
+.dd-bk-bl { left: 0; bottom: 0; --dx: -1; --dy: 1; }
+.dd-bk-br { right: 0; bottom: 0; --dx: 1; --dy: 1; }
+.dd-open-ballwrap,
+.dd-open-ping {
+  position: absolute;
+  left: 30px;
+  top: 30px;
+  width: 174px;
+  height: 174px;
+}
+.dd-open-ball {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.dd-lay {
+  position: absolute;
+  inset: 0;
+}
+.dd-open-ping {
+  border-radius: 50%;
+  border: 2px solid #ff2436;
+  opacity: 0;
+}
+.dd-open-word {
+  margin-top: 20px;
+  width: 226px;
+  height: 42px;
+}
+.dd-open-slogan {
+  margin-top: 28px;
+  font: 700 14px/1.5 var(--font-geist-sans), system-ui, sans-serif;
+  letter-spacing: 0.2em;
+  padding-left: 0.2em;
+  text-transform: uppercase;
+  color: #f87171;
+  white-space: nowrap;
+}
+.dd-open-slogan span {
+  display: none;
+}
+/* Opening C's reticle: four hairlines from the screen edges to the ball's centre (y 335) */
+.dd-ln {
+  display: none;
+  position: absolute;
+  background: #ff2436;
+  opacity: 0.85;
+}
+html[data-open='c'] .dd-ln { display: block; }
+.dd-ln-l { right: 195px; width: 50vw; height: 2px; top: 334px; transform-origin: left center; }
+.dd-ln-r { left: 195px; width: 50vw; height: 2px; top: 334px; transform-origin: right center; }
+.dd-ln-t { left: 194px; width: 2px; height: 100vh; bottom: 509px; transform-origin: center top; }
+.dd-ln-b { left: 194px; width: 2px; height: 100vh; top: 335px; transform-origin: center bottom; }
+
+@keyframes dd-open-exit { to { opacity: 0; visibility: hidden; } }
+@keyframes dd-open-out { to { opacity: 0; visibility: hidden; } }
+@keyframes dd-open-skip { to { opacity: 0; visibility: hidden; } }
+@keyframes dd-open-wait { to { opacity: 0; visibility: hidden; } }
+@keyframes dd-open-exit-b { to { opacity: 0; visibility: hidden; } }
+@keyframes dd-open-fade { from { opacity: 0; } }
+@keyframes dd-open-rise { from { opacity: 0; transform: translateY(8px); } }
+@keyframes dd-open-ballin { from { opacity: 0; transform: scale(0.8); } }
+@keyframes dd-open-thump { 0% { transform: scale(1); } 38% { transform: scale(1.05); } 100% { transform: scale(1); } }
+@keyframes dd-open-ping { 0% { opacity: 0.55; transform: scale(1); } 100% { opacity: 0; transform: scale(1.55); } }
+@keyframes dd-open-bkclose {
+  0% { transform: translate(calc(var(--dx) * 68px), calc(var(--dy) * 68px)); animation-timing-function: cubic-bezier(0.16, 0.84, 0.34, 1); }
+  72% { transform: translate(calc(var(--dx) * -4px), calc(var(--dy) * -4px)); animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes dd-open-sweepx { from { transform: scaleX(0); } }
+@keyframes dd-open-sweepy { from { transform: scaleY(0); } }
+@keyframes dd-open-lnout { to { opacity: 0; } }
+@keyframes dd-open-bksin { from { opacity: 0; transform: scale(1.16); } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* A, Lock on (1.45 s): the brackets close in on the ball like a scope */
+  html[data-open='a'] .dd-open-glow { animation: dd-open-fade 700ms ease-out 260ms backwards; }
+  html[data-open='a'] .dd-open-ball { animation: dd-open-ballin 400ms var(--ease-deadeye) 100ms backwards; }
+  html[data-open='a'] .dd-open-ballwrap { animation: dd-open-thump 320ms var(--ease-deadeye) 520ms both; }
+  html[data-open='a'] .dd-bk { animation: dd-open-bkclose 460ms linear 60ms backwards, dd-open-fade 140ms linear 60ms backwards; }
+  html[data-open='a'] .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 520ms forwards; }
+  html[data-open='a'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 560ms backwards; }
+  html[data-open='a'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 800ms backwards; }
+
+  /* C, Reticle (1.4 s): hairlines meet at the centre, the ball shows, the brackets settle */
+  html[data-open='c'] .dd-ln-l,
+  html[data-open='c'] .dd-ln-r { animation: dd-open-sweepx 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
+  html[data-open='c'] .dd-ln-t,
+  html[data-open='c'] .dd-ln-b { animation: dd-open-sweepy 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
+  html[data-open='c'] .dd-open-glow { animation: dd-open-fade 600ms ease-out 360ms backwards; }
+  html[data-open='c'] .dd-open-ball { animation: dd-open-ballin 380ms var(--ease-deadeye) 340ms backwards; }
+  html[data-open='c'] .dd-open-bks { animation: dd-open-bksin 380ms var(--ease-deadeye) 420ms backwards; }
+  html[data-open='c'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 640ms backwards; }
+  html[data-open='c'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 820ms backwards; }
+
+  /* B, Swish (B2, about 2.05 s): /opening/swish.js draws the hoop and adds
+     .dd-b-go. Until then the screen is plain dark; if the file never comes,
+     the splash still leaves on its own (dd-open-wait). */
+  html[data-open='b']:not(.dd-b-go) .dd-open-lock { visibility: hidden; }
+  html[data-open='b']:not(.dd-b-go) #dd-open { animation-name: dd-open-wait; animation-delay: 2400ms; }
+  html[data-open='b'].dd-b-go #dd-open { animation-name: dd-open-exit-b; animation-delay: 1850ms; }
+  html[data-open='b'].dd-b-go .dd-open-glow { animation: dd-open-fade 700ms ease-out 1150ms backwards; }
+  html[data-open='b'].dd-b-go .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 1380ms forwards; }
+  html[data-open='b'].dd-b-go .dd-open-word { animation: dd-open-rise 380ms var(--ease-deadeye) 1340ms backwards; }
+  html[data-open='b'].dd-b-go .dd-open-slogan { animation: dd-open-rise 380ms var(--ease-deadeye) 1540ms backwards; }
+}
+
+/* Reduced motion: the finished lockup at once, held 0.7 s, then a 200 ms fade */
+@media (prefers-reduced-motion: reduce) {
+  html[data-open] #dd-open { animation-delay: 700ms; animation-duration: 200ms; animation-timing-function: linear; }
+  html[data-open] .dd-ln { display: none; }
+}
+
+/* Skip and the app-ready exit beat every scene's own timing */
+html.dd-open-out[data-open] #dd-open { animation: dd-open-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+html.dd-open-skip[data-open] #dd-open { animation: dd-open-skip 150ms ease-out both; }

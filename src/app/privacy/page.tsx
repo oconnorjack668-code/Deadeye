@@ -9,7 +9,7 @@ import { OFFER_ENDS_TEXT as OFFER_END } from '@/lib/competition';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 18, 2026';
+const LAST_UPDATED = 'November 23, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -324,8 +324,9 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
           <p>
             Deadeye&apos;s own cookies are only there to keep you logged in. The app also keeps a few things on your
-            device so it works for you (for example unsent drafts, offline saves, your settings and invite links you
-            followed); nothing on your device is used to track you or count visits.
+            device so it works for you (for example unsent drafts, offline saves, your settings, invite links you
+            followed, and which opening animation and slogan come next, so they change each time); nothing on your
+            device is used to track you or count visits.
           </p>
           <p>
             Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads
