@@ -35,7 +35,7 @@ UNION ALL SELECT 4, 'logged 2nd', count(*) FILTER (WHERE n >= 2) FROM sessions
 UNION ALL SELECT 5, 'logged 3rd', count(*) FILTER (WHERE n >= 3) FROM sessions
 UNION ALL SELECT 6, 'saved a tracked session', count(*) FILTER (WHERE tracked) FROM sessions
 UNION ALL SELECT 10 + array_position(
-    ARRAY['welcome_seen', 'welcome_court', 'welcome_later', 'sample_played', 'sample_finished', 'today_log_tapped', 'today_track_tapped', 'today_program_tapped', 'video_opened', 'tracker_opened', 'tracker_setup', 'tracker_started', 'tracker_finished', 'tracker_saved', 'watch_back_played', 'watch_back_edited', 'log_opened', 'log_finish_opened', 'reminder_set', 'play_opened', 'play_quiz_done', 'play_drawn', 'film_opened', 'film_done'],
+    ARRAY['welcome_seen', 'welcome_court', 'welcome_later', 'sample_played', 'sample_finished', 'today_log_tapped', 'today_track_tapped', 'today_program_tapped', 'video_opened', 'tracker_opened', 'tracker_setup', 'tracker_started', 'tracker_finished', 'tracker_saved', 'watch_back_played', 'watch_back_edited', 'log_opened', 'log_finish_opened', 'reminder_set', 'play_opened', 'play_quiz_done', 'play_drawn', 'film_opened', 'film_done', 'share_card_shared', 'first_result_seen', 'first_result_go_again'],
     name
   ), name, players FROM steps
 ORDER BY step_order;

@@ -11,7 +11,7 @@ import type { ShotZone } from '@/lib/supabase/types';
 import { ArrowLeft, Target, Sparkles, Video } from 'lucide-react';
 import { ShareCardButton } from '@/components/ShareCardButton';
 import { DeleteSessionButton } from './DeleteSessionButton';
-import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { FirstSessionResult } from '@/components/basketball/FirstSessionResult';
 import { AfterSession } from '@/components/basketball/AfterSession';
 import { XP_VALUES } from '@/lib/achievements';
 import { CountUp } from '@/components/CountUp';
@@ -92,15 +92,27 @@ export default async function BasketballSessionPage({
   const attempts = entries.reduce((n, e) => n + e.attempts, 0);
   const tracked = analysis ? parseSummary(analysis.summary) : null;
 
+  // The camera tracker lands here after a first save: the result screen first
+  if (firstSession) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="mx-auto max-w-md p-4 pb-28 md:p-8">
+          <FirstSessionResult
+            userId={user.id}
+            sessionId={id}
+            xp={XP_VALUES.session + (session.verified_by_video ? XP_VALUES.videoTracked : 0)}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-auto">
       <div className="p-4 md:p-8 max-w-2xl mx-auto">
         <Link href="/basketball" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200 mb-4">
           <ArrowLeft className="h-4 w-4" /> Hoops
         </Link>
-        {firstSession && (
-          <FirstSessionCelebration xp={XP_VALUES.session + (session.verified_by_video ? XP_VALUES.videoTracked : 0)} />
-        )}
         <h1 className="text-3xl font-black tracking-tight text-white capitalize flex items-center gap-2">
           <Target className="h-7 w-7 text-orange-400" /> {session.session_type.replace(/-/g, ' ')}
         </h1>

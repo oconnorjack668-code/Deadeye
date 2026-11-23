@@ -1,6 +1,10 @@
 // src/app/api/share/[kind]/route.tsx
-// Share cards: 1080×1350 PNGs (Instagram/TikTok portrait) of a session, workout or rank.
+// Share cards: PNGs of a session, workout, game or rank, 1080 x 1920 (story,
+// the default) or 1080 x 1350 (?format=feed).
 // Uses the player's own login (RLS), so only their own data can be drawn.
+// The first name is printed only with ?name=1, which the player turns on in
+// the share sheet: off by default. We never add a face, school or town; text
+// the player typed is drawn as typed (filtered by cardText()).
 //   /api/share/session?id=<training_session id>
 //   /api/share/workout?id=<workout id>
 //   /api/share/game?id=<game id>
@@ -10,12 +14,12 @@ import { ImageResponse } from 'next/og';
 import { getCurrentUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { loadAchievements } from '@/lib/achievements-server';
-import { ZONE_LABELS } from '@/lib/court';
 import { asMeasurementSystem, displayWeight, weightUnitLabel } from '@/lib/units';
 import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
-import { CARD_HEIGHT, CARD_WIDTH, Frame, GameCard, RankCard, SessionCard, WorkoutCard, titleCase } from '@/lib/shareCards';
-import { parseSummary } from '@/lib/video/trackedShots';
-import { streaks } from '@/lib/video/shotStats';
+import { CARD_WIDTH, Frame, GameCard, RankCard, SessionCard, WorkoutCard, asCardFormat, cardHeight, cardName } from '@/lib/shareCards';
+import { cardFonts } from '@/lib/shareCardFonts';
+import { bestShootingPct, personalBest, tallyBySession, type ShootingTally } from '@/lib/video/personalBest';
+import { localDateString } from '@/lib/dates';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,40 +40,34 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
   const { kind } = await params;
   const url = new URL(request.url);
   const id = url.searchParams.get('id') || '';
+  const format = asCardFormat(url.searchParams.get('format'));
+  const showName = url.searchParams.get('name') === '1';
   const supabase = await createClient();
-  const [{ data: profile }, icon] = await Promise.all([
+  const [{ data: profile }, icon, fonts] = await Promise.all([
     supabase.from('profiles').select('display_name, measurement_system').eq('id', user.id).maybeSingle(),
     iconData(url.origin),
+    cardFonts(),
   ]);
-  const name = profile?.display_name || 'Deadeye player';
+  const name = cardName(profile?.display_name, showName);
+  let date = localDateString();
   let body: React.ReactNode;
 
   if (kind === 'session') {
-    const [{ data: session }, { data: analysis }] = await Promise.all([
+    const [{ data: session }, { data: allDrills, error: drillsError }] = await Promise.all([
       supabase
         .from('training_sessions')
-        .select('session_date, session_type, duration_minutes, session_drills(shooting_entries(shot_zone, makes, attempts))')
+        .select('session_date, duration_minutes, session_drills(shooting_entries(shot_zone, makes, attempts))')
         .eq('id', id)
         .eq('user_id', user.id)
         .maybeSingle(),
-      supabase
-        .from('video_analyses')
-        .select('summary')
-        .eq('session_id', id)
-        .eq('user_id', user.id)
-        .eq('kind', 'shot_tracking')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+      // Every session's totals, for "New personal best" (filtered to the player's own rows: a coach can read players' too)
+      supabase.from('session_drills').select('session_id, shooting_entries(makes, attempts)').eq('user_id', user.id).limit(5000),
     ]);
-    const tracked = analysis ? parseSummary(analysis.summary) : null;
-    const made = tracked?.shots.map((s) => s.made) ?? [];
     if (!session) return new Response('Not found', { status: 404 });
     // session_drills(shooting_entries(...)) is a two-level embed, which this
     // hand-written schema doesn't model relationship metadata for.
     const typedSession = session as unknown as {
       session_date: string;
-      session_type: string;
       duration_minutes: number;
       session_drills: Array<{ shooting_entries: Array<{ shot_zone: string; makes: number; attempts: number }> }>;
     };
@@ -82,14 +80,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
         zones.set(e.shot_zone, z);
       }
     }
+    const current = [...zones.values()].reduce((t, z) => ({ makes: t.makes + z.makes, attempts: t.attempts + z.attempts }), { makes: 0, attempts: 0 });
+    const others = tallyBySession(
+      ((allDrills ?? []) as unknown as Array<{ session_id: string; shooting_entries: ShootingTally[] | null }>).filter((d) => d.session_id !== id)
+    );
+    date = typedSession.session_date;
     body = (
       <SessionCard
-        date={typedSession.session_date}
-        type={typedSession.session_type}
+        format={format}
         minutes={typedSession.duration_minutes}
         drills={(typedSession.session_drills || []).length}
-        zones={[...zones.entries()].map(([zone, z]) => ({ label: ZONE_LABELS[zone as keyof typeof ZONE_LABELS] || titleCase(zone), ...z }))}
-        tracked={made.length ? { made, bestRun: streaks(made).best } : null}
+        zones={[...zones.entries()].map(([zone, z]) => ({ zone, ...z }))}
+        // No "new personal best" if the history couldn't be read: never claim one that may not be true
+        personalBest={!drillsError && personalBest(current, bestShootingPct(others)).kind !== 'none'}
       />
     );
   } else if (kind === 'workout') {
@@ -118,8 +121,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
         best.set(s.exercise_name, { weight: s.weight_kg, reps: formatAmount(setAmount(s, mode), mode), pr });
       else if (pr) cur.pr = true;
     }
+    date = workout.workout_date;
     body = (
       <WorkoutCard
+        format={format}
         date={workout.workout_date}
         type={workout.workout_type}
         minutes={workout.duration_minutes}
@@ -146,8 +151,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
       { label: 'Steals · Blocks', value: `${g.stl} · ${g.blk}` },
     ];
     if (g.minutes != null) line.push({ label: 'Minutes', value: `${g.minutes}` });
+    date = g.game_date;
     body = (
       <GameCard
+        format={format}
         date={g.game_date}
         opponent={g.opponent}
         result={g.result}
@@ -162,22 +169,30 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
     const a = await loadAchievements(user.id);
     body = (
       <RankCard
+        format={format}
         rank={a.level.tier}
         level={a.level.level}
+        progress={a.level.progress}
+        toNext={a.level.toNext}
         xp={a.xp}
         streak={a.stats.currentStreak}
         sessions={a.stats.totalSessions + a.stats.totalWorkouts}
         badges={a.badges.filter((b) => b.earned).length}
-        makes={a.stats.totalMakes}
       />
     );
   } else {
     return new Response('Unknown card', { status: 404 });
   }
 
-  return new ImageResponse(<Frame icon={icon} name={name}>{body}</Frame>, {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
-    headers: { 'Cache-Control': 'private, no-store' },
-  });
+  return new ImageResponse(
+    <Frame icon={icon} name={name} date={date} format={format}>
+      {body}
+    </Frame>,
+    {
+      width: CARD_WIDTH,
+      height: cardHeight(format),
+      fonts: fonts.length ? fonts : undefined,
+      headers: { 'Cache-Control': 'private, no-store' },
+    }
+  );
 }
