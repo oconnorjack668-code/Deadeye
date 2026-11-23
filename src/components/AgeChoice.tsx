@@ -5,12 +5,13 @@
 
 import React from 'react';
 import { cn } from '@/lib/utils';
+import { FIELD_BORDER } from '@/components/ui/Input';
 
 export type AgeAnswer = '16-plus' | '13-15';
 
 const OPTIONS: Array<{ value: AgeAnswer; label: string; hint: string }> = [
-  { value: '16-plus', label: "I'm 16 or older", hint: 'You can start straight away.' },
-  { value: '13-15', label: "I'm 13, 14 or 15", hint: 'A parent or guardian approves your account first.' },
+  { value: '16-plus', label: '16 or older', hint: 'You can start straight away.' },
+  { value: '13-15', label: '13, 14 or 15', hint: 'A parent or guardian approves your account first.' },
 ];
 
 export function AgeChoice({
@@ -30,8 +31,8 @@ export function AgeChoice({
           <label
             key={o.value}
             className={cn(
-              'flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors',
-              value === o.value ? 'border-red-500/70 bg-red-500/10' : 'border-zinc-800 bg-zinc-950/40 hover:border-zinc-700'
+              'flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border px-3 py-2.5 text-sm transition-colors',
+              value === o.value ? 'border-red-500/70 bg-red-500/10' : cn(FIELD_BORDER, 'bg-zinc-950/40 hover:border-zinc-400')
             )}
           >
             <input
@@ -40,11 +41,11 @@ export function AgeChoice({
               value={o.value}
               checked={value === o.value}
               onChange={() => onChange(o.value)}
-              className="mt-0.5 h-4 w-4 accent-red-500"
+              className="mt-0.5 h-5 w-5 shrink-0 accent-red-500"
             />
             <span>
               <span className="block font-semibold text-zinc-100">{o.label}</span>
-              <span className="block text-xs text-zinc-400">{o.hint}</span>
+              <span className="block text-sm text-zinc-400">{o.hint}</span>
             </span>
           </label>
         ))}
