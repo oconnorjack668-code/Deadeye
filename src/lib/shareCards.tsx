@@ -1,137 +1,262 @@
 // src/lib/shareCards.tsx
 // Share card layouts (rendered to PNG by next/og in /api/share/[kind]).
+// Brand round 2026-11-22 (docs/agent-os/design/2026-11-22-polish.md, share cards;
+// mockups 2026-11-22-polish-share-*): 1080 x 1920 story and 1080 x 1350 feed,
+// heavy white numbers with an orange glow, "AIM IS EARNED" in brand red, the
+// player's own shot chart. The name is off unless the player turns it on: no
+// face, school or place, ever.
 // next/og only supports flexbox: every element with more than one child needs display: flex.
 import React from 'react';
+import { sessionCrop, shotChartLayout, shotChartSvg, type ChartZoneInput } from '@/lib/shotChart';
 
+export type CardFormat = 'story' | 'feed';
 export const CARD_WIDTH = 1080;
-export const CARD_HEIGHT = 1350;
+export const cardHeight = (format: CardFormat) => (format === 'feed' ? 1350 : 1920);
+export const asCardFormat = (v: string | null | undefined): CardFormat => (v === 'feed' ? 'feed' : 'story');
+
 const ORANGE = '#f97316';
+const ORANGE_TEXT = '#fb923c';
+const BRAND_RED = '#f87171';
+const MUTED = '#d4d4d8';
+const GLOW = '0 0 90px rgba(249,115,22,0.55), 0 0 30px rgba(249,115,22,0.25)';
+
+/** Where things sit, by size. Story keeps everything inside y 270 to 1500 (the app chrome covers the rest). */
+const POS = {
+  story: { head: 300, pill: 415, num: 520, numPx: 345, pct: 832, pctPx: 124, sub: 968, court: 1030, courtW: 640, bottom: 1500 },
+  feed: { head: 76, pill: 190, num: 292, numPx: 330, pct: 604, pctPx: 120, sub: 740, court: 800, courtW: 640, bottom: 1290 },
+} as const;
 
 export const pct = (m: number, a: number) => (a > 0 ? Math.round((m / a) * 100) : 0);
+const shortDate = (d: string) => new Date(`${d}T00:00:00`).toLocaleDateString('en-IE', { day: 'numeric', month: 'short' });
 const niceDate = (d: string) =>
   new Date(`${d}T00:00:00`).toLocaleDateString('en-IE', { weekday: 'short', day: 'numeric', month: 'short' });
 export const titleCase = (s: string) => s.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 
-export function Frame({ icon, name, children }: { icon: string | null; name: string; children: React.ReactNode }) {
+/**
+ * The name printed on a card: nothing unless the player switched "Show my
+ * name" on, and then only the first name (no surname, school or place).
+ */
+export function cardName(displayName: string | null | undefined, show: boolean): string | null {
+  if (!show) return null;
+  const first = (displayName ?? '').trim().split(/\s+/)[0] ?? '';
+  return first ? first.slice(0, 20) : null;
+}
+
+const abs = (top: number, extra: React.CSSProperties = {}): React.CSSProperties => ({
+  position: 'absolute',
+  left: 0,
+  // Satori does not stretch an absolute box between left and right: give the width
+  width: CARD_WIDTH,
+  top,
+  display: 'flex',
+  justifyContent: 'center',
+  ...extra,
+});
+
+export function Frame({
+  icon,
+  name,
+  date,
+  format,
+  children,
+}: {
+  icon: string | null;
+  /** First name, or null (the default) for no name. */
+  name: string | null;
+  /** yyyy-mm-dd */
+  date: string;
+  format: CardFormat;
+  children: React.ReactNode;
+}) {
+  const h = cardHeight(format);
+  const p = POS[format];
+  const right = `${name ? `${name} · ` : ''}${shortDate(date)}`.toUpperCase();
   return (
     <div
       style={{
         width: CARD_WIDTH,
-        height: CARD_HEIGHT,
+        height: h,
         display: 'flex',
-        flexDirection: 'column',
+        position: 'relative',
         backgroundColor: '#09090b',
-        backgroundImage: 'radial-gradient(circle at 20% 15%, rgba(234,88,12,0.45), #09090b 55%)',
+        backgroundImage: `radial-gradient(80% 42% at 50% ${format === 'story' ? 38 : 40}%, rgba(249,115,22,0.30), rgba(9,9,11,0) 72%)`,
         color: '#fff',
-        padding: 72,
-        fontFamily: 'sans-serif',
+        fontFamily: 'Geist, sans-serif',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-        {/* next/image cannot be used here: these cards are rendered by Satori
-            inside next/og's ImageResponse, which only understands plain img. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        {icon ? <img src={icon} width={96} height={96} style={{ borderRadius: 24 }} alt="" /> : null}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ fontSize: 52, fontWeight: 900 }}>Deadeye</div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: ORANGE, letterSpacing: 3 }}>AI BASKETBALL TRAINER</div>
+      <div style={{ position: 'absolute', left: 90, width: CARD_WIDTH - 180, top: p.head, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          {/* next/image cannot be used here: Satori only understands plain img. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {icon ? <img src={icon} width={84} height={84} style={{ borderRadius: 9999 }} alt="" /> : null}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ fontSize: 54, fontWeight: 900, lineHeight: 1, letterSpacing: -1 }}>DEADEYE</div>
+            <div style={{ fontSize: 26, fontWeight: 700, color: BRAND_RED, letterSpacing: 4.7, marginTop: 6 }}>AIM IS EARNED</div>
+          </div>
         </div>
+        <div style={{ display: 'flex', fontSize: 36, fontWeight: 700, color: MUTED, letterSpacing: 1.5 }}>{right}</div>
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, justifyContent: 'center' }}>{children}</div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 30, color: '#a1a1aa' }}>
-        <div style={{ display: 'flex', fontWeight: 700, color: '#fff' }}>{name}</div>
-        <div style={{ display: 'flex' }}>Train with Deadeye</div>
-      </div>
+      {children}
     </div>
   );
 }
 
-function Bar({ label, value, sub }: { label: string; value: number; sub: string }) {
+/** The space under the header, for the cards that flow rather than sit at fixed places. */
+function Body({ format, children }: { format: CardFormat; children: React.ReactNode }) {
+  const p = POS[format];
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 22 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 32 }}>
-        <div style={{ display: 'flex' }}>{label}</div>
-        <div style={{ display: 'flex', color: '#d4d4d8' }}>{sub}</div>
-      </div>
-      <div style={{ display: 'flex', height: 18, borderRadius: 9, backgroundColor: '#27272a', marginTop: 10 }}>
-        <div style={{ display: 'flex', width: `${Math.max(3, value)}%`, height: 18, borderRadius: 9, backgroundColor: ORANGE }} />
-      </div>
+    <div
+      style={{
+        position: 'absolute',
+        left: 90,
+        width: CARD_WIDTH - 180,
+        top: p.head + 140,
+        height: p.bottom - p.head - 140,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}
+    >
+      {children}
     </div>
   );
 }
 
-function Stat({ value, label, color = '#fff' }: { value: string; label: string; color?: string }) {
+function Stat({ value, label, color = '#fff', size = 84 }: { value: string; label: string; color?: string; size?: number }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1 }}>
-      <div style={{ fontSize: 72, fontWeight: 900, color }}>{value}</div>
-      <div style={{ fontSize: 26, color: '#a1a1aa', letterSpacing: 2 }}>{label.toUpperCase()}</div>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexGrow: 1, flexBasis: 0 }}>
+      <div style={{ display: 'flex', fontSize: size, fontWeight: 900, color, lineHeight: 1 }}>{value}</div>
+      <div style={{ display: 'flex', fontSize: 28, fontWeight: 700, color: '#a1a1aa', letterSpacing: 4, marginTop: 10 }}>{label.toUpperCase()}</div>
+    </div>
+  );
+}
+
+/** The player's own shot chart: court and zones as an image, chips laid over it (Satori cannot draw SVG text). */
+function CardChart({ zones, maxW, maxH }: { zones: ChartZoneInput[]; maxW: number; maxH: number }) {
+  const crop = sessionCrop(zones);
+  const [x0, x1] = crop.xRange ?? [-28, 528];
+  const tall = ((crop.yMax ?? 47) - (crop.yMin ?? -3)) * 10;
+  // As wide as it may be without running past the bottom of the safe area
+  const width = Math.round(Math.min(maxW, (maxH * (x1 - x0)) / tall));
+  const layout = shotChartLayout(zones, { id: 'card', renderW: width, pctPx: 38, subPx: 25, ...crop });
+  const { x: vx, y: vy, h: vh } = layout.viewBox;
+  const k = layout.k;
+  const src = `data:image/svg+xml;base64,${Buffer.from(shotChartSvg(layout)).toString('base64')}`;
+  return (
+    <div style={{ display: 'flex', position: 'relative', width, height: Math.round(vh * k) }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} width={width} height={Math.round(vh * k)} alt="" />
+      {layout.chips.map((c) => {
+        const left = (c.cx - c.w / 2 - vx) * k;
+        const top = (c.cy - c.h / 2 - vy) * k;
+        return (
+          <div key={c.zone} style={{ display: 'flex', position: 'absolute', left, top, width: c.w * k, height: c.h * k }}>
+            {c.pointer ? (
+              // A diamond half under the chip reads as the pointer (Satori draws no border triangles)
+              <div
+                style={{
+                  position: 'absolute',
+                  left: (c.w * k) / 2 - 10,
+                  top: -10,
+                  width: 20,
+                  height: 20,
+                  backgroundColor: c.band.edge,
+                  transform: 'rotate(45deg)',
+                }}
+              />
+            ) : null}
+            <div
+              style={{
+                display: 'flex',
+                width: '100%',
+                height: '100%',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 10,
+                borderRadius: c.h * k * 0.32,
+                backgroundColor: 'rgba(9,9,11,0.9)',
+                border: `2px solid ${c.band.edge}`,
+              }}
+            >
+              <div style={{ display: 'flex', fontSize: 38, fontWeight: 900, color: '#fff' }}>{`${c.pct}%`}</div>
+              {c.solo ? null : <div style={{ display: 'flex', fontSize: 25, fontWeight: 700, color: MUTED }}>{`${c.makes}/${c.attempts}`}</div>}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export interface SessionCardData {
-  date: string;
-  type: string;
+  format: CardFormat;
   minutes: number;
   drills: number;
-  zones: Array<{ label: string; makes: number; attempts: number }>;
-  /** A session the tracker counted: every shot in order, and the best run of makes. */
-  tracked?: { made: boolean[]; bestRun: number } | null;
+  zones: ChartZoneInput[];
+  /** True only when this session beat (or, with enough shots, set) the player's best %. */
+  personalBest: boolean;
 }
 
-/** Most shots drawn as dots; past this the row would not fit the card. */
-const MAX_DOTS = 60;
-
-function ShotDots({ made, bestRun }: { made: boolean[]; bestRun: number }) {
-  const shown = made.slice(-MAX_DOTS);
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', marginTop: 36 }}>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-        {shown.map((m, i) => (
-          <div key={i} style={{ display: 'flex', width: 26, height: 26, borderRadius: 13, backgroundColor: m ? '#34d399' : '#f87171' }} />
-        ))}
-      </div>
-      <div style={{ display: 'flex', fontSize: 30, color: '#d4d4d8', marginTop: 18 }}>
-        {bestRun >= 2 ? `Best run ${bestRun} in a row · counted by the Deadeye tracker` : 'Counted by the Deadeye tracker'}
-      </div>
-    </div>
-  );
-}
-
-export function SessionCard({ date, type, minutes, drills, zones, tracked }: SessionCardData) {
+export function SessionCard({ format, minutes, drills, zones, personalBest }: SessionCardData) {
+  const p = POS[format];
   const makes = zones.reduce((n, z) => n + z.makes, 0);
   const attempts = zones.reduce((n, z) => n + z.attempts, 0);
-  const top = [...zones].sort((a, b) => b.attempts - a.attempts).slice(0, 4);
+  const spots = zones.filter((z) => z.attempts > 0).length;
+  // "8/10" is drawn at full size; longer scores shrink so "120/200" still fits the width
+  const numPx = Math.round(p.numPx * Math.min(1, 4 / `${makes}/${attempts}`.length));
+  if (attempts === 0) {
+    return (
+      <Body format={format}>
+        <div style={{ display: 'flex' }}>
+          <Stat value={`${minutes}`} label="minutes" size={200} />
+          <Stat value={`${drills}`} label={drills === 1 ? 'drill' : 'drills'} size={200} />
+        </div>
+      </Body>
+    );
+  }
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', fontSize: 36, color: '#d4d4d8' }}>
-        {`${titleCase(type)} session · ${niceDate(date)} · ${minutes} min`}
+    <>
+      {personalBest ? (
+        <div style={abs(p.pill)}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: 84,
+              padding: '0 44px',
+              borderRadius: 9999,
+              border: '2px solid rgba(251,146,60,0.5)',
+              backgroundColor: 'rgba(249,115,22,0.15)',
+              color: '#fdba74',
+              fontSize: 36,
+              fontWeight: 700,
+              letterSpacing: 5,
+            }}
+          >
+            NEW PERSONAL BEST
+          </div>
+        </div>
+      ) : null}
+      <div style={abs(p.num + (p.numPx - numPx) / 2, { fontSize: numPx, fontWeight: 900, lineHeight: 0.9, letterSpacing: -numPx * 0.035, textShadow: GLOW })}>
+        <span>{makes}</span>
+        <span style={{ color: '#71717a' }}>/</span>
+        <span>{attempts}</span>
       </div>
-      {attempts > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-end', gap: 28, marginTop: 20 }}>
-            <div style={{ display: 'flex', fontSize: 220, fontWeight: 900, color: ORANGE, lineHeight: 1 }}>{`${pct(makes, attempts)}%`}</div>
-            <div style={{ display: 'flex', fontSize: 56, fontWeight: 800, marginBottom: 30 }}>{`${makes}/${attempts}`}</div>
-          </div>
-          <div style={{ display: 'flex', fontSize: 30, color: '#a1a1aa', marginTop: 4 }}>shots made</div>
-          {tracked && tracked.made.length > 0 ? <ShotDots made={tracked.made} bestRun={tracked.bestRun} /> : null}
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: 36 }}>
-            {top.slice(0, tracked ? 3 : 4).map((z) => (
-              <Bar key={z.label} label={z.label} value={pct(z.makes, z.attempts)} sub={`${z.makes}/${z.attempts} · ${pct(z.makes, z.attempts)}%`} />
-            ))}
-          </div>
+      <div style={abs(p.pct, { fontSize: p.pctPx, fontWeight: 900, lineHeight: 1, color: ORANGE_TEXT })}>{`${pct(makes, attempts)}%`}</div>
+      <div style={abs(p.sub, { fontSize: 40, fontWeight: 700, color: MUTED })}>
+        {`${attempts} ${attempts === 1 ? 'shot' : 'shots'} from ${spots} ${spots === 1 ? 'spot' : 'spots'}`}
+      </div>
+      {spots > 0 ? (
+        <div style={abs(p.court)}>
+          <CardChart zones={zones} maxW={p.courtW} maxH={p.bottom - p.court} />
         </div>
-      ) : (
-        <div style={{ display: 'flex', marginTop: 40 }}>
-          <Stat value={`${minutes}`} label="minutes" color={ORANGE} />
-          <Stat value={`${drills}`} label="drills" />
-        </div>
-      )}
-    </div>
+      ) : null}
+    </>
   );
 }
 
 export interface WorkoutCardData {
+  format: CardFormat;
   date: string;
   type: string;
   minutes: number;
@@ -143,10 +268,10 @@ export interface WorkoutCardData {
   best: Array<{ exercise: string; weight: number | null; reps: number | string; pr: boolean }>;
 }
 
-export function WorkoutCard({ date, type, minutes, sets, volume, unit, prs, best }: WorkoutCardData) {
+export function WorkoutCard({ format, date, type, minutes, sets, volume, unit, prs, best }: WorkoutCardData) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', fontSize: 36, color: '#d4d4d8' }}>{`${titleCase(type)} workout · ${niceDate(date)}`}</div>
+    <Body format={format}>
+      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${titleCase(type)} workout · ${niceDate(date)}`}</div>
       <div style={{ display: 'flex', marginTop: 40 }}>
         <Stat value={`${sets}`} label="sets" color={ORANGE} />
         <Stat value={`${minutes}`} label="minutes" />
@@ -161,52 +286,107 @@ export function WorkoutCard({ date, type, minutes, sets, volume, unit, prs, best
         {best.slice(0, 5).map((b) => (
           <div key={b.exercise} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 34, marginTop: 14 }}>
             <div style={{ display: 'flex' }}>{b.exercise}</div>
-            <div style={{ display: 'flex', color: b.pr ? '#fbbf24' : '#d4d4d8' }}>
+            <div style={{ display: 'flex', color: b.pr ? '#fbbf24' : MUTED }}>
               {`${b.weight ? `${Math.round(b.weight)} ${unit} × ` : ''}${b.reps}${b.pr ? ' PR' : ''}`}
             </div>
           </div>
         ))}
       </div>
-    </div>
+    </Body>
   );
 }
 
 export interface RankCardData {
+  format: CardFormat;
   /** The tier name. */
   rank: string;
-  /** Shown large above the tier when given. */
-  level?: number;
+  level: number;
+  /** 0 to 1 of the way to the next level */
+  progress: number;
+  /** XP to the next level, 0 at the top */
+  toNext: number;
   xp: number;
   streak: number;
   sessions: number;
   badges: number;
-  makes: number;
 }
 
-export function RankCard({ rank, level, xp, streak, sessions, badges, makes }: RankCardData) {
+function LevelRing({ size, progress }: { size: number; progress: number }) {
+  const r = size / 2 - 30;
+  const c = 2 * Math.PI * r;
+  const p = Math.max(0, Math.min(1, progress));
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f97316"/><stop offset="1" stop-color="#fbbf24"/></linearGradient></defs><circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="#27272a" stroke-width="40"/>${
+    p > 0
+      ? `<circle cx="${size / 2}" cy="${size / 2}" r="${r}" fill="none" stroke="url(#rg)" stroke-width="40" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - p)}" transform="rotate(-90 ${size / 2} ${size / 2})"/>`
+      : ''
+  }</svg>`;
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src={`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`} width={size} height={size} alt="" />;
+}
+
+export function RankCard({ format, rank, level, progress, toNext, xp, streak, sessions, badges }: RankCardData) {
+  const big = format === 'story';
+  const D = big ? 600 : 500;
+  const top = big ? 410 : 200;
+  const statsTop = big ? 1285 : 1000;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <div style={{ display: 'flex', fontSize: 34, color: '#a1a1aa', letterSpacing: 4 }}>{level ? 'MY LEVEL' : 'MY RANK'}</div>
-      {level ? (
-        <>
-          <div style={{ display: 'flex', fontSize: 170, fontWeight: 900, color: ORANGE, lineHeight: 1.05 }}>{`Level ${level}`}</div>
-          <div style={{ display: 'flex', fontSize: 64, fontWeight: 800, color: '#e4e4e7' }}>{rank}</div>
-        </>
-      ) : (
-        <div style={{ display: 'flex', fontSize: 150, fontWeight: 900, color: ORANGE, lineHeight: 1.1 }}>{rank}</div>
-      )}
-      <div style={{ display: 'flex', fontSize: 44, fontWeight: 800 }}>{`${xp.toLocaleString('en-IE')} XP`}</div>
-      <div style={{ display: 'flex', width: '100%', marginTop: 64 }}>
-        <Stat value={`${streak}`} label="day streak" color={ORANGE} />
-        <Stat value={`${sessions}`} label="sessions" />
-        <Stat value={`${badges}`} label="badges" color="#fbbf24" />
+    <>
+      <div style={{ position: 'absolute', left: (CARD_WIDTH - D) / 2, top, width: D, height: D, display: 'flex' }}>
+        <LevelRing size={D} progress={progress} />
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: D,
+            height: D,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div style={{ display: 'flex', fontSize: 36, fontWeight: 700, color: '#a1a1aa', letterSpacing: 11 }}>LEVEL</div>
+          <div style={{ display: 'flex', fontSize: big ? 310 : 260, fontWeight: 900, lineHeight: 0.9, textShadow: GLOW }}>{`${level}`}</div>
+        </div>
       </div>
-      <div style={{ display: 'flex', marginTop: 48, fontSize: 34, color: '#d4d4d8' }}>{`${makes.toLocaleString('en-IE')} shots made`}</div>
-    </div>
+      <div style={abs(top + D - 50)}>
+        <div
+          style={{
+            display: 'flex',
+            fontSize: 38,
+            fontWeight: 700,
+            letterSpacing: 6,
+            padding: '16px 50px',
+            borderRadius: 9999,
+            border: '2px solid rgba(251,146,60,0.5)',
+            backgroundColor: '#09090b',
+            color: '#fdba74',
+          }}
+        >
+          {rank.toUpperCase()}
+        </div>
+      </div>
+      <div style={abs(top + D + 55, { flexDirection: 'column', alignItems: 'center' })}>
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <span style={{ fontSize: 80, fontWeight: 900 }}>{xp.toLocaleString('en-IE')}</span>
+          <span style={{ fontSize: 44, fontWeight: 700, color: MUTED, marginLeft: 12 }}>XP</span>
+        </div>
+        {toNext > 0 ? (
+          <div style={{ display: 'flex', fontSize: 38, fontWeight: 700, color: MUTED, marginTop: 8 }}>{`${toNext} XP to Level ${level + 1}`}</div>
+        ) : null}
+      </div>
+      <div style={{ position: 'absolute', left: 90, width: CARD_WIDTH - 180, top: statsTop, display: 'flex' }}>
+        <Stat value={`${streak}`} label="day streak" size={big ? 100 : 84} />
+        <Stat value={`${sessions}`} label="sessions" size={big ? 100 : 84} />
+        <Stat value={`${badges}`} label="badges" size={big ? 100 : 84} />
+      </div>
+    </>
   );
 }
 
 export interface GameCardData {
+  format: CardFormat;
   date: string;
   opponent: string | null;
   result: string | null;
@@ -217,13 +397,11 @@ export interface GameCardData {
   line: Array<{ label: string; value: string }>;
 }
 
-export function GameCard({ date, opponent, result, score, points, rebounds, assists, line }: GameCardData) {
+export function GameCard({ format, date, opponent, result, score, points, rebounds, assists, line }: GameCardData) {
   const tag = result === 'win' ? 'WIN' : result === 'loss' ? 'LOSS' : result === 'draw' ? 'DRAW' : null;
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', fontSize: 36, color: '#d4d4d8' }}>
-        {`${opponent ? `vs ${opponent}` : 'Game day'} · ${niceDate(date)}`}
-      </div>
+    <Body format={format}>
+      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${opponent ? `vs ${opponent}` : 'Game day'} · ${niceDate(date)}`}</div>
       {tag && (
         <div style={{ display: 'flex', marginTop: 16, fontSize: 34, fontWeight: 800, color: result === 'win' ? '#34d399' : '#a1a1aa' }}>
           {`${tag}${score ? ` ${score}` : ''}`}
@@ -242,6 +420,6 @@ export function GameCard({ date, opponent, result, score, points, rebounds, assi
           </div>
         ))}
       </div>
-    </div>
+    </Body>
   );
 }

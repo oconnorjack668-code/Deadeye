@@ -47,6 +47,12 @@ export const EVENT_NAMES = [
   'film_opened',
   /** Answered every question on a film clip, and the attempt was saved */
   'film_done',
+  /** Shared or saved a share card from the share sheet (any card: session, rank, workout, game) */
+  'share_card_shared',
+  /** Saw the result screen after their first saved session */
+  'first_result_seen',
+  /** Result screen after the first session: tapped "Go again" */
+  'first_result_go_again',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];
