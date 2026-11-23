@@ -10,7 +10,7 @@ const fetchMock = vi.fn();
 
 beforeEach(() => {
   fetchMock.mockReset();
-  fetchMock.mockImplementation(async () => new Response(new Blob(['png'], { type: 'image/png' }), { status: 200 }));
+  fetchMock.mockImplementation(async () => ({ ok: true, status: 200, blob: async () => new Blob(['png'], { type: 'image/png' }) }));
   vi.stubGlobal('fetch', fetchMock);
   // jsdom has neither
   HTMLDialogElement.prototype.showModal = function showModal(this: HTMLDialogElement) {
