@@ -67,11 +67,12 @@ try{ss=w.sessionStorage;ss.getItem('${OPENED_KEY}')}catch(e){ss=null}
 try{ls=w.localStorage;ls.getItem('${OPEN_COUNT_KEY}')}catch(e){ls=null}
 function g(s,k){try{return s?s.getItem(k):null}catch(e){return null}}
 function p(s,k,v){try{if(s)s.setItem(k,String(v))}catch(e){}}
+var path=location.pathname;
+if(path==='/'||${NO_OPENING_PATH.toString()}.test(path))return;
 var k=parseInt(g(ss,'${SLOGAN_KEY}'),10);
 if(!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=0&&l<M;k=Math.floor(Math.random()*(a?M-1:M));if(a&&k>=l)k++;p(ss,'${SLOGAN_KEY}',k);p(ls,'${SLOGAN_LAST_KEY}',k)}
 d.setAttribute('data-sl',k);
-var path=location.pathname;
-if(!ss||g(ss,'${OPENED_KEY}')||path==='/'||${NO_OPENING_PATH.toString()}.test(path))return;
+if(!ss||g(ss,'${OPENED_KEY}'))return;
 p(ss,'${OPENED_KEY}',1);
 var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%3;if(!(n>=0))n=0;ls.setItem('${OPEN_COUNT_KEY}',String(n))}catch(e){n=Math.floor(Math.random()*3)}
 d.setAttribute('data-open','abc'.charAt(n));

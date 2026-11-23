@@ -100,6 +100,15 @@ describe('the opening rotation', () => {
     expect(coldOpen('/clubs/abc')).toBe('b');
   });
 
+  it('writes nothing to the device on website pages (ePrivacy: storage only where it is used)', () => {
+    for (const p of ['/', '/privacy', '/parents/abc', '/competition']) {
+      coldOpen(p);
+      for (const k of ['dd-open-n', 'dd-sl-last']) expect(local.getItem(k), `${p} ${k}`).toBeNull();
+      for (const k of ['dd-opened', 'dd-sl']) expect(session.getItem(k), `${p} ${k}`).toBeNull();
+      expect(document.documentElement.getAttribute('data-sl'), p).toBeNull();
+    }
+  });
+
   it('loads the swish file only when B plays with motion allowed', () => {
     const swish = () => [...document.head.querySelectorAll('script')].some((s) => s.getAttribute('src') === SWISH_SRC);
     coldOpen(); // a

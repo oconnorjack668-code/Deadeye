@@ -230,7 +230,8 @@ export default async function Home() {
                   <ChevronRight className="h-5 w-5 flex-none text-zinc-400" aria-hidden="true" />
                 </Link>
                 <p className="mt-2 text-sm text-zinc-400">
-                  Ages 13 and over, Republic of Ireland. Under 18? A parent or guardian approves your entry. No purchase
+                  To enter: make a free account, log one training session and tell us one thing you liked and one
+                  thing you would change. Ages 13 and over, Republic of Ireland. Under 18? A parent or guardian approves your entry. No purchase
                   needed. Judged on the most useful feedback, not a draw; &quot;Pro for life&quot; means for as long as
                   Deadeye offers Pro.
                 </p>

@@ -9,7 +9,7 @@ import { OFFER_ENDS_TEXT as OFFER_END } from '@/lib/competition';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 18, 2026';
+const LAST_UPDATED = 'November 23, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
