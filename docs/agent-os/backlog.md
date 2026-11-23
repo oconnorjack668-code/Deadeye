@@ -277,3 +277,16 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 ## D8 · Fix the sideways scroll on six hubs · idea
 - Change: Hoops, Gym, Train, Plays, Film and IQ scroll sideways by about 52 px from the `PageHeader` glow; `overflow-x-clip` on its wrapper (review #8). `src/components/layout/PageHeader.tsx`. Bug fix, can skip the mockup step.
 - Signal: none; polish.
+
+## Approved designs, 2026-11-22/23 (founder signed off; ready to build when marked NEXT)
+
+The polish round replaced the first review mockups for D2 to D7 and D1: build from `design/2026-11-22-polish.md` and its `mockups/2026-11-22-polish-*` and `2026-11-22-shotchart-*` files, not the 2026-11-20 ones. Safety and founder checklist: pending on each.
+
+## D9 · Logo C · idea (approved)
+- Change: replace the app icon and logo files with logo improved C (`design/logo/README.md` lists the `public/` files and how to regenerate them). Sharper at small sizes; works on light backgrounds.
+
+## D10 · Shot chart v2 · idea (approved)
+- Change: hardwood court, the 13 real zones soft-filled on the classic blue-cold to red-hot scale, one small chip per zone (`design/2026-11-22-polish.md`, Shot chart redesign). `src/components/**/ShotHeatMap.tsx`, `CourtMarkings.tsx`, the share card route.
+
+## D11 · Opening animation, slogans and loaders · idea (approved)
+- Change: openings A, B2 and C rotating per cold open (0.8 s minimum, tap to skip, never on page changes, reduced-motion still); a new slogan each visit from the founder's picks (`marketing/2026-11-22-slogans.md`); page loader pill after 400 ms; tracker decode screen with tips rotating three times then holding. Spec: `design/2026-11-22-loading.md`.
