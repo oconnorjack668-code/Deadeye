@@ -46,7 +46,7 @@ export function Alert({
           pushes straight through the border instead of wrapping. */}
       <div className="min-w-0 flex-1 space-y-1">
         {title && <h5 className="font-semibold leading-none tracking-tight">{title}</h5>}
-        <div className="text-xs opacity-90 break-words">{children}</div>
+        <div className="text-sm opacity-90 break-words">{children}</div>
       </div>
     </div>
   );

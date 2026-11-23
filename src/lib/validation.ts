@@ -79,7 +79,7 @@ export const updatePasswordSchema = z
 
 export const onboardingSchema = z.object({
   displayName: z.string().check(z.minLength(2, 'Display name is required'), z.refine((n) => !nameBlocked(n), NAME_BLOCKED_MESSAGE)),
-  ageBracket: z.enum(['13', '14-17', '18-22', '23-30', '30+'], {
+  ageBracket: z.enum(['13-15', '16-17', '18+'], {
     message: 'Please select an age bracket',
   }),
   heightCm: z.optional(

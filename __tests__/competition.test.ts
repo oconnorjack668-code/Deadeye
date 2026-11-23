@@ -120,6 +120,22 @@ describe('who needs a parent (rules section 9)', () => {
     expect(isAdultCoach({ is_adult: true }, sixteen)).toBe(false);
     expect(isAdultCoach({ is_adult: true }, under16)).toBe(false);
   });
+
+  // D4: setup saves 13-15, 16-17 or 18+ (00068); old values still read the same
+  describe('with the D4 age brackets', () => {
+    const said16Plus = adult.ageCheck;
+    it('18+ enters straight away, 16-17 asks a parent, 13-15 emails the approving parent', () => {
+      expect(entryRoute({ ageCheck: said16Plus, ageBracket: '18+' })).toBe('adult');
+      expect(entryRoute({ ageCheck: said16Plus, ageBracket: '16-17' })).toBe('ask-parent');
+      expect(entryRoute({ ...under16, ageBracket: '13-15' })).toBe('under16');
+    });
+
+    it('never makes a 16-17 or 13-15 an adult coach, whatever coach setup says', () => {
+      expect(isAdultCoach({ is_adult: true }, { ageCheck: said16Plus, ageBracket: '18+' })).toBe(true);
+      expect(isAdultCoach({ is_adult: true }, { ageCheck: said16Plus, ageBracket: '16-17' })).toBe(false);
+      expect(isAdultCoach({ is_adult: true }, { ageCheck: said16Plus, ageBracket: '13-15' })).toBe(false);
+    });
+  });
 });
 
 describe('the entry form', () => {

@@ -53,6 +53,8 @@ export const EVENT_NAMES = [
   'first_result_seen',
   /** Result screen after the first session: tapped "Go again" */
   'first_result_go_again',
+  /** Opened setup as a new account, before any answer (D4: read against "finished setup") */
+  'setup_started',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

@@ -13,7 +13,8 @@ import { Button } from '@/components/ui/Button';
 import { Avatar } from '@/components/Avatar';
 import { Award, ChevronRight, Crosshair, Eye, Flag, Flame, Pencil, Settings, Target, TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
-import { focusAreaLabel } from '@/lib/focusAreas';
+import { chipLabel, focusAreaLabel } from '@/lib/focusAreas';
+import { ageBracketLabel } from '@/lib/ageBracket';
 import { asMeasurementSystem, formatHeight } from '@/lib/units';
 import { loadAchievements } from '@/lib/achievements-server';
 import { getShotTotals } from '@/lib/player-activity';
@@ -26,17 +27,17 @@ export const dynamic = 'force-dynamic';
 export const metadata = { title: 'Profile - Deadeye' };
 
 const LEVEL_LABELS: Record<string, string> = {
-  beginner: 'Beginner',
-  intermediate: 'Intermediate',
-  advanced: 'Advanced',
-  elite: 'College / Pro Pipeline',
-  college_pro: 'College / Pro',
+  beginner: 'Just starting',
+  intermediate: 'School or club team',
+  advanced: 'Top club or academy',
+  elite: 'Senior or pro',
+  college_pro: 'Senior or pro',
 };
 
 const HAND_LABELS: Record<string, string> = {
   left: 'Left',
   right: 'Right',
-  ambidextrous: 'Ambidextrous',
+  ambidextrous: 'Both',
 };
 
 function Field({ label, value }: { label: string; value: React.ReactNode }) {
@@ -104,7 +105,7 @@ export default async function ProfilePage() {
     return v !== null && (best === null || v > best) ? v : best;
   }, null);
   const earned = achievements.badges.filter((b) => b.earned).length;
-  const goals: string[] = profile?.goals || [];
+  const goals: string[] = (profile?.goals || []).map(chipLabel);
   // Deduped: an old name and its new one would otherwise show as the same tag twice
   const focusAreas = [...new Set<string>((profile?.focus_areas || []).map(focusAreaLabel))];
 
@@ -197,7 +198,7 @@ export default async function ProfilePage() {
             <Field label="Position" value={profile?.position} />
             <Field label="Height" value={formatHeight(profile?.height_cm, units)} />
             <Field label="Level" value={profile?.playing_level ? LEVEL_LABELS[profile.playing_level] : null} />
-            <Field label="Age" value={profile?.age_bracket} />
+            <Field label="Age" value={ageBracketLabel(profile?.age_bracket)} />
             <Field label="Dominant hand" value={profile?.dominant_hand ? HAND_LABELS[profile.dominant_hand] : null} />
             <Field label="Training" value={`${achievements.stats.totalSessions} sessions · ${achievements.stats.totalWorkouts} workouts`} />
             <Field label="Plan" value={<Link href="/pro" className="underline">{planLabel(subscription)}</Link>} />

@@ -66,9 +66,10 @@ describe('reminderWindowOpen', () => {
 
 describe('streak warning, opt-in for under-18s (00057)', () => {
   it('is on by default only for an 18+ age bracket', () => {
-    for (const b of ['18-22', '23-30', '30+']) expect(streakWarningAllowed(null, b)).toBe(true);
-    for (const b of ['13', '14-17', null, undefined, '']) expect(streakWarningAllowed(null, b)).toBe(false);
+    for (const b of ['18+', '18-22', '23-30', '30+']) expect(streakWarningAllowed(null, b)).toBe(true);
+    for (const b of ['13-15', '16-17', '13', '14-17', null, undefined, '']) expect(streakWarningAllowed(null, b)).toBe(false);
     expect(isAdultBracket('14-17')).toBe(false);
+    expect(isAdultBracket('16-17')).toBe(false);
   });
 
   it('follows the choice the player made, at any age', () => {

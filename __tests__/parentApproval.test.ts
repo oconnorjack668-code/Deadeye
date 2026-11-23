@@ -35,12 +35,10 @@ describe('ageGate', () => {
 });
 
 describe('allowedAgeBrackets', () => {
-  it('keeps 13 away from players who said they are 16 or over, and adults away from under-16s', () => {
-    expect(allowedAgeBrackets(true)).not.toContain('13');
-    expect(allowedAgeBrackets(false)).toEqual(['13', '14-17']);
-    // 14-17 straddles 16, so both can pick it
-    expect(allowedAgeBrackets(true)).toContain('14-17');
-    expect(allowedAgeBrackets(null)).toHaveLength(5);
+  it('keeps 13-15 away from players who said they are 16 or over, and adults away from under-16s', () => {
+    expect(allowedAgeBrackets(true)).toEqual(['16-17', '18+']);
+    expect(allowedAgeBrackets(false)).toEqual(['13-15']);
+    expect(allowedAgeBrackets(null)).toEqual(['13-15', '16-17', '18+']);
   });
 });
 

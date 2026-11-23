@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { ShieldAlert, Settings } from 'lucide-react';
 import type { Profile } from '@/lib/auth';
 import { Avatar } from '@/components/Avatar';
-import { COACH_NAV_ITEMS, DESKTOP_NAV_ITEMS, isNavActive } from './BottomNav';
+import { COACH_NAV_ITEMS, DESKTOP_NAV_ITEMS, hidesAppChrome, isNavActive } from './BottomNav';
 import { ModeSwitch } from './ModeSwitch';
 import { AppSearch } from '@/components/search/AppSearch';
 import { MODE_HOME, shownMode } from '@/lib/coachSide';
@@ -29,6 +29,7 @@ export function Navbar({ profile, photoUrl = null, isOwner = false, mode: savedM
   // right beside Settings, was easy to tap by mistake.
   const pathname = usePathname();
   const mode = shownMode(savedMode, pathname);
+  if (hidesAppChrome(pathname)) return null;
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md">
