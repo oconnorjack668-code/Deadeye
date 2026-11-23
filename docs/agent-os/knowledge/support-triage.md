@@ -44,6 +44,11 @@ Newest first. Seeded 2026-11-07 from real failures in the handoffs.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-23 · Second week with 0 problem reports and the same 3 open crashes, no crash text, no
+  tracker file changed since 16 Nov (`reports/2026-11-23-support.md`). **Rule:** an open crash count that
+  does not move for a week is old rows nobody marked fixed, not a new fault; say "unchanged", do not re-rank
+  it, and keep asking for the text once (not repeat the whole triage). Check `git log` on the files the
+  crashes name before writing "no change".
 - 2026-11-16 · First run with a results review: no earlier support report existed in `reports/`, so
   nothing to check. The weekly "Crash reports open" count includes owner and test accounts and every
   crash ever left open (`agent-counts/route.ts:28`), so a jump after a night of live debugging is
