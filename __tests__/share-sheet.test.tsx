@@ -47,14 +47,14 @@ describe('share sheet', () => {
 
     const nameSwitch = screen.getByRole('switch', { name: /show my name/i }) as HTMLInputElement;
     expect(nameSwitch.checked).toBe(false);
-    await screen.findByRole('img', { name: 'Preview of your share card' });
+    await screen.findByRole('img', { name: 'Preview of your share card, no name on it' });
     expect(cardFetches()).toEqual(['/api/share/session?id=abc']);
   });
 
   it('fetches the card with the first name only after the player turns the switch on', async () => {
     render(<ShareCardButton path="/api/share/session?id=abc" text="6/10" />);
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-    await screen.findByRole('img', { name: 'Preview of your share card' });
+    await screen.findByRole('img', { name: /^Preview of your share card/ });
 
     fireEvent.click(screen.getByRole('switch', { name: /show my name/i }));
     await waitFor(() => expect(cardFetches()).toContain('/api/share/session?id=abc&name=1'));
@@ -75,9 +75,20 @@ describe('share sheet', () => {
     const click = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
     render(<ShareCardButton path="/api/share/session?id=abc" text="6/10" />);
     fireEvent.click(screen.getByRole('button', { name: 'Share' }));
-    await screen.findByRole('img', { name: 'Preview of your share card' });
+    await screen.findByRole('img', { name: /^Preview of your share card/ });
     fireEvent.click(screen.getByRole('button', { name: 'Save image' }));
     expect(click).toHaveBeenCalled();
     click.mockRestore();
+  });
+});
+
+describe('share sheet name default', () => {
+  it('turns the name off again each time the sheet opens', async () => {
+    render(<ShareCardButton path="/api/share/session?id=abc" text="6/10" />);
+    fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+    fireEvent.click(screen.getByRole('switch', { name: /show my name/i }));
+    expect((screen.getByRole('switch', { name: /show my name/i }) as HTMLInputElement).checked).toBe(true);
+    fireEvent.click(screen.getByRole('button', { name: 'Share' }));
+    expect((screen.getByRole('switch', { name: /show my name/i }) as HTMLInputElement).checked).toBe(false);
   });
 });

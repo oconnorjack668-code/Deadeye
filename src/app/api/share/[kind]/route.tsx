@@ -3,7 +3,8 @@
 // the default) or 1080 x 1350 (?format=feed).
 // Uses the player's own login (RLS), so only their own data can be drawn.
 // The first name is printed only with ?name=1, which the player turns on in
-// the share sheet: off by default. No face, school or place, ever.
+// the share sheet: off by default. We never add a face, school or town; text
+// the player typed is drawn as typed (filtered by cardText()).
 //   /api/share/session?id=<training_session id>
 //   /api/share/workout?id=<workout id>
 //   /api/share/game?id=<game id>
@@ -52,7 +53,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
   let body: React.ReactNode;
 
   if (kind === 'session') {
-    const [{ data: session }, { data: allDrills }] = await Promise.all([
+    const [{ data: session }, { data: allDrills, error: drillsError }] = await Promise.all([
       supabase
         .from('training_sessions')
         .select('session_date, duration_minutes, session_drills(shooting_entries(shot_zone, makes, attempts))')
@@ -90,7 +91,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ kind
         minutes={typedSession.duration_minutes}
         drills={(typedSession.session_drills || []).length}
         zones={[...zones.entries()].map(([zone, z]) => ({ zone, ...z }))}
-        personalBest={personalBest(current, bestShootingPct(others)).kind !== 'none'}
+        // No "new personal best" if the history couldn't be read: never claim one that may not be true
+        personalBest={!drillsError && personalBest(current, bestShootingPct(others)).kind !== 'none'}
       />
     );
   } else if (kind === 'workout') {

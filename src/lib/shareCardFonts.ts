@@ -5,11 +5,27 @@
 // instance from Google Fonts as TTF (Satori cannot read woff2) and kept in
 // memory. The request carries a fixed character set and nothing about the
 // player. All three or none: if any fails, the card renders in the bundled font.
+// next/og fetches any letter its fonts lack from Google Fonts by itself, so
+// every piece of player text drawn on a card goes through cardText() first:
+// letters outside CHARSET are dropped, and no typed letter ever leaves the server.
 
-/** Printable ASCII and Latin-1 (Irish and European names of drills, teams and exercises). Fixed: never the player's text. */
-const CHARSET = [...Array.from({ length: 95 }, (_, i) => 32 + i), ...Array.from({ length: 95 }, (_, i) => 161 + i)]
+const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
+
+/**
+ * Printable ASCII, Latin-1 and Latin Extended-A (Irish and European names of
+ * drills, teams and exercises), plus dashes, curly quotes and the ellipsis.
+ * Fixed: never the player's text.
+ */
+export const CHARSET = [...range(32, 126), ...range(161, 255), ...range(0x100, 0x17f), 0x2013, 0x2014, ...range(0x2018, 0x201d), 0x2026]
   .map((c) => String.fromCharCode(c))
   .join('');
+
+const ALLOWED = new Set(CHARSET);
+
+/** Player text for a card, with any letter the loaded fonts don't cover removed. */
+export function cardText(s: string | null | undefined): string {
+  return [...(s ?? '')].filter((ch) => ALLOWED.has(ch)).join('').replace(/\s+/g, ' ').trim();
+}
 
 export interface CardFont {
   name: string;

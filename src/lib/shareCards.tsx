@@ -3,10 +3,12 @@
 // Brand round 2026-11-22 (docs/agent-os/design/2026-11-22-polish.md, share cards;
 // mockups 2026-11-22-polish-share-*): 1080 x 1920 story and 1080 x 1350 feed,
 // heavy white numbers with an orange glow, "AIM IS EARNED" in brand red, the
-// player's own shot chart. The name is off unless the player turns it on: no
-// face, school or place, ever.
+// player's own shot chart. The name is off unless the player turns it on. We
+// never add a face, school or town; text the player typed (an opponent, an
+// exercise) is drawn as typed, filtered by cardText().
 // next/og only supports flexbox: every element with more than one child needs display: flex.
 import React from 'react';
+import { cardText } from '@/lib/shareCardFonts';
 import { sessionCrop, shotChartLayout, shotChartSvg, type ChartZoneInput } from '@/lib/shotChart';
 
 export type CardFormat = 'story' | 'feed';
@@ -38,7 +40,7 @@ export const titleCase = (s: string) => s.replace(/[-_]/g, ' ').replace(/\b\w/g,
  */
 export function cardName(displayName: string | null | undefined, show: boolean): string | null {
   if (!show) return null;
-  const first = (displayName ?? '').trim().split(/\s+/)[0] ?? '';
+  const first = cardText(displayName).split(' ')[0] ?? '';
   return first ? first.slice(0, 20) : null;
 }
 
@@ -271,7 +273,7 @@ export interface WorkoutCardData {
 export function WorkoutCard({ format, date, type, minutes, sets, volume, unit, prs, best }: WorkoutCardData) {
   return (
     <Body format={format}>
-      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${titleCase(type)} workout · ${niceDate(date)}`}</div>
+      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${titleCase(cardText(type))} workout · ${niceDate(date)}`}</div>
       <div style={{ display: 'flex', marginTop: 40 }}>
         <Stat value={`${sets}`} label="sets" color={ORANGE} />
         <Stat value={`${minutes}`} label="minutes" />
@@ -285,7 +287,7 @@ export function WorkoutCard({ format, date, type, minutes, sets, volume, unit, p
       <div style={{ display: 'flex', flexDirection: 'column', marginTop: 36 }}>
         {best.slice(0, 5).map((b) => (
           <div key={b.exercise} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 34, marginTop: 14 }}>
-            <div style={{ display: 'flex' }}>{b.exercise}</div>
+            <div style={{ display: 'flex' }}>{cardText(b.exercise)}</div>
             <div style={{ display: 'flex', color: b.pr ? '#fbbf24' : MUTED }}>
               {`${b.weight ? `${Math.round(b.weight)} ${unit} × ` : ''}${b.reps}${b.pr ? ' PR' : ''}`}
             </div>
@@ -401,7 +403,7 @@ export function GameCard({ format, date, opponent, result, score, points, reboun
   const tag = result === 'win' ? 'WIN' : result === 'loss' ? 'LOSS' : result === 'draw' ? 'DRAW' : null;
   return (
     <Body format={format}>
-      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${opponent ? `vs ${opponent}` : 'Game day'} · ${niceDate(date)}`}</div>
+      <div style={{ display: 'flex', fontSize: 36, color: MUTED }}>{`${cardText(opponent) ? `vs ${cardText(opponent)}` : 'Game day'} · ${niceDate(date)}`}</div>
       {tag && (
         <div style={{ display: 'flex', marginTop: 16, fontSize: 34, fontWeight: 800, color: result === 'win' ? '#34d399' : '#a1a1aa' }}>
           {`${tag}${score ? ` ${score}` : ''}`}

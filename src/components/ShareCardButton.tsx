@@ -80,6 +80,8 @@ export function ShareCardButton({
   const ready = card && card.url === want ? card : null;
 
   function openSheet() {
+    // Every share starts with the name off, even if it was on last time
+    setShowName(false);
     setFailed(false);
     setMessage(null);
     setOpen(true);
@@ -172,7 +174,7 @@ export function ShareCardButton({
                 {ready ? (
                   // A blob URL made here: next/image cannot optimise it
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={ready.src} alt="Preview of your share card" className="h-full w-full object-cover" />
+                  <img src={ready.src} alt={`Preview of your share card, ${showName ? 'with your first name' : 'no name on it'}`} className="h-full w-full object-cover" />
                 ) : (
                   <div className={`h-full w-full ${loading ? 'animate-pulse bg-zinc-800' : ''}`} aria-hidden="true" />
                 )}
@@ -181,7 +183,7 @@ export function ShareCardButton({
                 <h2 id="share-sheet-title" className="text-lg font-black text-white">
                   Share your result
                 </h2>
-                <p className="mt-1 text-sm text-zinc-400">Only what you choose is on the card. No face, school or place.</p>
+                <p className="mt-1 text-sm text-zinc-400">We never add your face, school or town. Check the preview for anything you typed, like an opponent&apos;s name.</p>
               </div>
             </div>
 
