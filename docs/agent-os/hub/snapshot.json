@@ -209,6 +209,17 @@
   "calls": [
     {
       "agent": "release-checker",
+      "detail": "Safety PASS (UI only, founding offer now waits for first log). typegen, tsc, eslint, 1819 tests pass; no migrations, no env vars. Checklist in the PR comment.",
+      "group": "live",
+      "id": "pr-162",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/162",
+      "onApprove": "The next Claude Code session merges PR #162 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #162: D6: Today for a new player asks for one thing",
+      "words": "merge 162"
+    },
+    {
+      "agent": "release-checker",
       "detail": "Opened 2026-11-20 from design/watch-back-and-screen-review. Check its safety verdict and checks on GitHub before approving.",
       "group": "live",
       "id": "pr-160",
@@ -711,12 +722,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #159, 20 Nov) is running (checked 22 Nov).",
+      "detail": "Live and up to date: the latest version (PR #158, 23 Nov) is running (checked 23 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors on the live site in the last 24 hours (checked 22 Nov).",
+      "detail": "No errors on the live site in the last 24 hours (checked 23 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -726,7 +737,7 @@
       "status": "warn"
     },
     {
-      "detail": "3 open, checks green: PR #160 (screen designs), PR #158 (blur rule) and PR #95 (agent scheduled runs), docs only (checked 22 Nov).",
+      "detail": "5 open, checks green: PR #164 (sign-up polish and check your email), PR #163 (new logo), PR #162 (Today for a new player), PR #161 (setup design, docs only) and PR #95 (agent scheduled runs) (checked 23 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -771,13 +782,23 @@
   ],
   "log": [
     {
-      "at": "2026-11-22T08:09:11Z",
-      "text": "Morning check: live site up to date (PR #159). No errors in the last 24 hours. 3 pull requests open, all green.",
+      "at": "2026-11-23T08:12:00Z",
+      "text": "Morning check: live site up to date (PR #158). No errors in the last 24 hours. 5 pull requests open, all green.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-21T19:02:21Z",
+      "at": "2026-11-23T00:50:00Z",
+      "text": "PR #162 (D6 Today for a new player) checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 162.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-22T19:02:03Z",
       "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 0 new, 0 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-22T08:09:11Z",
+      "text": "Morning check: live site up to date (PR #159). No errors in the last 24 hours. 3 pull requests open, all green.",
       "tone": "ok"
     },
     {
@@ -859,21 +880,6 @@
       "at": "2026-11-18T13:15:00Z",
       "text": "PR #139 (HQ to-do list built from STATUS and open PRs) merged to main at 13:04 UTC. Its merge call is cleared.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:10:00Z",
-      "text": "PR #137 (privacy page names the Today card taps, S46) merged to main at 13:01 UTC. Its merge call is cleared.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:02:12Z",
-      "text": "PR #137 re-checked on 9b87eab after the merge from main: safety PASS, all checks green, no migrations or env vars. Waiting for merge 137.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:05:00Z",
-      "text": "PR #139 (HQ to-do list built from STATUS) checked: safety PASS, all checks green, no migrations or env vars. Waiting for merge 139.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -890,6 +896,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-22T08:09:11Z",
+  "updatedAt": "2026-11-23T08:12:00Z",
   "updatedBy": "Morning check"
 }
