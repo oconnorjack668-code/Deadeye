@@ -1,6 +1,6 @@
 # Designer knowledge
 
-Last researched: 2026-11-11 (about 70 sources: 6 peer-reviewed, 34 official, 14 industry, 17 practitioner)
+Last researched: 2026-11-20 (visual trends and design-system direction, about 12 new sources, see `findings/designer.md`); the children's-design and accessibility research is from 2026-11-11 (about 70 sources: 6 peer-reviewed, 34 official, 14 industry, 17 practitioner)
 
 Read `README.md` here for how this file works. Strength: `strong` (peer-reviewed with a
 good sample, or the official rule itself), `moderate` (small study, or a large industry
@@ -8,6 +8,16 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 
 ## Lessons from the founder
 
+- 2026-11-22 · Founder's standard for every design, not only loading: "make the animations smooth and the
+  designs nice and well made looking, not simple and unpolished looking; that applies for every design."
+  Brand is **black and red**: red for the logo and slogans like "AIM IS EARNED", orange for actions.
+  Sleek, professional, easy to understand, looks cool, never busy. **Rule:** motion is transform and
+  opacity only, eased (`var(--ease-deadeye)` or a stated curve), 60 fps, tested on a throttled CPU; a design
+  is shown as a working prototype the founder can watch (HTML plus an MP4 rendered frame by frame), not a
+  still, when motion is the point; plain boxes and bare bars are not finished. Also learned: a CSS-only
+  prototype can be captured exactly by restarting the page's animations, pausing them in the same tick and
+  setting `currentTime` per frame (finished animations drop out of `getAnimations()`, so never wait first).
+  Auto-updating text (a rotating slogan) falls under WCAG 2.2.2: say how it pauses, or change it per visit.
 - 2026-11-11 · The founder wants a designer who knows "from internet research basketball
   trends what looks good and cool". Rule: every design cites the trend board
   (`../trends/visual.md`) and dated sources; never design from memory or taste alone.
@@ -17,6 +27,47 @@ dataset), `weak`/`practitioner` (vendor or trend piece); `dated` = over ~2 years
 What the outcome of earlier work taught (see "Results review" in the agent file).
 Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-20 (notes on the review mockups) · Founder, screen by screen. **Keep or bring back:** the
+  mail icon on "Check your email"; the Deadeye logo and the top menu bar on the website; icons in
+  general, including the Log menu icons ("icons make the app look nicer"). **Liked:** the all-black
+  background; some text moved from red to orange (red reads as something bad); white numbers in the 4
+  Today stat boxes; on the website, proof first and the competition as one row. **Needs more:** the
+  first-session result was "way simpler ... less cool"; it must look appealing and well made. Share and
+  rank cards are too simple, before and after: "a user wants a cool looking share card to flex their
+  score". Today was good; fix text that overlaps or sits too far from what it belongs to. Log menu
+  colours: open (recommended: each row keeps its section's colour). Look: take ideas from Strava without
+  copying it; Deadeye has its own look that feels familiar: sleek, professional, simple, easy to use,
+  while also looking cool.
+- 2026-11-20 (later) · Founder on the three directions (Arena, HUD, Glass): "too much", "didn't look
+  professional at all", "I prefer the old look". What was meant: "futuristic" only slightly, only where
+  it improves a part; "vibrant" means bright, nice colour where colour is needed, not everywhere; "cool"
+  means "wow, it's well made and looks professional", not mega bright or sci-fi. The app should be
+  "sleek and professional as well as simplistic and easy to interact with"; a player must never be
+  confused. **Rule:** start from today's look and polish it. Keep screens simple and clear; add a modern
+  touch (a glow on one key number, a better icon, a gradient on one hero card, a richer colour for a
+  make) only where it clearly improves that part, never as a theme over everything. Judge every mockup
+  side by side with today's screen: it must look more finished and professional, never busier. This
+  overrides the earlier 2026-11-20 lesson below where they differ.
+- 2026-11-20 · Founder on the screen review mockups: "some of the design changes make some pages look
+  simpler and less professional. The UI designs should be professional, futuristic, vibrant, high quality
+  icons, nice looking text font. A user should think wow this app looks cool." The review leaned on
+  `docs/design.md`'s quiet rules (one orange, no glow, no gradient, no icon tiles, lucide only, Geist) and
+  stripped colour and detail out. **Rule:** the target is "wow, this app looks cool" to a 13-19 year old,
+  not minimal. Fix real problems (contrast, wrong words, bugs, touch targets) without making a screen
+  plainer; never remove colour, icons or depth only for consistency. Where `docs/design.md` blocks a
+  vibrant, premium look, propose the change to it with mockups for the founder to approve instead of
+  designing down to it.
+- 2026-11-20 · Visual-direction pitch: a script that renders each page, hides the text, and measures every line
+  against the pixels behind it (`design/mockups/2026-11-20-direction-contrast.mjs`) caught failures I
+  could not see (grey text over an orange glow, a number box crossing a gauge ring). Rule: measure on pixels, trim
+  the sampled box to the glyph core (the font box is taller than the letters), and give vivid backgrounds a
+  dark plate under text. Also: `clip-path` shapes clip the focus ring, so a chamfered button needs another focus
+  style; glass needs a 30% dark underlay or grey text fails over bright ember.
+- 2026-11-20 · Screen review: the tester's session lived on the old address and was gone after
+  the move to deadeye.ie, so no signed-in screen could be screenshotted. Rule: before a review
+  run, open the live address and check the tester is signed in; if not, say so first. Also: a
+  headless Chrome driven over the DevTools protocol (device metrics 390x844, prefers-color-scheme
+  emulated) gives true phone dark and light shots without the extension window.
 - 2026-11-13 · Tracker S8 review: the builder's 640 px stills looked right, but at 390 px inline
   and in the 9:16 export the MAKE/MISS call clipped and covered the "Fix rim" and full-screen buttons.
   Rule: review overlays at 390 inline, full screen, 9:16, and with warnings showing, never from
@@ -26,10 +77,25 @@ Newest first, each with the date, what happened, and the rule.
 
 ### Every design
 
+- [ ] Motion: transform and opacity only, eased, 60 fps; a watchable prototype or video for anything that moves;
+      still version for reduced motion; any text that changes by itself has a pause or changes per visit.
+      Finished and well made, black and red brand, orange for actions, never busy. (Founder, 2026-11-22.)
+- [ ] Side by side with today's screen: it looks more polished and professional, never plainer and
+      never busier. A fix that removes useful colour is not a fix; a touch that adds noise is not
+      either. Simple and easy to use first. (Founder, 2026-11-20.)
+- [ ] Contrast measured on the rendered pixels, including text over footage:
+      `design/mockups/2026-11-20-direction-contrast.mjs <page.html>`, not eyeballed.
+
 - [ ] Looked at the real screen live at 390x844, dark and light, before designing.
 - [ ] Trend board line(s) cited; nothing copied (no NBA, team, Nike, Jordan, Basketball
       Ireland marks, kits, fonts or colour schemes; no emerald-and-shamrock as our colours).
-- [ ] Two or three directions that differ in idea; one recommended with why.
+- [ ] Two or three directions that differ in idea; one recommended with why. This holds
+      in a quick reply to the founder too, even when the request names one look ("make it
+      like X"): one direction is a decision made for the founder. (Exam, 2026-11-17: one
+      direction given.)
+- [ ] Every trend reference carries its own date and source link (or the trend board line
+      it comes from, with that line's date and source), not only "from the trend board".
+      (Exam, 2026-11-17.)
 - [ ] Contrast measured from the hex values (text 4.5:1, large 3:1, controls 3:1), dark and
       light, small grey labels on zinc-900 checked first.
 - [ ] Targets 44px for main actions (platforms say 44pt/48dp; propose 48px for in-session

@@ -31,13 +31,19 @@ instead.
 - Keep durable project decisions in repository documentation, not only in an
   agent conversation. `CLAUDE.md` imports this file, so these rules apply to
   both agents.
-- Status and handoffs: **read `docs/STATUS.md` first** in every session (it
-  is what is open now and recently done, and it wins over old handoffs and
-  memory notes; Claude Code gets it automatically at session start, Codex
-  must open it). For history, `docs/handoffs/INDEX.md`. When a session
+- Status and handoffs: **read `docs/STATUS.md` first** in every session, and
+  read main's copy (`git fetch origin main && git show
+  origin/main:docs/STATUS.md`), because a checkout on an old branch has an
+  old one. STATUS is what is open now and recently done, and it wins over old handoffs and
+  memory notes. Claude Code gets main's copy automatically at session start;
+  Codex must open it. For history, `docs/handoffs/INDEX.md`. When a session
   ends, update STATUS and write a handoff, following
-  `.claude/skills/handoff/SKILL.md`. Never tell the founder an item is open
-  or broken from an old handoff without checking it is still true.
+  `.claude/skills/handoff/SKILL.md`. Put them in a docs-only pull request
+  (only `docs/STATUS.md` and `docs/handoffs/`) and merge it yourself once
+  its checks pass, so the next chat sees it; a PR that touches anything
+  else waits for the founder (founder's decision, 2026-11-18). Never tell
+  the founder an item is open or broken from an old handoff without
+  checking it is still true.
 - Agent OS: activation work (the weekly funnel loop, its backlog, its agents
   and their permissions) runs from `docs/agent-os/README.md`. Read it before
   taking a backlog item.

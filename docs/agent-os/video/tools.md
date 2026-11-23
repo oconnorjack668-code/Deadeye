@@ -57,7 +57,7 @@ Context checked in the repo: `docs/legal/dpia.md` R9 says app videos are "never 
   - **ADOPT** ffmpeg `scale=...:flags=lanczos` + `cas` sharpening + `hqdn3d`/`nlmeans`.
   - Better capture is the real fix: 4K landscape gives a ~1215 px wide 9:16 crop; or film closer, or run a second phone filming vertically.
 - **Stabilisation.** ffmpeg `vidstabdetect`/`vidstabtransform` (if this build has libvidstab), `deshake`, or Resolve. Propped-phone footage rarely needs it.
-- **Removing bystanders. SKIP.** Generative fill changes what happened, falls under Meta and TikTok's labels for realistic AI-altered video, and blurring is banned. Re-crop, re-cut or get consent.
+- **Removing bystanders. SKIP.** Generative fill changes what happened, falls under Meta and TikTok's labels for realistic AI-altered video, and a blur only covers faces that are not the focus and never replaces consent (founder, 2026-11-20). Re-crop, re-cut or get consent.
 
 ## 3. Voice
 - **Real voice first (ADOPT).** The AI label cut credibility and clicks in a 2025 study (already in `marketing.md`). Record an adult Irish voice and clean it locally (ffmpeg `afftdn`/`arnndn`, `loudnorm`). Until then, switch Kokoro to its British voices (`bf_emma`, `bm_george`), which cost nothing.

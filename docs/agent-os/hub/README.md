@@ -9,7 +9,8 @@ data: the page's database, mirrored in `snapshot.json` here.
 
 - **Home**: the activation goal in a full sentence with progress, players, systems; what needs a
   decision; what's in progress; coming up; recent activity; systems.
-- **To-do**: every call, filtered by Needs decision / In progress / Later / Done.
+- **To-do**: every open item in `docs/STATUS.md`, filtered by Needs decision / In progress / Later /
+  Done. Built from STATUS by `scripts/status-to-hub.mjs`, never written by hand (below).
 - **Growth** (funnel, experiments, weekly rate), **Agents** (with latest lesson and prompts to copy),
   **Clubs and content**, **Ask Claude** (answers from the page's data).
 
@@ -47,15 +48,38 @@ No decision document means the call is waiting for the founder. Only the owner a
 - Approval never covers posting, sending, messaging anyone or spending money: those stay the
   founder's own actions.
 
+## The to-do list comes from STATUS
+
+Since 2026-11-18 the to-do list (`calls`) is built from the Open table of `docs/STATUS.md` on main: one
+card per `S<n>` row, with the S id as the card id. Founder's reason: the hand-kept list still showed
+pull requests merged days earlier as waiting, and missed open items. So:
+
+- **To add, change or close a to-do, change STATUS**, never `calls`. Anything the founder must
+  approve or do gets an `S<n>` row with an owner.
+- **Open pull requests get a card each automatically** (id `pr-<number>`, "Code ready to go live"),
+  read from GitHub's public API, and lose it when they are merged or closed. The PR check routine
+  may write its safety verdict and checks into that card's `detail` (same id); the rebuild keeps it
+  while the pull request is open.
+- **Rebuild the list whenever STATUS changes on main**: every session right after its STATUS pull
+  request merges (handoff skill, step 6), and the hub worker at every run:
+  1. `ArtifactData get` `hub/snapshot` with `out_dir` (note its `version`).
+  2. `node scripts/status-to-hub.mjs --snapshot <that file> --out <new file>` (reads
+     `origin/main:docs/STATUS.md` itself).
+  3. `ArtifactData set` `hub/snapshot` with `file_path` = the new file and `if_version`; on a
+     conflict, redo from step 1 once.
+- The page cannot read GitHub itself: the artifact sandbox blocks every outside site.
+- **The founder's buttons on an S item**: Approve and Later are a decision for the item's owner to
+  act on. Done means the founder says it is finished: the next session checks it, closes the row in
+  STATUS with the evidence (or with "founder marked done in HQ on <date>" when only the founder can
+  know), rebuilds the list and deletes the decision.
+
 ## Every run that touches the hub
 
 1. **Start from the page's data**, not the repo file: `ArtifactData get` `hub/snapshot` (note its
    `version`). The repo's `snapshot.json` can be older.
 2. **Read decisions**: `ArtifactData list` `decisions`, and act on those for your agent's calls as above.
-3. **Edit the snapshot** with what changed. Every call needs `id`, `kind` (`merge` | `approve` |
-   `task`), `agent`, `title` (plain words, what it is), `detail` (why, in a sentence or two) and
-   `onApprove` (what happens if the founder approves, in one sentence); `link` for pull requests;
-   `options` for a pick; `due` (YYYY-MM-DD) when there is one. Newest log line first, at most 20.
+3. **Edit the snapshot** with what changed, except `calls` (the to-do list), which only
+   `scripts/status-to-hub.mjs` writes. Newest log line first, at most 20.
    Plain English everywhere: no jargon, no sports terms. Set `updatedAt` (UTC) and `updatedBy`.
 4. **Save it**: write it to `docs/agent-os/hub/snapshot.json`, then `ArtifactData set` `hub/snapshot`
    with `file_path` and `if_version`. On a version conflict, re-read and redo once.

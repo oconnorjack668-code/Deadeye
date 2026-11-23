@@ -18,6 +18,7 @@ import {
   getUserIdForSave,
   isOffline,
   newId,
+  NOT_KEPT_MESSAGE,
   saveBasketballSession,
   type BasketballSavePayload,
 } from '@/lib/offline';
@@ -574,7 +575,7 @@ export default function NewBasketballSessionPage() {
 
     if (result.network) {
       const shots = draft.drills.reduce((n, d) => n + d.shots.length, 0);
-      enqueue({
+      const kept = enqueue({
         id: payload.id,
         kind: 'basketball',
         userId,
@@ -582,6 +583,12 @@ export default function NewBasketballSessionPage() {
         createdAt: Date.now(),
         payload,
       });
+      if (!kept) {
+        // Keep the draft: the player must not be told it was saved
+        setError(NOT_KEPT_MESSAGE);
+        setSaving(false);
+        return;
+      }
     }
 
     try {

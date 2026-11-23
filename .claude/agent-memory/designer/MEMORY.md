@@ -1,0 +1,1 @@
+- [Polished motion, black and red](feedback_polished_motion_black_red.md) — founder's standard: smooth, finished, red brand, orange actions, never busy; how to render motion prototypes to MP4

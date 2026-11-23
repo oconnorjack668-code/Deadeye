@@ -73,6 +73,7 @@ const SERVER_ONLY = new Set([
 const SERVER_WRITTEN = new Set([
   'play_quiz_attempts', // play quiz scores, marked in submitQuizAttempt (00065)
   'film_attempts', // film scores, marked in submitFilmAttempt (00065)
+  'competition_entries', // entry status is the parent's decision, not the player's (00067)
 ]);
 
 /**

@@ -11,10 +11,10 @@
 -- It checks the tables, columns, functions and indexes each migration creates.
 -- It does not check policies, grants or data, so these migrations, which only
 -- change those, cannot be told apart from not being run:
---   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064, 00065
+--   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064, 00065, 00066
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00065, 65 files, 315 things). Do not edit it by
+-- (00001 to 00067, 67 files, 321 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -335,7 +335,13 @@ WITH expected(migration, kind, obj, col) AS (
     ('00062', 'function', 'film_assignment_split', ''),
     ('00062', 'index', 'team_assignments_film_clip_id_idx', ''),
     ('00062', 'index', 'team_assignments_film_pack_id_idx', ''),
-    ('00062', 'function', 'enforce_assignment_film', '')
+    ('00062', 'function', 'enforce_assignment_film', ''),
+    ('00067', 'column', 'player_reports', 'kind'),
+    ('00067', 'table', 'competition_entries', ''),
+    ('00067', 'index', 'competition_entries_club_key_idx', ''),
+    ('00067', 'index', 'competition_entries_team_idx', ''),
+    ('00067', 'index', 'competition_entries_created_idx', ''),
+    ('00067', 'index', 'competition_entries_unsent_idx', '')
 ),
 checked AS (
   SELECT

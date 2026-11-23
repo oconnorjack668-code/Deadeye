@@ -26,6 +26,7 @@
 // unlimited AI, the one thing that costs money every time it runs.
 import { FREE_MONTHLY_AI_REPORTS } from './entitlements';
 import { FREE_CHAT_PER_DAY } from './ai/chat';
+import { PRO_CHAT_PER_DAY } from './ai/fairUse';
 import { FREE_COACH_PLAYS, FREE_PLAYBOOK_TEAMS, PRO_PLAYBOOK_TEAMS } from './plays/limits';
 
 /** Drills in the library: 150 in 00013 and 18 in 00048. __tests__/plans.test.ts counts them. */
@@ -60,10 +61,10 @@ export const FREE_PLAN: Plan = {
 
 export const PRO_PLAN: Plan = {
   name: 'Pro',
-  tagline: 'Your own coach, with no limits',
+  tagline: 'Your own coach, every day',
   features: [
-    'Unlimited AI coaching on every session and video',
-    'Unlimited questions to your AI coach, plus a weekly AI report',
+    'AI coaching on every session and video, with no monthly allowance',
+    `Up to ${PRO_CHAT_PER_DAY} questions to your AI coach a day, plus a weekly AI report`,
     'Every training program, built around a goal or your position',
     'Every Basketball IQ section, with all lessons and quizzes',
     'Every play in the library, each with a quiz on your role',
@@ -106,10 +107,23 @@ export const WHY_PRO_COSTS: Array<{ title: string; text: string }> = [
  * (docs/sales/deadeye-club-plans.html, printed to public/deadeye-club-plans.pdf)
  * carries the same numbers: change both together. Paid club plans are not on
  * sale yet, so the page says they open soon.
+ *
+ * Every plan is priced per year (decided 2026-11-18): seasons differ between
+ * clubs and countries, and players train most in the offseason. The Club plan
+ * is one flat price for up to 8 teams; below 6 teams, Team Passes cost less.
  */
 export const CLUB_PLANS: Array<{ name: string; price: string; alt: string; detail: string }> = [
   { name: 'Coach Free', price: '€0', alt: 'always', detail: 'One team: codes, assignments, coach home and club board' },
-  { name: 'Team Pass', price: '€149.99', alt: 'per season, or €19.99 a month', detail: 'Every player on the team gets Pro, up to 15' },
-  { name: 'Club plan', price: '€99.99', alt: 'per team per season, or €11.99 a month', detail: 'Team Pass for every team, from 4 teams, one bill' },
+  { name: 'Team Pass', price: '€179', alt: 'a year, or €19.99 a month', detail: 'Every player on the team gets Pro, up to 15' },
+  { name: 'Club plan', price: '€899', alt: 'a year for up to 8 teams, then €89 a team', detail: 'Team Pass for every team, one bill. Best value from 6 teams' },
 ];
 export const CLUB_PLANS_PDF = '/deadeye-club-plans.pdf';
+
+/**
+ * The founding club offer, quoted whole wherever it appears (homepage, /clubs, the sheet).
+ * The founding price lasts 2 years after the free months, then the club moves to
+ * the normal plans (founder's decision, 2026-11-20: a price for life locked the
+ * first clubs at about 33c a player a month for good).
+ */
+export const FOUNDING_CLUB_OFFER =
+  'Founding club offer: our first 3 clubs are free until 31 January 2027, then pay €59.99 per team per year for 2 years, until 31 January 2029. Closes 31 December 2026.';

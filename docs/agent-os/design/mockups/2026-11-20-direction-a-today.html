@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadeye visual direction A (Arena): today</title>
+<!-- Designer proposal 2026-11-20, draft only. Direction A: Arena. Made-up data. Not built, not in docs/design.md.
+     Fonts: Google Fonts (OFL). Icons: Phosphor (MIT). Footage frame (watch page): local file, consent confirmed by the founder, do not upload. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0B0E;--panel:#16161B;--panel2:#1F1F26;--line:#6F6F7C;--hair:#2B2B34;--red:#FF2D4A;--or:#FF6B1A;--or2:#FF9A1F;--amber:#FFC933;
+--text:#F7F7F9;--mut:#B8B8C4;--make:#35E08A;--miss:#FF5468;--ink:#0B0B0E}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{width:390px;font-family:'Barlow',system-ui,sans-serif;color:var(--text);font-weight:500;-webkit-font-smoothing:antialiased}
+.ph{width:1em;height:1em;flex:none;display:block}
+.screen{position:relative;width:390px;min-height:844px;overflow:hidden;background:
+ linear-gradient(115deg,transparent 0 62%,rgba(255,107,26,.13) 62% 74%,transparent 74% 78%,rgba(255,45,74,.10) 78% 83%,transparent 83%) 0 0/100% 260px no-repeat,var(--bg)}
+.pad{padding:0 16px}
+.d{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.005em;line-height:.95}
+.num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;font-variant-numeric:tabular-nums;line-height:.9}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:13px;color:var(--mut)}
+.cut{clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+.cut-s{clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.plate{background:linear-gradient(160deg,#1D1D24,#131318);position:relative}
+.plate::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.bar{position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--or2),var(--red))}
+.tag{display:inline-block;transform:skewX(-14deg);padding:3px 12px}
+.tag>span{display:block;transform:skewX(14deg)}
+.tile{width:34px;height:34px;display:grid;place-items:center;font-size:20px;color:var(--ink);background:linear-gradient(135deg,var(--or2),var(--or));clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border:0;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.03em;font-size:22px;color:var(--ink);background:linear-gradient(100deg,var(--or2),var(--or) 60%,#FF4A1A);clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.btn .ph{font-size:24px}
+.btn2{background:var(--line);color:var(--text);height:48px;font-size:20px;position:relative}
+.btn2::after{content:"";position:absolute;inset:2px;background:#16161B;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);z-index:0}
+.btn2>*{position:relative;z-index:1}
+.nav{position:absolute;left:0;right:0;bottom:0;height:76px;background:#0F0F13;border-top:1px solid var(--hair);display:flex;padding:6px 8px 10px}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--mut);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;position:relative}
+.nav a .ph{font-size:26px}
+.nav a.on{color:var(--text)}
+.nav a.on .ph{color:var(--or)}
+.nav a.on::before{content:"";position:absolute;top:-7px;left:22%;right:22%;height:4px;background:var(--or);transform:skewX(-30deg)}
+.fab{position:absolute;right:16px;bottom:92px;width:58px;height:58px;display:grid;place-items:center;color:var(--ink);font-size:30px;background:linear-gradient(135deg,var(--or2),var(--or) 55%,#FF4A1A);clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);filter:drop-shadow(0 4px 0 #000)}
+.seg{display:flex;gap:4px}
+.seg i{flex:1;height:12px;background:#2A2A33;transform:skewX(-24deg)}
+.seg i.f{background:linear-gradient(90deg,var(--or2),var(--or))}
+.hex{width:56px;height:62px;display:grid;place-items:center;clip-path:polygon(50% 0,100% 22%,100% 78%,50% 100%,0 78%,0 22%)}
+.hex.lock{background:#2A2A33;color:#8C8C99}
+.hex.bronze{background:linear-gradient(160deg,#FFC37A,#C8631F 60%,#8B3F10);color:#2A1204}
+.small{font-size:14px;line-height:1.4;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="screen">
+ <header class="pad" style="display:flex;align-items:center;gap:12px;padding-top:20px;padding-bottom:16px">
+  <img src="../../../../public/logo.png" width="44" height="44" alt="">
+  <div style="flex:1">
+   <div class="d" style="font-size:32px">Hey Sam</div>
+   <div class="lbl" style="color:var(--amber);margin-top:3px">Level 1 · Rookie</div>
+  </div>
+  <div class="tag" style="background:var(--amber);color:var(--ink)"><span class="lbl" style="color:var(--ink);font-size:15px">0 / 60 XP</span></div>
+ </header>
+
+ <section class="pad">
+  <div class="plate cut" style="padding:20px 18px 18px 22px;overflow:hidden">
+   <span class="bar"></span>
+   <div style="position:absolute;right:-30px;top:-14px;width:132px;height:176px;background:linear-gradient(160deg,var(--or2),var(--red));transform:skewX(-14deg);opacity:.95"></div>
+   <div style="position:absolute;right:4px;top:16px;font-size:84px;color:var(--ink);opacity:.9"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M63.6,46.39a103.48,103.48,0,0,1,52-21.65,4,4,0,0,1,4.45,4V120H95.7A103.77,103.77,0,0,0,63.38,52.44,4,4,0,0,1,63.6,46.39ZM46,64.07a103.51,103.51,0,0,0-21.29,51.46,4,4,0,0,0,4,4.47H79.63A87.86,87.86,0,0,0,51.89,63.59,4,4,0,0,0,46,64.07ZM192.4,46.39a103.48,103.48,0,0,0-52-21.65,4,4,0,0,0-4.45,4V120h24.3a103.77,103.77,0,0,1,32.32-67.56A4,4,0,0,0,192.4,46.39Zm38.86,69.14A103.51,103.51,0,0,0,210,64.07a4,4,0,0,0-5.86-.48A87.86,87.86,0,0,0,176.37,120h50.91A4,4,0,0,0,231.26,115.53ZM24.74,140.47A103.51,103.51,0,0,0,46,191.93a4,4,0,0,0,5.86.48A87.86,87.86,0,0,0,79.63,136H28.72A4,4,0,0,0,24.74,140.47ZM210,191.93a103.51,103.51,0,0,0,21.29-51.46,4,4,0,0,0-4-4.47H176.37a87.86,87.86,0,0,0,27.74,56.41A4,4,0,0,0,210,191.93ZM63.6,209.61a103.48,103.48,0,0,0,52,21.65,4,4,0,0,0,4.45-4V136H95.7a103.77,103.77,0,0,1-32.32,67.56A4,4,0,0,0,63.6,209.61ZM160.3,136H136v91.28a4,4,0,0,0,4.45,4,103.48,103.48,0,0,0,52-21.65,4,4,0,0,0,.22-6.05A103.77,103.77,0,0,1,160.3,136Z"/></svg></div>
+   <div style="position:relative">
+    <div class="tag" style="background:var(--or)"><span class="lbl" style="color:var(--ink);font-size:14px">Today</span></div>
+    <h1 class="d" style="font-size:42px;margin:12px 0 10px;max-width:215px">Log your first shots</h1>
+    <p class="small" style="max-width:215px;margin-bottom:18px">About five minutes. Every shot builds your chart.</p>
+   </div>
+   <div style="position:relative;display:grid;gap:10px">
+    <button class="btn"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM192,108.68,147.31,64l24-24L216,84.68Z"/></svg>Log shots</button>
+    <button class="btn btn2"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,56H180.28L166.65,35.56A8,8,0,0,0,160,32H96a8,8,0,0,0-6.65,3.56L75.71,56H48A24,24,0,0,0,24,80V192a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V80A24,24,0,0,0,208,56Zm-44,76a36,36,0,1,1-36-36A36,36,0,0,1,164,132Z"/></svg><span>Track with camera</span></button>
+   </div>
+  </div>
+ </section>
+
+ <section class="pad" style="margin-top:16px">
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+   
+   <div class="plate cut-s" style="padding:12px 12px 12px 16px"><span class="bar" style="width:4px"></span>
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32L167.6,99.71h0l-37.71,37.71-23.95,23.95a40,40,0,0,0,62-35.67,8,8,0,1,1,16-.9,56,56,0,0,1-95.5,42.79h0a56,56,0,0,1,73.13-84.43L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg></div>
+    <div class="num" style="font-size:46px;margin-top:10px">0</div>
+    <div class="lbl" style="margin-top:4px">Makes</div>
+   </div>
+   <div class="plate cut-s" style="padding:12px 12px 12px 16px"><span class="bar" style="width:4px"></span>
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M143.38,17.85a8,8,0,0,0-12.63,3.41l-22,60.41L84.59,58.26a8,8,0,0,0-11.93.89C51,87.53,40,116.08,40,144a88,88,0,0,0,176,0C216,84.55,165.21,36,143.38,17.85Zm40.51,135.49a57.6,57.6,0,0,1-46.56,46.55A7.65,7.65,0,0,1,136,200a8,8,0,0,1-1.32-15.89c16.57-2.79,30.63-16.85,33.44-33.45a8,8,0,0,1,15.78,2.68Z"/></svg></div>
+    <div class="num" style="font-size:46px;margin-top:10px">0</div>
+    <div class="lbl" style="margin-top:4px">Day streak</div>
+   </div>
+   <div class="plate cut-s" style="padding:12px 12px 12px 16px"><span class="bar" style="width:4px"></span>
+    <div class="tile"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM200,192H56a8,8,0,0,1-8-8V72a8,8,0,0,1,16,0v76.69l34.34-34.35a8,8,0,0,1,11.32,0L128,132.69,172.69,88H144a8,8,0,0,1,0-16h48a8,8,0,0,1,8,8v48a8,8,0,0,1-16,0V99.31l-50.34,50.35a8,8,0,0,1-11.32,0L104,131.31l-40,40V176H200a8,8,0,0,1,0,16Z"/></svg></div>
+    <div class="num" style="font-size:46px;margin-top:10px">--</div>
+    <div class="lbl" style="margin-top:4px">Accuracy</div>
+   </div>
+  </div>
+  <p class="small" style="margin-top:10px">Your first session fills these in.</p>
+ </section>
+
+ <section class="pad" style="margin-top:14px;padding-bottom:158px">
+  <div class="plate cut" style="padding:16px 16px 16px 22px"><span class="bar"></span>
+   <div style="display:flex;justify-content:space-between;align-items:baseline">
+    <div class="d" style="font-size:26px">Level 1 <span style="color:var(--amber)">Rookie</span></div>
+    <div class="lbl">60 XP to Level 2</div>
+   </div>
+   <div class="seg" style="margin:10px 0 8px"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+   <p class="small" style="margin-bottom:12px">Your first session is worth 20 XP and a badge.</p>
+   <div style="display:flex;gap:14px">
+    
+    <div style="flex:1;display:grid;justify-items:center;gap:6px;text-align:center">
+     <div class="hex lock" style="font-size:26px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Z"/></svg></div>
+     <div class="lbl" style="font-size:13px;letter-spacing:.05em">First Session</div>
+    </div>
+    <div style="flex:1;display:grid;justify-items:center;gap:6px;text-align:center">
+     <div class="hex lock" style="font-size:26px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Z"/></svg></div>
+     <div class="lbl" style="font-size:13px;letter-spacing:.05em">Heating Up</div>
+    </div>
+    <div style="flex:1;display:grid;justify-items:center;gap:6px;text-align:center">
+     <div class="hex lock" style="font-size:26px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96Z"/></svg></div>
+     <div class="lbl" style="font-size:13px;letter-spacing:.05em">First 100</div>
+    </div>
+   </div>
+  </div>
+ </section>
+
+ <div class="fab" aria-label="Log"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z"/></svg></div>
+ <nav class="nav" aria-label="Main">
+ <a class="on"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M224,120v96a8,8,0,0,1-8,8H160a8,8,0,0,1-8-8V164a4,4,0,0,0-4-4H108a4,4,0,0,0-4,4v52a8,8,0,0,1-8,8H40a8,8,0,0,1-8-8V120a16,16,0,0,1,4.69-11.31l80-80a16,16,0,0,1,22.62,0l80,80A16,16,0,0,1,224,120Z"/></svg>Home</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M63.6,46.39a103.48,103.48,0,0,1,52-21.65,4,4,0,0,1,4.45,4V120H95.7A103.77,103.77,0,0,0,63.38,52.44,4,4,0,0,1,63.6,46.39ZM46,64.07a103.51,103.51,0,0,0-21.29,51.46,4,4,0,0,0,4,4.47H79.63A87.86,87.86,0,0,0,51.89,63.59,4,4,0,0,0,46,64.07ZM192.4,46.39a103.48,103.48,0,0,0-52-21.65,4,4,0,0,0-4.45,4V120h24.3a103.77,103.77,0,0,1,32.32-67.56A4,4,0,0,0,192.4,46.39Zm38.86,69.14A103.51,103.51,0,0,0,210,64.07a4,4,0,0,0-5.86-.48A87.86,87.86,0,0,0,176.37,120h50.91A4,4,0,0,0,231.26,115.53ZM24.74,140.47A103.51,103.51,0,0,0,46,191.93a4,4,0,0,0,5.86.48A87.86,87.86,0,0,0,79.63,136H28.72A4,4,0,0,0,24.74,140.47ZM210,191.93a103.51,103.51,0,0,0,21.29-51.46,4,4,0,0,0-4-4.47H176.37a87.86,87.86,0,0,0,27.74,56.41A4,4,0,0,0,210,191.93ZM63.6,209.61a103.48,103.48,0,0,0,52,21.65,4,4,0,0,0,4.45-4V136H95.7a103.77,103.77,0,0,1-32.32,67.56A4,4,0,0,0,63.6,209.61ZM160.3,136H136v91.28a4,4,0,0,0,4.45,4,103.48,103.48,0,0,0,52-21.65,4,4,0,0,0,.22-6.05A103.77,103.77,0,0,1,160.3,136Z"/></svg>Hoops</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M200,64V192a16,16,0,0,1-16,16H168a16,16,0,0,1-16-16V136H104v56a16,16,0,0,1-16,16H72a16,16,0,0,1-16-16V64A16,16,0,0,1,72,48H88a16,16,0,0,1,16,16v56h48V64a16,16,0,0,1,16-16h16A16,16,0,0,1,200,64ZM36,72H32A16,16,0,0,0,16,88v32H8.27A8.18,8.18,0,0,0,0,127.47,8,8,0,0,0,8,136h8v32a16,16,0,0,0,16,16h4a4,4,0,0,0,4-4V76A4,4,0,0,0,36,72Zm220,55.47a8.18,8.18,0,0,0-8.25-7.47H240V88a16,16,0,0,0-16-16h-4a4,4,0,0,0-4,4V180a4,4,0,0,0,4,4h4a16,16,0,0,0,16-16V136h8A8,8,0,0,0,256,127.47Z"/></svg>Gym</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M213.85,125.46l-112,120a8,8,0,0,1-13.69-7l14.66-73.33L45.19,143.49a8,8,0,0,1-3-13l112-120a8,8,0,0,1,13.69,7L153.18,90.9l57.63,21.61a8,8,0,0,1,3,12.95Z"/></svg>Train</a><a class=""><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M212,76V72a44,44,0,0,0-74.86-31.31,3.93,3.93,0,0,0-1.14,2.8v88.72a4,4,0,0,0,6.2,3.33A47.67,47.67,0,0,1,167.68,128a8.18,8.18,0,0,1,8.31,7.58,8,8,0,0,1-8,8.42,32,32,0,0,0-32,32v33.88a4,4,0,0,0,1.49,3.12,47.92,47.92,0,0,0,74.21-17.16,4,4,0,0,0-4.49-5.56A68.06,68.06,0,0,1,192,192h-7.73a8.18,8.18,0,0,1-8.25-7.47,8,8,0,0,1,8-8.53h8a51.6,51.6,0,0,0,24-5.88v0A52,52,0,0,0,212,76Zm-12,36h-4a36,36,0,0,1-36-36V72a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4a8,8,0,0,1,0,16ZM88,28A44.05,44.05,0,0,0,44,72v4a52,52,0,0,0-4,94.12h0A51.6,51.6,0,0,0,64,176h7.73A8.18,8.18,0,0,1,80,183.47,8,8,0,0,1,72,192H64a67.48,67.48,0,0,1-15.21-1.73,4,4,0,0,0-4.5,5.55A47.93,47.93,0,0,0,118.51,213a4,4,0,0,0,1.49-3.12V176a32,32,0,0,0-32-32,8,8,0,0,1-8-8.42A8.18,8.18,0,0,1,88.32,128a47.67,47.67,0,0,1,25.48,7.54,4,4,0,0,0,6.2-3.33V43.49a4,4,0,0,0-1.14-2.81A43.85,43.85,0,0,0,88,28Zm8,48a36,36,0,0,1-36,36H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,76V72a8,8,0,0,1,16,0Z"/></svg>IQ</a>
+</nav>
+</div>
+</body>
+</html>

@@ -2,6 +2,18 @@
 
 Older lines from INDEX.md, newest first. The handoff files themselves stay in this folder.
 
+- 2026-11-03 · tracker-accuracy-bench · Bench suite 67→77%: slow phones, washed-out light; test-library button; rim notebook · open: 3 → [handoff](2026-11-03-tracker-accuracy-bench.md)
+- 2026-11-02 · tracker-personal-best · New personal best % in tracker review and video end card · open: 2 → [handoff](2026-11-02-tracker-personal-best.md)
+- 2026-11-02 · tracker-vertical-slowmo · Vertical 9:16 tracker video, slow-mo make replays, milestone banners · open: 2 → [handoff](2026-11-02-tracker-vertical-slowmo.md)
+- 2026-11-02 · tracker-video-export · Save tracker video with overlay; streak flame on live HUD · open: 2 → [handoff](2026-11-02-tracker-video-export.md)
+- 2026-11-02 · preview-signin · Previews sign in, privately; no service key on previews; standing preview-check permission · open: none → [handoff](2026-11-02-preview-signin.md)
+- 2026-11-01 · ui-polish-desktop · Contrast, text sizes, light theme setting, calmer Home and Train, desktop two-column hubs · open: 3 → [handoff](2026-11-01-ui-polish-desktop.md)
+- 2026-11-01 · tracker-upgrades · Tracker: accuracy data, worker, camera watch, HUD, drills, replays, synced hoops; merged #50 · open: 2 → [handoff](2026-11-01-tracker-upgrades.md)
+- 2026-11-01 · cron-secret-and-setup · Scheduled jobs fixed (missing CRON_SECRET); migration check clean; founder setup done · open: 4 → [handoff](2026-11-01-cron-secret-and-setup.md)
+- 2026-10-25 · e2-e3-migration-check · E2 and E3 built; migration check query; docs and lint cleanup · open: 4 → [handoff](2026-10-25-e2-e3-migration-check.md)
+- 2026-10-24 · founder-notice · Founder posts can go to every player as a dismissible dashboard notice · open: 2 → [handoff](2026-10-24-founder-notice.md)
+- 2026-10-24 · pose-timestamp-crash · Form check and jump test no longer crash on a second analysis · open: 1 → [handoff](2026-10-24-pose-timestamp-crash.md)
+- 2026-10-23 · sample-rim-fix · Sample rim and start, camera black screen, Next.js patch, club card gap · open: 2 → [handoff](2026-10-23-sample-rim-fix.md)
 - 2026-10-22 · pricing-and-claude · Club pricing sheet and founding offer; AI on Claude; club picker · open: 4 → [handoff](2026-10-22-pricing-and-claude.md)
 - 2026-10-22 · league-and-club-board · League picker for teams; club boards with founder approval · open: 2 → [handoff](2026-10-22-league-and-club-board.md)
 - 2026-10-22 · home-club · Players pick a home club; not-listed suggestions; opt-in card badge · open: 2 → [handoff](2026-10-22-home-club.md)

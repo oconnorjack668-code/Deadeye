@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadeye visual direction C (Glass): watch</title>
+<!-- Designer proposal 2026-11-20, draft only. Direction C: Glass. Made-up data. Not built, not in docs/design.md.
+     Fonts: Google Fonts (OFL). Icons: Phosphor (MIT). Footage frame (watch page): local file, consent confirmed by the founder, do not upload. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#08080C;--ember1:#FFA14A;--ember2:#FF4E2B;--text:#FFFFFF;--mut:rgba(255,255,255,.86);--mint:#34D399;--rose:#FB7185;--ice:#9AD0FF;--ink:#160A04;--amber:#FFC46B}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{width:390px;font-family:'Plus Jakarta Sans',system-ui,sans-serif;color:var(--text);font-weight:500;-webkit-font-smoothing:antialiased}
+.ph{width:1em;height:1em;flex:none;display:block}
+.screen{position:relative;width:390px;min-height:844px;overflow:hidden;background:var(--bg)}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>")}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none}
+.z{position:relative;z-index:1}
+.pad{padding:0 16px}
+.disp{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.018em;word-spacing:.08em;line-height:1;font-variation-settings:'opsz' 72}
+.num{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;letter-spacing:-.03em;word-spacing:.08em;font-variant-numeric:tabular-nums;line-height:.92;font-variation-settings:'opsz' 96}
+.cap{font-size:13px;font-weight:600;color:var(--mut)}
+.small{font-size:14px;line-height:1.5;color:var(--mut)}
+.glass{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04)),rgba(8,8,12,.32);border:1px solid rgba(255,255,255,.17);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);border-radius:26px;box-shadow:0 20px 44px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.28)}
+.pill{border-radius:999px}
+.tile{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:26px;color:var(--ember1);background:linear-gradient(150deg,rgba(255,255,255,.2),rgba(255,255,255,.04));border:1px solid rgba(255,255,255,.2);box-shadow:0 0 22px rgba(255,110,40,.38),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:54px;border:0;border-radius:18px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.01em;color:var(--ink);background:linear-gradient(135deg,#FFB35C,#FF7433 55%,#FF5A2E);box-shadow:0 12px 32px rgba(255,92,40,.5),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(160,40,0,.25)}
+.btn .ph{font-size:24px}
+.btn2{color:var(--text);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.05));border:1.5px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.3);height:50px}
+.nav{position:absolute;left:12px;right:12px;bottom:12px;height:68px;border-radius:34px;display:flex;align-items:center;padding:0 6px;z-index:5}
+.nav a{flex:1;height:54px;border-radius:27px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--mut);font-size:12px;font-weight:700}
+.nav a .ph{font-size:24px}
+.nav a.on{color:#fff;background:linear-gradient(160deg,rgba(255,150,70,.35),rgba(255,80,40,.18));box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 0 22px rgba(255,100,40,.35)}
+.nav a.on .ph{color:var(--ember1)}
+.fab{position:absolute;right:20px;bottom:92px;width:60px;height:60px;border-radius:50%;display:grid;place-items:center;color:var(--ink);font-size:28px;z-index:6;background:linear-gradient(135deg,#FFB35C,#FF5A2E);box-shadow:0 14px 34px rgba(255,92,40,.6),inset 0 1px 0 rgba(255,255,255,.6)}
+.medal{border-radius:50%;display:grid;place-items:center;position:relative}
+.medal.lock{width:54px;height:54px;font-size:22px;color:rgba(255,255,255,.7);background:linear-gradient(160deg,rgba(255,255,255,.14),rgba(255,255,255,.04));border:1px dashed rgba(255,255,255,.4)}
+.medal.bronze{background:radial-gradient(circle at 30% 25%,#FFE0B0 0,#E39A52 32%,#B2561E 68%,#7A3410 100%);color:#3A1604;box-shadow:0 0 0 3px rgba(255,255,255,.14),0 0 0 6px rgba(255,150,70,.18),0 0 40px rgba(255,120,40,.55),inset 0 2px 0 rgba(255,255,255,.55),inset 0 -6px 12px rgba(80,20,0,.4)}
+.bar{height:12px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#FFB35C,#FF5A2E);box-shadow:0 0 14px rgba(255,100,40,.8)}
+</style>
+</head>
+<body>
+<div class="screen" style="min-height:900px"><div class="blob" style="left:-90px;top:120px;width:280px;height:280px;background:rgba(255,40,70,.50)"></div>
+<div class="blob" style="right:-110px;top:-60px;width:320px;height:320px;background:rgba(255,120,30,.55)"></div>
+<div class="blob" style="right:-60px;top:560px;width:260px;height:260px;background:rgba(110,80,255,.26)"></div>
+ <div class="pad z" style="padding-top:18px;display:flex;justify-content:space-between;align-items:flex-end">
+  <div><div class="cap">Hoops</div><div class="disp" style="font-size:34px;margin-top:5px">Shot tracker</div></div>
+  <div class="cap" style="padding-bottom:6px;color:#fff;font-weight:700">Review</div>
+ </div>
+
+ <div class="pad z" style="margin-top:12px">
+  <div class="glass" style="padding:12px 18px;display:flex;align-items:center;gap:16px;border-radius:24px">
+   <div class="num" style="font-size:60px;text-shadow:0 0 26px rgba(255,130,60,.45)">5/9</div>
+   <div><div class="disp" style="font-size:22px;color:var(--amber)">56% made</div><div class="small" style="margin-top:4px">Watch it back to check the calls</div></div>
+  </div>
+ </div>
+
+ <div class="pad z" style="margin-top:12px">
+  <div class="glass" style="padding:0 0 14px;border-radius:28px;overflow:hidden">
+   <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px 10px">
+    <div style="font-weight:700;font-size:15px">Watch it back</div>
+    <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--mut)">
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:10px;height:10px;border-radius:50%;background:var(--mint)"></i>Make</span>
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:10px;height:10px;border-radius:50%;border:2.5px solid var(--rose)"></i>Miss</span>
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:9px;height:9px;background:var(--amber);transform:rotate(45deg)"></i>Unclear</span>
+    </div>
+   </div>
+
+   <div style="position:relative;width:342px;height:316px;margin:0 auto;border-radius:20px;overflow:hidden;background:#000;box-shadow:0 12px 30px rgba(0,0,0,.5)">
+    <img src="2026-11-20-direction-footage-frame.jpg" width="342" height="316" alt="Gym footage, ball in the net" style="display:block">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,0) 28%,rgba(0,0,0,0) 70%,rgba(0,0,0,.44))"></div>
+    <!-- tracker overlay, Glass look -->
+    <div style="position:absolute;left:10px;top:10px;background:rgba(12,12,16,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25);padding:7px 14px 8px;display:flex;align-items:baseline;gap:10px;border-radius:18px">
+     <span class="num" style="font-size:38px;color:#fff">4/7</span>
+     <span class="num" style="font-size:22px;color:var(--amber)">57%</span>
+     <span style="font-size:13px;font-weight:700;color:#fff">0:31</span>
+    </div>
+    <div style="position:absolute;right:10px;top:12px;background:rgba(12,12,16,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25);padding:7px 12px;display:flex;align-items:center;gap:7px;border-radius:999px"><i style="width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)"></i><span style="font-size:13px;font-weight:700;color:#fff">Ball tracked</span></div>
+    <svg style="position:absolute;left:0;top:0" width="342" height="316" viewBox="0 0 342 316" aria-hidden="true">
+     <defs><linearGradient id="tr" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".95"/></linearGradient></defs>
+     <path d="M178 60 C 160 64, 142 72, 126 82" fill="none" stroke="url(#tr)" stroke-width="4" stroke-linecap="round" style="filter:drop-shadow(0 0 6px rgba(255,255,255,.8))"/>
+     <circle cx="122" cy="82" r="30" fill="none" stroke="#34D399" stroke-opacity=".4" stroke-width="2"/>
+     <circle cx="122" cy="82" r="21" fill="none" stroke="#34D399" stroke-width="3.5" style="filter:drop-shadow(0 0 8px rgba(52,211,153,.9))"/>
+    </svg>
+    <div style="position:absolute;left:10px;top:122px;background:rgba(12,12,16,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25);border-color:rgba(52,211,153,.7);padding:6px 16px 6px 8px;border-radius:999px;display:flex;align-items:center;gap:9px;box-shadow:0 8px 24px rgba(0,0,0,.45),0 0 26px rgba(52,211,153,.4)">
+     <span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:22px;color:#06281C;background:linear-gradient(150deg,#6EE7B7,#34D399)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span>
+     <span class="disp" style="font-size:30px;color:#fff;letter-spacing:-.02em">Make</span>
+    </div>
+    <div style="position:absolute;left:10px;bottom:12px;display:flex;gap:5px">
+     <i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(52,211,153,.9)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--rose);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(52,211,153,.9)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(52,211,153,.9)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--rose);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--rose);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px rgba(52,211,153,.9)"></i>
+    </div>
+    <div style="position:absolute;right:10px;bottom:10px;width:44px;height:44px;display:grid;place-items:center;font-size:22px;color:#fff;background:rgba(12,12,16,.74);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.28);box-shadow:0 8px 24px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.25);border-radius:50%"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M220,48V96a12,12,0,0,1-24,0V77l-35.51,35.52a12,12,0,0,1-17-17L179,60H160a12,12,0,0,1,0-24h48A12,12,0,0,1,220,48ZM95.51,143.51,60,179V160a12,12,0,0,0-24,0v48a12,12,0,0,0,12,12H96a12,12,0,0,0,0-24H77l35.52-35.51a12,12,0,0,0-17-17ZM208,148a12,12,0,0,0-12,12v19l-35.51-35.52a12,12,0,0,0-17,17L179,196H160a12,12,0,0,0,0,24h48a12,12,0,0,0,12-12V160A12,12,0,0,0,208,148ZM77,60H96a12,12,0,0,0,0-24H48A12,12,0,0,0,36,48V96a12,12,0,0,0,24,0V77l35.51,35.52a12,12,0,0,0,17-17Z"/></svg></div>
+   </div>
+
+   <div style="padding:6px 16px 0">
+    <div style="position:relative;height:30px;margin-top:6px"><i style="position:absolute;left:19px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(52,211,153,.8);"></i><i style="position:absolute;left:53px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--rose);"></i><i style="position:absolute;left:80px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(52,211,153,.8);"></i><i style="position:absolute;left:114px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(52,211,153,.8);"></i><i style="position:absolute;left:148px;top:4px;width:14px;height:14px;background:var(--amber);transform:rotate(45deg);border-radius:3px;box-shadow:0 0 10px rgba(255,196,107,.7);"></i><i style="position:absolute;left:175px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--rose);"></i><i style="position:absolute;left:203px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(52,211,153,.8);outline:3px solid #fff;outline-offset:1px;"></i><i style="position:absolute;left:243px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px rgba(52,211,153,.8);"></i><i style="position:absolute;left:284px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--rose);"></i></div>
+    <div style="position:relative;height:44px;margin-top:-6px">
+     <div style="position:absolute;left:0;right:0;top:19px;height:6px;background:rgba(255,255,255,.28);border-radius:3px"></div>
+     <div style="position:absolute;left:0;width:211px;top:19px;height:6px;background:#fff;border-radius:3px;box-shadow:0 0 12px rgba(255,255,255,.6)"></div>
+     <div style="position:absolute;left:199px;top:10px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.5),0 0 0 4px rgba(255,150,70,.45)"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+     <button class="btn" style="width:56px;height:52px;border-radius:18px;font-size:24px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg></button>
+     <button class="btn btn2" style="width:46px;height:46px;border-radius:16px;font-size:20px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,47.88V208.12a16,16,0,0,1-24.43,13.43L64,146.77V216a8,8,0,0,1-16,0V40a8,8,0,0,1,16,0v69.23L183.57,34.45A15.95,15.95,0,0,1,208,47.88Z"/></svg></button><button class="btn btn2" style="width:46px;height:46px;border-radius:16px;font-size:20px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,40V216a8,8,0,0,1-16,0V146.77L72.43,221.55A15.95,15.95,0,0,1,48,208.12V47.88A15.95,15.95,0,0,1,72.43,34.45L192,109.23V40a8,8,0,0,1,16,0Z"/></svg></button>
+     <div class="num" style="font-size:20px;flex:1;text-align:center;white-space:nowrap;letter-spacing:-.02em">0:31 <span style="color:var(--mut);font-size:15px;font-weight:600">/ 0:48</span></div>
+     <button class="btn btn2" style="width:50px;height:46px;font-size:16px;border-radius:16px">1×</button>
+    </div>
+   </div>
+
+   <div style="margin:12px 16px 0;padding-top:12px;border-top:1px solid rgba(255,255,255,.14)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+     <div><div class="disp" style="font-size:21px;letter-spacing:-.02em">Shot 7 <span style="color:var(--mut);font-weight:700">· 0:31</span></div><div class="small" style="font-size:14px;margin-top:3px">Tracker said Make. Tap to change.</div></div>
+     <div style="display:flex;gap:6px;align-items:center;height:44px;font-weight:700;font-size:14px"><span style="font-size:18px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M200,56V208a8,8,0,0,1-8,8H64a8,8,0,0,1-8-8V56Z" opacity="0.2"/><path d="M216,48H176V40a24,24,0,0,0-24-24H104A24,24,0,0,0,80,40v8H40a8,8,0,0,0,0,16h8V208a16,16,0,0,0,16,16H192a16,16,0,0,0,16-16V64h8a8,8,0,0,0,0-16ZM96,40a8,8,0,0,1,8-8h48a8,8,0,0,1,8,8v8H96Zm96,168H64V64H192ZM112,104v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Zm48,0v64a8,8,0,0,1-16,0V104a8,8,0,0,1,16,0Z"/></svg></span>Not a shot</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+     <button class="btn" style="height:54px;color:#06281C;background:linear-gradient(135deg,#6EE7B7,#34D399);box-shadow:0 12px 28px rgba(52,211,153,.4),inset 0 1px 0 rgba(255,255,255,.55)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg>Make</button>
+     <button class="btn btn2" style="height:54px;border-color:var(--rose);color:#FFD1D8"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg>Miss</button>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="pad z" style="margin-top:16px;padding-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><div style="font-weight:700;font-size:15px">Every call · 9</div><div class="small" style="font-size:14px">Tap a time to watch that shot</div></div>
+  <div class="glass" style="margin-top:8px;padding:10px 16px;display:flex;align-items:center;gap:12px;border-radius:18px">
+   <span class="cap">#6</span><span class="num" style="font-size:20px;display:flex;align-items:center;gap:6px"><span style="font-size:16px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg></span>0:27</span><span style="margin-left:auto;color:var(--rose);font-weight:700;font-size:14px">Miss</span>
+  </div>
+ </div>
+</div>
+</body>
+</html>

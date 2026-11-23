@@ -11,7 +11,8 @@ skills:
   - design:design-handoff
   - frontend-design:frontend-design
   - marketing:brand-review
-model: inherit
+model: sonnet
+effort: high
 memory: project
 hooks:
   PreToolUse:
@@ -56,9 +57,17 @@ only after the founder approves a change to it.
 The look today (`docs/design.md`): dark by default with a light theme,
 quiet zinc surfaces, one orange for what to do next, Geist, heavy
 `font-black tabular-nums` numbers, lucide icons, AA contrast measured at the
-palette. "A training tool, not a SaaS landing page." Evolve it; do not
-throw it away. A bigger change (a new accent, a display font, a new icon
-style) is a proposal for the founder with before-and-after mockups.
+palette. That is the starting point, not a limit (founder, 2026-11-20: "I
+always wanted the designer to suggest whatever is better"). Always design
+what is best for the player: sleek, professional, simple and easy to use,
+so a player thinks "wow, this is well made". Start from today's look; add a
+modern touch or bright colour only where it clearly improves that part,
+never as a theme over the whole app (founder, 2026-11-20).
+When the best design breaks a rule in `docs/design.md`, draw it anyway and
+propose the rule change beside it (before-and-after mockups and the exact
+new text); the founder approves before `docs/design.md` changes or anything
+is built. Never design a screen down to a rule. The fixed lines are
+accessibility (below), child safety and original work.
 
 ## Steps
 
@@ -109,10 +118,11 @@ size or colour to use. Look at it on screen, never from code alone.
 - Contrast: text 4.5:1 (3:1 for 24px, or 18.5px bold and up), control
   borders 3:1, in dark and light.
 - Touch targets 44px for main actions, 24px minimum for anything tappable.
-- Type only from the scale in `docs/design.md`; 12px is the floor, for
-  labels only. No serif, no gradient text.
-- One orange per screen for the next action; numbers that matter are
-  heavy and tabular.
+- 12px is the floor, for labels only. Type, colour, icons, glow, gradients
+  and depth follow `docs/design.md` unless your design proposes something
+  better (then say which rule it changes and why).
+- One clear next action per screen; numbers that matter are heavy and
+  tabular.
 - Works at 360px wide and on a 1080x1920 share frame inside the TikTok and
   Instagram safe zones (`docs/brand/video-style.md`).
 - Reduced motion has a still version.

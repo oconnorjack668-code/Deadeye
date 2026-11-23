@@ -26,12 +26,24 @@ type InsertChain = Promise<{ data: null; error: { message: string } | null }> & 
  * functions actually use, so it's cast to the real client type once here
  * rather than loosening those functions' parameter type to `any`.
  */
-function fakeSupabase(failOn: Record<string, string> = {}) {
+function fakeSupabase(failOn: Record<string, string> = {}, existing: Record<string, Array<{ id: string }>> = {}) {
   const ops: Op[] = [];
   const client = {
     from(table: string) {
       const result = () => (failOn[table] ? { data: null, error: { message: failOn[table] } } : { data: null, error: null });
       return {
+        // Lookups for a retry: what the server already holds (`existing`), or a failure (`select:<table>`)
+        select(_cols: string, opts?: { count?: string; head?: boolean }) {
+          const rows = existing[table] ?? [];
+          const error = failOn[`select:${table}`] ? { message: failOn[`select:${table}`] } : null;
+          const answer = { data: error ? null : rows, count: error ? null : rows.length, error };
+          const filtered = {
+            maybeSingle: async () => ({ data: error ? null : (rows[0] ?? null), error }),
+            then: (resolve: (v: typeof answer) => unknown) => Promise.resolve(answer).then(resolve),
+          };
+          void opts;
+          return { eq: () => filtered, in: () => filtered };
+        },
         insert(rows: unknown) {
           ops.push({ table, op: 'insert', rows });
           const res = result();
@@ -120,11 +132,36 @@ describe('saveBasketballSession', () => {
     expect(result.network).toBe(true);
   });
 
-  it('a retry clears any half-saved copy first (no duplicates)', async () => {
+  it('a retry with nothing on the server saves it, deleting nothing', async () => {
     const { client, ops } = fakeSupabase();
+    expect(await saveBasketballSession(client, 'user-1', hoops, true)).toEqual({ id: 'session-1' });
+    expect(ops[0]).toMatchObject({ table: 'training_sessions', op: 'insert' });
+    expect(ops.some((o) => o.op === 'delete')).toBe(false);
+  });
+
+  it('a retry clears a half-saved copy first (no duplicates)', async () => {
+    // Session row and drills are there, but the shot rows never arrived
+    const { client, ops } = fakeSupabase({}, { training_sessions: [{ id: 'session-1' }], session_drills: [{ id: 'd1' }, { id: 'd2' }] });
     await saveBasketballSession(client, 'user-1', hoops, true);
     expect(ops[0]).toEqual({ table: 'training_sessions', op: 'delete', id: 'session-1' });
     expect(ops[1]).toMatchObject({ table: 'training_sessions', op: 'insert' });
+  });
+
+  it('a retry never deletes a session the server already holds in full', async () => {
+    // The first try saved everything; only the reply was lost to the signal
+    const { client, ops } = fakeSupabase(
+      { training_sessions: 'insert would fail' },
+      { training_sessions: [{ id: 'session-1' }], session_drills: [{ id: 'd1' }, { id: 'd2' }], shooting_entries: [{ id: 's1' }] }
+    );
+    expect(await saveBasketballSession(client, 'user-1', hoops, true)).toEqual({ id: 'session-1' });
+    expect(ops).toEqual([]);
+  });
+
+  it('a retry that cannot check the server stays queued as a connection problem', async () => {
+    const { client, ops } = fakeSupabase({ 'select:training_sessions': 'TypeError: Failed to fetch' });
+    const result = await saveBasketballSession(client, 'user-1', hoops, true);
+    expect(result.network).toBe(true);
+    expect(ops).toEqual([]);
   });
 });
 
@@ -155,10 +192,35 @@ describe('saveWorkout', () => {
     expect((routineRows.rows as unknown[])[0]).toMatchObject({ routine_id: 'routine-1', user_id: 'user-1' });
   });
 
-  it('runQueuedSave retries with delete-first', async () => {
-    const { client, ops } = fakeSupabase();
+  it('runQueuedSave clears a half-saved workout first', async () => {
+    const { client, ops } = fakeSupabase({}, { workouts: [{ id: 'workout-1' }] });
     await runQueuedSave(client, { id: 'workout-1', kind: 'workout', userId: 'user-1', label: 'x', createdAt: 0, payload: gym });
     expect(ops[0]).toEqual({ table: 'workouts', op: 'delete', id: 'workout-1' });
+  });
+
+  it('runQueuedSave leaves a workout the server already holds in full', async () => {
+    const { client, ops } = fakeSupabase({}, { workouts: [{ id: 'workout-1' }], workout_sets: [{ id: 'set-1' }] });
+    const item = { id: 'workout-1', kind: 'workout' as const, userId: 'user-1', label: 'x', createdAt: 0, payload: gym };
+    expect(await runQueuedSave(client, item)).toEqual({ id: 'workout-1' });
+    expect(ops).toEqual([]);
+  });
+});
+
+describe('saveGame retry', () => {
+  const game = { id: 'game-1', game: { opponent: null } };
+
+  it('leaves a game that is already saved', async () => {
+    const { client, ops } = fakeSupabase({}, { games: [{ id: 'game-1' }] });
+    expect(await runQueuedSave(client, { id: 'game-1', kind: 'game', userId: 'user-1', label: 'x', createdAt: 0, payload: game })).toEqual({
+      id: 'game-1',
+    });
+    expect(ops).toEqual([]);
+  });
+
+  it('saves a game the server does not have', async () => {
+    const { client, ops } = fakeSupabase();
+    await runQueuedSave(client, { id: 'game-1', kind: 'game', userId: 'user-1', label: 'x', createdAt: 0, payload: game });
+    expect(ops).toEqual([{ table: 'games', op: 'insert', rows: { opponent: null, id: 'game-1', user_id: 'user-1' } }]);
   });
 });
 
@@ -175,6 +237,20 @@ describe('offline queue', () => {
     expect(readQueue()[0].lastError).toBe('nope');
     removeFromQueue('a');
     expect(readQueue()).toEqual([]);
+  });
+
+  it('says so when the phone will not keep the save', () => {
+    const item = { id: 'a', kind: 'workout' as const, userId: 'u', label: 'Leg day', createdAt: 1, payload: gym };
+    expect(enqueue(item)).toBe(true);
+    const setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = () => {
+      throw new DOMException('quota', 'QuotaExceededError');
+    };
+    try {
+      expect(enqueue({ ...item, id: 'b' })).toBe(false);
+    } finally {
+      Storage.prototype.setItem = setItem;
+    }
   });
 
   it('survives corrupted storage', () => {

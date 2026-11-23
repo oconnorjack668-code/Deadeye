@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadeye visual direction A (Arena): result</title>
+<!-- Designer proposal 2026-11-20, draft only. Direction A: Arena. Made-up data. Not built, not in docs/design.md.
+     Fonts: Google Fonts (OFL). Icons: Phosphor (MIT). Footage frame (watch page): local file, consent confirmed by the founder, do not upload. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;0,900;1,700;1,800;1,900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0B0E;--panel:#16161B;--panel2:#1F1F26;--line:#6F6F7C;--hair:#2B2B34;--red:#FF2D4A;--or:#FF6B1A;--or2:#FF9A1F;--amber:#FFC933;
+--text:#F7F7F9;--mut:#B8B8C4;--make:#35E08A;--miss:#FF5468;--ink:#0B0B0E}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{width:390px;font-family:'Barlow',system-ui,sans-serif;color:var(--text);font-weight:500;-webkit-font-smoothing:antialiased}
+.ph{width:1em;height:1em;flex:none;display:block}
+.screen{position:relative;width:390px;min-height:844px;overflow:hidden;background:
+ linear-gradient(115deg,transparent 0 62%,rgba(255,107,26,.13) 62% 74%,transparent 74% 78%,rgba(255,45,74,.10) 78% 83%,transparent 83%) 0 0/100% 260px no-repeat,var(--bg)}
+.pad{padding:0 16px}
+.d{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.005em;line-height:.95}
+.num{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;font-variant-numeric:tabular-nums;line-height:.9}
+.lbl{font-family:'Barlow Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.09em;font-size:13px;color:var(--mut)}
+.cut{clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px)}
+.cut-s{clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.plate{background:linear-gradient(160deg,#1D1D24,#131318);position:relative}
+.plate::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.035) 0 2px,transparent 2px 14px);pointer-events:none}
+.bar{position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--or2),var(--red))}
+.tag{display:inline-block;transform:skewX(-14deg);padding:3px 12px}
+.tag>span{display:block;transform:skewX(14deg)}
+.tile{width:34px;height:34px;display:grid;place-items:center;font-size:20px;color:var(--ink);background:linear-gradient(135deg,var(--or2),var(--or));clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border:0;font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.03em;font-size:22px;color:var(--ink);background:linear-gradient(100deg,var(--or2),var(--or) 60%,#FF4A1A);clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+.btn .ph{font-size:24px}
+.btn2{background:var(--line);color:var(--text);height:48px;font-size:20px;position:relative}
+.btn2::after{content:"";position:absolute;inset:2px;background:#16161B;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);z-index:0}
+.btn2>*{position:relative;z-index:1}
+.nav{position:absolute;left:0;right:0;bottom:0;height:76px;background:#0F0F13;border-top:1px solid var(--hair);display:flex;padding:6px 8px 10px}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--mut);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;position:relative}
+.nav a .ph{font-size:26px}
+.nav a.on{color:var(--text)}
+.nav a.on .ph{color:var(--or)}
+.nav a.on::before{content:"";position:absolute;top:-7px;left:22%;right:22%;height:4px;background:var(--or);transform:skewX(-30deg)}
+.fab{position:absolute;right:16px;bottom:92px;width:58px;height:58px;display:grid;place-items:center;color:var(--ink);font-size:30px;background:linear-gradient(135deg,var(--or2),var(--or) 55%,#FF4A1A);clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);filter:drop-shadow(0 4px 0 #000)}
+.seg{display:flex;gap:4px}
+.seg i{flex:1;height:12px;background:#2A2A33;transform:skewX(-24deg)}
+.seg i.f{background:linear-gradient(90deg,var(--or2),var(--or))}
+.hex{width:56px;height:62px;display:grid;place-items:center;clip-path:polygon(50% 0,100% 22%,100% 78%,50% 100%,0 78%,0 22%)}
+.hex.lock{background:#2A2A33;color:#8C8C99}
+.hex.bronze{background:linear-gradient(160deg,#FFC37A,#C8631F 60%,#8B3F10);color:#2A1204}
+.small{font-size:14px;line-height:1.4;color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="screen">
+ <div style="position:relative;height:318px;background:linear-gradient(120deg,#FF9A1F,#FF5A1A 55%,#FF2D4A);clip-path:polygon(0 0,100% 0,100% 88%,0 100%)">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(0,0,0,.07) 0 3px,transparent 3px 22px)"></div>
+  <div style="position:absolute;right:-30px;top:-40px;font-size:300px;color:#0B0B0E;opacity:.09"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M63.6,46.39a103.48,103.48,0,0,1,52-21.65,4,4,0,0,1,4.45,4V120H95.7A103.77,103.77,0,0,0,63.38,52.44,4,4,0,0,1,63.6,46.39ZM46,64.07a103.51,103.51,0,0,0-21.29,51.46,4,4,0,0,0,4,4.47H79.63A87.86,87.86,0,0,0,51.89,63.59,4,4,0,0,0,46,64.07ZM192.4,46.39a103.48,103.48,0,0,0-52-21.65,4,4,0,0,0-4.45,4V120h24.3a103.77,103.77,0,0,1,32.32-67.56A4,4,0,0,0,192.4,46.39Zm38.86,69.14A103.51,103.51,0,0,0,210,64.07a4,4,0,0,0-5.86-.48A87.86,87.86,0,0,0,176.37,120h50.91A4,4,0,0,0,231.26,115.53ZM24.74,140.47A103.51,103.51,0,0,0,46,191.93a4,4,0,0,0,5.86.48A87.86,87.86,0,0,0,79.63,136H28.72A4,4,0,0,0,24.74,140.47ZM210,191.93a103.51,103.51,0,0,0,21.29-51.46,4,4,0,0,0-4-4.47H176.37a87.86,87.86,0,0,0,27.74,56.41A4,4,0,0,0,210,191.93ZM63.6,209.61a103.48,103.48,0,0,0,52,21.65,4,4,0,0,0,4.45-4V136H95.7a103.77,103.77,0,0,1-32.32,67.56A4,4,0,0,0,63.6,209.61ZM160.3,136H136v91.28a4,4,0,0,0,4.45,4,103.48,103.48,0,0,0,52-21.65,4,4,0,0,0,.22-6.05A103.77,103.77,0,0,1,160.3,136Z"/></svg></div>
+  <button aria-label="Close" style="position:absolute;right:12px;top:14px;width:44px;height:44px;border:0;display:grid;place-items:center;font-size:22px;color:var(--text);background:var(--ink);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg></button>
+  <div style="position:absolute;left:16px;top:20px"><div class="tag" style="background:var(--ink)"><span class="lbl" style="color:var(--text);font-size:15px">First session logged</span></div></div>
+  <div class="num" style="position:absolute;left:12px;top:56px;font-size:178px;color:var(--ink);letter-spacing:-.01em">6<span style="color:rgba(11,11,14,.75)">/</span>10</div>
+  <div style="position:absolute;left:16px;top:236px;display:flex;align-items:baseline;gap:12px;color:var(--ink)">
+   <span class="num" style="font-size:54px">60%</span><span class="d" style="font-size:24px">from Mid top</span>
+  </div>
+ </div>
+
+ <div class="pad" style="margin-top:-6px;display:flex;gap:8px">
+  <div class="tag" style="background:var(--panel2)"><span class="lbl" style="color:var(--text);font-size:16px">Day 1</span></div>
+  <div class="tag" style="background:var(--amber)"><span class="lbl" style="color:var(--ink);font-size:16px">+20 XP</span></div>
+ </div>
+
+ <div class="pad" style="margin-top:14px;display:grid;grid-template-columns:1.25fr 1fr;gap:8px">
+  <div class="plate cut-s" style="padding:12px 10px 10px 14px"><span class="bar" style="width:4px"></span>
+   <div class="lbl">Your shot chart</div>
+   <div style="margin-top:4px"><svg class="court" viewBox="0 0 220 200" role="img" aria-label="Half court. Ten shots from Mid top, six made.">
+  <defs>
+    <radialGradient id="za" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#FF9A1F" stop-opacity="0.85"/>
+      <stop offset="1" stop-color="#FF2D4A" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="ka"><path d="M13 190 V128 A104.5 104.5 0 0 1 207 128 V190 Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#ka)"><ellipse cx="110" cy="87" rx="62" ry="30" fill="url(#za)"/></g>
+  <g fill="none" stroke="#C9C9D4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 190 V10 H218 V190 Z" opacity="0.55"/>
+    <rect x="75" y="106" width="70" height="84"/>
+    <path d="M84 106 A26 26 0 0 1 136 106"/>
+    <path d="M84 106 A26 26 0 0 0 136 106" stroke-dasharray="3 4" opacity=".6"/>
+    <path d="M13 190 V128 A104.5 104.5 0 0 1 207 128 V190"/>
+    <path d="M97 173 H123"/>
+    <circle cx="110" cy="167" r="6" stroke="#FF6B1A" stroke-width="2.2"/>
+  </g>
+  <circle cx="90" cy="85" r="4.6" fill="#35E08A"/><circle cx="103" cy="78" r="4.6" fill="#35E08A"/><circle cx="118" cy="80" r="4.6" fill="#35E08A"/><circle cx="130" cy="90" r="4.6" fill="#35E08A"/><circle cx="100" cy="96" r="4.6" fill="#35E08A"/><circle cx="113" cy="89" r="4.6" fill="#35E08A"/><circle cx="82" cy="92" r="3.5999999999999996" fill="none" stroke="#FF5468" stroke-width="2"/><circle cx="138" cy="80" r="3.5999999999999996" fill="none" stroke="#FF5468" stroke-width="2"/><circle cx="94" cy="73" r="3.5999999999999996" fill="none" stroke="#FF5468" stroke-width="2"/><circle cx="124" cy="99" r="3.5999999999999996" fill="none" stroke="#FF5468" stroke-width="2"/>
+</svg></div>
+  </div>
+  <div class="plate cut-s" style="padding:12px 10px 12px 14px;display:grid;justify-items:center;align-content:space-between;text-align:center"><span class="bar" style="width:4px"></span>
+   <div class="lbl">Badge earned</div>
+   <div class="hex bronze" style="width:70px;height:78px;font-size:34px;margin:6px 0"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M221.87,83.16A104.1,104.1,0,1,1,195.67,49l22.67-22.68a8,8,0,0,1,11.32,11.32L167.6,99.71h0l-37.71,37.71-23.95,23.95a40,40,0,0,0,62-35.67,8,8,0,1,1,16-.9,56,56,0,0,1-95.5,42.79h0a56,56,0,0,1,73.13-84.43L184.3,60.39a87.88,87.88,0,1,0,23.13,29.67,8,8,0,0,1,14.44-6.9Z"/></svg></div>
+   <div><div class="d" style="font-size:22px">First Session</div><div class="lbl" style="color:var(--amber)">+50 XP · Level 2</div></div>
+  </div>
+ </div>
+ <div class="pad" style="margin-top:8px">
+  <div class="plate cut-s" style="padding:10px 14px 12px 18px"><span class="bar" style="width:4px"></span>
+   <div style="display:flex;justify-content:space-between;align-items:baseline"><div class="d" style="font-size:22px">Level 2 <span style="color:var(--amber)">reached</span></div><div class="lbl">70 / 140 XP to Level 3</div></div>
+   <div class="seg" style="margin-top:8px"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+ </div>
+ <p class="pad small" style="margin-top:12px;padding-bottom:190px">Your shot chart has its first spot. Next time, try a different spot and see how the chart fills in.</p>
+
+ <div style="position:absolute;left:0;right:0;bottom:0;padding:12px 16px 14px;background:linear-gradient(0deg,#0B0B0E 70%,rgba(11,11,14,0))">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+   <button class="btn" style="height:52px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M244,56v48a12,12,0,0,1-12,12H184a12,12,0,1,1,0-24H201.1l-19-17.38c-.13-.12-.26-.24-.38-.37A76,76,0,1,0,127,204h1a75.53,75.53,0,0,0,52.15-20.72,12,12,0,0,1,16.49,17.45A99.45,99.45,0,0,1,128,228h-1.37A100,100,0,1,1,198.51,57.06L220,76.72V56a12,12,0,0,1,24,0Z"/></svg>Go again</button>
+   <button class="btn btn2" style="height:52px"><span>Done for today</span></button>
+  </div>
+  <div style="display:flex;justify-content:center;align-items:center;gap:8px;height:44px;margin-top:4px;color:var(--text);font-family:'Barlow Condensed';font-weight:700;font-size:18px;letter-spacing:.06em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M220,112v96a20,20,0,0,1-20,20H56a20,20,0,0,1-20-20V112A20,20,0,0,1,56,92H76a12,12,0,0,1,0,24H60v88H196V116H180a12,12,0,0,1,0-24h20A20,20,0,0,1,220,112ZM96.49,72.49,116,53v83a12,12,0,0,0,24,0V53l19.51,19.52a12,12,0,1,0,17-17l-40-40a12,12,0,0,0-17,0l-40,40a12,12,0,1,0,17,17Z"/></svg>Share this result</div>
+ </div>
+</div>
+</body>
+</html>

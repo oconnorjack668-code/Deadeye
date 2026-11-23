@@ -7,7 +7,7 @@ skills:
   - engineering:testing-strategy
   - engineering:debug
   - design:accessibility-review
-model: inherit
+model: sonnet
 effort: high
 memory: project
 hooks:

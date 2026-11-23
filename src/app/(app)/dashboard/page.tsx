@@ -11,7 +11,8 @@ import { calculateDashboardMetrics, getShootingByZone, rankZones } from '@/lib/d
 import { getRecentZoneTotals } from '@/lib/player-activity';
 import { aiReportsLeft, FREE_MONTHLY_AI_REPORTS, hasPro } from '@/lib/entitlements';
 import { ProNote } from '@/components/ProGate';
-import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity, ChevronDown } from 'lucide-react';
+import { Zap, TrendingUp, Target, Award, Star, Users, MessageCircle, Activity, ChevronDown, Trophy } from 'lucide-react';
+import { entriesOpen } from '@/lib/competition';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -24,6 +25,7 @@ import { squadActivityLine, type FriendRow } from '@/lib/friends';
 import { InstallNudge } from '@/components/InstallNudge';
 import { RemindersCard } from '@/app/(app)/profile/RemindersCard';
 import { StarterSteps } from '@/components/StarterSteps';
+import { TodayFirstStep } from '@/components/TodayFirstStep';
 import { FounderPostCard } from '@/components/FounderPostCard';
 import { DashboardClubCard } from '@/components/clubs/DashboardClubCard';
 import { FounderNotice } from '@/components/FounderNotice';
@@ -234,26 +236,11 @@ export default async function DashboardPage() {
             // thing the landing page promised, rather than to sign up for a
             // weeks-long program. On 19 Oct 2026, 12 of the 17 players who had
             // finished setup had done nothing at all, and 1 had started a program.
-            <>
-              <div className="mt-1 text-xl font-black text-white">Log your first shots</div>
-              <div className="text-sm text-zinc-300">
-                Tap where you shoot from, then how many went in. Your shot chart starts with the first spot.
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Link href="/basketball/new">
-                  <Button variant="primary" size="sm">Log shots</Button>
-                </Link>
-                <Link href="/video">
-                  <Button variant="outline" size="sm">Track with the camera</Button>
-                </Link>
-              </div>
-              <Link
-                href={recommendedGoal ? `/programs?goal=${recommendedGoal}` : '/programs'}
-                className="mt-3 inline-block text-xs font-semibold text-orange-300 hover:text-orange-200"
-              >
-                {recommendedLabel ? `Or see ${recommendedLabel.toLowerCase()} programs →` : 'Or follow a program →'}
-              </Link>
-            </>
+            // One button, the other ways in as quiet links, each tap a marker.
+            <TodayFirstStep
+              programHref={recommendedGoal ? `/programs?goal=${recommendedGoal}` : '/programs'}
+              programLabel={recommendedLabel ? `see ${recommendedLabel.toLowerCase()} programs` : 'follow a program'}
+            />
           ) : (
             <>
               <div className="mt-1 text-lg font-bold text-white">
@@ -306,6 +293,15 @@ export default async function DashboardPage() {
             heads-up in the last week of a founding member's free months. Under
             Today, because it is an offer rather than training. */}
         <FoundingCard state={founding} where="dashboard" founderPrice={founderPrice} />
+
+        {/* The founding competition, as one quiet line like the squad line: only
+            after the first log, which is when a player can enter (00067) */}
+        {!firstRun && entriesOpen() && (
+          <Link href="/competition" className="mb-4 flex min-h-11 items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200">
+            <Trophy className="h-4 w-4 flex-shrink-0 text-orange-400" />
+            <span className="min-w-0">Founding competition: tell us what you think, 10 players win Pro for life</span>
+          </Link>
+        )}
 
         {/* Only for a player who follows the founder, once there is a post */}
         {latestPost && <FounderPostCard post={latestPost as FounderPost} founderId={latestPost.author_id} />}

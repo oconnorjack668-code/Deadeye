@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deadeye visual direction B (HUD): watch</title>
+<!-- Designer proposal 2026-11-20, draft only. Direction B: HUD. Made-up data. Not built, not in docs/design.md.
+     Fonts: Google Fonts (OFL). Icons: Phosphor (MIT). Footage frame (watch page): local file, consent confirmed by the founder, do not upload. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,600;0,700;1,600;1,700&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#05070D;--s1:#0B1220;--s2:#101A2E;--cy:#5CE1FF;--cyline:rgba(92,225,255,.34);--cydim:rgba(92,225,255,.14);--or:#FF6A1F;--or2:#FFA21F;
+--mint:#3DF5A0;--coral:#FF6377;--amber:#FFC24B;--text:#EAF4FF;--mut:#A3B6CC;--ink:#05070D}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{width:390px;font-family:'Geist',system-ui,sans-serif;color:var(--text);-webkit-font-smoothing:antialiased}
+.ph{width:1em;height:1em;flex:none;display:block}
+.screen{position:relative;width:390px;min-height:844px;overflow:hidden;background:
+ radial-gradient(420px 300px at 90% -4%,rgba(92,225,255,.17),transparent 70%),
+ radial-gradient(380px 300px at -10% 40%,rgba(255,106,31,.10),transparent 70%),
+ radial-gradient(rgba(92,225,255,.16) 1px,transparent 1.4px) 0 0/22px 22px,var(--bg)}
+.pad{padding:0 16px}
+.disp{font-family:'Chakra Petch',sans-serif;font-weight:700;letter-spacing:-.005em;line-height:1}
+.num{font-family:'Chakra Petch',sans-serif;font-weight:700;font-variant-numeric:tabular-nums;line-height:.95}
+.mono{font-family:'Geist Mono',monospace;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:12px;color:var(--mut)}
+.small{font-size:14px;line-height:1.45;color:var(--mut)}
+.card{position:relative;background:linear-gradient(180deg,rgba(18,30,52,.82),rgba(9,15,28,.86));border:1px solid var(--cyline);border-radius:6px;box-shadow:0 0 24px rgba(92,225,255,.07),inset 0 1px 0 rgba(255,255,255,.06)}
+.brk::after{content:"";position:absolute;inset:-1px;pointer-events:none;background:
+ linear-gradient(var(--cy),var(--cy)) top left/14px 2px no-repeat,linear-gradient(var(--cy),var(--cy)) top left/2px 14px no-repeat,
+ linear-gradient(var(--cy),var(--cy)) top right/14px 2px no-repeat,linear-gradient(var(--cy),var(--cy)) top right/2px 14px no-repeat,
+ linear-gradient(var(--cy),var(--cy)) bottom left/14px 2px no-repeat,linear-gradient(var(--cy),var(--cy)) bottom left/2px 14px no-repeat,
+ linear-gradient(var(--cy),var(--cy)) bottom right/14px 2px no-repeat,linear-gradient(var(--cy),var(--cy)) bottom right/2px 14px no-repeat;filter:drop-shadow(0 0 4px rgba(92,225,255,.7))}
+.icn{width:38px;height:38px;border-radius:8px;display:grid;place-items:center;font-size:22px;color:var(--cy);background:var(--cydim);border:1px solid var(--cyline);filter:drop-shadow(0 0 6px rgba(92,225,255,.45))}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:52px;border:0;border-radius:10px;font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:19px;color:var(--ink);background:linear-gradient(100deg,var(--or2),var(--or));box-shadow:0 0 26px rgba(255,106,31,.5),inset 0 1px 0 rgba(255,255,255,.4)}
+.btn .ph{font-size:22px}
+.btn2{background:rgba(92,225,255,.06);color:var(--text);border:1px solid rgba(92,225,255,.7);box-shadow:0 0 16px rgba(92,225,255,.15);height:48px}
+.nav{position:absolute;left:0;right:0;bottom:0;height:78px;background:linear-gradient(180deg,rgba(8,13,24,.9),#060A14);border-top:1px solid var(--cyline);display:flex;padding:6px 8px 12px;backdrop-filter:blur(8px)}
+.nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--mut);font-family:'Geist Mono',monospace;font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;position:relative}
+.nav a .ph{font-size:24px}
+.nav a.on{color:var(--text)}
+.nav a.on .ph{color:var(--cy);filter:drop-shadow(0 0 7px rgba(92,225,255,.9))}
+.nav a.on::before{content:"";position:absolute;top:-7px;left:26%;right:26%;height:2px;background:var(--cy);box-shadow:0 0 10px var(--cy)}
+.fab{position:absolute;right:16px;bottom:94px;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;color:var(--ink);font-size:28px;background:linear-gradient(135deg,var(--or2),var(--or));box-shadow:0 0 0 1px rgba(255,255,255,.3) inset,0 0 30px rgba(255,106,31,.65)}
+.ticks{display:flex;gap:3px}.ticks i{flex:1;height:10px;background:rgba(92,225,255,.14);border-radius:1px}
+.ticks i.f{background:linear-gradient(180deg,var(--cy),#2FA8D6);box-shadow:0 0 8px rgba(92,225,255,.6)}
+.hexo{width:54px;height:60px;display:grid;place-items:center;font-size:24px;position:relative}
+.hexo svg.h{position:absolute;inset:0}
+.hexo .ph{position:relative}
+</style>
+</head>
+<body>
+<div class="screen" style="min-height:900px">
+ <svg style="position:absolute;left:-70px;bottom:-60px;opacity:.09" width="520" height="470" viewBox="0 0 220 200" aria-hidden="true"><g fill="none" stroke="#5CE1FF" stroke-width="1.4"><rect x="75" y="106" width="70" height="84"/><path d="M84 106 A26 26 0 0 1 136 106"/><path d="M13 190 V128 A104.5 104.5 0 0 1 207 128 V190"/><circle cx="110" cy="167" r="6"/></g></svg>
+ <div class="pad" style="position:relative;padding-top:18px;display:flex;justify-content:space-between;align-items:flex-end">
+  <div><div class="mono" style="color:var(--cy)">Hoops</div><div class="disp" style="font-size:32px;margin-top:6px">Shot tracker</div></div>
+  <div class="mono" style="padding-bottom:6px;color:var(--text)">Review</div>
+ </div>
+
+ <div class="pad" style="position:relative;margin-top:12px">
+  <div class="card brk" style="padding:12px 16px;display:flex;align-items:center;gap:16px">
+   <div class="num" style="font-size:56px;color:var(--text);text-shadow:0 0 22px rgba(92,225,255,.4)">5<span style="color:var(--cy)">/</span>9</div>
+   <div><div class="disp" style="font-size:22px;color:var(--mint)">56% made</div><div class="small" style="margin-top:3px">Watch it back to check the calls</div></div>
+  </div>
+ </div>
+
+ <div class="pad" style="position:relative;margin-top:12px">
+  <div class="card brk" style="padding-bottom:14px">
+   <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px 10px">
+    <div class="mono" style="color:var(--text)">Watch it back</div>
+    <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--mut)">
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:10px;height:10px;border-radius:50%;background:var(--mint)"></i>Make</span>
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:10px;height:10px;border-radius:50%;border:2.5px solid var(--coral)"></i>Miss</span>
+     <span style="display:flex;gap:5px;align-items:center"><i style="width:9px;height:9px;background:var(--amber);transform:rotate(45deg)"></i>Unclear</span>
+    </div>
+   </div>
+
+   <div style="position:relative;width:356px;margin:0 auto;height:331px;overflow:hidden;background:#000;border-top:1px solid var(--cyline);border-bottom:1px solid var(--cyline)">
+    <img src="2026-11-20-direction-footage-frame.jpg" width="358" height="331" alt="Gym footage, ball in the net" style="display:block;margin-left:-1px">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,6,14,.4),rgba(0,0,0,0) 28%,rgba(0,0,0,0) 70%,rgba(2,6,14,.5))"></div>
+    <!-- tracker overlay, HUD look -->
+    <div style="position:absolute;left:10px;top:10px;background:rgba(5,7,13,.84);border:1px solid rgba(92,225,255,.65);padding:4px 12px 6px;display:flex;align-items:baseline;gap:10px;border-radius:3px">
+     <span class="num" style="font-size:38px;color:#fff">4<span style="color:var(--cy)">/</span>7</span>
+     <span class="num" style="font-size:22px;color:var(--cy)">57%</span>
+     <span class="mono" style="font-size:12px;color:#fff;letter-spacing:.06em">0:31</span>
+    </div>
+    <div style="position:absolute;right:10px;top:12px;background:rgba(5,7,13,.84);border:1px solid rgba(92,225,255,.65);padding:6px 10px;display:flex;align-items:center;gap:7px;border-radius:3px"><i style="width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)"></i><span class="mono" style="font-size:12px;color:#fff;letter-spacing:.06em">Ball tracked</span></div>
+    <svg style="position:absolute;left:0;top:0" width="356" height="331" viewBox="0 0 356 331" aria-hidden="true">
+     <path d="M182 56 C 164 62, 146 70, 133 83" fill="none" stroke="#5CE1FF" stroke-width="2" stroke-dasharray="3 5" stroke-linecap="round"/>
+     <g stroke="#3DF5A0" stroke-width="3" fill="none" stroke-linecap="square" style="filter:drop-shadow(0 0 5px #3DF5A0)">
+      <path d="M97 62 H110 M97 62 V75"/><path d="M158 62 H145 M158 62 V75"/><path d="M97 111 H110 M97 111 V98"/><path d="M158 111 H145 M158 111 V98"/>
+     </g>
+     <circle cx="127" cy="86" r="21" fill="none" stroke="#3DF5A0" stroke-width="1.5" stroke-dasharray="3 4" opacity=".9"/>
+     <path d="M127 117 V132 M127 132 H96" fill="none" stroke="#3DF5A0" stroke-width="1.5"/>
+    </svg>
+    <div style="position:absolute;left:10px;top:132px;background:rgba(5,7,13,.84);border:1px solid rgba(92,225,255,.65);border-color:rgba(61,245,160,.8);padding:5px 14px 6px 12px;border-radius:3px;display:flex;align-items:center;gap:8px;box-shadow:0 0 18px rgba(61,245,160,.35)">
+     <span class="disp" style="font-size:34px;color:var(--mint);text-shadow:0 0 14px rgba(61,245,160,.6)">MAKE</span><span style="font-size:24px;color:var(--mint)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg></span>
+    </div>
+    <div style="position:absolute;left:10px;bottom:12px;display:flex;gap:5px">
+     <i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--coral);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--coral);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;border:3px solid var(--coral);background:rgba(0,0,0,.4)"></i><i style="width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 6px var(--mint)"></i>
+    </div>
+    <div style="position:absolute;right:10px;bottom:10px;width:44px;height:44px;display:grid;place-items:center;font-size:22px;color:#fff;background:rgba(5,7,13,.84);border:1px solid rgba(92,225,255,.65);border-radius:8px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M220,48V96a12,12,0,0,1-24,0V77l-35.51,35.52a12,12,0,0,1-17-17L179,60H160a12,12,0,0,1,0-24h48A12,12,0,0,1,220,48ZM95.51,143.51,60,179V160a12,12,0,0,0-24,0v48a12,12,0,0,0,12,12H96a12,12,0,0,0,0-24H77l35.52-35.51a12,12,0,0,0-17-17ZM208,148a12,12,0,0,0-12,12v19l-35.51-35.52a12,12,0,0,0-17,17L179,196H160a12,12,0,0,0,0,24h48a12,12,0,0,0,12-12V160A12,12,0,0,0,208,148ZM77,60H96a12,12,0,0,0,0-24H48A12,12,0,0,0,36,48V96a12,12,0,0,0,24,0V77l35.51,35.52a12,12,0,0,0,17-17Z"/></svg></div>
+   </div>
+
+   <div style="padding:6px 16px 0">
+    <div style="position:relative;height:30px;margin-top:6px"><i style="position:absolute;left:19px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);"></i><i style="position:absolute;left:53px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--coral);"></i><i style="position:absolute;left:80px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);"></i><i style="position:absolute;left:114px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);"></i><i style="position:absolute;left:148px;top:4px;width:14px;height:14px;background:var(--amber);transform:rotate(45deg);border-radius:2px;box-shadow:0 0 8px var(--amber);"></i><i style="position:absolute;left:175px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--coral);"></i><i style="position:absolute;left:203px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);outline:3px solid #fff;outline-offset:1px;"></i><i style="position:absolute;left:243px;top:4px;width:14px;height:14px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint);"></i><i style="position:absolute;left:284px;top:4px;width:14px;height:14px;border-radius:50%;border:3px solid var(--coral);"></i></div>
+    <div style="position:relative;height:44px;margin-top:-6px">
+     <div style="position:absolute;left:0;right:0;top:20px;height:4px;background:#5C6E86;border-radius:2px"></div>
+     <div style="position:absolute;left:0;width:211px;top:19px;height:6px;background:linear-gradient(90deg,var(--cy),#fff);border-radius:3px;box-shadow:0 0 10px rgba(92,225,255,.7)"></div>
+     <div style="position:absolute;left:200px;top:11px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(92,225,255,.7),0 0 14px var(--cy)"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+     <button class="btn" style="width:52px;height:48px;border-radius:10px;font-size:24px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg></button>
+     <button class="btn btn2" style="width:44px;height:44px;border-radius:10px;font-size:20px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,47.88V208.12a16,16,0,0,1-24.43,13.43L64,146.77V216a8,8,0,0,1-16,0V40a8,8,0,0,1,16,0v69.23L183.57,34.45A15.95,15.95,0,0,1,208,47.88Z"/></svg></button><button class="btn btn2" style="width:44px;height:44px;border-radius:10px;font-size:20px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208,40V216a8,8,0,0,1-16,0V146.77L72.43,221.55A15.95,15.95,0,0,1,48,208.12V47.88A15.95,15.95,0,0,1,72.43,34.45L192,109.23V40a8,8,0,0,1,16,0Z"/></svg></button>
+     <div class="num" style="font-size:20px;flex:1;text-align:center;white-space:nowrap">0:31 <span style="color:var(--mut);font-size:15px">/ 0:48</span></div>
+     <button class="btn btn2" style="width:48px;height:44px;font-size:16px;border-radius:10px">1×</button>
+    </div>
+   </div>
+
+   <div style="margin:12px 16px 0;padding-top:12px;border-top:1px solid var(--cyline)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+     <div><div class="disp" style="font-size:21px">Shot 7 <span style="color:var(--mut);font-weight:600">· 0:31</span></div><div class="small" style="font-size:14px">Tracker said Make. Tap to change.</div></div>
+     <div class="mono" style="display:flex;gap:6px;align-items:center;color:var(--text);height:44px;letter-spacing:.04em"><span style="font-size:17px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M216,48H180V36A28,28,0,0,0,152,8H104A28,28,0,0,0,76,36V48H40a12,12,0,0,0,0,24h4V208a20,20,0,0,0,20,20H192a20,20,0,0,0,20-20V72h4a12,12,0,0,0,0-24ZM100,36a4,4,0,0,1,4-4h48a4,4,0,0,1,4,4V48H100Zm88,168H68V72H188ZM116,104v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Zm48,0v64a12,12,0,0,1-24,0V104a12,12,0,0,1,24,0Z"/></svg></span>Not a shot</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+     <button class="btn" style="height:52px;background:linear-gradient(100deg,#7BFFC4,var(--mint));box-shadow:0 0 22px rgba(61,245,160,.4),inset 0 1px 0 rgba(255,255,255,.5)"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z"/></svg>Make</button>
+     <button class="btn btn2" style="height:52px;border-color:var(--coral);box-shadow:0 0 16px rgba(255,99,119,.2);color:#FFB3BC"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z"/></svg>Miss</button>
+    </div>
+   </div>
+  </div>
+ </div>
+
+ <div class="pad" style="position:relative;margin-top:16px;padding-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:baseline"><div class="mono" style="color:var(--text)">Every call · 9</div><div class="small" style="font-size:14px">Tap a time to watch that shot</div></div>
+  <div class="card" style="margin-top:8px;padding:10px 14px;display:flex;align-items:center;gap:12px">
+   <span class="mono">#6</span><span class="num" style="font-size:20px;display:flex;align-items:center;gap:6px"><span style="font-size:16px"><svg class="ph " aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="currentColor"><path d="M240,128a15.74,15.74,0,0,1-7.6,13.51L88.32,229.65a16,16,0,0,1-16.2.3A15.86,15.86,0,0,1,64,216.13V39.87a15.86,15.86,0,0,1,8.12-13.82,16,16,0,0,1,16.2.3L232.4,114.49A15.74,15.74,0,0,1,240,128Z"/></svg></span>0:27</span><span class="mono" style="margin-left:auto;color:var(--coral)">Miss</span>
+  </div>
+ </div>
+</div>
+</body>
+</html>

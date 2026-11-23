@@ -3,6 +3,8 @@ import React from 'react';
 import Link from 'next/link';
 import { operator } from '@/lib/legal';
 import { FOUNDING_MONTHS, FOUNDING_PLACES } from '@/lib/founding';
+import { PRO_CHAT_PER_DAY, PRO_REPORTS_PER_DAY } from '@/lib/ai/fairUse';
+import { PRO_TRIAL_DAYS } from '@/lib/stripe';
 
 export const metadata = { title: 'Terms of Use - Deadeye' };
 
@@ -58,6 +60,14 @@ export default function TermsPage() {
             <li>
               Pro is a paid subscription, billed monthly or yearly through Stripe. The price shown before you pay is the
               full price, with nothing added at checkout.
+            </li>
+            <li>
+              Your first {PRO_TRIAL_DAYS} days of Pro are free the first time you subscribe (founding members get their
+              free months instead). Cancel before the free time ends and you pay nothing.
+            </li>
+            <li>
+              Pro has no monthly AI allowance, but it has a fair-use limit so one account cannot run up costs: up to{' '}
+              {PRO_CHAT_PER_DAY} questions to the AI coach a day and {PRO_REPORTS_PER_DAY} AI reports in 24 hours.
             </li>
             <li>It renews automatically until you cancel. You can cancel any time in Profile → Deadeye Pro → Manage subscription; you keep Pro until the end of the period you paid for.</li>
             <li>

@@ -14,6 +14,14 @@ export const EVENT_NAMES = [
   'dashboard_seen',
   'sample_played',
   'sample_finished',
+  /** Today card, no session yet: tapped "Log shots" */
+  'today_log_tapped',
+  /** Today card, no session yet: tapped "track with the camera" */
+  'today_track_tapped',
+  /** Today card, no session yet: tapped the program link */
+  'today_program_tapped',
+  /** Reached the Video AI page (/video), before any tracker opens */
+  'video_opened',
   'tracker_opened',
   /** Picked the camera or a video, and is setting the rim */
   'tracker_setup',

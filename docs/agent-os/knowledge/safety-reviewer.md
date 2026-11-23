@@ -1,8 +1,8 @@
-Skills: all 5 loaded (2026-11-13 review of PR #97, ref tracking and build id)
+Skills: all 5 loaded (2026-11-18 review of worktree-pricing-yearly-clubs, founding competition)
 
 # Safety reviewer knowledge
 
-Last researched: 2026-11-13 (attribution links, ePrivacy, small numbers)
+Last researched: 2026-11-18 (competitions and prizes for children, Play review rule, Art 14 notices)
 
 Read `README.md` in this folder for how this file works. This is research,
 not legal advice: lines marked **(legal advice)** need a solicitor before the
@@ -133,6 +133,26 @@ file). Newest first, each with the date, what happened, and the rule.
       all), don't store it; if it is stored, the policy's "what we collect"
       names it. Focus Finder stored the child's description for the life of
       the account with no reader (PR #103).
+- [ ] **Merge is launch.** Main deploys to production. A feature whose own
+      notes list checks "before launch" (solicitor, promoter named, DPIA,
+      billing) has a switch that is off by default, or the merge waits. Look
+      for in-app links to it (dashboard, Settings) as well as the page.
+- [ ] **Emails to someone a child named.** A parent or other adult whose
+      address came from a child gets, in the first email: who we are, that
+      the child gave us the address, how long it is kept, a privacy link, and
+      what to do if they are not the parent (GDPR Art 14).
+- [ ] **Rules a child agrees to match who reads the data.** Competition or
+      offer terms are read line by line against the code and the process
+      (a second judge is a recipient; "read by the promoter only" is then false).
+- [ ] **Offers and prizes for under-18s go through a parent.** Discount or
+      prize emails and winner contact go to the approving parent; posts aimed
+      at players carry no discount line (ASAI 7.5(c), 7.7).
+- [ ] **Prize promos a child can see** (homepage, posts, cards): prizes may
+      be shown, but the closing date and the parent rule sit in the main text,
+      not small print (ASAI 7.7(c), (f)); the entry steps are stated; a
+      headline says how many win ("10 players win"), not "Win"; "for life" or
+      similar is qualified as the rules define it (7.7(g)); shown only while
+      `entriesOpen()` (homepage card review, 2026-11-18).
 
 ## Research
 

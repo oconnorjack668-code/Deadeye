@@ -66,9 +66,17 @@ describe('buildFunnel', () => {
     expect(count(f, 'welcome_later')).toBe(2);
     expect(count(f, 'log_opened')).toBe(2);
     expect(count(f, 'log_finish_opened')).toBe(1);
-    // The tracker group still carries tracker_saved, whatever groups follow it
+    // The tracker group still carries tracker_saved, whatever groups come before or after it
     expect(f.groups.find((g) => g.title === 'Shot tracker')?.steps.map((s) => s.key)).toContain('tracker_saved');
-    expect(f.groups.map((g) => g.title)).toEqual(['Joining and logging', 'Welcome', 'Shot tracker', 'Logging shots', 'Reminders', 'Coming back']);
+    expect(f.groups.map((g) => g.title)).toEqual([
+      'Joining and logging',
+      'Welcome',
+      'Today card',
+      'Shot tracker',
+      'Logging shots',
+      'Reminders',
+      'Coming back',
+    ]);
   });
 
   it('counts players with no session who came back to the dashboard, by player, not by day (E6)', () => {

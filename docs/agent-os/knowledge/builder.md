@@ -16,8 +16,10 @@ in brackets).
   `--webpack`; run any worker on the live site before calling it done. A worker
   that pulls a CDN runtime is a plain file in `public/workers/`; the tracker's
   bundled `new URL(...)` module worker does work. (2026-11-03-rim-finder)
-- 2026-11-03 · Signed-in features cannot be checked locally or on previews:
-  they cannot reach Supabase. **Rule:** check them on the live site in the
+- 2026-11-03 · Signed-in features cannot be checked locally: they cannot
+  reach Supabase. (Previews can since 2 Nov: they sign in and use the live
+  database, so check there as the tester, looking only, saving nothing.)
+  **Rule:** check them on the preview, then the live site, in the
   founder's Chrome with the tester session (memory `test-live-in-chrome`);
   the founder types passwords, never Claude. Signed-out checks can use a temp
   page under `/parents/`; delete it and `.next/dev` after, or `next build`
@@ -114,6 +116,17 @@ file). Newest first, each with the date, what happened, and the rule.
       table is in `SERVER_WRITTEN` (rls-rules test).
 - [ ] 390px wide, both themes, no sideways scroll, taps 44px (`h-11`),
       colours from `docs/design.md`.
+- [ ] Slow network and low-end phone: the screen tried with Chrome's
+      network throttling (Slow 4G) and CPU slowdown (4x); a loading state
+      shows, nothing jumps, and a save that times out says so. Most players
+      are teenagers on older phones and mobile data at a court. (Exam,
+      2026-11-17: the phone check left this out.)
+- [ ] Data a player owns is read with the user's server client
+      (`createClient()` from `@/lib/supabase/server`) so RLS applies, with
+      the user taken from the session, never from a query parameter; the
+      admin (service-role) client only for what the server itself writes.
+      Say which client in the plan. (Exam, 2026-11-17: a new-table plan did
+      not say.)
 - [ ] Nothing loads from another company (iframe, image, font, script) before
       the player asks for it; a YouTube video goes through `TapToLoadYouTube`
       (or `FilmClipPlayer`, which shares its tap card); the privacy page names

@@ -69,6 +69,19 @@ offline first, and turn reminders back on."
    stopgap with Resend: host `smtp.resend.com`, port `465`, username
    `resend`, password = the Resend API key, sender `no-reply@deadeye.ie`,
    name `Deadeye`.
+   Then Authentication → Emails → Templates, so email links work in any
+   browser (Supabase's default link only signs the player in if they open it
+   in the browser they signed up in; the Gmail app or another phone fails).
+   In each template below, replace `{{ .ConfirmationURL }}` in the link with
+   the address shown, and save:
+   - **Confirm signup**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/onboarding`
+   - **Reset password**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/update-password`
+   - **Change email address**:
+     `{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email_change&next=/settings`
+   Do this only after the app change that reads these links (`src/lib/authLink.ts`)
+   is live, or every link fails.
 6. **Redeploy** in Vercel (Deployments → latest → Redeploy). New variables
    only reach new deployments.
 7. Check: sign up a new test account and confirm the email arrives from
@@ -127,11 +140,16 @@ the live site.
 ## Part 6: club billing (Claude builds, you approve), by 1 Feb 2027
 
 Not built yet. Ask Claude to start it by **mid-December**. It needs:
-season and monthly club prices in Stripe, Pro for a whole team, invoices a
-club treasurer can pay (card or SEPA), and a short club agreement. Prices
-and the founding club offer are in `docs/sales/` and the
-`2026-10-22-pricing-and-claude` handoff. Under-18 players' accounts stay in
-the parent's name.
+yearly club prices in Stripe (all plans are per year since 18 Nov 2026:
+Team Pass €179 a year or €19.99 a month; Club plan €899 a year for up to 8
+teams plus €89 a year for each extra team; founding clubs €59.99 per team per
+year or €6.99 a month, for 2 years until 31 January 2029), Pro for a whole team, invoices a club treasurer can
+pay (card or SEPA), and a short club agreement. A year runs 12 months from the
+day a club starts. Prices and the founding club offer are in
+`docs/sales/deadeye-club-plans.html` and `src/lib/plans.ts`. The founding
+competition's 25% entrant discount (`docs/sales/founding-competition-rules.md`)
+needs a Stripe coupon valid to 31 March 2027. Under-18 players' accounts stay
+in the parent's name.
 
 ## After the domain: the Play Store app
 

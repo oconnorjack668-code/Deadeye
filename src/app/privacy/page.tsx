@@ -5,10 +5,11 @@ import { aiProviderCompany } from '@/lib/ai/config';
 import { emailConfigured } from '@/lib/email';
 import { operator } from '@/lib/legal';
 import { UNAPPROVED_ACCOUNT_DAYS } from '@/lib/parentApproval';
+import { OFFER_ENDS_TEXT as OFFER_END } from '@/lib/competition';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 16, 2026';
+const LAST_UPDATED = 'November 23, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -127,19 +128,32 @@ export default function PrivacyPage() {
               90 days and used only to fix bugs.
             </li>
             <li>
-              Problem reports, if you send one from Settings or the crash screen: what you write, the page, your device
-              type and your account id, kept for 90 days and used only to fix problems. Deleting your account deletes
-              them straight away.
+              Feedback, ideas and problem reports, if you send one from Settings or the crash screen: what you write,
+              which of the three it is, the page, your device type and your account id, kept for 90 days and used only to
+              improve the app and fix problems. Deleting your account deletes them straight away.
+            </li>
+            <li>
+              If you enter the <Link href="/competition" className="text-orange-400 underline">founding competition</Link>:
+              your entry, the feedback you write for it and, for players under 18, the parent or guardian&apos;s email
+              (and name, if you give it) so we can ask their permission. For a club entry, the club name and team. We use
+              it to judge the competition, contact winners (through a parent for under-18s) and send the 25% offer. Two
+              adults judge, the promoter and one other adult who is not entering, and they read entries with names
+              hidden. For players under 18 the offer is emailed to their parent or guardian, not to them. Parent links
+              stop working when the competition closes, parent names and emails are deleted after the offer closes on{' '}
+              {OFFER_END}, and the entry list is deleted 6 months after that (by 30 September 2027), or straight away if
+              you delete your account.
             </li>
             <li>
               A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
               gave there (at a court, or not right now), opening the Home screen before you have saved a shooting
-              session, playing the sample clip, opening the shot logger and pressing Finish in it, and opening, starting
-              and finishing the shot tracker. On the IQ tab, opening a play, finishing its quiz, opening a film clip and
-              answering all its questions, and, for coaches, saving a play you drew. We also note when you turn training
-              reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id, only
-              to see where players get stuck so we can fix it. We record only the steps named here, not the other pages
-              you open; no device details, nothing shared with anyone. Deleting your account deletes them straight away.
+              session, playing the sample clip, and, before your first session, which link you tap on the Today card
+              (log shots, track with the camera, or your program). Opening the Video AI page, opening the shot tracker,
+              setting it up, starting and finishing it, and saving its result. Opening the shot logger and pressing
+              Finish in it. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip, and, if
+              you coach, saving a play you drew. We also note when you turn training reminders on, or change your
+              reminder days while they are on. Kept for 90 days, with your account id, only to see where players get
+              stuck so we can fix it. We record only the steps named here, not the other pages you open; no device
+              details, nothing shared with anyone. Deleting your account deletes them straight away.
             </li>
             <li>
               If you answer the optional &quot;Where did you hear about Deadeye?&quot; question when you sign up, your answer (for
@@ -170,7 +184,7 @@ export default function PrivacyPage() {
               reminders, rely on your choice, and you can switch them off at any time in Settings.
             </li>
             <li>
-              Crash reports, problem reports you send, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
+              Crash reports, feedback and problem reports you send, running the founding competition you enter, the app steps above, your answer on where you heard about us, measuring and improving the shot tracker,
               and keeping the service secure rely on our legitimate interest in Deadeye working properly and knowing where new
               players hear about us.
             </li>

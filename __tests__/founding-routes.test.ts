@@ -12,6 +12,8 @@ let waitingForParent = false;
 let rpcResult: { data: string | null; error: unknown } = { data: 'claimed', error: null };
 const rpc = vi.fn(async () => rpcResult);
 let subRow: Record<string, unknown> | null = null;
+// Earlier Stripe subscriptions of the customer (the free week is once only)
+let earlierSubs: unknown[] = [];
 const sessionsCreate = vi.fn<(args: unknown) => Promise<{ url: string }>>(async () => ({ url: 'https://checkout.test/session' }));
 
 vi.mock('@/lib/auth', () => ({
@@ -36,6 +38,7 @@ vi.mock('@/lib/stripe', async (importOriginal) => ({
   stripeConfigured: () => true,
   getStripe: () => ({
     customers: { create: async () => ({ id: 'cus_new' }) },
+    subscriptions: { list: async () => ({ data: earlierSubs }) },
     checkout: { sessions: { create: sessionsCreate } },
   }),
 }));
@@ -92,6 +95,7 @@ describe('POST /api/billing/checkout for a founding member', () => {
 
   beforeEach(() => {
     sessionsCreate.mockClear();
+    earlierSubs = [];
     process.env.STRIPE_PRO_MONTHLY_PRICE_ID = 'price_normal';
     process.env.STRIPE_PRO_YEARLY_PRICE_ID = 'price_year';
     process.env.STRIPE_FOUNDER_MONTHLY_PRICE_ID = 'price_founder';
@@ -111,15 +115,27 @@ describe('POST /api/billing/checkout for a founding member', () => {
     expect(args.subscription_data.metadata.founding_member).toBe('true');
   });
 
-  it('charges everyone else the normal price, straight away', async () => {
+  it('gives a player who never subscribed the normal price after a free week', async () => {
     subRow = { stripe_customer_id: 'cus_1', plan_type: 'free', founding_claimed_at: null, founding_pro_until: null };
     await checkout('month');
     const args = sessionsCreate.mock.calls[0][0] as unknown as {
       line_items: Array<{ price: string }>;
-      subscription_data: { trial_end?: number };
+      subscription_data: { trial_end?: number; trial_period_days?: number };
     };
     expect(args.line_items[0].price).toBe('price_normal');
     expect(args.subscription_data.trial_end).toBeUndefined();
+    expect(args.subscription_data.trial_period_days).toBe(7);
+  });
+
+  it('charges a player who subscribed before straight away', async () => {
+    subRow = { stripe_customer_id: 'cus_1', plan_type: 'free', founding_claimed_at: null, founding_pro_until: null };
+    earlierSubs = [{ id: 'sub_old', status: 'canceled' }];
+    await checkout('month');
+    const args = sessionsCreate.mock.calls[0][0] as unknown as {
+      subscription_data: { trial_end?: number; trial_period_days?: number };
+    };
+    expect(args.subscription_data.trial_end).toBeUndefined();
+    expect(args.subscription_data.trial_period_days).toBeUndefined();
   });
 
   it('refuses a second subscription', async () => {
