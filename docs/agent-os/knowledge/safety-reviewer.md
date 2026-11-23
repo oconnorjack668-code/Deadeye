@@ -1,4 +1,4 @@
-Skills: all 5 loaded (2026-11-23 drafts review: marketing week, friends outreach, Blazers)
+Skills: all 5 loaded (2026-11-23 E6 re-review at 7d4ab59; earlier today: drafts review)
 
 # Safety reviewer knowledge
 
@@ -19,6 +19,13 @@ None yet.
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-23 · E6 re-review. The clause I approved on 16 Nov said "playing
+  the sample clip" for two events (`sample_played`, `sample_finished`) and
+  "saving a play you drew" for `play_drawn`, which also fires for a copied-in
+  play. My DPIA R8 condition from 16 Nov was still not done a week later.
+  Rule: for every `EVENT_NAMES` entry, write one line pairing it with the
+  clause words that cover it, read from the place in the code that fires it.
+  On a re-review, check each condition I set earlier.
 - 2026-11-23 · Drafts review. My 18 Nov competition pass checked the rules
   against the code but not who opens the owner page: `/admin/competition`
   shows every entry's feedback (names on request) to the owner account the
@@ -128,7 +135,10 @@ file). Newest first, each with the date, what happened, and the rule.
 - [ ] **Every app step is named.** A branch that adds to `EVENT_NAMES`
       (`src/lib/events.ts`) names each new step in plain words in the privacy
       clause "A few steps you reach in the app", and the clause still matches
-      its own "no page tracking" style promises (E6, S45).
+      its own "no page tracking" style promises (E6, S45). On every clause
+      change, write one line per name with the clause words that cover it,
+      read from the place in the code that fires it (E6 re-review:
+      `sample_finished`, copied-in plays).
 - [ ] **Public counts, every table and every week.** Under-5 check on every
       table `src/lib/agentCounts.ts` writes, and on the change between two
       published files (subtraction); check visibility with `gh api

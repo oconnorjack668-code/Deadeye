@@ -314,6 +314,43 @@ Report: [2026-11-23](reports/2026-11-23-activation.md), [2026-11-16](reports/202
   (Everyone minus 7-day, and differences between rows or weeks) is accepted as a leftover risk: no code change.
   Two conditions: the analyst never writes a worked-out number from 1 to 4 into a public report (write "under 5";
   the founder reads E6's 2-or-fewer / 3-4 / 5-or-more decision on `/admin/funnel`), and DPIA R8 records it.
+  Follow-up (2026-11-23, head 7d4ab59, after the merge of main): PASS WITH NOTES, no BLOCK. The merged clause
+  (`privacy/page.tsx:147-156`) keeps my three sentences word for word. It names 22 of the 23 `EVENT_NAMES` in plain
+  words (`play_drawn` only in part), and its purpose and "only the steps named here" fit every step. "Where new
+  players hear about us" (`:188`) is about the sign-up answer, so it does not clash. The under-5 rule holds cell by cell
+  (`agentCounts.ts:148,176,200,206`): every funnel group including Coming back, the 7-day column (no split when 1 to 4
+  joined), the biggest-drop line, and both columns of the answers table, "Other answers" and "Didn't say" included.
+  The 4 changed test files pass (32 tests, run on an exported copy of 7d4ab59). Findings, all FIX SOON:
+  (1) `privacy/page.tsx:149` "playing the sample clip" does not name `sample_finished` (`SampleClient.tsx:27`), and
+  `:153` "saving a play you drew" leaves out a copied-in play (`PlayEditor.tsx:295` fires for any new play). GDPR
+  Art 5(1)(a), Art 12(1), DPC F6. Both wordings were on main before E6, and I approved the same words on 16 Nov. Fix,
+  folded into the one founder approval: "playing the sample clip and whether you watched it to the end" and "saving a
+  new play you drew or copied in". The privacy-page test regexes still match.
+  (2) `docs/legal/dpia.md:93` R8 still covers only the sign-up answers, so my 16 Nov condition is not met (GDPR Art
+  35(7)). Fix: add to R8: "Funnel step counts are in the public file too: 1 to 4 read 'under 5', and the 7-day column
+  has no split when fewer than 5 joined. Accepted leftover: the difference between two rows, between a total and its
+  answers, or between two weeks' files can give back a number under 5; agents write 'under 5', never a worked-out
+  1 to 4."
+  (3) Already on main, not in this diff: `agentCounts.ts:215,217` print "Players on a team" and "Players who picked a
+  home club" as raw numbers (the 11-23 file says "1"). This breaks our under-5 rule for every public table. Fix:
+  `publicCount()` on those two lines, plus a test. Coach, team and board counts can stay exact.
+  NOTE: main's 11-23 counts file printed raw 1 to 4 step counts (`data/2026-11-23-funnel.md:13-43`). Merging before
+  the 30 Nov 08:30 run stops that; what is already in git history stays public. The accepted leftover also covers the
+  answers table: Joined minus the exact rows gives back a lone "under 5" row (24 - 21 = 3). That only tells you
+  "some other answer", so no code change is needed.
+  Per file: `privacy/page.tsx` (copy): see (1); LAST_UPDATED 23 Nov (`:12`) is right. `agentCounts.ts` (data,
+  public file): the rule holds; see (3). `events.ts` (data): adds one name; the route is unchanged and checks the user
+  server-side. `funnel.ts` (data, owner page and public file): adds "Coming back" as the last group. `DashboardSeen.tsx`
+  (data): renders nothing; the parent gate (`(app)/layout.tsx:34-36`) and the coach redirect (`dashboard/page.tsx:104`)
+  still apply. `dashboard/page.tsx` (data): the marker sits only in the `totalSessions === 0` block (`:285-287`), and
+  nothing a player sees changes. `docs/funnel-counts.sql` (data): adds the name, counts only.
+  `docs/agent-os/data/README.md` (copy): accurate. Tests (`agentCounts`, `dashboard-seen`, `funnel`, `privacy-page`):
+  no data; they pin down the under-5 rule and the three kept sentences. The 16 Nov data map is still true (export
+  `:69`, cascade delete, 90-day job). Security review: no new route, table or secret. Accessibility: nothing a player
+  taps or sees changes. NOTE: the clause is one long paragraph, and a bullet list would be easier for a 13-year-old
+  (DPC F6). The founder still needs to approve the merged clause, with fix (1), before merging, because it is not the
+  text approved on 16 Nov.
+  Not checked: the build, lint and the full test suite; the Supabase advisors (no migration); the live preview.
 - Founder checklist: <from release-checker>
 - Result:
 
