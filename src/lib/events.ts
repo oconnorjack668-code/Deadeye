@@ -27,6 +27,10 @@ export const EVENT_NAMES = [
   /** Reached the results, whether or not they then saved */
   'tracker_finished',
   'tracker_saved',
+  /** Pressed play on Watch it back, the tracker review's player (D1) */
+  'watch_back_played',
+  /** Changed, removed or added a call while watching the clip back (D1) */
+  'watch_back_edited',
   /** Opened the shot logger, to track every shot or to enter totals */
   'log_opened',
   /** Pressed Finish with something logged, so the Finish panel opened */

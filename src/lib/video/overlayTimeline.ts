@@ -313,3 +313,50 @@ export function overlayAt(tl: OverlayTimeline, clockMs: number, held = false): O
     drill: drillProgress(tl.mode, madeSoFar, clockMs),
   };
 }
+
+/**
+ * The run's timeline with the calls as the player left them in review, not as
+ * the tracker first made them: flips, removed calls and shots added at a
+ * moment in the clip. Watch it back and the saved video draw from this, so a
+ * make the player changed to a miss is never shown as a make. Frames, rims and
+ * gaps are the run's own. Each shot's time also counts as activity, so a shot
+ * the player added keeps the shooting clock going as a called one did.
+ */
+export function shotsToTimeline(
+  base: OverlayTimeline,
+  shots: ReadonlyArray<{ t: number; made: boolean; confident: boolean }>
+): OverlayTimeline {
+  const calls = shots.map((s) => ({ t: s.t, made: s.made, confident: s.confident })).sort((a, b) => a.t - b.t);
+  const activity = [...new Set([...base.activity, ...calls.map((c) => c.t)])].sort((a, b) => a - b);
+  return { ...base, calls, activity };
+}
+
+/** Paused this long before a call, Watch it back offers that call... */
+export const CALL_BEFORE_MS = 500;
+/** ...and until this long after it: about as long as its MAKE or MISS is up. */
+export const CALL_AFTER_MS = 1500;
+
+/**
+ * The call a paused moment belongs to: the nearest one from CALL_BEFORE_MS
+ * before it to CALL_AFTER_MS after it, or null (then Watch it back offers to
+ * add a shot there). Times on the tracking clock.
+ */
+export function nearestCall<T extends { t: number }>(items: readonly T[], clockMs: number): T | null {
+  let best: T | null = null;
+  for (const item of items) {
+    const since = clockMs - item.t;
+    if (since < -CALL_BEFORE_MS || since > CALL_AFTER_MS) continue;
+    if (!best || Math.abs(since) < Math.abs(clockMs - best.t)) best = item;
+  }
+  return best;
+}
+
+/** Pins closer than this on the scrub bar, px, are drawn as thin bars instead. */
+export const PIN_GAP_PX = 8;
+
+/** Whether any two neighbouring pins, at these shares of a bar `widthPx` wide, sit closer than PIN_GAP_PX. */
+export function pinsCrowded(fractions: readonly number[], widthPx: number): boolean {
+  const sorted = [...fractions].sort((a, b) => a - b);
+  for (let i = 1; i < sorted.length; i++) if ((sorted[i] - sorted[i - 1]) * widthPx < PIN_GAP_PX) return true;
+  return false;
+}
