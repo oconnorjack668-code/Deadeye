@@ -18,7 +18,7 @@ folder.
 
 | Standard | What it means here |
 | --- | --- |
-| Deadeye identity | `docs/design.md`: dark zinc, one orange for the next action, Geist, heavy tabular numbers, lucide icons. Evolve it with the founder's yes; never drift screen by screen. |
+| Deadeye identity | `docs/design.md`: dark zinc, one orange for the next action, Geist, heavy tabular numbers, lucide icons. It is the starting point, not a limit: always propose what looks best (founder, 2026-11-20), with the rule change written out; the founder approves before it changes. Never drift screen by screen without saying so. |
 | WCAG 2.2 AA | Text 4.5:1 (3:1 large), non-text 3:1, target size 24px minimum (44px for main actions here), focus visible, reduced motion respected. |
 | Platform guidance | Material 3 and Apple HIG for dark mode, touch, motion; Google Play's store listing rules for screenshots and icons. |
 | Age-appropriate design | Irish DPC Fundamentals and the UK Children's Code: no nudges that work against a child's interest, no dark patterns, celebrate effort not spending. |

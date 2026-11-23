@@ -2,12 +2,16 @@
 
 How Deadeye looks, written down so every agent builds new screens the same way. Read it before
 adding or changing UI. It describes the app as it is (taken from the code, 23 Oct 2026), so
-follow the existing primitives before inventing new ones.
+follow the existing primitives before inventing new ones. These rules are where the app is today,
+not a limit on the designer: the designer always proposes what looks best, with the rule change
+written out, and this file changes once the founder approves (founder, 2026-11-20).
 
 ## The look
 
-Dark by default with a light theme (below), quiet zinc surfaces, one orange for what to do next, heavy type for the numbers that
-matter. A training tool, not a SaaS landing page.
+Dark by default with a light theme (below), one orange for what to do next, heavy type for the numbers that matter. The aim
+(founder, 2026-11-20): sleek, professional, simple and easy to use, so a player thinks "wow, this is well made". Today's look
+is the base. Modern touches (a glow, a gradient, a richer colour, a better icon) go only where they clearly improve that part,
+never as a theme over everything; bright colour where colour is needed. A training tool, not a SaaS landing page.
 
 ## Building blocks
 
@@ -21,8 +25,8 @@ Use `src/components/ui/` first: `Button`, `Card`, `Badge`, `Alert`, `Input`, `Se
 | Pills, avatars, dots | `rounded-full` |
 | Primary button | `<Button>` (orange-600, `rounded-xl`, `h-11`, the 44px touch target) |
 | Secondary action | `<Button variant="secondary">` or `outline`; plain text links for the least important |
-| Font | Geist sans (body), Geist mono only for code-like values |
-| Icons | `lucide-react` only, `h-4 w-4` inline or `h-5 w-5` in buttons |
+| Font | Geist sans (body), Geist mono for data. A display font for headings and big numbers is allowed (chosen with the visual direction) |
+| Icons | `lucide-react` today. A higher-quality set (for example Phosphor bold/duotone, MIT) is allowed once chosen with the visual direction; one set per screen |
 
 ## Type
 
@@ -37,7 +41,7 @@ One scale, so a new screen never picks a size by eye (Tailwind names, px):
 - Section label: `text-xs font-semibold uppercase tracking-wider text-zinc-400`.
 - Body: `text-sm text-zinc-300`. Secondary: `text-sm text-zinc-400`; `text-zinc-500` for the
   quietest text (hints, timestamps). `text-zinc-600` is never text: it is under 3:1.
-- No serif fonts. No gradient text.
+- No gradient on text someone has to read. One display size above 48px is allowed for result numbers and share cards.
 
 ## Contrast
 
@@ -143,11 +147,20 @@ Adapted from the community Unslop UI skill, trimmed to what applies here.
 - **Claims the tracker can't back.** Copy says "counts your makes and misses", not "every"
   (see `docs/agent-os/marketing/2026-10-23-first-promo.md`).
 
+## Loosened 2026-11-20
+
+The founder loosened the quiet rules below (2026-11-20), for use in small doses where they
+clearly improve a part, not across the app: icon tiles (one consistent style), a gradient on a hero
+card or progress fill, a soft glow on one key number or action, a display font for big numbers,
+a bigger display number size. The founder turned down three full restyles the same day as too much. Still out: emoji as UI, gradient on readable text, stacked blur, cards inside cards,
+the generic SaaS look, and anything that fails the contrast or touch-target rules. Where the list
+below still says "don't", read it as "only on purpose, in the chosen visual direction".
+
 ## Before you ship a screen
 
 - [ ] Checked at phone width (Playwright screenshot or a real phone)
 - [ ] One obvious next action, in orange
 - [ ] Colours match the table above
 - [ ] Every card in a stack has a gap below it
-- [ ] No new icon tiles (the `PageHeader` one is the exception), emoji, glow, gradient text or nested cards
+- [ ] Tiles, glow and gradients only where they clearly improve that part; the screen still looks simple; no emoji as UI, gradient on readable text or nested cards
 - [ ] Works with `prefers-reduced-motion`

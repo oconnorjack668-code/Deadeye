@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en-IE"><head><meta charset="utf-8"><title>Review: Home (returning player) and the Log menu, before and proposed</title>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.11"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style type="text/tailwindcss">
+@theme { --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif; --color-zinc-500:#8b8b94; --color-orange-600: oklch(55.3% 0.195 38.402); }
+body{background:#2a2a2e;font-family:'Geist',system-ui,sans-serif}
+</style></head>
+<body class="p-6 text-white">
+<!-- Designer review 2026-11-20. Made-up data. "Today" frames are rebuilt from the classes in
+     src/app/(app)/dashboard/page.tsx and QuickLog.tsx (the tester was signed out on deadeye.ie, so
+     there is no screenshot of these two screens). Check against the live screen when the tester is signed in. -->
+<div class="mx-auto grid w-[1230px] grid-cols-3 gap-6">
+
+ <!-- HOME BEFORE (rebuilt from code) -->
+ <div>
+  <p class="mb-2 text-sm font-semibold text-zinc-300">Home today, player with a finished program (rebuilt from code)</p>
+  <div class="relative overflow-hidden rounded-[24px] border border-zinc-700 bg-zinc-950 px-4 pt-4" style="height:900px">
+   <h1 class="mb-4 text-xl font-black tracking-tight text-white md:text-3xl">Sam<span class="ml-2 align-middle text-sm font-semibold text-zinc-500">1-day streak</span></h1>
+   <div class="mb-4 rounded-2xl border border-orange-600/40 bg-gradient-to-br from-orange-600/15 to-transparent p-5">
+    <div class="text-xs font-bold uppercase tracking-wider text-orange-300">Today</div>
+    <div class="mt-1 text-xl font-black text-white">Catch and shoot, week 2</div>
+    <div class="text-sm text-zinc-300">Form Shooting &middot; Week 2, session 3 &middot; 25 min</div>
+    <a class="mt-3 inline-flex h-8 items-center rounded-xl bg-orange-600 px-3 text-xs font-medium text-white shadow-md shadow-orange-950/20">Start today&apos;s session</a>
+    <p class="mt-2 text-sm text-zinc-500">&uarr; 32px tall, 12px text: the main action of the screen</p>
+   </div>
+   <div class="grid grid-cols-2 gap-3">
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">This week</div><div class="mt-1 flex items-end justify-between"><span class="text-3xl font-black tabular-nums text-orange-400">2</span><span class="rounded-full border border-orange-500/30 bg-orange-500/10 px-2 py-0.5 text-xs font-semibold text-orange-300">sessions</span></div><div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800"><div class="h-full w-2/3 bg-gradient-to-r from-orange-500 to-amber-400"></div></div><div class="mt-1 text-sm text-zinc-500">Goal: 3 days</div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Shooting %</div><div class="mt-1 flex items-end justify-between"><span class="text-3xl font-black tabular-nums text-red-400">41.0%</span><span class="rounded-full border border-red-500/30 bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-300">career</span></div><div class="mt-2 text-sm text-zinc-500">5 zones tracked</div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Streak</div><div class="mt-1 flex items-end justify-between"><span class="text-3xl font-black tabular-nums text-emerald-400">1</span><span class="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-300">days</span></div><div class="mt-2 text-sm text-zinc-500">Safe - a rest day will not break it</div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Consistency</div><div class="mt-1 flex items-end justify-between"><span class="text-3xl font-black tabular-nums text-cyan-400">2</span><span class="rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 text-xs font-semibold text-cyan-300">days</span></div><div class="mt-2 text-sm text-zinc-500">Your % shows after your first week</div></div>
+   </div>
+   <p class="mt-3 text-sm text-zinc-400">Four numbers, four colours: orange, red, green, blue. Red is the colour of a miss, but it is on the career shooting %. "1 days".</p>
+  </div>
+ </div>
+
+ <!-- HOME AFTER -->
+ <div>
+  <p class="mb-2 text-sm font-semibold text-orange-300">Proposed: one orange, numbers in white</p>
+  <div class="relative overflow-hidden rounded-[24px] border border-zinc-700 bg-zinc-950 px-4 pt-4" style="height:900px">
+   <h1 class="mb-4 text-xl font-black tracking-tight text-white md:text-3xl">Sam<span class="ml-2 align-middle text-sm font-semibold text-zinc-400">1-day streak</span></h1>
+   <div class="mb-4 rounded-2xl border border-orange-600/40 bg-gradient-to-br from-orange-600/15 to-transparent p-5">
+    <div class="text-xs font-semibold uppercase tracking-wider text-orange-300">Today</div>
+    <div class="mt-1 text-xl font-black text-white">Catch and shoot, week 2</div>
+    <div class="text-sm text-zinc-300">Form Shooting &middot; Week 2, session 3 &middot; 25 min</div>
+    <a class="mt-3 flex h-11 w-full items-center justify-center rounded-xl bg-orange-600 px-4 text-sm font-semibold text-white shadow-md shadow-orange-950/20">Start today&apos;s session</a>
+   </div>
+   <div class="grid grid-cols-2 gap-3">
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">This week</div><div class="mt-1 flex items-end gap-2"><span class="text-3xl font-black tabular-nums text-white">2</span><span class="pb-1 text-sm text-zinc-400">of 3 days</span></div><div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800"><div class="h-full w-2/3 bg-orange-500"></div></div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Shooting %</div><div class="mt-1 flex items-end gap-2"><span class="text-3xl font-black tabular-nums text-white">41%</span><span class="pb-1 text-sm text-zinc-400">career</span></div><div class="mt-2 text-sm text-zinc-400">5 zones tracked</div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Streak</div><div class="mt-1 flex items-end gap-2"><span class="text-3xl font-black tabular-nums text-white">1</span><span class="pb-1 text-sm text-zinc-400">day</span></div><div class="mt-2 text-sm text-emerald-400">Safe. A rest day will not break it.</div></div>
+    <div class="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-4"><div class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Consistency</div><div class="mt-1 flex items-end gap-2"><span class="text-3xl font-black tabular-nums text-white">2</span><span class="pb-1 text-sm text-zinc-400">days</span></div><div class="mt-2 text-sm text-zinc-400">Your % shows after your first week</div></div>
+   </div>
+   <p class="mt-3 text-sm text-zinc-400">Numbers are white and heavy. Colour only says something: orange is the one next action (and the weekly bar), green or amber is the streak state. Singular "day". Pill badges go (the unit sits beside the number).</p>
+  </div>
+ </div>
+
+ <div class="space-y-6">
+  <!-- LOG MENU before and after, two small frames stacked -->
+  <div>
+   <p class="mb-2 text-sm font-semibold text-zinc-300">Log menu today (rebuilt from code): red button, four colours</p>
+   <div class="relative overflow-hidden rounded-[24px] border border-zinc-700 bg-zinc-950" style="height:430px">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="absolute bottom-[8.5rem] left-4 right-4 space-y-2">
+     <div class="flex items-center gap-3 rounded-2xl border border-zinc-700/70 bg-zinc-900 p-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-600">&#9678;</span><span><span class="block text-sm font-bold">Hoops session</span><span class="block text-xs text-zinc-400">Drills and shooting</span></span></div>
+     <div class="flex items-center gap-3 rounded-2xl border border-zinc-700/70 bg-zinc-900 p-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-600">&#9632;</span><span><span class="block text-sm font-bold">Gym workout</span><span class="block text-xs text-zinc-400">Sets, reps and tests</span></span></div>
+     <div class="flex items-center gap-3 rounded-2xl border border-zinc-700/70 bg-zinc-900 p-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-600">&#9679;</span><span><span class="block text-sm font-bold">Track with camera</span><span class="block text-xs text-zinc-400">Counts shots on your phone</span></span></div>
+     <div class="flex items-center gap-3 rounded-2xl border border-zinc-700/70 bg-zinc-900 p-3"><span class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-600">&#9650;</span><span><span class="block text-sm font-bold">Game stats</span><span class="block text-xs text-zinc-400">Box score from a real game</span></span></div>
+    </div>
+    <span class="absolute bottom-[5.5rem] right-4 flex h-14 w-14 items-center justify-center rounded-full bg-zinc-700 text-2xl">&times;</span>
+    <div class="absolute inset-x-0 bottom-0 grid grid-cols-5 border-t border-zinc-800 bg-zinc-950 px-1 pb-2 pt-1.5 text-center text-xs text-zinc-400"><span class="font-semibold text-red-500">Home</span><span>Hoops</span><span>Gym</span><span>Train</span><span>IQ</span></div>
+   </div>
+  </div>
+  <div>
+   <p class="mb-2 text-sm font-semibold text-orange-300">Proposed: same action, same orange; neutral rows</p>
+   <div class="relative overflow-hidden rounded-[24px] border border-zinc-700 bg-zinc-950" style="height:430px">
+    <div class="absolute inset-0 bg-black/60"></div>
+    <div class="absolute bottom-[8.5rem] left-4 right-4 space-y-2">
+     <div class="flex min-h-14 items-center gap-3 rounded-2xl border border-zinc-500/70 bg-zinc-900 p-3"><span class="w-6 text-center text-orange-400">&#9678;</span><span><span class="block text-sm font-bold">Hoops session</span><span class="block text-sm text-zinc-400">Drills and shooting</span></span></div>
+     <div class="flex min-h-14 items-center gap-3 rounded-2xl border border-zinc-500/70 bg-zinc-900 p-3"><span class="w-6 text-center text-orange-400">&#9679;</span><span><span class="block text-sm font-bold">Track with camera</span><span class="block text-sm text-zinc-400">Counts shots on your phone</span></span></div>
+     <div class="flex min-h-14 items-center gap-3 rounded-2xl border border-zinc-500/70 bg-zinc-900 p-3"><span class="w-6 text-center text-orange-400">&#9632;</span><span><span class="block text-sm font-bold">Gym workout</span><span class="block text-sm text-zinc-400">Sets, reps and tests</span></span></div>
+     <div class="flex min-h-14 items-center gap-3 rounded-2xl border border-zinc-500/70 bg-zinc-900 p-3"><span class="w-6 text-center text-orange-400">&#9650;</span><span><span class="block text-sm font-bold">Game stats</span><span class="block text-sm text-zinc-400">Box score from a real game</span></span></div>
+    </div>
+    <span class="absolute bottom-[5.5rem] right-4 flex h-14 w-14 items-center justify-center rounded-full bg-zinc-700 text-2xl">&times;</span>
+    <div class="absolute inset-x-0 bottom-0 grid grid-cols-5 border-t border-zinc-800 bg-zinc-950 px-1 pb-2 pt-1.5 text-center text-xs text-zinc-400"><span class="font-semibold text-white">Home</span><span>Hoops</span><span>Gym</span><span>Train</span><span>IQ</span></div>
+   </div>
+   <p class="mt-2 text-sm text-zinc-400">Closed: the round button is orange-600 (it is the log action). Open: it turns zinc-700 as now. Same four items and words as today; icons are the existing lucide Target, Camera, Dumbbell, Trophy (glyphs here are stand-ins). Active tab text is white, so red stays the logo and orange stays the action. Founder decision, see the doc.</p>
+  </div>
+ </div>
+</div>
+</body></html>

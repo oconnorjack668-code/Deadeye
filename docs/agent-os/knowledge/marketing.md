@@ -14,6 +14,15 @@ patches, stills, loudness, the edit lessons from the first promos) lives in
 `video-editor.md` in this folder; the video-editor runs it. The lessons and
 checks here are marketing's: scripts, claims, brand and the audience.
 
+- 2026-11-20 · Footage `20261118_174626.mp4` (18 Nov, Deadeye shooting videos
+  folder): the founder confirmed consent for the rebounder and is happy with
+  "O CONNOR" on the shirt being seen. Founder changed the 2026-10-20 no-blur
+  rule. **Rule:** a small, tight blur is allowed on sponsor banners and other
+  third-party logos, and on the faces of people who are not the focus (a
+  rebounder, people in the background). Never blur the main subject, and no
+  darkened bands, blurred strips or washes. A blur is extra privacy, not
+  consent: an under-18 who could still be known by kit, hall or voice needs a
+  parent's written consent or is cropped out.
 - 2026-11-18 · Founder brief for the shooting series (`2026-11-18-shooting-series.md`):
   one recurring question, real numbers with a day count, bad days kept, 4 posts a
   week not daily, same video on both apps, `#DeadeyeDaily` plus 3 to 5 specific
@@ -88,12 +97,13 @@ checks here are marketing's: scripts, claims, brand and the audience.
 - [ ] Works with the sound off (captions carry the message).
 - [ ] No identifiable under-18 without a parent's written consent; app
       screens from the tester account.
-- [ ] Never offer a blur, darkened patch or mask as the way to show a person
-      (founder, 2026-10-20; `video-editor.md`): a blurred child can still be
-      known by kit, hall or voice, so it is still a consent question. The
-      ways out are a re-crop that leaves them out of frame, other footage,
-      an adult, or consent. (Exam, 2026-11-17: marketing offered "blur the
-      face".)
+- [ ] Blur only sponsor banners, third-party logos and the faces of people
+      who are not the focus (founder, 2026-11-20; was no blur at all from
+      2026-10-20). A blur never stands in for consent: a blurred child can
+      still be known by kit, hall or voice. For an under-18 without consent
+      the ways out are a re-crop that leaves them out of frame, other
+      footage, an adult, or consent. (Exam, 2026-11-17: marketing offered
+      "blur the face" as the fix for a child with no consent.)
 - [ ] Ends on one clear action that matches the activation goal (try the
       demo, log a first session).
 
