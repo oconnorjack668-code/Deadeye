@@ -245,7 +245,7 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 
 From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadeye.ie, player and coach as far as an under-18 tester goes). Each is `idea` until the founder approves the mockup; the ranked list in that doc has the files and full spec. Safety: pending on each. Founder checklist: pending.
 
-## D2 · Show the result after the first save · idea
+## D2 · Show the result after the first save · review (exp/D10-D2-D7-chart-result-cards)
 - Hypothesis: after a first log the player sees a green "First session logged! +20 XP" card that never shows their 6/10 or 60%, then a cyan invite card; the payoff of logging is hidden.
 - Change: result screen with the score, one orange "Go again", an equal "Done for today", a quiet "Share this result" (review #1, mockup D).
 - Signal: second session within 7 days of the first.
@@ -272,7 +272,7 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: review #6 (mockup C). Founder decision: Pro offer timing (recommend none before the first log).
 - Signal: finished setup to first session (read with S42).
 
-## D7 · Share cards to the brand · idea
+## D7 · Share cards to the brand · review (exp/D10-D2-D7-chart-result-cards)
 - Change: review #7 (mockup D): 1080 x 1920 plus 1080 x 1350, Geist Black numbers, name off by default, drop "AI BASKETBALL TRAINER". `src/app/api/share/[kind]/route.tsx`.
 - Signal: shares per session saved.
 
@@ -287,7 +287,7 @@ The polish round replaced the first review mockups for D2 to D7 and D1: build fr
 ## D9 · Logo C · review (exp/D9-logo-c)
 - Change: replace the app icon and logo files with logo improved C (`design/logo/README.md` lists the `public/` files and how to regenerate them). Sharper at small sizes; works on light backgrounds.
 
-## D10 · Shot chart v2 · idea (approved)
+## D10 · Shot chart v2 · review (exp/D10-D2-D7-chart-result-cards)
 - Change: hardwood court, the 13 real zones soft-filled on the classic blue-cold to red-hot scale, one small chip per zone (`design/2026-11-22-polish.md`, Shot chart redesign). `src/components/**/ShotHeatMap.tsx`, `CourtMarkings.tsx`, the share card route.
 
 ## D11 · Opening animation, slogans and loaders · idea (approved)

@@ -78,6 +78,17 @@ in brackets).
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-23 · Share cards (D7): Satori (next/og) does not stretch an
+  absolute box between `left` and `right` (the card collapsed to the left
+  edge), draws no CSS border triangles, and cannot draw SVG `<text>` in an
+  inline image. Passing `fonts` replaces the bundled Geist Regular. In the
+  browser check, a local dev server plus four iframes froze Chrome's renderer
+  on a low-memory laptop. **Rule:** in cards give absolute boxes a `width`,
+  draw text as divs over an SVG image, pass all weights or none; render cards
+  with `SHARE_CARD_OUT=<dir> npx vitest run __tests__/share-cards.test.tsx`
+  and look at the PNGs; check phone widths with one page at a time and stop
+  the dev server straight after.
+
 - 2026-11-14 · Plays (00061) and Film (00062) marked quiz answers on the
   server, but still granted players INSERT on `play_quiz_attempts` and
   `film_attempts`, so anyone could post any score straight to the Supabase API
@@ -138,6 +149,8 @@ file). Newest first, each with the date, what happened, and the rule.
       `getUserMedia` error named, each stage has a time limit.
 - [ ] Heavy work (model, decode, export) in a worker or chunked; no tap
       handler blocks the main thread.
+- [ ] A share card change: the PNGs rendered with `SHARE_CARD_OUT` (and
+      `SHARE_CARD_FONTS=1`) and looked at, story and feed, with the name off.
 - [ ] Signed-in or worker behaviour checked live with the tester session, or
       listed as unchecked in the handoff. Own paths staged; handoff written.
 

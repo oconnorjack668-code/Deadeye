@@ -10,7 +10,7 @@ import Link from 'next/link';
 import { Plus, Target, ListChecks, ClipboardList, Video, Lightbulb, ChevronRight } from 'lucide-react';
 import { formatShootingPercentage } from '@/lib/stats';
 import { getShotTotals } from '@/lib/player-activity';
-import { FirstSessionCelebration } from '@/components/basketball/FirstSessionCelebration';
+import { FirstSessionResult } from '@/components/basketball/FirstSessionResult';
 import { AfterSession } from '@/components/basketball/AfterSession';
 import { XP_VALUES } from '@/lib/achievements';
 
@@ -55,6 +55,18 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
   const overallPct = formatShootingPercentage(totalMakes, totalAttempts);
   const zonesTracked = shootingData?.length || 0;
 
+  // The shot logger lands here after saving (?saved=1): a first session gets its own result screen
+  const first = saved === '1' && totalSessions === 1 ? sessions?.[0] : undefined;
+  if (first) {
+    return (
+      <div className="flex-1 overflow-auto">
+        <div className="mx-auto max-w-md p-4 pb-28 md:p-8">
+          <FirstSessionResult userId={user.id} sessionId={first.id} xp={XP_VALUES.session} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-auto">
       <div className={HUB_CONTAINER}>
@@ -67,8 +79,6 @@ export default async function BasketballPage({ searchParams }: { searchParams: P
           top={
             <>
 
-        {/* The shot logger lands here after saving (?saved=1) */}
-        {saved === '1' && totalSessions === 1 && <FirstSessionCelebration xp={XP_VALUES.session} />}
         {/* After a hand-logged save: how the newest session compares, and an invite */}
         {saved === '1' && <AfterSession userId={user.id} sessionId={null} showInvite />}
 
