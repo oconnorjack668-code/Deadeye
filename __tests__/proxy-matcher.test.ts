@@ -17,6 +17,7 @@ describe('the proxy matcher', () => {
     expect(runsProxy('/deadeye-club-plans.pdf')).toBe(false);
     expect(runsProxy('/promo/deadeye-promo.mp4')).toBe(false);
     expect(runsProxy('/samples/tracker-sample-poster.jpg')).toBe(false);
+    expect(runsProxy('/opening/swish.js')).toBe(false);
   });
 
   it('still checks the app pages', () => {

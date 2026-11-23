@@ -78,6 +78,15 @@ in brackets).
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
 
+- 2026-11-23 · D11's opening B: a plain script (`public/opening/swish.js`)
+  added nodes beside React's server-rendered splash before hydration, and the
+  production build threw React error #418 (hydration mismatch) on every B
+  open; jsdom tests passed. Seen only in a headless capture's console.
+  **Rule:** a script that runs before hydration only changes attributes or
+  fills the `innerHTML` of an empty element React rendered with
+  `dangerouslySetInnerHTML={{ __html: '' }}` and `suppressHydrationWarning`;
+  read the production console on every variant before pushing.
+
 - 2026-11-14 · Plays (00061) and Film (00062) marked quiz answers on the
   server, but still granted players INSERT on `play_quiz_attempts` and
   `film_attempts`, so anyone could post any score straight to the Supabase API
@@ -136,6 +145,9 @@ file). Newest first, each with the date, what happened, and the rule.
       helpers live in `src/lib/` (caught on F3 before it shipped).
 - [ ] Camera/video: `playsInline` + `muted`, tracks stopped on unmount, each
       `getUserMedia` error named, each stage has a time limit.
+- [ ] A head or async script that touches the page before hydration: no new
+      nodes in React's tree (attributes, or an empty innerHTML host only), and
+      the `next build` console read for each variant (no React #418).
 - [ ] Heavy work (model, decode, export) in a worker or chunked; no tap
       handler blocks the main thread.
 - [ ] Signed-in or worker behaviour checked live with the tester session, or

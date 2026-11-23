@@ -53,11 +53,11 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
 
   // Its own page, not a section here, so it is a link that never shows as active
   const clubsLinkClass =
-    'whitespace-nowrap rounded-full border border-orange-500/50 px-3 py-1.5 text-sm font-semibold text-orange-300 hover:bg-orange-600/15';
+    'whitespace-nowrap rounded-full border border-zinc-600 px-3 py-1.5 text-sm font-semibold text-zinc-200 hover:bg-zinc-900';
 
   return (
     <header className="sticky top-0 z-20 border-b border-zinc-900 bg-zinc-950/90 backdrop-blur">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
         <Link href="/" className="flex items-center gap-2">
           <Logo size={28} />
           <span className="text-lg font-black uppercase tracking-tight text-white">Deadeye</span>
@@ -74,15 +74,15 @@ export function LandingHeader({ signedIn = false }: { signedIn?: boolean }) {
             </Link>
           </nav>
           {signedIn ? (
-            <Link href="/dashboard" className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500">
+            <Link href="/dashboard" className="flex h-11 items-center rounded-xl bg-orange-600 px-4 text-sm font-semibold text-white hover:bg-orange-500">
               Open Deadeye
             </Link>
           ) : (
             <>
-              <Link href="/login" className="rounded-lg px-3 py-1.5 text-sm text-zinc-300 hover:text-white">
+              <Link href="/login" className="flex h-11 items-center px-3 text-sm font-medium text-zinc-300 hover:text-white">
                 Log in
               </Link>
-              <Link href="/signup" className="rounded-lg bg-orange-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-orange-500">
+              <Link href="/signup" className="flex h-11 items-center rounded-xl bg-orange-600 px-4 text-sm font-semibold text-white hover:bg-orange-500">
                 Start free
               </Link>
             </>

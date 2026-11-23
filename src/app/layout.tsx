@@ -5,6 +5,8 @@ import { ErrorReporter } from "@/components/ErrorReporter";
 import { ThemeWatcher } from "@/components/ThemeWatcher";
 import { buildLabel } from "@/lib/build";
 import { THEME_COLOR, THEME_SCRIPT } from "@/lib/theme";
+import { OPENING_SCRIPT } from "@/lib/opening";
+import { OpeningSplash } from "@/components/brand/OpeningSplash";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -62,8 +64,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Before anything paints, so a light-mode phone never flashes dark */}
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {/* Picks the opening animation and the visit's slogan, also before the first paint */}
+        <script dangerouslySetInnerHTML={{ __html: OPENING_SCRIPT }} />
       </head>
       <body className="min-h-full flex flex-col">
+        <OpeningSplash />
         {children}
         <ThemeWatcher />
         <ServiceWorkerRegistrar />
