@@ -233,7 +233,7 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Founder checklist: pending.
 - Result:
 
-## D1 · "Watch it back" on the tracker review · idea (designer drawing, 2026-11-20)
+## D1 · "Watch it back" on the tracker review · review (exp/D1-watch-it-back)
 - Hypothesis: since #118 an uploaded clip is checked frame by frame without playing (`clipDecoder.ts`), which is quicker and more accurate, but the player never sees the tracking. The founder (20 Nov): a player "can't see the video tracking the makes and misses and it can't see if the tracker is making a mistake because it's not watching playback". Review today has a per-shot replay (`ShotReplay`), Make/Miss toggles, Unclear buttons, and "Add make / Add miss" with no time; shots the tracker never saw can only be found by watching the clip somewhere else.
 - Change: a "Watch it back" player on the review step (`src/components/video/ShotTracker.tsx`) that plays the whole clip with the same MAKE/MISS and count drawn from the run's `OverlayTimeline` (`overlayTimeline.ts`, `overlayArt.ts`, as `TrackerVideoExport` does). Tap pauses; paused on a called shot, one tap flips it; paused elsewhere, "Add a make here" / "Add a miss here" adds a shot at that time (so it can be replayed and charted). Decode mode stays as it is. Mockup first: `docs/agent-os/design/` (designer, 2026-11-20); founder approves before build.
 - Signal: share of uploaded-clip sessions where the player corrects or adds a shot, and "Tracker got this wrong?" reports per upload; trust is the aim, not a funnel step.
@@ -290,3 +290,4 @@ The polish round replaced the first review mockups for D2 to D7 and D1: build fr
 
 ## D11 · Opening animation, slogans and loaders · idea (approved)
 - Change: openings A, B2 and C rotating per cold open (0.8 s minimum, tap to skip, never on page changes, reduced-motion still); a new slogan each visit from the founder's picks (`marketing/2026-11-22-slogans.md`); page loader pill after 400 ms; tracker decode screen with tips rotating three times then holding. Spec: `design/2026-11-22-loading.md`.
+- Build: the tracker decode screen is built with D1 on `exp/D1-watch-it-back` (both live in `ShotTracker.tsx`); status review. Openings, slogans and the page loader are separate.

@@ -239,6 +239,10 @@ function pill(ctx: Ctx, x: number, y: number, h: number, text: string, bg: strin
  * vertical video sets it, verticalLayout). A `replay` frame shows only that it
  * is a replay, the call and the mark: the score as it stood back then would
  * read as the score going backwards.
+ *
+ * Watch it back (on the phone, under the player's own controls) draws it with
+ * `mark` false, since the app is already on screen, and `still` under reduced
+ * motion: the call and a milestone then fade without the punch-in.
  */
 export function drawHud(
   ctx: Ctx,
@@ -247,7 +251,13 @@ export function drawHud(
   s: OverlayState,
   t: number,
   family: string,
-  { area, picture, replay = false }: { area?: Rect; picture?: Rect; replay?: boolean } = {}
+  {
+    area,
+    picture,
+    replay = false,
+    mark = true,
+    still = false,
+  }: { area?: Rect; picture?: Rect; replay?: boolean; mark?: boolean; still?: boolean } = {}
 ) {
   const a = area ?? { x: 0, y: 0, w: canvasW, h: canvasH };
   // Where the footage sits, for placing the call beside the rim (the HUD's area unless a vertical video sets it)
@@ -327,7 +337,8 @@ export function drawHud(
     12 * u,
     24 * u,
     s.ballInView ? 'Ball tracked' : 'Watching the hoop',
-    s.ballInView ? 'rgba(16,185,129,0.9)' : 'rgba(0,0,0,0.55)',
+    // emerald-700 at 95%: white on the old emerald-500 at 90% was 2.9:1, this is 5.5:1
+    s.ballInView ? 'rgba(4,120,87,0.95)' : 'rgba(0,0,0,0.55)',
     s.ballInView ? '#ffffff' : '#f4f4f5',
     u,
     'right',
@@ -368,11 +379,11 @@ export function drawHud(
     ctx.fill();
   });
 
-  if (s.banner) drawBanner(ctx, s.banner.label, s.banner.age, u, family);
+  if (s.banner) drawBanner(ctx, s.banner.label, s.banner.age, u, family, still);
   }
 
-  drawMark(ctx, w, h, u, family, safeRight);
-  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family, callAt(ctx, s, { a, pic, h, u, safeRight, family, scoreRow }));
+  if (mark) drawMark(ctx, w, h, u, family, safeRight);
+  if (s.flash) drawFlash(ctx, w, h, s.flash, u, family, callAt(ctx, s, { a, pic, h, u, safeRight, family, scoreRow }), still);
   ctx.restore();
 }
 
@@ -386,8 +397,9 @@ export function bannerCurve(age: number): { opacity: number; scale: number } {
 }
 
 /** A milestone, under the score where the live HUD shows it. */
-function drawBanner(ctx: Ctx, label: string, age: number, u: number, family: string) {
-  const { opacity, scale } = bannerCurve(age);
+function drawBanner(ctx: Ctx, label: string, age: number, u: number, family: string, still = false) {
+  const { opacity, scale: curveScale } = bannerCurve(age);
+  const scale = still ? 1 : curveScale;
   if (opacity <= 0) return;
   ctx.save();
   ctx.globalAlpha = opacity;
@@ -581,8 +593,9 @@ interface CallAt {
  * score is already on the HUD (founder's choices, 13 Nov). Centred, when there
  * is no room beside the rim, it keeps the count as well.
  */
-function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string, at: CallAt | null = null) {
-  const { opacity, scale } = flashCurve(f.age);
+function drawFlash(ctx: Ctx, w: number, h: number, f: NonNullable<OverlayState['flash']>, u: number, family: string, at: CallAt | null = null, still = false) {
+  const { opacity, scale: curveScale } = flashCurve(f.age);
+  const scale = still ? 1 : curveScale;
   if (opacity <= 0) return;
   ctx.save();
   ctx.globalAlpha = opacity;

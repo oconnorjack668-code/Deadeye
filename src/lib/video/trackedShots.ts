@@ -38,6 +38,22 @@ export function addedShot(id: number, t: number, made: boolean, zone?: ShotZoneC
   return { id, t, made, confident: true, called: null, ...(zone ? { zone } : {}) };
 }
 
+/** The list with `shot` put in its place by time, after any shot at the same moment. */
+export function insertShot(shots: readonly TrackedShot[], shot: TrackedShot): TrackedShot[] {
+  const at = shots.findIndex((s) => s.t > shot.t);
+  return at < 0 ? [...shots, shot] : [...shots.slice(0, at), shot, ...shots.slice(at)];
+}
+
+/**
+ * A shot the player added at a moment in the clip (Watch it back's "Add a make
+ * here"), in its place by time so the list numbers it as it happened. Its id is
+ * one past the largest, so nothing impure is needed to make one.
+ */
+export function addShotAt(shots: readonly TrackedShot[], t: number, made: boolean, zone?: ShotZoneChoice): TrackedShot[] {
+  const id = shots.reduce((max, s) => Math.max(max, s.id), 0) + 1;
+  return insertShot(shots, addedShot(id, t, made, zone));
+}
+
 export interface RunQuality {
   /** Frames scored a second, over the whole run. */
   fps: number;

@@ -168,6 +168,106 @@ body {
   }
 }
 
+/* Watch it back's scrub bar (WatchItBack): a native range input, restyled.
+   Played part white, the rest zinc-500 (5.5:1 on the card), a white thumb.
+   The theme variables flip both in light mode. --p is the played share, set
+   inline, since WebKit has no pseudo-element for it. Vendor rules stay in
+   separate blocks: a list with an unknown one drops the whole rule. */
+.dd-scrub {
+  appearance: none;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+.dd-scrub::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-white) var(--p, 0%), var(--color-zinc-500) var(--p, 0%));
+}
+.dd-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--color-white);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.35);
+}
+.dd-scrub::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-zinc-500);
+}
+.dd-scrub::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-white);
+}
+.dd-scrub::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-white);
+}
+.dd-scrub:focus-visible {
+  outline: 2px solid var(--color-orange-500);
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* The tracker's decode screen (DecodeProgress): a red band sweeping down the
+   clip, a sheen along the orange bar, each line fading in. Transform and
+   opacity only; all three stop under reduced motion. */
+@keyframes dd-scan {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.dd-scan {
+  animation: dd-scan 2.4s linear infinite;
+}
+@keyframes dd-sheen {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+.dd-sheen {
+  background: linear-gradient(to right, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: dd-sheen 1.8s ease-in-out infinite;
+}
+@keyframes dd-tip {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.dd-tip {
+  animation: dd-tip 350ms var(--ease-deadeye) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dd-scan,
+  .dd-sheen {
+    animation: none;
+    opacity: 0;
+  }
+  .dd-tip {
+    animation: none;
+  }
+}
+
 /* Room at the end of every page on a phone, so the last thing on it can scroll
    clear of the floating quick-log button (QuickLog), which sits above the
    bottom nav. Pages scroll inside their own flex-1 overflow-auto container,
