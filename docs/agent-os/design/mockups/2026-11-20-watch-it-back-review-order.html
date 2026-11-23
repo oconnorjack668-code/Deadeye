@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-IE" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Watch it back, order of the review screen</title>
+<!-- Designer mockup, draft only. Uses the app's own Tailwind v4 classes and src/app/theme.css, so the builder can lift it. Made-up data, no real player. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3"></script>
+<style type="text/tailwindcss">
+@theme {
+  --color-zinc-500: #8b8b94;
+  --color-orange-600: oklch(55.3% 0.195 38.402);
+  --color-emerald-600: oklch(50.8% 0.118 165.612);
+  --font-sans: 'Geist', system-ui, sans-serif;
+}
+</style>
+<link rel="stylesheet" href="../../../../src/app/theme.css">
+<style>
+  html, body { margin: 0; }
+  body { font-family: 'Geist', system-ui, sans-serif; background: var(--background); color: var(--foreground); -webkit-font-smoothing: antialiased; }
+  .frame { width: 780px; margin: 0; }
+  .mx-auto { margin-left: 0 !important; margin-right: 0 !important; }
+</style>
+</head>
+<body>
+<div class="mx-auto flex gap-8 px-6 py-6" style="width:780px">
+    <div style="width:340px">
+      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">Today</p>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-300" style="height:70px"><span>Verdict: 5/9, 56%</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:40px"><span>Personal best card (if any)</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:70px"><span>Tracking quality</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:70px"><span>Check again from the recording</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:90px"><span>Shooting breakdown</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:28px"><span>Tracker got this wrong? Tell us</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-300" style="height:150px"><span>Shot list, each row with a ▶ that opens a pop-up replay</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:40px"><span>Add a make / miss it missed (no time)</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:90px"><span>Remember this hoop · Spot · Export · Reel</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-300" style="height:48px"><span>Save as a Hoops session</span></div>
+      </div>
+    </div>
+    <div style="width:340px">
+      <p class="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">Proposed</p>
+      <div class="space-y-2">
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-300" style="height:70px"><span>Verdict: 5/9, 56%</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:40px"><span>Personal best card (if any)</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-white bg-zinc-900 font-semibold text-white" style="height:232px"><span>WATCH IT BACK: picture, pins, controls, edit strip</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">New</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-500 text-zinc-300" style="height:150px"><span>Shot list. ▶ now plays in the player above</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Changed</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:70px"><span>Tracking quality</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Moved</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:70px"><span>Check again from the recording</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Moved</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:90px"><span>Shooting breakdown</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Moved</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:28px"><span>Tracker got this wrong? Tell us</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Moved</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-dashed border-zinc-700 text-zinc-500" style="height:40px"><span>Add buttons: only when there is no video</span><span class="shrink-0 text-xs font-bold uppercase tracking-wider">Changed</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-400" style="height:90px"><span>Remember this hoop · Spot · Export · Reel</span></div>
+        <div class="flex items-center justify-between gap-2 rounded-xl border px-3 text-sm border-zinc-700 text-zinc-300" style="height:48px"><span>Save as a Hoops session</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
