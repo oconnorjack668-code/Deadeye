@@ -478,7 +478,7 @@ export default function OnboardingPage() {
               </div>
 
               {is16Plus === true && (
-                <fieldset id="field-age" aria-describedby="age-why" className="space-y-2">
+                <fieldset id="field-age" aria-describedby={errors.age ? 'age-why age-error' : 'age-why'} aria-invalid={errors.age ? true : undefined} className="space-y-2">
                   <legend className="text-sm font-medium text-zinc-200">How old are you?</legend>
                   <p className="text-sm text-zinc-400">You said you are 16 or older when you signed up.</p>
                   <div className="grid grid-cols-2 gap-3">
@@ -499,7 +499,7 @@ export default function OnboardingPage() {
                   <p id="age-why" className="text-sm text-zinc-400">
                     Why we ask: players under 18 get extra protections, like a parent saying yes to competition entries.
                   </p>
-                  {errors.age && <p className="text-sm font-medium text-red-400">{errors.age}</p>}
+                  {errors.age && <p id="age-error" role="alert" className="text-sm font-medium text-red-400">{errors.age}</p>}
                 </fieldset>
               )}
 

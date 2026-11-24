@@ -69,6 +69,7 @@ CREATE OR REPLACE FUNCTION public.age_group(p_bracket text)
 RETURNS text
 LANGUAGE sql
 IMMUTABLE
+SET search_path = ''
 AS $$
   SELECT CASE
     WHEN p_bracket IS NULL THEN NULL
@@ -194,3 +195,33 @@ END;
 $$;
 
 -- CREATE OR REPLACE keeps the grants 00047 set on these functions.
+
+-- =============================================================================
+-- 5. A PLAYER WHO SAID "UNDER 16" CAN'T SAVE AN OLDER BRACKET (safety review, PR #168 F3)
+-- =============================================================================
+-- "Update own profile" lets a player write age_bracket through the API. Three
+-- readers go by the bracket alone (friend requests, streak warnings, the
+-- leaderboard band), so a player whose sign-up answer was under 16 is kept at
+-- 13-15 whatever the client sends. The sign-up answer itself is changed only
+-- through the parent-approval flow, never by the player.
+CREATE OR REPLACE FUNCTION public.keep_under_16_bracket()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+BEGIN
+  IF NEW.age_bracket IS DISTINCT FROM '13-15'
+     AND EXISTS (SELECT 1 FROM public.age_checks a WHERE a.user_id = NEW.id AND a.is_16_plus = false) THEN
+    NEW.age_bracket := '13-15';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.keep_under_16_bracket() FROM PUBLIC, anon, authenticated;
+
+DROP TRIGGER IF EXISTS profiles_keep_under_16_bracket ON public.profiles;
+CREATE TRIGGER profiles_keep_under_16_bracket
+  BEFORE INSERT OR UPDATE OF age_bracket ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.keep_under_16_bracket();

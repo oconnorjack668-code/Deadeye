@@ -14,7 +14,7 @@
 --   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064, 00065, 00066, 00069
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00069, 69 files, 323 things). Do not edit it by
+-- (00001 to 00069, 69 files, 324 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -343,7 +343,8 @@ WITH expected(migration, kind, obj, col) AS (
     ('00067', 'index', 'competition_entries_created_idx', ''),
     ('00067', 'index', 'competition_entries_unsent_idx', ''),
     ('00068', 'function', 'is_adult_bracket', ''),
-    ('00068', 'function', 'is_minor_bracket', '')
+    ('00068', 'function', 'is_minor_bracket', ''),
+    ('00068', 'function', 'keep_under_16_bracket', '')
 ),
 checked AS (
   SELECT

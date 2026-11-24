@@ -144,7 +144,7 @@ export default function PrivacyPage() {
               you delete your account.
             </li>
             <li>
-              A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
+              A few steps you reach in the app, at most once a day each: opening setup before you finish it, seeing the welcome screen and which answer you
               gave there (at a court, or not right now), playing the sample clip, and, before your first session, which
               link you tap on the Today card (log shots, track with the camera, or your program). Opening the Video AI
               page, opening the shot tracker, setting it up, starting and finishing it, pressing play on Watch it back, changing, removing or adding a call while watching it back, and saving its result. Opening the shot logger and
