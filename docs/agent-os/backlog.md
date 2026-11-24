@@ -255,7 +255,8 @@ From `design/2026-11-20-screen-review.md` (every screen seen at 390 px on deadey
 - Change: two plain steps, "Send it again" (`auth.resend`, 60 s cooldown), "Wrong email? Start again" (review #2, mockup B). `src/app/(auth)/verify-email/page.tsx`.
 - Signal: sign-up to confirmed account.
 
-## D4 · Setup for Irish players · idea
+## D4 · Setup for Irish players · review (exp/D4-setup)
+- Built 2026-11-23 as drawn, age option A. Migrations 00068 (allow the new brackets, teach the DB rules) and 00069 (backfill) are written, not run: order 00068, deploy the code, then 00069, after safety-reviewer passes and the founder OKs. Signal marker `setup_started` added.
 - Hypothesis: setup asks age again with brackets that skip 13 live, uses US words (High School, Varsity, NCAA, Defense), imperial units, small right-aligned Next, and keeps the tab bar.
 - Change: review #3 (the doc names a mockup E; it was not drawn, so the designer draws it before this is approved). `src/app/(app)/onboarding/page.tsx`, `src/lib/focusAreas.ts`. Founder decision: shorten setup.
 - Signal: started setup to finished setup.

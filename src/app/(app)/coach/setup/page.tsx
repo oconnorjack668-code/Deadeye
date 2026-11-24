@@ -23,6 +23,7 @@ import { TeamShare } from '@/components/coach/TeamShare';
 import { LeagueOptions } from '@/components/coach/LeagueOptions';
 import { AGE_GROUPS, TEAM_LEVELS, clearTeamInvite, pendingTeamInvite } from '@/lib/coachSide';
 import { normaliseCode } from '@/lib/friends';
+import { isMinorBracket } from '@/lib/ageBracket';
 import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 import { ClipboardCheck, ShieldCheck } from 'lucide-react';
 
@@ -77,7 +78,7 @@ export default function CoachSetupPage() {
         supabase.from('age_checks').select('is_16_plus').eq('user_id', user.id).maybeSingle(),
       ]);
 
-      const minor = age?.is_16_plus === false || ['13', '14-17'].includes(profile?.age_bracket ?? '');
+      const minor = age?.is_16_plus === false || isMinorBracket(profile?.age_bracket);
       setKnownMinor(minor);
       setName(profile?.display_name ?? '');
       setPlayerSetupDone(!!profile?.onboarding_completed);

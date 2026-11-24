@@ -1,5 +1,6 @@
 // src/lib/reminders.ts
 // Decides whether a player should get a training reminder right now, in their timezone.
+import { isAdultBracket } from './ageBracket';
 
 export interface ReminderPrefs {
   reminder_enabled: boolean;
@@ -64,12 +65,8 @@ export function reminderWindowOpen(prefs: ReminderPrefs, now: Date): boolean {
   return prefs.reminder_enabled && prefs.push_enabled && prefs.last_reminded_on !== date;
 }
 
-/** Age brackets (profiles.age_bracket) that mean 18 or over. */
-const ADULT_BRACKETS = new Set(['18-22', '23-30', '30+']);
-
-export function isAdultBracket(bracket: string | null | undefined): boolean {
-  return !!bracket && ADULT_BRACKETS.has(bracket);
-}
+/** Age brackets (profiles.age_bracket) that mean 18 or over: src/lib/ageBracket.ts. */
+export { isAdultBracket };
 
 /**
  * Whether tonight's "your streak ends tonight" warning may go out (00057).

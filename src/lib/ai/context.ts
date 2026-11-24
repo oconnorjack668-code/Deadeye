@@ -7,6 +7,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/types';
 import { formatAmount, setAmount, setModeOf } from '@/lib/exercises';
+import { ageBracketLabel } from '@/lib/ageBracket';
 
 // These queries use PostgREST's embedded-resource syntax (e.g. `session_drills(session_id)`),
 // which this hand-written schema doesn't model (that needs real foreign-key metadata from
@@ -127,7 +128,7 @@ export async function buildPlayerContext(
     lines.push(
       // No name: the AI provider gets only what coaching uses (data minimisation;
       // the display name may be a real name, and the coach speaks to "you")
-      `Player: age ${p.age_bracket || 'unknown'}; ${p.height_cm ? `${Math.round(p.height_cm)} cm` : 'height unknown'}; position ${p.position || 'unknown'}; ${p.dominant_hand || 'unknown'}-handed; level ${p.playing_level || 'unknown'}.`
+      `Player: age ${ageBracketLabel(p.age_bracket) || 'unknown'}; ${p.height_cm ? `${Math.round(p.height_cm)} cm` : 'height unknown'}; position ${p.position || 'unknown'}; ${p.dominant_hand || 'unknown'}-handed; level ${p.playing_level || 'unknown'}.`
     );
     if (p.goals?.length) lines.push(`Goals: ${p.goals.join(', ')}.`);
     if (p.focus_areas?.length) lines.push(`Focus areas: ${p.focus_areas.join(', ')}.`);
