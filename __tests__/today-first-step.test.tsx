@@ -33,7 +33,7 @@ beforeEach(() => {
 });
 
 function renderCard() {
-  render(<TodayFirstStep programHref="/programs?goal=shooting" programLabel="see shooting programs" />);
+  render(<TodayFirstStep programHref="/programs?goal=shooting" programLabel="See shooting programs" />);
 }
 
 describe('TodayFirstStep', () => {
@@ -51,15 +51,15 @@ describe('TodayFirstStep', () => {
 
   it('keeps the camera and programs as quiet links', () => {
     renderCard();
-    expect(screen.getByRole('link', { name: 'track with the camera' }).getAttribute('href')).toBe('/video');
-    expect(screen.getByRole('link', { name: 'see shooting programs' }).getAttribute('href')).toBe('/programs?goal=shooting');
+    expect(screen.getByRole('link', { name: 'Track with the camera' }).getAttribute('href')).toBe('/video');
+    expect(screen.getByRole('link', { name: 'See shooting programs' }).getAttribute('href')).toBe('/programs?goal=shooting');
   });
 
   it('records which way in the player tapped', () => {
     renderCard();
     fireEvent.click(screen.getByRole('link', { name: 'Log shots' }));
-    fireEvent.click(screen.getByRole('link', { name: 'track with the camera' }));
-    fireEvent.click(screen.getByRole('link', { name: 'see shooting programs' }));
+    fireEvent.click(screen.getByRole('link', { name: 'Track with the camera' }));
+    fireEvent.click(screen.getByRole('link', { name: 'See shooting programs' }));
     expect(tracked).toEqual(['today_log_tapped', 'today_track_tapped', 'today_program_tapped']);
   });
 

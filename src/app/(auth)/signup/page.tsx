@@ -2,13 +2,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Logo } from '@/components/Logo';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { Check, Lock, Mail, User } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
-import { signUpSchema } from '@/lib/validation';
+import { PASSWORD_HINT, signUpSchema } from '@/lib/validation';
+import { AuthBrand } from '@/components/AuthBrand';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { FIELD_BORDER, Input } from '@/components/ui/Input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { AgeChoice, type AgeAnswer } from '@/components/AgeChoice';
@@ -97,24 +98,13 @@ export default function SignUpPage() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-zinc-950">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        <div className="flex flex-col items-center mb-8 text-center">
-          <Logo size={56} className="mb-3" />
-          <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
-          <p className="text-sm text-zinc-400 mt-1">Join serious players building intentional habits</p>
-        </div>
+      <div className="w-full max-w-md">
+        <AuthBrand />
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Create your player record</CardTitle>
-            <CardDescription>
-              Private by default. Your sessions, gym work, video, and personal progress in one place.
-            </CardDescription>
+            <CardTitle className="text-xl">Create your account</CardTitle>
+            <CardDescription>Private by default. Takes about a minute.</CardDescription>
           </CardHeader>
 
           <form onSubmit={handleSignUp}>
@@ -126,9 +116,11 @@ export default function SignUpPage() {
               )}
 
               <Input
-                label="Player Name / Nickname"
+                label="Your name or a nickname"
+                id="display-name"
                 type="text"
-                placeholder="Jordan Clarkson"
+                icon={User}
+                placeholder="e.g. Sam"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 error={errors.displayName}
@@ -139,7 +131,8 @@ export default function SignUpPage() {
               <Input
                 label="Email"
                 type="email"
-                placeholder="player@example.com"
+                icon={Mail}
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 error={errors.email}
@@ -148,8 +141,10 @@ export default function SignUpPage() {
               />
 
               <Input
-                label="Password (min 8 chars, 1 uppercase, 1 number)"
+                label="Password"
                 type="password"
+                icon={Lock}
+                hint={PASSWORD_HINT}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -169,25 +164,40 @@ export default function SignUpPage() {
               />
 
               <div>
-                <label className="flex items-start gap-2.5 text-sm text-zinc-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 accent-red-500"
-                  />
+                <label className="flex min-h-11 items-start gap-3 text-sm text-zinc-300 cursor-pointer">
+                  {/* A drawn box: the browser's own checkbox edge is too faint on
+                      the dark card. Its border matches the fields (3:1). */}
+                  <span className="relative mt-0.5 flex h-5 w-5 shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      aria-invalid={errors.termsAccepted ? true : undefined}
+                      aria-describedby={errors.termsAccepted ? 'terms-error' : undefined}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className={`peer h-5 w-5 cursor-pointer appearance-none rounded-md border bg-zinc-900 ${FIELD_BORDER} checked:border-orange-600 checked:bg-orange-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900`}
+                    />
+                    <Check
+                      className="pointer-events-none absolute inset-0 m-auto hidden h-3.5 w-3.5 text-white peer-checked:block"
+                      strokeWidth={3}
+                      aria-hidden
+                    />
+                  </span>
                   <span>
                     I agree to the{' '}
-                    <Link href="/privacy" target="_blank" className="text-red-400 underline hover:text-red-300">
+                    <Link href="/privacy" target="_blank" className="text-orange-400 underline hover:text-orange-300">
                       privacy policy
                     </Link>{' '}
                     and{' '}
-                    <Link href="/terms" target="_blank" className="text-red-400 underline hover:text-red-300">
+                    <Link href="/terms" target="_blank" className="text-orange-400 underline hover:text-orange-300">
                       terms of use
                     </Link>
                   </span>
                 </label>
-                {errors.termsAccepted && <p className="mt-1 text-sm text-red-400">{errors.termsAccepted}</p>}
+                {errors.termsAccepted && (
+                  <p id="terms-error" role="alert" className="mt-1 text-sm text-red-400">
+                    {errors.termsAccepted}
+                  </p>
+                )}
               </div>
             </CardContent>
 
@@ -199,14 +209,14 @@ export default function SignUpPage() {
                 className="w-full"
                 isLoading={isLoading}
               >
-                Create Player Account
+                Create account
               </Button>
 
               <p className="text-sm text-center text-zinc-400">
                 Already have an account?{' '}
                 <Link
                   href="/login"
-                  className="font-semibold text-red-400 hover:text-red-300 transition-colors"
+                  className="font-semibold text-orange-400 underline hover:text-orange-300 transition-colors"
                 >
                   Sign in
                 </Link>

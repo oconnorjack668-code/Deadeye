@@ -11,10 +11,10 @@
 -- It checks the tables, columns, functions and indexes each migration creates.
 -- It does not check policies, grants or data, so these migrations, which only
 -- change those, cannot be told apart from not being run:
---   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064, 00065, 00066
+--   00008, 00009, 00012, 00029, 00030, 00040, 00059, 00063, 00064, 00065, 00066, 00069
 --
 -- Written by scripts/build-migration-check.mjs from supabase/migrations/
--- (00001 to 00067, 67 files, 321 things). Do not edit it by
+-- (00001 to 00069, 69 files, 324 things). Do not edit it by
 -- hand: add a migration, then run  node scripts/build-migration-check.mjs
 --
 -- NOTE ON STYLE: no apostrophes in these comments (see 00035).
@@ -175,7 +175,7 @@ WITH expected(migration, kind, obj, col) AS (
     ('00024', 'index', 'idx_profiles_country_region', ''),
     ('00024', 'function', 'check_profile_timezone', ''),
     ('00024', 'function', 'player_today', ''),
-    ('00024', 'function', 'age_group', ''),
+    ('00068', 'function', 'age_group', ''),
     ('00024', 'column', 'teams', 'club_name'),
     ('00024', 'column', 'teams', 'country'),
     ('00024', 'column', 'teams', 'region'),
@@ -234,13 +234,13 @@ WITH expected(migration, kind, obj, col) AS (
     ('00045', 'table', 'app_events', ''),
     ('00045', 'index', 'app_events_user_name_day_idx', ''),
     ('00045', 'index', 'app_events_created_idx', ''),
-    ('00047', 'function', 'send_friend_request_to', ''),
+    ('00068', 'function', 'send_friend_request_to', ''),
     ('00047', 'table', 'coach_profiles', ''),
     ('00047', 'column', 'profiles', 'app_mode'),
-    ('00047', 'function', 'is_minor', ''),
+    ('00068', 'function', 'is_minor', ''),
     ('00047', 'function', 'is_coach_account', ''),
     ('00047', 'function', 'coach_and_minor', ''),
-    ('00047', 'function', 'save_coach_profile', ''),
+    ('00068', 'function', 'save_coach_profile', ''),
     ('00047', 'function', 'is_team_staff', ''),
     ('00047', 'function', 'create_team_with_details', ''),
     ('00047', 'function', 'team_preview', ''),
@@ -341,7 +341,10 @@ WITH expected(migration, kind, obj, col) AS (
     ('00067', 'index', 'competition_entries_club_key_idx', ''),
     ('00067', 'index', 'competition_entries_team_idx', ''),
     ('00067', 'index', 'competition_entries_created_idx', ''),
-    ('00067', 'index', 'competition_entries_unsent_idx', '')
+    ('00067', 'index', 'competition_entries_unsent_idx', ''),
+    ('00068', 'function', 'is_adult_bracket', ''),
+    ('00068', 'function', 'is_minor_bracket', ''),
+    ('00068', 'function', 'keep_under_16_bracket', '')
 ),
 checked AS (
   SELECT

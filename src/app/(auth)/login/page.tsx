@@ -2,13 +2,14 @@
 'use client';
 
 import React, { Suspense, useState } from 'react';
-import { Logo } from '@/components/Logo';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Lock, Mail } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { AuthBrand } from '@/components/AuthBrand';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card';
+import { FIELD_LABEL, Input } from '@/components/ui/Input';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card';
 import { Alert } from '@/components/ui/Alert';
 import { safeAppPath } from '@/lib/safePath';
 import { authLinkErrorMessage } from '@/lib/authLink';
@@ -59,27 +60,12 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-zinc-950">
-      {/* Basketball court subtle background glow */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-3xl" />
-      </div>
-
-      <div className="w-full max-w-md relative z-10">
-        {/* Brand Header */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <Logo size={56} className="mb-3" />
-          <h1 className="text-2xl font-black tracking-tight text-white uppercase">Deadeye</h1>
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-red-400">Aim is earned</p>
-          <p className="text-sm text-zinc-400 mt-1">Player Development Operating System</p>
-        </div>
+      <div className="w-full max-w-md">
+        <AuthBrand />
 
         <Card className="border-zinc-800/80 bg-zinc-900/90 shadow-2xl backdrop-blur-xl">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-xl">Sign in to your player record</CardTitle>
-            <CardDescription>
-              Train with intent. See your progress. Improve every day.
-            </CardDescription>
+            <CardTitle className="text-xl">Sign in</CardTitle>
           </CardHeader>
 
           <form onSubmit={handleLogin}>
@@ -98,24 +84,22 @@ function LoginContent() {
               <Input
                 label="Email"
                 type="email"
-                placeholder="player@example.com"
+                icon={Mail}
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
               />
 
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label
-                    htmlFor="password"
-                    className="block text-xs font-semibold uppercase tracking-wider text-zinc-300"
-                  >
+                  <label htmlFor="password" className={FIELD_LABEL}>
                     Password
                   </label>
                   <Link
                     href="/reset-password"
-                    className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                    className="text-sm text-orange-400 underline hover:text-orange-300 transition-colors"
                   >
                     Forgot password?
                   </Link>
@@ -123,6 +107,7 @@ function LoginContent() {
                 <Input
                   id="password"
                   type="password"
+                  icon={Lock}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -140,7 +125,7 @@ function LoginContent() {
                 className="w-full"
                 isLoading={isLoading}
               >
-                Sign In
+                Sign in
               </Button>
 
               {invited && (
@@ -161,7 +146,7 @@ function LoginContent() {
                     rememberInvite(redirectTo);
                     rememberTeamInvite(redirectTo);
                   }}
-                  className="font-semibold text-red-400 hover:text-red-300 transition-colors"
+                  className="font-semibold text-orange-400 underline hover:text-orange-300 transition-colors"
                 >
                   Create an account
                 </Link>
@@ -179,7 +164,7 @@ export default function LoginPage() {
     <Suspense fallback={
       <div className="min-h-screen w-full flex items-center justify-center p-4 bg-zinc-950">
         <div className="text-center">
-          <div className="h-10 w-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <div className="h-10 w-10 border-4 border-red-600 border-t-transparent rounded-full animate-spin motion-reduce:animate-none mx-auto mb-4" />
           <p className="text-sm text-zinc-400">Loading...</p>
         </div>
       </div>

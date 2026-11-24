@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Alert } from '@/components/ui/Alert';
 import { rimFromEdges, rimTapProblem, rimYAt, type DetectedShot, type Rim } from '@/lib/video/shotDetector';
-import { addedShot, buildSummary, deviceClass, fromDetected, toSavedShot, type RunQuality, type ShotZoneChoice, type TrackedShot } from '@/lib/video/trackedShots';
+import { addedShot, addShotAt, insertShot, buildSummary, deviceClass, fromDetected, toSavedShot, type RunQuality, type ShotZoneChoice, type TrackedShot } from '@/lib/video/trackedShots';
 import type { Json } from '@/lib/supabase/types';
 import { announceShot, loadSound, preloadRecordings, DEFAULT_SOUND, type SoundSettings } from '@/lib/video/trackerSound';
 import { SoundStatus } from './SoundPicker';
@@ -36,6 +36,7 @@ import {
   mediaAtClock,
   milestoneFor,
   rimTone,
+  shotsToTimeline,
   TRAIL_MS,
   TRAIL_POINTS,
   type OverlayLog,
@@ -80,7 +81,8 @@ import { CameraZoom } from './CameraZoom';
 import { TrackerHud, type ShotFlash } from './TrackerHud';
 import { DrillPicker } from './DrillPicker';
 import { FramingPanel } from './FramingPanel';
-import { ShotReplay } from './ShotReplay';
+import { WatchItBack, type WatchItBackHandle } from './WatchItBack';
+import { DecodeProgress, DecodeScan } from './DecodeProgress';
 import { ShootingBreakdown } from '@/components/basketball/ShootingBreakdown';
 import { track } from '@/lib/events';
 import { deleteAccountRim, loadAccountRims, mergeRims, saveAccountRim } from '@/lib/video/rimSync';
@@ -279,8 +281,9 @@ export function ShotTracker({
   const [recording, setRecording] = useState<LiveRecording | null>(null);
   /** The current run is a second look at a live session's recording. */
   const [rechecked, setRechecked] = useState(false);
-  /** The shot being watched again, by id. */
-  const [replayId, setReplayId] = useState<number | null>(null);
+  /** The shot Watch it back is on, by id, for the list to highlight. */
+  const [watchingId, setWatchingId] = useState<number | null>(null);
+  const watchRef = useRef<WatchItBackHandle>(null);
   // What the overlay showed, logged through the run so the video can be saved
   // with it drawn in (overlayTimeline.ts); snapshotted when the run ends
   const overlayLogRef = useRef<OverlayLog | null>(null);
@@ -761,7 +764,7 @@ export function ShotTracker({
       setQuality(null);
       setShootingMs(0);
       setPaused(false);
-      setReplayId(null);
+      setWatchingId(null);
       analysedRef.current = 0;
       ballSeenRef.current = 0;
       minCanvasRef.current = null;
@@ -1393,6 +1396,17 @@ export function ShotTracker({
     setShots((cur) => cur.filter((x) => x.id !== id));
   }
 
+  /** Watch it back's Undo after "Not a shot": the shot back in its place, and no longer counted as removed. */
+  function restoreShot(shot: TrackedShot) {
+    if (shot.called) setRemoved((n) => Math.max(0, n - 1));
+    setShots((cur) => insertShot(cur, shot));
+  }
+
+  /** Watch it back's "Add a make here": a shot at that moment, so it can be replayed, charted and saved in the video. */
+  function addShotHere(made: boolean, clockMs: number) {
+    setShots((cur) => addShotAt(cur, clockMs, made));
+  }
+
   async function saveSession() {
     if (shots.length === 0) {
       setError('There are no shots to save.');
@@ -1490,8 +1504,10 @@ export function ShotTracker({
   // fix every later shot sits that much further into the recording.
   const clockGaps = timeline?.gaps ?? [];
   const inVideo = (t: number) => mediaAtClock(clockGaps, t) - replayOffset;
-  const replayShot = replayId === null ? null : shots.find((s) => s.id === replayId) ?? null;
-  const replayIndex = replayShot ? shots.indexOf(replayShot) : -1;
+  // The run's overlay with the calls as corrected here: what Watch it back
+  // shows and what a saved video draws, so neither shows a call the player changed
+  const corrected = timeline ? shotsToTimeline(timeline, shots) : null;
+  const canWatch = !!replayFile && !!corrected;
   const anyWithoutZone = shots.some((s) => !s.zone);
   const lowFps = quality !== null && quality.fps < 12;
   const best = sample ? ({ kind: 'none' } as const) : personalBest({ makes, attempts: shots.length }, shootingBest);
@@ -1630,6 +1646,7 @@ export function ShotTracker({
                 rim={rim}
               />
             )}
+            {step === 'tracking' && decoding && <DecodeScan />}
           </div>
           {theatre && step === 'tracking' && (
             <button
@@ -1801,7 +1818,9 @@ export function ShotTracker({
         </div>
       )}
 
-      {step === 'tracking' && (
+      {step === 'tracking' && decoding && <DecodeProgress progress={progress} shotsFound={shots.length} onStop={stopTracking} />}
+
+      {step === 'tracking' && !decoding && (
         <div className="space-y-2">
           {source === 'file' && (
             <div className="h-1.5 rounded-full bg-zinc-800 overflow-hidden">
@@ -1810,9 +1829,7 @@ export function ShotTracker({
           )}
           <p className="text-sm text-zinc-500 flex items-center gap-1.5">
             <Activity className="h-3.5 w-3.5" />
-            {decoding
-              ? 'Checking every frame of the clip, without playing it. Usually quicker than watching it, and no shot is missed between frames.'
-              : slowedDown
+            {slowedDown
               ? 'Checking every frame, so this clip plays at half speed. It takes a little longer and gets more shots right.'
               : rechecked
                 ? 'Checking the recording again at full frame rate. It plays at normal speed.'
@@ -1833,8 +1850,8 @@ export function ShotTracker({
               {makes}/{shots.length}
             </div>
             <div className="text-sm text-zinc-400">
-              {shots.length ? Math.round((makes / shots.length) * 100) : 0}%{describeMode(mode) ? ` · ${describeMode(mode)}` : ''} · tap a shot to
-              switch make/miss
+              {shots.length ? Math.round((makes / shots.length) * 100) : 0}%{describeMode(mode) ? ` · ${describeMode(mode)}` : ''} ·{' '}
+              {canWatch ? 'watch it back to check the calls' : 'tap a shot to switch make/miss'}
             </div>
             {/* Counted at the top, because an unresolved shot is currently
                 saved as a miss and the player should know how many of these
@@ -1885,74 +1902,45 @@ export function ShotTracker({
           )}
           {sample?.cta}
 
-          {/* How well the tracking itself went. Counts from a run that managed
-              8 frames a second deserve less trust than one that managed 30. */}
-          {quality && (
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
-              <div className="flex items-center justify-between gap-2 text-xs">
-                <span className="font-semibold uppercase tracking-wider text-zinc-400">Tracking quality</span>
-                <span className="tabular-nums text-zinc-400">{quality.fps.toFixed(0)} fps analysed</span>
-              </div>
-              {/* Judged on how many shots the tracker was unsure of, not on how
-                  often the ball was in view: the tracker reports only a ball in
-                  flight, under a tenth of the frames of a normal session. */}
-              <p className="mt-1.5 text-sm text-zinc-500">
-                {lowFps
-                  ? recording
-                    ? 'That is a low frame rate, so shots may have been missed between frames. Check it again from the recording below to catch them.'
-                    : 'That is a low frame rate, so shots may have been missed between frames. Closing other apps, or filming a clip and analysing it afterwards, gives the tracker more to work with.'
-                  : shots.length > 0 && unresolved / shots.length > 0.2
-                    ? 'The tracker was unsure of a lot of these. That is usually the hoop being small in the picture, dim light, or bright windows behind it - the tips on the first screen help most.'
-                    : quality.moved
-                      ? 'The camera moved during the session. Calls made before you fixed the rim are worth a second look.'
-                      : 'Good conditions. The counts below should be close, but check them anyway.'}
-              </p>
-            </div>
+          {/* The whole clip with every call drawn on it, from the calls as
+              corrected here (D1). A row's play button plays that shot in it. */}
+          {canWatch && replayFile && corrected && (
+            <WatchItBack
+              ref={watchRef}
+              file={replayFile}
+              offsetMs={replayOffset}
+              timeline={corrected}
+              shots={shots}
+              onSet={settleShot}
+              onAdd={addShotHere}
+              onDelete={deleteShot}
+              onRestore={restoreShot}
+              onCurrent={setWatchingId}
+            />
           )}
 
-          {/* A second look at full frame rate, from the recording. Offered
-              whenever there is one, pressed hardest when the phone was slow. */}
-          {recording && !rechecked && rim && (
-            <div className={`rounded-2xl border p-3 ${lowFps ? 'border-orange-500/50 bg-orange-600/10' : 'border-zinc-800 bg-zinc-900/70'}`}>
-              <p className="text-sm font-semibold text-white">Check again from the recording</p>
-              <p className="mt-1 text-sm text-zinc-400">
-                Runs the tracker over the video at its full frame rate. It plays at normal speed, so it takes as long as the session
-                did ({clock(elapsedMs)}). The calls below are replaced by the new ones.
-              </p>
-              <Button variant={lowFps ? 'primary' : 'secondary'} size="sm" className="mt-2 gap-2" onClick={recheck}>
-                <RotateCcw className="h-4 w-4" /> Check again
-              </Button>
-              {recording.capped && <p className="mt-2 text-sm text-zinc-500">The recording stopped early to save space, so only the first part is in it.</p>}
+          {canWatch && shots.length > 0 && (
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">Every call · {shots.length}</h3>
+              <p className="text-sm text-zinc-400">Tap a time to watch that shot</p>
             </div>
           )}
-
-          {!sample && shots.length > 0 && <ShootingBreakdown shots={shots.map(toSavedShot)} />}
-
-          {/* The player is the only one who saw what really happened, and this
-              is the moment they know it. The run's numbers go with the report
-              so it can be matched to what the tracker did. */}
-          {!sample && <ReportProblem
-            label="Tracker got this wrong? Tell us"
-            context={`Shot tracker, ${source === 'camera' ? 'live camera' : 'video'}: ${makes}/${shots.length} on screen, ${unresolved} unclear${
-              quality ? `, ${quality.fps.toFixed(0)} fps${quality.worker === false ? ', main thread' : ''}` : ''
-            }, ${ZONE_LABELS[zone]}`}
-            className="text-xs text-zinc-500 underline"
-            panelClassName="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3"
-          />}
-
           <div className="space-y-1.5 max-h-96 overflow-y-auto">
             {shots.map((s, i) => (
-              <div key={s.id} className="rounded-lg bg-zinc-900/70 px-3 py-2 text-sm">
+              <div
+                key={s.id}
+                className={`rounded-lg px-3 py-2 text-sm ${canWatch && watchingId === s.id ? 'bg-zinc-800 ring-1 ring-zinc-500' : 'bg-zinc-900/70'}`}
+              >
                 <div className="flex items-center gap-2">
                   <span className="w-8 text-zinc-500">#{i + 1}</span>
-                  {replayFile && s.called ? (
+                  {canWatch ? (
                     <button
                       type="button"
-                      onClick={() => setReplayId(s.id)}
-                      aria-label={`Watch shot ${i + 1} again`}
-                      className="flex h-9 w-14 items-center gap-1 rounded-md text-zinc-400 hover:text-white"
+                      onClick={() => watchRef.current?.watch(s.id)}
+                      aria-label={`Watch shot ${i + 1}`}
+                      className="flex h-11 w-16 items-center gap-1 rounded-md text-zinc-300 hover:text-white"
                     >
-                      <Play className="h-3.5 w-3.5" /> {clock(s.t)}
+                      <Play className="h-3.5 w-3.5" aria-hidden="true" /> {clock(inVideo(s.t))}
                     </button>
                   ) : (
                     <span className="w-14 text-zinc-500">{clock(s.t)}</span>
@@ -2020,19 +2008,73 @@ export function ShotTracker({
             )}
           </div>
 
-          {replayShot && replayFile && (
-            <ShotReplay
-              file={replayFile}
-              atMs={inVideo(replayShot.t)}
-              title={`Shot ${replayIndex + 1} at ${clock(replayShot.t)}`}
-              made={replayShot.confident ? replayShot.made : null}
-              onSet={(made) => {
-                settleShot(replayShot.id, made);
-                setReplayId(null);
-              }}
-              onClose={() => setReplayId(null)}
-            />
+          {/* Without a video a missed shot can only be added with no time. With
+              one, Watch it back adds it at its moment instead. */}
+          {!sample && !canWatch && (
+          <div className="flex gap-2">
+            <button type="button" onClick={() => addShot(true)} className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-zinc-800 py-2 text-xs font-semibold text-zinc-200">
+              <Plus className="h-3.5 w-3.5" /> Add a make it missed
+            </button>
+            <button type="button" onClick={() => addShot(false)} className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-zinc-800 py-2 text-xs font-semibold text-zinc-200">
+              <Plus className="h-3.5 w-3.5" /> Add a miss it missed
+            </button>
+          </div>
           )}
+
+          {/* How well the tracking itself went. Counts from a run that managed
+              8 frames a second deserve less trust than one that managed 30. */}
+          {quality && (
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3">
+              <div className="flex items-center justify-between gap-2 text-xs">
+                <span className="font-semibold uppercase tracking-wider text-zinc-400">Tracking quality</span>
+                <span className="tabular-nums text-zinc-400">{quality.fps.toFixed(0)} fps analysed</span>
+              </div>
+              {/* Judged on how many shots the tracker was unsure of, not on how
+                  often the ball was in view: the tracker reports only a ball in
+                  flight, under a tenth of the frames of a normal session. */}
+              <p className="mt-1.5 text-sm text-zinc-500">
+                {lowFps
+                  ? recording
+                    ? 'That is a low frame rate, so shots may have been missed between frames. Check it again from the recording below to catch them.'
+                    : 'That is a low frame rate, so shots may have been missed between frames. Closing other apps, or filming a clip and analysing it afterwards, gives the tracker more to work with.'
+                  : shots.length > 0 && unresolved / shots.length > 0.2
+                    ? 'The tracker was unsure of a lot of these. That is usually the hoop being small in the picture, dim light, or bright windows behind it - the tips on the first screen help most.'
+                    : quality.moved
+                      ? 'The camera moved during the session. Calls made before you fixed the rim are worth a second look.'
+                      : 'Good conditions. The counts below should be close, but check them anyway.'}
+              </p>
+            </div>
+          )}
+
+          {/* A second look at full frame rate, from the recording. Offered
+              whenever there is one, pressed hardest when the phone was slow. */}
+          {recording && !rechecked && rim && (
+            <div className={`rounded-2xl border p-3 ${lowFps ? 'border-orange-500/50 bg-orange-600/10' : 'border-zinc-800 bg-zinc-900/70'}`}>
+              <p className="text-sm font-semibold text-white">Check again from the recording</p>
+              <p className="mt-1 text-sm text-zinc-400">
+                Runs the tracker over the video at its full frame rate. It plays at normal speed, so it takes as long as the session
+                did ({clock(elapsedMs)}). The calls below are replaced by the new ones.
+              </p>
+              <Button variant={lowFps ? 'primary' : 'secondary'} size="sm" className="mt-2 gap-2" onClick={recheck}>
+                <RotateCcw className="h-4 w-4" /> Check again
+              </Button>
+              {recording.capped && <p className="mt-2 text-sm text-zinc-500">The recording stopped early to save space, so only the first part is in it.</p>}
+            </div>
+          )}
+
+          {!sample && shots.length > 0 && <ShootingBreakdown shots={shots.map(toSavedShot)} />}
+
+          {/* The player is the only one who saw what really happened, and this
+              is the moment they know it. The run's numbers go with the report
+              so it can be matched to what the tracker did. */}
+          {!sample && <ReportProblem
+            label="Tracker got this wrong? Tell us"
+            context={`Shot tracker, ${source === 'camera' ? 'live camera' : 'video'}: ${makes}/${shots.length} on screen, ${unresolved} unclear${
+              quality ? `, ${quality.fps.toFixed(0)} fps${quality.worker === false ? ', main thread' : ''}` : ''
+            }, ${ZONE_LABELS[zone]}`}
+            className="text-xs text-zinc-500 underline"
+            panelClassName="rounded-xl border border-zinc-800 bg-zinc-900/70 p-3"
+          />}
 
           {sample ? (
             // A plain button, not <Button>: handed to a component, the React
@@ -2048,15 +2090,6 @@ export function ShotTracker({
             </button>
           ) : (
           <>
-          <div className="flex gap-2">
-            <button type="button" onClick={() => addShot(true)} className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-zinc-800 py-2 text-xs font-semibold text-zinc-200">
-              <Plus className="h-3.5 w-3.5" /> Add a make it missed
-            </button>
-            <button type="button" onClick={() => addShot(false)} className="flex-1 flex items-center justify-center gap-1 rounded-lg bg-zinc-800 py-2 text-xs font-semibold text-zinc-200">
-              <Plus className="h-3.5 w-3.5" /> Add a miss it missed
-            </button>
-          </div>
-
           {/* Offered here rather than the moment the rim is measured, because
               here the player knows whether the detection actually worked. A rim
               that produced nonsense is not one worth skipping the taps for. */}
@@ -2107,8 +2140,8 @@ export function ShotTracker({
             </label>
           )}
 
-          {replayFile && timeline && timeline.calls.length > 0 && (
-            <TrackerVideoExport file={replayFile} timeline={timeline} offsetMs={replayOffset} best={shootingBest} />
+          {replayFile && corrected && corrected.calls.length > 0 && (
+            <TrackerVideoExport file={replayFile} timeline={corrected} offsetMs={replayOffset} best={shootingBest} />
           )}
 
           {replayFile ? (

@@ -9,23 +9,26 @@ import React from 'react';
 import Link from 'next/link';
 import {
   Activity,
+  ArrowRight,
   Brain,
   Check,
   ChevronDown,
+  ChevronRight,
   ClipboardList,
+  Crosshair,
   Crown,
   Download,
   Dumbbell,
   Gift,
   ScanEye,
   ShieldCheck,
+  Smartphone,
   Sparkles,
   Target,
   Trophy,
   Users,
   Video,
 } from 'lucide-react';
-import { Logo } from '@/components/Logo';
 import { InstallGuide } from '@/components/InstallGuide';
 import { InAppBrowserNotice } from '@/components/InAppBrowserNotice';
 import { LandingHeader } from '@/components/LandingHeader';
@@ -36,7 +39,7 @@ import { CLUB_PLANS, CLUB_PLANS_PDF, DRILL_COUNT, FOUNDING_CLUB_OFFER, FREE_PLAN
 import { proPriceLabels, stripeConfigured } from '@/lib/stripe';
 import { FOUNDER_PRICE_FALLBACK, FOUNDING_MONTHS, FOUNDING_PLACES, showPlacesLeft } from '@/lib/founding';
 import { getFoundingOffer } from '@/lib/foundingServer';
-import { CLOSING_TEXT, entriesOpen } from '@/lib/competition';
+import { entriesOpen } from '@/lib/competition';
 
 export const dynamic = 'force-dynamic';
 
@@ -165,72 +168,82 @@ export default async function Home() {
       <LandingHeader signedIn={signedIn} />
 
       <main>
-        {/* Hero */}
-        <section className="relative overflow-hidden px-4 pb-16 pt-14 sm:pt-20">
-          <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-red-600/10 blur-3xl" />
-          <div className="relative mx-auto max-w-3xl text-center">
+        {/* Hero. Black page, one orange button, and the proof straight under
+            it: the real tracker on a real clip, so a visitor sees it count on
+            the first screen (design/2026-11-22-polish.md, landing). */}
+        <section className="px-4 pb-14 pt-8 sm:pt-16">
+          <div className="mx-auto max-w-xl text-center">
             <InAppBrowserNotice />
-            <Logo size={72} className="mx-auto" />
-            <p className="mt-6 text-xs font-bold uppercase tracking-[0.25em] text-red-400">Aim is earned</p>
-            <h1 className="mt-3 text-4xl font-black tracking-tight text-white sm:text-6xl">
+            <p className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-red-400">
+              <Crosshair className="h-4 w-4" aria-hidden="true" /> Aim is earned
+            </p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-white sm:text-5xl">
               The basketball app that watches your shot
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base text-zinc-400 sm:text-lg">
+            <p className="mt-3 text-base text-zinc-300 sm:text-lg">
               Point your phone at the hoop and Deadeye counts your makes and misses for you. Then it checks your form,
               plans your training and tells you what to work on next.
             </p>
-            <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
-              <Link
-                href={signedIn ? '/dashboard' : '/signup'}
-                className="flex h-12 items-center justify-center rounded-xl bg-orange-600 px-8 font-semibold text-white hover:bg-orange-500"
-              >
-                {signedIn ? 'Open Deadeye' : 'Create a free account'}
-              </Link>
-              <a
-                href="#get-the-app"
-                className="flex h-12 items-center justify-center rounded-xl border border-zinc-700 px-8 font-semibold text-zinc-200 hover:bg-zinc-900"
-              >
-                How to get the app
-              </a>
+            <Link
+              href={signedIn ? '/dashboard' : '/signup'}
+              className="mt-5 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-orange-600 text-base font-semibold text-white shadow-md shadow-orange-950/20 hover:bg-orange-500"
+            >
+              {signedIn ? 'Open Deadeye' : 'Create a free account'} <ArrowRight className="h-5 w-5" aria-hidden="true" />
+            </Link>
+            <p className="mt-2 text-sm text-zinc-400">Free to start. For players aged 13 and over. No ads.</p>
+          </div>
+
+          {/* The tracker itself, on a real clip, in the visitor's own browser.
+              The page's one glow sits on it. */}
+          <div id="try-it" className="mx-auto mt-5 max-w-xl scroll-mt-28">
+            <h2 className="sr-only">Watch it call real shots</h2>
+            <div className="rounded-2xl shadow-[0_0_70px_-22px_rgba(249,115,22,0.6)]">
+              <LandingDemo signedIn={signedIn} />
             </div>
-            <p className="mt-4 text-sm text-zinc-500">Free to start · For players aged 13 and over · No ads</p>
-            <a href="#try-it" className="mt-3 inline-block text-sm font-semibold text-orange-400 hover:text-orange-300">
-              Watch it track real shots, right here ↓
+          </div>
+
+          <div className="mx-auto max-w-xl">
+            <a
+              href="#get-the-app"
+              className="mt-4 flex h-11 items-center justify-center gap-2 rounded-xl border border-zinc-500/70 text-sm font-semibold text-zinc-100 hover:bg-zinc-900"
+            >
+              <Smartphone className="h-4 w-4" aria-hidden="true" /> How to get the app
             </a>
-            {/* The founding competition, with what can be won and the key
-                conditions side by side (ASAI 7.7: free, age, parent's OK,
-                area, closing date). No discount or prices here: the
-                homepage reaches 13-year-olds. */}
+
+            {/* The founding competition as one row, with the key conditions in
+                the line under it (ASAI 7.7: free, age, parent's OK, area,
+                closing date). No discount or prices here: the homepage
+                reaches 13-year-olds. The full rules are on /competition. */}
             {competitionOpen && (
-              <div className="mx-auto mt-8 max-w-lg rounded-2xl border border-orange-500/50 bg-gradient-to-br from-orange-600/20 via-zinc-900/80 to-zinc-900/80 p-5 text-left">
-                <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-orange-300">
-                  <Trophy className="h-4 w-4 flex-shrink-0" /> Founding competition · free to enter · closes 31 December 2026
-                </p>
-                <h2 className="mt-2 text-2xl font-black text-white">10 players win Deadeye Pro for life</h2>
-                <p className="mt-2 text-base text-zinc-200">
-                  Make a free account, log one training session and tell us one thing you liked and one thing you would
-                  change. The most useful feedback wins, judged by two adults, not a draw. 1 club also wins a year of the
-                  Club plan free. Under 18? A parent or guardian approves your entry by email.
-                </p>
+              <>
                 <Link
                   href="/competition"
-                  className="mt-4 flex h-11 items-center justify-center rounded-xl bg-orange-500 px-5 text-sm font-bold text-zinc-950 hover:bg-orange-400"
+                  className="mt-5 flex min-h-14 items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/70 p-3 text-left hover:bg-zinc-900"
                 >
-                  See how to enter
+                  <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-gradient-to-br from-orange-600 to-orange-700 text-white ring-1 ring-inset ring-white/15">
+                    <Trophy className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-white">10 players win Pro for life</span>
+                    <span className="block text-sm text-zinc-400">Free to enter. Closes 31 December 2026.</span>
+                  </span>
+                  <ChevronRight className="h-5 w-5 flex-none text-zinc-400" aria-hidden="true" />
                 </Link>
-                <p className="mt-3 text-xs text-zinc-400">
-                  Free to enter, no purchase needed. Ages 13 and over, Republic of Ireland. &quot;Pro for life&quot; means Pro
-                  for as long as Deadeye offers a Pro plan. Closes at {CLOSING_TEXT}.
+                <p className="mt-2 text-sm text-zinc-400">
+                  To enter: make a free account, log one training session and tell us one thing you liked and one
+                  thing you would change. Ages 13 and over, Republic of Ireland. Under 18? A parent or guardian approves your entry. No purchase
+                  needed. Judged on the most useful feedback, not a draw; &quot;Pro for life&quot; means for as long as
+                  Deadeye offers Pro.
                 </p>
-              </div>
+              </>
             )}
             {offer.open && (
               <a
                 href="#pricing"
-                className="mx-auto mt-6 flex max-w-md items-center justify-center gap-2 rounded-full border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-semibold text-amber-200 hover:bg-amber-500/15"
+                className="mt-3 flex items-center gap-3 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3 text-left hover:bg-amber-500/15"
               >
-                <Gift className="h-4 w-4 flex-shrink-0" />
-                <span>
+                <Gift className="h-5 w-5 flex-none text-amber-400" aria-hidden="true" />
+                <span className="text-sm font-semibold text-amber-200">
                   Founding offer: {foundingLine.charAt(0).toLowerCase() + foundingLine.slice(1)}
                   {offer.counted && showPlacesLeft(offer.placesLeft) ? ` · only ${offer.placesLeft} left` : ''}
                 </span>
@@ -295,17 +308,6 @@ export default async function Home() {
                 </li>
               ))}
             </ul>
-          </div>
-
-          {/* The tracker itself, on a real clip. The promo shows it; this lets a
-              visitor watch it count, in their own browser, before signing up. */}
-          <div id="try-it" className="mx-auto mt-14 max-w-xl scroll-mt-28">
-            <h3 className="text-2xl font-black tracking-tight text-white">Watch it call real shots</h3>
-            <p className="mt-2 mb-5 text-sm text-zinc-400">
-              This is the real tracker, running right here in your browser on a clip from a real session. Press play and
-              watch it count makes and misses.
-            </p>
-            <LandingDemo signedIn={signedIn} />
           </div>
         </section>
 

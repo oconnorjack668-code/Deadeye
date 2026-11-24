@@ -5,6 +5,7 @@
 // valid entry looks like, and what a parent's link may still do. The routes
 // and pages call these, so the rules are tested without a database.
 import type { AgeBracket, ConsentStatus, EntryStatus } from './supabase/types';
+import { isAdultBracket, isMinorBracket } from './ageBracket';
 import { CONFIRM_LINK_DAYS, olderThanDays, parseParentDetails, type ParentDetails } from './parentApproval';
 
 /**
@@ -102,7 +103,7 @@ export type AgeFacts = {
  *  - needs-account-approval: under 16 and the account is not approved, or no
  *    approving parent's email is on file, so there is nobody to ask.
  *
- * Under 18 is the age range 13 or 14-17. A player who said they are 16 or
+ * Under 18 is the age range 13-15 or 16-17 (or the older 13 and 14-17). A player who said they are 16 or
  * over but never picked an age range might be 16, so they are treated as under
  * 18 until they add one: a parent asked once too often is better than a
  * 16-year-old entered with nobody asked.
@@ -117,7 +118,7 @@ export function entryRoute({ ageCheck, ageBracket }: AgeFacts): EntryRoute {
     // address would let a child name anyone, so the entry waits instead
     return ageCheck.parent_email ? 'under16' : 'needs-account-approval';
   }
-  if (ageBracket === '18-22' || ageBracket === '23-30' || ageBracket === '30+') return 'adult';
+  if (isAdultBracket(ageBracket)) return 'adult';
   return 'ask-parent';
 }
 
@@ -185,7 +186,7 @@ export function normaliseClubName(name: string): string {
 export function isAdultCoach(coach: { is_adult: boolean } | null, facts: AgeFacts): boolean {
   if (!coach?.is_adult) return false;
   if (facts.ageCheck && !facts.ageCheck.is_16_plus) return false;
-  return facts.ageBracket !== '13' && facts.ageBracket !== '14-17';
+  return !isMinorBracket(facts.ageBracket);
 }
 
 export type ClubEntryInput ={ clubName: string; clubKey: string; teamId: string; feedback: string };

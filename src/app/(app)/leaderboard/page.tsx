@@ -20,8 +20,9 @@ export const metadata = { title: 'Leaderboard - Deadeye' };
 type Scope = 'everyone' | 'country' | 'region' | 'friends' | 'team';
 const AGE_GROUPS = [
   { id: 'all', label: 'All ages' },
-  { id: 'u14', label: 'U14' },
-  { id: '14-17', label: '14–17' },
+  // public.age_group() in 00068: 13-15 is u16 (the older 13 too)
+  { id: 'u16', label: 'U16' },
+  { id: '16-17', label: '16–17' },
   { id: '18+', label: '18+' },
 ] as const;
 const LIST_LIMIT = 100;

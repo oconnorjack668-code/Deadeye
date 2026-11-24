@@ -9,7 +9,7 @@ import { OFFER_ENDS_TEXT as OFFER_END } from '@/lib/competition';
 
 export const metadata = { title: 'Privacy Policy - Deadeye' };
 
-const LAST_UPDATED = 'November 18, 2026';
+const LAST_UPDATED = 'November 23, 2026';
 
 export default function PrivacyPage() {
   const contactEmail = process.env.SUPPORT_EMAIL || process.env.OWNER_EMAIL;
@@ -144,11 +144,11 @@ export default function PrivacyPage() {
               you delete your account.
             </li>
             <li>
-              A few steps you reach in the app, at most once a day each: seeing the welcome screen and which answer you
+              A few steps you reach in the app, at most once a day each: opening setup before you finish it, seeing the welcome screen and which answer you
               gave there (at a court, or not right now), playing the sample clip, and, before your first session, which
               link you tap on the Today card (log shots, track with the camera, or your program). Opening the Video AI
-              page, opening the shot tracker, setting it up, starting and finishing it, and saving its result. Opening the shot logger and
-              pressing Finish in it. Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
+              page, opening the shot tracker, setting it up, starting and finishing it, pressing play on Watch it back, changing, removing or adding a call while watching it back, and saving its result. Opening the shot logger and
+              pressing Finish in it. Seeing your result after your first session, tapping Go again there, and sharing or saving a share card (a session, workout, game or your level). Opening a play or a film clip on the IQ tab, finishing a play quiz or a film clip,
               and, if you coach, saving a play you drew. We also note when you turn training reminders on, or change your
               reminder days while they are on. Kept for 90 days, with your account id, only to see where new players get
               stuck so we can fix it. Only these steps are noted, not every page you visit; no device details, nothing
@@ -324,8 +324,9 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-bold text-white">Cookies and videos</h2>
           <p>
             Deadeye&apos;s own cookies are only there to keep you logged in. The app also keeps a few things on your
-            device so it works for you (for example unsent drafts, offline saves, your settings and invite links you
-            followed); nothing on your device is used to track you or count visits.
+            device so it works for you (for example unsent drafts, offline saves, your settings, invite links you
+            followed, and which opening animation and slogan come next, so they change each time); nothing on your
+            device is used to track you or count visits.
           </p>
           <p>
             Lesson, drill and exercise videos and film clips play from YouTube, which is owned by Google. Nothing loads

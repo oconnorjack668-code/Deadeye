@@ -27,6 +27,10 @@ export const EVENT_NAMES = [
   /** Reached the results, whether or not they then saved */
   'tracker_finished',
   'tracker_saved',
+  /** Pressed play on Watch it back, the tracker review's player (D1) */
+  'watch_back_played',
+  /** Changed, removed or added a call while watching the clip back (D1) */
+  'watch_back_edited',
   /** Opened the shot logger, to track every shot or to enter totals */
   'log_opened',
   /** Pressed Finish with something logged, so the Finish panel opened */
@@ -43,6 +47,14 @@ export const EVENT_NAMES = [
   'film_opened',
   /** Answered every question on a film clip, and the attempt was saved */
   'film_done',
+  /** Shared or saved a share card from the share sheet (any card: session, rank, workout, game) */
+  'share_card_shared',
+  /** Saw the result screen after their first saved session */
+  'first_result_seen',
+  /** Result screen after the first session: tapped "Go again" */
+  'first_result_go_again',
+  /** Opened setup as a new account, before any answer (D4: read against "finished setup") */
+  'setup_started',
 ] as const;
 
 export type EventName = (typeof EVENT_NAMES)[number];

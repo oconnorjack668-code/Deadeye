@@ -1,6 +1,6 @@
 # Builder knowledge
 
-Last researched: 2026-11-16 (recording a funnel step from the client: Next prefetching, React effects)
+Last researched: 2026-11-23 (Supabase auth email rate limits and resend; overflow-x clip)
 
 Read `README.md` in this folder for how this file works. Stack then: Next.js
 16.4.2, React 19.2.8, eslint-plugin-react-hooks 7.1.1, Vitest 5 + jsdom.
@@ -30,7 +30,8 @@ in brackets).
   splits unquoted paths; Git Bash rewrites `/route` args; a script's
   run-directly check compared mismatched paths. **Rule:** write files with
   Write/Edit or Node, quote paths, `MSYS_NO_PATHCONV=1`, import a script's
-  function rather than run it. (2026-11-03-rim-finder,
+  function rather than run it. (2026-11-23: worktree files check out with
+  CRLF, so a Node find-and-replace must normalise `\r\n` first or it misses.) (2026-11-03-rim-finder,
   2026-11-01-tracker-upgrades, 2026-10-21-app-review-fixes)
 - 2026-11-03 · Editing tracker source during a bench run corrupted it. **Rule:**
   no edits in `src/lib/video/` while a bench runs. (2026-11-03-tracker-accuracy-bench)
@@ -76,6 +77,25 @@ in brackets).
 
 What the outcome of earlier work taught (see "Results review" in the agent
 file). Newest first, each with the date, what happened, and the rule.
+
+- 2026-11-23 · D11's opening B: a plain script (`public/opening/swish.js`)
+  added nodes beside React's server-rendered splash before hydration, and the
+  production build threw React error #418 (hydration mismatch) on every B
+  open; jsdom tests passed. Seen only in a headless capture's console.
+  **Rule:** a script that runs before hydration only changes attributes or
+  fills the `innerHTML` of an empty element React rendered with
+  `dangerouslySetInnerHTML={{ __html: '' }}` and `suppressHydrationWarning`;
+  read the production console on every variant before pushing.
+- 2026-11-23 · Share cards (D7): Satori (next/og) does not stretch an
+  absolute box between `left` and `right` (the card collapsed to the left
+  edge), draws no CSS border triangles, and cannot draw SVG `<text>` in an
+  inline image. Passing `fonts` replaces the bundled Geist Regular. In the
+  browser check, a local dev server plus four iframes froze Chrome's renderer
+  on a low-memory laptop. **Rule:** in cards give absolute boxes a `width`,
+  draw text as divs over an SVG image, pass all weights or none; render cards
+  with `SHARE_CARD_OUT=<dir> npx vitest run __tests__/share-cards.test.tsx`
+  and look at the PNGs; check phone widths with one page at a time and stop
+  the dev server straight after.
 
 - 2026-11-16 · The privacy page lists the recorded app steps as a closed
   list. E3 added steps without naming them and safety review blocked it
@@ -148,8 +168,15 @@ file). Newest first, each with the date, what happened, and the rule.
       helpers live in `src/lib/` (caught on F3 before it shipped).
 - [ ] Camera/video: `playsInline` + `muted`, tracks stopped on unmount, each
       `getUserMedia` error named, each stage has a time limit.
+- [ ] A head or async script that touches the page before hydration: no new
+      nodes in React's tree (attributes, or an empty innerHTML host only), and
+      the `next build` console read for each variant (no React #418).
 - [ ] Heavy work (model, decode, export) in a worker or chunked; no tap
       handler blocks the main thread.
+- [ ] A share card change: the PNGs rendered with `SHARE_CARD_OUT` (and
+      `SHARE_CARD_FONTS=1`) and looked at, story and feed, with the name off.
+- [ ] A migration that changes stored values: ask what the code still live reads during the gap. If old code would misread new values, split it: one file allows them and teaches the DB rules (safe with old code), then deploy, then the backfill. Readers accept old and new values until the backfill has run (D4, 00068/00069).
+- [ ] A page test that mocks `useRouter` returns one object, as Next does; a new object each render re-runs effects that depend on it and wipes state (D4).
 - [ ] Signed-in or worker behaviour checked live with the tester session, or
       listed as unchecked in the handoff. Own paths staged; handoff written.
 

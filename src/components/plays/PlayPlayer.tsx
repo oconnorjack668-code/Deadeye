@@ -9,7 +9,7 @@
 // sliding, holding each step on screen.
 'use client';
 
-import React, { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ChevronLeft, ChevronRight, Pause, Play, RotateCcw } from 'lucide-react';
 import { PlayCourt } from './PlayCourt';
 import { sceneAt, stepStart, stepTimes, totalMs } from '@/lib/plays/animation';
@@ -17,25 +17,10 @@ import { stepCount, type Diagram } from '@/lib/plays/diagram';
 import { roleJobs, roleStart, stepNames } from '@/lib/plays/roles';
 import { track } from '@/lib/events';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/lib/usePrefersReducedMotion';
 
 /** How long each step is held when moving step by step (reduced motion), at 1x. */
 const STEP_HOLD_MS = 1400;
-
-const REDUCED_QUERY = '(prefers-reduced-motion: reduce)';
-
-function subscribeReduced(onChange: () => void): () => void {
-  const mq = window.matchMedia?.(REDUCED_QUERY);
-  mq?.addEventListener('change', onChange);
-  return () => mq?.removeEventListener('change', onChange);
-}
-
-function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribeReduced,
-    () => !!window.matchMedia?.(REDUCED_QUERY).matches,
-    () => false
-  );
-}
 
 const controlButton =
   'inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 px-3 text-sm font-semibold text-zinc-200 hover:bg-zinc-800 disabled:opacity-40';

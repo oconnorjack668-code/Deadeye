@@ -3,7 +3,8 @@
 // supabase/migrations/00036_parent_approval.sql for why). This file is the
 // pure part - what a given age answer means, and what counts as a valid
 // approval - so the rules are testable without a database.
-import type { AgeBracket, ConsentStatus } from './supabase/types';
+import type { ConsentStatus } from './supabase/types';
+import type { CurrentAgeBracket } from './ageBracket';
 
 export type AgeCheck = { is_16_plus: boolean; consent_status: ConsentStatus } | null;
 
@@ -23,11 +24,10 @@ export const UNAPPROVED_ACCOUNT_DAYS = 30;
 export const CONFIRM_LINK_DAYS = 7;
 
 /** The age brackets a player can pick, given what they said about being 16. */
-export function allowedAgeBrackets(is16Plus: boolean | null): AgeBracket[] {
-  // 14-17 straddles 16, so it is open to both
-  if (is16Plus === true) return ['14-17', '18-22', '23-30', '30+'];
-  if (is16Plus === false) return ['13', '14-17'];
-  return ['13', '14-17', '18-22', '23-30', '30+'];
+export function allowedAgeBrackets(is16Plus: boolean | null): CurrentAgeBracket[] {
+  if (is16Plus === true) return ['16-17', '18+'];
+  if (is16Plus === false) return ['13-15'];
+  return ['13-15', '16-17', '18+'];
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

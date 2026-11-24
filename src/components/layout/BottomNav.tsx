@@ -50,9 +50,19 @@ export function isNavActive(pathname: string, match: string[], exact = false): b
   return match.some((m) => pathname === m || (!exact && pathname.startsWith(`${m}/`)));
 }
 
+/**
+ * Setup (/onboarding) has its own slim header and footer: no search, profile,
+ * tab bar or Log button over the form (D4). Settings stays one tap away in
+ * the setup header.
+ */
+export function hidesAppChrome(pathname: string): boolean {
+  return pathname === '/onboarding' || pathname.startsWith('/onboarding/');
+}
+
 export function BottomNav({ mode: savedMode = 'playing' }: { mode?: AppMode }) {
   const pathname = usePathname();
   const mode = shownMode(savedMode, pathname);
+  if (hidesAppChrome(pathname)) return null;
   const items: Array<(typeof NAV_ITEMS)[number] & { exact?: boolean }> = mode === 'coaching' ? COACH_NAV_ITEMS : NAV_ITEMS;
 
   return (

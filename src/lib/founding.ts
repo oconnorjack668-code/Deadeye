@@ -67,6 +67,18 @@ export function foundingState(
 }
 
 /**
+ * Whether Today (the dashboard) shows the founding card. The offer waits for
+ * the player's first log, so a new player's first screen asks for one thing
+ * (founder's decision, 2026-11-23; D6). The heads-up in a founding member's
+ * last week is not an offer and is not held back. The Pro page shows the card
+ * whatever this says, so the offer can still be found and claimed there.
+ */
+export function foundingCardOnToday(state: FoundingState, hasLogged: boolean): boolean {
+  if (state.kind === 'can-claim') return hasLogged;
+  return state.kind === 'active' && state.daysLeft <= FOUNDING_REMINDER_DAYS;
+}
+
+/**
  * The exact number of places left is only shown once it is this low. "97
  * places left" reads as nobody wanting it; "only 20 left" is the moment the
  * number helps. Above this the offer is described as "the first 100 players".

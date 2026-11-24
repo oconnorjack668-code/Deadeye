@@ -11,7 +11,11 @@ export type Json =
 
 export type UserRole = 'player' | 'owner' | 'admin';
 export type PlanType = 'free' | 'pro' | 'owner';
-export type AgeBracket = '13' | '14-17' | '18-22' | '23-30' | '30+';
+/**
+ * profiles.age_bracket. Setup saves 13-15, 16-17 or 18+ (00068); the older
+ * values stay readable until 00069 has moved every row (src/lib/ageBracket.ts).
+ */
+export type AgeBracket = '13-15' | '16-17' | '18+' | '13' | '14-17' | '18-22' | '23-30' | '30+';
 export type AppMode = 'playing' | 'coaching';
 export type ConsentStatus = 'not_needed' | 'pending' | 'approved' | 'withdrawn';
 /** What a player sent from Settings or the crash screen (00067) */

@@ -179,7 +179,7 @@ export function TrackerHud({
         {issues.length === 0 ? (
           <div
             className={`pointer-events-none flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold backdrop-blur-sm ${
-              health.ball ? 'bg-emerald-500/90 text-white' : 'bg-black/55 text-zinc-100'
+              health.ball ? 'bg-emerald-700/95 text-white' : 'bg-black/55 text-zinc-100'
             }`}
           >
             <span className="h-2 w-2 rounded-full bg-current" />

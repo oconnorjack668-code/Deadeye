@@ -1,9 +1,13 @@
 // src/app/(app)/loading.tsx
 // Shown instantly while a page's data loads, so taps on the nav feel immediate.
+// The skeleton is there at 0 ms with one slow light sweep across it; the
+// slogan pill (PageLoader) joins only if the page takes longer than 400 ms.
+import { PageLoader } from '@/components/brand/PageLoader';
+
 export default function Loading() {
   return (
-    <div className="flex-1 overflow-hidden">
-      <div className="p-4 md:p-8 max-w-7xl mx-auto animate-pulse" aria-busy="true" aria-label="Loading">
+    <div className="relative flex-1 overflow-hidden" aria-busy="true">
+      <div className="p-4 md:p-8 max-w-7xl mx-auto" aria-hidden="true">
         <div className="flex items-center gap-3 mb-8">
           <div className="h-12 w-12 rounded-xl bg-zinc-800" />
           <div className="space-y-2">
@@ -22,6 +26,11 @@ export default function Loading() {
           ))}
         </div>
       </div>
+      {/* One light band, moved by transform only */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="deadeye-sweep absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
+      </div>
+      <PageLoader />
     </div>
   );
 }

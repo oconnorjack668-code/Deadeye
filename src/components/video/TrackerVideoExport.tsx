@@ -97,9 +97,10 @@ export function planLengthMs(plan: readonly ExportSegment[]): number {
  * The recording is played through a canvas, each frame drawn with the overlay
  * as it stood at that moment (overlayTimeline.ts), and the canvas recorded.
  * Slow motion is the recording played at half speed into the same canvas.
- * Nothing is uploaded. The calls shown are the tracker's own, as they
- * happened: corrections made in review are not in it, because they were not
- * on the screen.
+ * Nothing is uploaded. The calls shown are the ones the player left in
+ * review (ShotTracker passes shotsToTimeline's timeline): a call they flipped,
+ * removed or added shows as they set it, as it did in Watch it back, so a
+ * saved video never shows a make the player knows was a miss.
  */
 export function TrackerVideoExport({
   file,

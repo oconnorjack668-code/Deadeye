@@ -33,6 +33,9 @@ import { nameBlocked, NAME_BLOCKED_MESSAGE } from '@/lib/nameFilter';
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const TIME = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
 
+/** The rule below in plain words, shown as a hint under every new-password field. */
+export const PASSWORD_HINT = 'At least 8 characters, with a capital letter and a number.';
+
 const newPassword = () =>
   z.string().check(
     z.minLength(8, 'Password must be at least 8 characters'),
@@ -76,7 +79,7 @@ export const updatePasswordSchema = z
 
 export const onboardingSchema = z.object({
   displayName: z.string().check(z.minLength(2, 'Display name is required'), z.refine((n) => !nameBlocked(n), NAME_BLOCKED_MESSAGE)),
-  ageBracket: z.enum(['13', '14-17', '18-22', '23-30', '30+'], {
+  ageBracket: z.enum(['13-15', '16-17', '18+'], {
     message: 'Please select an age bracket',
   }),
   heightCm: z.optional(
