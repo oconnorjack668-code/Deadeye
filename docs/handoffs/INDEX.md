@@ -4,6 +4,7 @@ One line per session, newest first. Open a handoff only when its line matches th
 
 **What is open now is in `docs/STATUS.md`, not here.** The "open: n" counts on lines before 2026-11-11 are what was open that day; many were closed later.
 
+- 2026-11-24 · d4-setup · Setup for Irish players and age brackets 13-15/16-17/18+ (#168); S55 → [handoff](2026-11-24-d4-setup.md)
 - 2026-11-20 · pricing-stripe · Prices kept; fair use, free week, 2-year founding clubs (#156); Stripe steps → [handoff](2026-11-20-pricing-stripe.md)
 - 2026-11-20 · domain-email · deadeye.ie live, Resend and hello@ email, links any browser (#151, #150); S52, S53 → [handoff](2026-11-20-domain-email.md)
 - 2026-11-18 · competition-homepage · 00067 applied, #144 merged, competition on, homepage prize card and For clubs (#146, #148); S49 closed → [handoff](2026-11-18-competition-homepage.md)
@@ -33,4 +34,3 @@ One line per session, newest first. Open a handoff only when its line matches th
 - 2026-11-09 · agent-learning-safety · Agents learn from research; streak opt-in under 18; AI safeguards; DPIA draft · open: 4 → [handoff](2026-11-09-agent-learning-safety.md)
 - 2026-11-09 · new-clips-labelled · New clips labelled; rattle-out fix; phantom calls 24→7 · open: 4 → [handoff](2026-11-09-new-clips-labelled.md)
 - 2026-11-07 · new-test-footage · Crash reports closed; push keys added 7 Nov (done); plan for 3 new clips · open: 1 → [handoff](2026-11-07-new-test-footage.md)
-- 2026-11-03 · rim-finder · Find the hoop for me shipped; live hang fixed (plain worker); checked live · open: 3 → [handoff](2026-11-03-rim-finder.md)
