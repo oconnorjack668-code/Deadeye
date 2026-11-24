@@ -209,39 +209,6 @@
   "calls": [
     {
       "agent": "release-checker",
-      "detail": "Safety PASS (UI only, founding offer now waits for first log). typegen, tsc, eslint, 1819 tests pass; no migrations, no env vars. Checklist in the PR comment.",
-      "group": "live",
-      "id": "pr-162",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/162",
-      "onApprove": "The next Claude Code session merges PR #162 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #162: D6: Today for a new player asks for one thing",
-      "words": "merge 162"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Opened 2026-11-20 from design/watch-back-and-screen-review. Check its safety verdict and checks on GitHub before approving.",
-      "group": "live",
-      "id": "pr-160",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/160",
-      "onApprove": "The next Claude Code session merges PR #160 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #160: Designs: Watch it back (D1) and full screen review (D2-D8)",
-      "words": "merge 160"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Opened 2026-11-20 from docs/blur-rule-2026-11-20. Check its safety verdict and checks on GitHub before approving.",
-      "group": "live",
-      "id": "pr-158",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
-      "onApprove": "The next Claude Code session merges PR #158 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #158: Blur rule: banners, logos and background faces may be blurred",
-      "words": "merge 158"
-    },
-    {
-      "agent": "release-checker",
       "detail": "Opened 2026-11-12 from agent-os. Check its safety verdict and checks on GitHub before approving.",
       "group": "live",
       "id": "pr-95",
@@ -252,14 +219,23 @@
       "words": "merge 95"
     },
     {
-      "agent": "Next agent that merges",
-      "detail": "Blur rule narrowed (founder, 20 Nov): sponsor banners, third-party logos and the faces of people who are not the focus (rebounder, background) may be blurred; no darkened patches, caption strips or blurring the main subject; a blur is not consent for an under-18. Updates the video-editor and marketing knowledge, video style, video-editor agent and skill, critic panel, tools note and exam case 3. Founder approved it to go in with the next merge, so whoever merges next merges #158 too. Codex's uncommitted copy .agents/skills/video-editor-playbook/SKILL.md still says never blur: bring it in... Last checked: 2026-11-20: PR open, docs and agent files only.",
+      "agent": "founder",
+      "detail": "Everything from the 20-24 Nov design round is live (#162-#168) but none of it was seen signed in on a phone (Chrome froze on the low-memory laptop; previews need the tester signed in). Founder, on a phone at deadeye.ie with the tester account: (1) setup at phone size (open it from Profile or Settings): slim header, Step n of 3, full-width Next, Irish words, height in cm, the age question only for a 16+ sign-up; Profile shows 16-17 or 18+, the leaderboard filters read U16 / 16-17 / 18+ (D4, #168); (2) opening animations and the new screens: open the app fresh in a new tab three times (A,... Last checked: 2026-11-24: all merged and deployed; production error log empty for the hour after #168.",
+      "group": "yours",
+      "id": "S56",
+      "kind": "task",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/162",
+      "title": "Next session: try the new build on your phone"
+    },
+    {
+      "agent": "Lead",
+      "detail": "public.profiles_age_bracket_bak (37 rows, RLS on, no grants to anon/authenticated) holds every player's age bracket from before 00069 ran (24 Nov), the only way to undo the move (old 18-22 vs 30+ can't be recovered otherwise). Once S56 shows setup and the leaderboard right, drop it (drop table public.profiles_age_bracket_bak;), around 1 Dec. A later migration can also drop the old values (13, 14-17, 18-22, 23-30, 30+) from the CHECK once nothing writes them; re-run 00069 first. Last checked: 2026-11-24: created and counted (37).",
       "group": "agents",
-      "id": "S54",
+      "id": "S57",
       "kind": "approve",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/158",
-      "onApprove": "Next agent that merges picks this up in the next session and records the result in STATUS (S54).",
-      "title": "Merge PR #158 together with the next PR that merges"
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/main/docs/STATUS.md",
+      "onApprove": "Lead picks this up in the next session and records the result in STATUS (S57).",
+      "title": "Drop the age-bracket backup table after S56 passes"
     },
     {
       "agent": "founder",
@@ -722,12 +698,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #158, 23 Nov) is running (checked 23 Nov).",
+      "detail": "Live and up to date: the latest version (PR #170, 24 Nov) is running (checked 24 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors on the live site in the last 24 hours (checked 23 Nov).",
+      "detail": "No errors on the live site in the last 24 hours (checked 24 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -737,7 +713,7 @@
       "status": "warn"
     },
     {
-      "detail": "5 open, checks green: PR #164 (sign-up polish and check your email), PR #163 (new logo), PR #162 (Today for a new player), PR #161 (setup design, docs only) and PR #95 (agent scheduled runs) (checked 23 Nov).",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 24 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -782,103 +758,103 @@
   ],
   "log": [
     {
+      "at": "2026-11-24T08:10:04Z",
+      "text": "Morning check: no live errors in 24 hours; live site is the latest main (c3c14f0, PR #170); 1 pull request open (#95), checks green.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-24T01:47:01Z",
+      "text": "To-do list rebuilt from STATUS (main c3c14f0): 30 open (1 pull requests), 2 new, 4 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-24T00:44:20Z",
+      "text": "PR #168 (D4 setup) re-checked at 1a6949f (main docs merged in, code unchanged): safety PASS; typegen, tsc, eslint, 1937 tests pass; 00068 before merge, 00069 after deploy; no env vars.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-24T00:18:39Z",
+      "text": "PR #168 (D4 setup) checked at de40483: safety PASS (privacy block fixed); typegen, tsc, eslint, 1937 tests pass; migrations 00068 (before merge) and 00069 (after deploy); no env vars.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-24T00:15:00Z",
+      "text": "PR #168 (D4 setup) re-checked at e78b9ca (builder knowledge only): safety still BLOCK, setup_started missing from the privacy policy step list; typegen, tsc, eslint, 73 covering tests pass; no env vars.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-24T00:02:19Z",
+      "text": "PR #168 (D4 setup) checked at 897c4ae: safety BLOCK, setup_started marker missing from the privacy policy step list; typegen, tsc, eslint, 1937 tests pass; migrations 00068 (before merge) and 00069 (after deploy); no env vars.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-23T23:55:00Z",
+      "text": "PR #167 (D11) re-checked at 061c292 after main was merged in: safety PASS; typegen, tsc, eslint, 1917 tests pass; CI still running at check time; no migrations or env vars. Ready for merge 167 once CI is green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T23:50:00Z",
+      "text": "PR #166 (D10, D2, D7) re-checked at eaf4554: safety PASS; typegen, tsc, eslint, 1892 tests pass (share-sheet mock fixed); CI still running at check time; no migrations or env vars. Ready for merge 166 once CI is green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T23:35:53Z",
+      "text": "PR #167 (D11) re-checked at cfdcb9c after the safety fixes: safety PASS; typegen, tsc, eslint, 1896 tests pass; CI still running at check time; no migrations or env vars. Ready for merge 167 once CI is green.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T23:34:57Z",
+      "text": "PR #166 re-checked at 650e3c9 after the safety fixes: safety PASS; typegen, tsc, eslint pass; the same 3 share-sheet tests still fail in CI (test mock, not the app). No migrations or env vars. Back to builder.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-23T23:35:00Z",
+      "text": "PR #167 (D11 openings, slogans, page loader, landing) checked at 2fb8284: safety PASS; typegen, tsc, eslint, 1895 tests and CI pass; no migrations or env vars. Ready for merge 167.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T23:45:00Z",
+      "text": "PR #166 (D10/D2/D7 chart, first result, share cards) checked at ff4ece8: safety PASS with one privacy-text fix; typegen, tsc, eslint pass; 3 share-sheet tests fail in CI (Node 22 mock Blob). No migrations or env vars. Back to builder.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-23T13:48:17Z",
+      "text": "PR #165 (D1 Watch it back + D11 decode screen) re-checked at 45bde63 after main was merged in: safety PASS, typegen, tsc, eslint and 1871 tests pass, up to date with main, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T13:41:49Z",
+      "text": "PR #164 (D3/D5/D8 auth polish) re-checked at 00df944 after main was merged in: safety PASS, typegen, tsc, eslint and 1856 tests pass, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T13:34:02Z",
+      "text": "PR #163 (D9 logo C) re-checked at a0b6f16: safety PASS, typegen, tsc, eslint and 1831 tests pass, up to date with main, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T13:55:00Z",
+      "text": "PR #165 (D1 Watch it back + decode screen) re-checked at 80373e3: privacy fix in, safety PASS; typegen, tsc, eslint and 1822 tests pass, merges cleanly, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T13:30:01Z",
+      "text": "PR #164 (D3/D5/D8 auth polish, hubs stop sliding) checked at 1d9d1a8: safety PASS, typegen, tsc, eslint and 1832 tests pass, merges cleanly, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-23T13:40:00Z",
+      "text": "PR #165 (D1 Watch it back + decode screen) checked at 05d9c9b: safety BLOCK (privacy page misses watch_back_played/edited), typegen, tsc, eslint and 1822 tests pass, no migrations or env vars.",
+      "tone": "warn"
+    },
+    {
+      "at": "2026-11-23T13:25:00Z",
+      "text": "PR #162 (D6 Today for a new player) re-checked at ab7a97f (main merged in): safety PASS, typegen, tsc, eslint and 1819 tests pass, no migrations or env vars. It was merged at 13:21, so its card is gone.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-23T08:12:00Z",
       "text": "Morning check: live site up to date (PR #158). No errors in the last 24 hours. 5 pull requests open, all green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T00:50:00Z",
-      "text": "PR #162 (D6 Today for a new player) checked: safety PASS, all checks green, no migrations or env vars. Ready for merge 162.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-22T19:02:03Z",
-      "text": "To-do list rebuilt from STATUS (main aa071c0): 31 open (3 pull requests), 0 new, 0 gone since the last update.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-22T08:09:11Z",
-      "text": "Morning check: live site up to date (PR #159). No errors in the last 24 hours. 3 pull requests open, all green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-21T08:09:19Z",
-      "text": "Morning check: live site up to date (PR #159). 3 parent-email errors on 20 Nov, all before the sender fix; nothing new. 3 pull requests open, all green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-20T16:15:27Z",
-      "text": "Learning digest: 24 new lessons (video editor 4, marketing 4, builder 3, safety reviewer 3, player outreach 3, activation analyst 2, club growth 2, QA tester 2, support triage 1). No research due.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-20T10:41:00Z",
-      "text": "PR #156 was merged before its check finished: the \"unlimited\" Pro wording (safety BLOCK) is live. Fix needs a new fix/ branch. Checks all pass.",
-      "tone": "warn"
-    },
-    {
-      "at": "2026-11-20T10:45:00Z",
-      "text": "PR #156 (pricing guards) checked: safety BLOCK, \"unlimited\" still on 5 screens. All checks pass. Back to builder.",
-      "tone": "warn"
-    },
-    {
-      "at": "2026-11-20T08:15:00Z",
-      "text": "Morning check: no errors in the last 24 hours. Live site is the latest version (PR #151). 2 pull requests open, both green. Nothing needs you.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-19T14:25:00Z",
-      "text": "PR #151 (email links in any browser) checked: safety PASS, all checks pass. Merge, then change 3 Supabase email templates.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-19T10:03:45Z",
-      "text": "Marketing mid-week: weekend 20 to 22 Nov drafted as the shooting series warm-up (founder post, Day 0 carousel, Story guess). Three picks waiting for you. No marketing decisions in the hub, no new numbers since 18 Nov.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-19T08:15:00Z",
-      "text": "Morning check: no errors on the live site in the last 24 hours; the live site is running the newest version (PR #149) and is ready; 1 pull request open (#95), checks green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T23:18:00Z",
-      "text": "PR #148 re-check on af4cbd6 (For clubs moved second in phone menu): safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T23:15:10Z",
-      "text": "PR #148 re-check on d0e1c6f (adds competition prize card): safety PASS with notes, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T23:14:43Z",
-      "text": "PR #148 check on d0e1c6f: safety PASS (prize card hidden until COMPETITION_LIVE; separate note on the old only-N-left offer pill), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. PR comment updated.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T23:09:36Z",
-      "text": "PR #148 check on bf46a84: safety PASS, all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T22:42:20Z",
-      "text": "PR #146 check on 82b11f4: safety PASS (banner wording suggestion), all checks green (typegen, tsc, eslint, 1790 tests). No migrations or env vars. Comment posted on the PR.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:50:00Z",
-      "text": "PR #141 check on 9f1f38e: safety PASS, all checks green (typegen, tsc, eslint, 8/8 tests). No migrations or env vars. Comment posted on the PR.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:07:00Z",
-      "text": "PR #139 check on 5ae723e (main merged in): safety PASS, all checks green (typegen, tsc, eslint, 7/7 tests, full suite 1721 passed). No migrations or env vars. It was already merged at 13:04 UTC, so no merge card was added.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-18T13:15:00Z",
-      "text": "PR #139 (HQ to-do list built from STATUS and open PRs) merged to main at 13:04 UTC. Its merge call is cleared.",
       "tone": "ok"
     }
   ],
@@ -896,6 +872,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-23T08:12:00Z",
+  "updatedAt": "2026-11-24T08:10:04Z",
   "updatedBy": "Morning check"
 }
