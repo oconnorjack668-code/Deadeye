@@ -162,6 +162,8 @@ file). Newest first, each with the date, what happened, and the rule.
       handler blocks the main thread.
 - [ ] A share card change: the PNGs rendered with `SHARE_CARD_OUT` (and
       `SHARE_CARD_FONTS=1`) and looked at, story and feed, with the name off.
+- [ ] A migration that changes stored values: ask what the code still live reads during the gap. If old code would misread new values, split it: one file allows them and teaches the DB rules (safe with old code), then deploy, then the backfill. Readers accept old and new values until the backfill has run (D4, 00068/00069).
+- [ ] A page test that mocks `useRouter` returns one object, as Next does; a new object each render re-runs effects that depend on it and wipes state (D4).
 - [ ] Signed-in or worker behaviour checked live with the tester session, or
       listed as unchecked in the handoff. Own paths staged; handoff written.
 
