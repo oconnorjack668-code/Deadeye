@@ -34,19 +34,23 @@ export const SLOGAN_KEY = 'dd-sl';
 export const SLOGAN_LAST_KEY = 'dd-sl-last';
 export const OPENED_AT_KEY = 'dd-open-t';
 export const SWISH_SRC = '/opening/swish.js';
+export const RUN_CLASS = 'dd-open-run';
+export const RUN_EVENT = 'dd-open-run';
+/** If the app never hydrates (a script error), the opening starts anyway after this. */
+export const RUN_FALLBACK_MS = 6000;
 
 /** Paths that are the website rather than the app: no opening there. */
 // /clubs itself is the website's clubs page; /clubs/<id> is a club in the app.
 export const NO_OPENING_PATH = /^\/(?:(?:privacy|terms|parents|parent-approval|competition|install|account-deletion|auth)(?:\/|$)|clubs\/?$)/;
 
 /**
- * The shortest time the opening stays up on a cold open, so the lock, the
- * name and the slogan all land and can be read: the slogan finishes rising at
- * about 1.2 s in A and C and 1.9 s in B (it was 0.8 s, which cut the splash
- * off just as the slogan started to appear). The exit starts when the app is ready, but never sooner than this
+ * The shortest time the opening stays up once it starts: its whole length, so
+ * the app never cuts it short (founder, 25 Nov 2026: "the user doesn't have
+ * the chance to see it"). It only starts once the app is on screen
+ * (html.dd-open-run, OpeningSplashRunner), so the whole of it is seen. The exit starts when the app is ready, but never sooner than this
  * and never later than the opening's own end.
  */
-export const MIN_SHOW_MS: Record<Opening, number> = { a: 1800, b: 2400, c: 1800 };
+export const MIN_SHOW_MS: Record<Opening, number> = { a: 2000, b: 2600, c: 2000 };
 
 /**
  * A visit ends after this long without an opening: the next cold open plays
@@ -92,6 +96,7 @@ var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
 document.addEventListener('pointerdown',skip,true);document.addEventListener('keydown',skip,true);
+setTimeout(function(){if(!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
 var still=false;try{still=w.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
 if(n===1&&!still){var s=document.createElement('script');s.src='${SWISH_SRC}';s.async=true;s.onerror=function(){d.setAttribute('data-open','a')};document.head.appendChild(s)}
 })();`;

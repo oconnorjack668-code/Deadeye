@@ -163,19 +163,30 @@ describe("the visit's slogan", () => {
 });
 
 describe('when the app ends the opening', () => {
-  it('waits for the minimum, so the slogan is up long enough to read, then exits when the app is ready', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 2000)).toBe(1500);
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 1900, 2000)).toBe(0);
-    // the slogan finishes rising at about 1.16 s; it must still be on screen well after that
-    expect(MIN_SHOW_MS.a).toBeGreaterThanOrEqual(1700);
-    expect(MIN_SHOW_MS.c).toBeGreaterThanOrEqual(1700);
+  it('plays every opening to its own end: the app never cuts it short', () => {
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 2000)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.c, 1900, 2000)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 2600)).toBeNull();
   });
-  it('never holds an opening past its own end', () => {
+  it('still never holds an opening past its own end', () => {
     expect(earlyExitDelay(MIN_SHOW_MS.a, 2100, 2000)).toBeNull();
-    // reduced motion: the still leaves at 1.4 s on its own, before the minimum
     expect(earlyExitDelay(MIN_SHOW_MS.a, 100, 1400)).toBeNull();
   });
-  it('lets B land its lock and slogan before leaving', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 2600)).toBe(2200);
+});
+
+describe('when the opening starts', () => {
+  it('waits for the app, but starts by itself if the app never hydrates', () => {
+    vi.useFakeTimers();
+    try {
+      coldOpen();
+      const root = document.documentElement;
+      expect(root.classList.contains('dd-open-run')).toBe(false);
+      vi.advanceTimersByTime(5999);
+      expect(root.classList.contains('dd-open-run')).toBe(false);
+      vi.advanceTimersByTime(1);
+      expect(root.classList.contains('dd-open-run')).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
