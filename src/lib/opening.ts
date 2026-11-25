@@ -7,13 +7,16 @@
 //   cold open: a counter in localStorage (`dd-open-n`) goes 0, 1, 2, 0...; 0 is
 //   A, so a brand-new device sees A first. If localStorage is blocked, the
 //   pick is random.
-// - Once per visit: a sessionStorage flag (`dd-opened`) is set as the opening
-//   is picked, so a reload, a tab switch or coming back within the visit never
-//   plays it again; page changes never run this script at all. If
-//   sessionStorage is blocked, nothing plays (better none than one per page).
+// - Once per visit: a sessionStorage flag (`dd-opened`) and the time it last
+//   played (`dd-open-t`, localStorage) are set as the opening is picked. A
+//   reload or coming back within VISIT_GAP_MS never plays it again; after
+//   that gap it plays on the next cold open even in the same tab (an
+//   installed app's sessionStorage can live for days). Page changes never run
+//   this script at all. If sessionStorage is blocked, nothing plays.
 // - Not on the website's own pages (the landing page, legal pages, clubs,
 //   competition, install): a visitor from a link gets the page, not a splash.
-// - The slogan: one per visit, never last visit's (src/lib/slogans.ts).
+// - The slogan: a new one on every cold open that plays the opening (and on
+//   the first load of a tab), never the last one shown (src/lib/slogans.ts).
 //
 // It sets <html data-open="a|b|c"> and <html data-sl="n">; CSS in
 // src/components/brand/opening.css shows the matching scene. B's hoop and net
@@ -29,6 +32,7 @@ export const OPEN_COUNT_KEY = 'dd-open-n';
 export const OPENED_KEY = 'dd-opened';
 export const SLOGAN_KEY = 'dd-sl';
 export const SLOGAN_LAST_KEY = 'dd-sl-last';
+export const OPENED_AT_KEY = 'dd-open-t';
 export const SWISH_SRC = '/opening/swish.js';
 
 /** Paths that are the website rather than the app: no opening there. */
@@ -36,12 +40,21 @@ export const SWISH_SRC = '/opening/swish.js';
 export const NO_OPENING_PATH = /^\/(?:(?:privacy|terms|parents|parent-approval|competition|install|account-deletion|auth)(?:\/|$)|clubs\/?$)/;
 
 /**
- * The shortest time the opening stays up on a cold open, so the lock lands:
- * 0.8 s for A and C (decision 3); B's brackets only land at 1.45 s, so B waits
- * for that. The exit starts when the app is ready, but never sooner than this
+ * The shortest time the opening stays up on a cold open, so the lock, the
+ * name and the slogan all land and can be read: the slogan finishes rising at
+ * about 1.2 s in A and C and 1.9 s in B (it was 0.8 s, which cut the splash
+ * off just as the slogan started to appear). The exit starts when the app is ready, but never sooner than this
  * and never later than the opening's own end.
  */
-export const MIN_SHOW_MS: Record<Opening, number> = { a: 800, b: 1450, c: 800 };
+export const MIN_SHOW_MS: Record<Opening, number> = { a: 1800, b: 2400, c: 1800 };
+
+/**
+ * A visit ends after this long without an opening: the next cold open plays
+ * it again even if the tab's sessionStorage survived (an installed app kept
+ * alive in the background keeps its sessionStorage for days, so "once per
+ * sessionStorage" meant the opening almost never played on phones).
+ */
+export const VISIT_GAP_MS = 30 * 60 * 1000;
 
 export function isOpening(v: unknown): v is Opening {
   return v === 'a' || v === 'b' || v === 'c';
@@ -69,11 +82,12 @@ function g(s,k){try{return s?s.getItem(k):null}catch(e){return null}}
 function p(s,k,v){try{if(s)s.setItem(k,String(v))}catch(e){}}
 var path=location.pathname;
 if(path==='/'||${NO_OPENING_PATH.toString()}.test(path))return;
+var now=Date.now(),t=parseInt(g(ls,'${OPENED_AT_KEY}'),10),fresh=!!ss&&(!g(ss,'${OPENED_KEY}')||(ls&&!(now-t<${VISIT_GAP_MS})&&!(t>now)));
 var k=parseInt(g(ss,'${SLOGAN_KEY}'),10);
-if(!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=0&&l<M;k=Math.floor(Math.random()*(a?M-1:M));if(a&&k>=l)k++;p(ss,'${SLOGAN_KEY}',k);p(ls,'${SLOGAN_LAST_KEY}',k)}
+if(fresh||!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=0&&l<M;k=Math.floor(Math.random()*(a?M-1:M));if(a&&k>=l)k++;p(ss,'${SLOGAN_KEY}',k);p(ls,'${SLOGAN_LAST_KEY}',k)}
 d.setAttribute('data-sl',k);
-if(!ss||g(ss,'${OPENED_KEY}'))return;
-p(ss,'${OPENED_KEY}',1);
+if(!fresh)return;
+p(ss,'${OPENED_KEY}',1);p(ls,'${OPENED_AT_KEY}',now);
 var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%3;if(!(n>=0))n=0;ls.setItem('${OPEN_COUNT_KEY}',String(n))}catch(e){n=Math.floor(Math.random()*3)}
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
