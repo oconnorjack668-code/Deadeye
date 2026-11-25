@@ -5,7 +5,7 @@
 // when B plays with motion allowed, and a tap skips. Runs the real inlined
 // script text, as the browser does.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC, VISIT_GAP_MS } from '@/lib/opening';
+import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC } from '@/lib/opening';
 import { SHORT_SLOGANS } from '@/lib/slogans';
 
 class MemoryStorage {
@@ -85,14 +85,11 @@ describe('the opening rotation', () => {
     expect(coldOpen()).toBe('b');
   });
 
-  it('plays again on a cold open after a long gap, even if sessionStorage survived (installed app)', () => {
-    const t0 = 1_000_000_000_000;
-    const now = vi.spyOn(Date, 'now').mockReturnValue(t0);
+  it('plays again on the next open after the app was fully closed, however soon', () => {
     expect(coldOpen()).toBe('a');
-    now.mockReturnValue(t0 + 5 * 60 * 1000);
-    expect(coldOpen()).toBeNull(); // a reload five minutes later
-    now.mockReturnValue(t0 + VISIT_GAP_MS + 1);
-    expect(coldOpen()).toBe('b'); // same tab, half an hour on
+    expect(coldOpen()).toBeNull(); // reloaded while still open
+    newVisit(); // swiped away and opened again a minute later
+    expect(coldOpen()).toBe('b');
   });
 
   it('shows nothing when sessionStorage is blocked, so it can never repeat on every load', () => {
@@ -113,7 +110,7 @@ describe('the opening rotation', () => {
   it('writes nothing to the device on website pages (ePrivacy: storage only where it is used)', () => {
     for (const p of ['/', '/privacy', '/parents/abc', '/competition']) {
       coldOpen(p);
-      for (const k of ['dd-open-n', 'dd-sl-last', 'dd-open-t']) expect(local.getItem(k), `${p} ${k}`).toBeNull();
+      for (const k of ['dd-open-n', 'dd-sl-last']) expect(local.getItem(k), `${p} ${k}`).toBeNull();
       for (const k of ['dd-opened', 'dd-sl']) expect(session.getItem(k), `${p} ${k}`).toBeNull();
       expect(document.documentElement.getAttribute('data-sl'), p).toBeNull();
     }
