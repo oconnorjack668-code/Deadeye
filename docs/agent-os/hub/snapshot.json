@@ -698,12 +698,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #170, 24 Nov) is running (checked 24 Nov).",
+      "detail": "Live and up to date: the latest version (PR #170, 24 Nov) is running (checked 25 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors on the live site in the last 24 hours (checked 24 Nov).",
+      "detail": "No errors on the live site in the last 24 hours (checked 25 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -713,7 +713,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 24 Nov).",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 25 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -758,14 +758,19 @@
   ],
   "log": [
     {
-      "at": "2026-11-24T08:10:04Z",
+      "at": "2026-11-25T08:09:43Z",
       "text": "Morning check: no live errors in 24 hours; live site is the latest main (c3c14f0, PR #170); 1 pull request open (#95), checks green.",
       "tone": "good"
     },
     {
-      "at": "2026-11-24T01:47:01Z",
-      "text": "To-do list rebuilt from STATUS (main c3c14f0): 30 open (1 pull requests), 2 new, 4 gone since the last update.",
+      "at": "2026-11-24T19:02:35Z",
+      "text": "To-do list rebuilt from STATUS (main c3c14f0): 30 open (1 pull requests), 0 new, 0 gone since the last update.",
       "tone": "ok"
+    },
+    {
+      "at": "2026-11-24T08:10:04Z",
+      "text": "Morning check: no live errors in 24 hours; live site is the latest main (c3c14f0, PR #170); 1 pull request open (#95), checks green.",
+      "tone": "good"
     },
     {
       "at": "2026-11-24T00:44:20Z",
@@ -851,11 +856,6 @@
       "at": "2026-11-23T13:25:00Z",
       "text": "PR #162 (D6 Today for a new player) re-checked at ab7a97f (main merged in): safety PASS, typegen, tsc, eslint and 1819 tests pass, no migrations or env vars. It was merged at 13:21, so its card is gone.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T08:12:00Z",
-      "text": "Morning check: live site up to date (PR #158). No errors in the last 24 hours. 5 pull requests open, all green.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -872,6 +872,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-24T08:10:04Z",
+  "updatedAt": "2026-11-25T08:09:43Z",
   "updatedBy": "Morning check"
 }
