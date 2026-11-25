@@ -5,7 +5,7 @@
 // when B plays with motion allowed, and a tap skips. Runs the real inlined
 // script text, as the browser does.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC } from '@/lib/opening';
+import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC, VISIT_GAP_MS } from '@/lib/opening';
 import { SHORT_SLOGANS } from '@/lib/slogans';
 
 class MemoryStorage {
@@ -85,6 +85,16 @@ describe('the opening rotation', () => {
     expect(coldOpen()).toBe('b');
   });
 
+  it('plays again on a cold open after a long gap, even if sessionStorage survived (installed app)', () => {
+    const t0 = 1_000_000_000_000;
+    const now = vi.spyOn(Date, 'now').mockReturnValue(t0);
+    expect(coldOpen()).toBe('a');
+    now.mockReturnValue(t0 + 5 * 60 * 1000);
+    expect(coldOpen()).toBeNull(); // a reload five minutes later
+    now.mockReturnValue(t0 + VISIT_GAP_MS + 1);
+    expect(coldOpen()).toBe('b'); // same tab, half an hour on
+  });
+
   it('shows nothing when sessionStorage is blocked, so it can never repeat on every load', () => {
     session = blocked;
     expect(coldOpen()).toBeNull();
@@ -103,7 +113,7 @@ describe('the opening rotation', () => {
   it('writes nothing to the device on website pages (ePrivacy: storage only where it is used)', () => {
     for (const p of ['/', '/privacy', '/parents/abc', '/competition']) {
       coldOpen(p);
-      for (const k of ['dd-open-n', 'dd-sl-last']) expect(local.getItem(k), `${p} ${k}`).toBeNull();
+      for (const k of ['dd-open-n', 'dd-sl-last', 'dd-open-t']) expect(local.getItem(k), `${p} ${k}`).toBeNull();
       for (const k of ['dd-opened', 'dd-sl']) expect(session.getItem(k), `${p} ${k}`).toBeNull();
       expect(document.documentElement.getAttribute('data-sl'), p).toBeNull();
     }
@@ -131,7 +141,7 @@ describe('the opening rotation', () => {
 });
 
 describe("the visit's slogan", () => {
-  it('stays the same all visit and changes on the next visit', () => {
+  it('stays the same across reloads in a visit and changes on the next visit', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     coldOpen();
     const first = document.documentElement.getAttribute('data-sl');
@@ -153,16 +163,19 @@ describe("the visit's slogan", () => {
 });
 
 describe('when the app ends the opening', () => {
-  it('waits for the minimum, then exits as soon as the app is ready', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 1250)).toBe(500);
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 1000, 1250)).toBe(0);
+  it('waits for the minimum, so the slogan is up long enough to read, then exits when the app is ready', () => {
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 2000)).toBe(1500);
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 1900, 2000)).toBe(0);
+    // the slogan finishes rising at about 1.16 s; it must still be on screen well after that
+    expect(MIN_SHOW_MS.a).toBeGreaterThanOrEqual(1700);
+    expect(MIN_SHOW_MS.c).toBeGreaterThanOrEqual(1700);
   });
   it('never holds an opening past its own end', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 1300, 1250)).toBeNull();
-    // reduced motion: the still leaves at 0.7 s on its own, before the minimum
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 100, 700)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 2100, 2000)).toBeNull();
+    // reduced motion: the still leaves at 1.4 s on its own, before the minimum
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 100, 1400)).toBeNull();
   });
-  it('lets B land its lock before leaving', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 1850)).toBe(1250);
+  it('lets B land its lock and slogan before leaving', () => {
+    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 2600)).toBe(2200);
   });
 });
