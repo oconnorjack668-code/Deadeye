@@ -178,8 +178,14 @@
       if (anim && anim.beginElement) anim.beginElement();
       document.dispatchEvent(new Event('dd-open-go'));
     };
-    if (window.requestAnimationFrame) window.requestAnimationFrame(go);
-    else go();
+    var frame = function () {
+      if (window.requestAnimationFrame) window.requestAnimationFrame(go);
+      else go();
+    };
+    // Waits, like A and C, until the app is on screen (html.dd-open-run, added by
+    // OpeningSplashRunner), so B is never half over before anyone can see it
+    if (root.classList.contains('dd-open-run')) frame();
+    else document.addEventListener('dd-open-run', frame, { once: true });
     return true;
   }
 

@@ -23,6 +23,16 @@ html[data-open] #dd-open {
   animation: dd-open-exit 250ms cubic-bezier(0.4, 0, 1, 1) 2000ms both;
 }
 
+/* Held at its first frame until the app is on screen (html.dd-open-run, added
+   by OpeningSplashRunner once React has hydrated and a frame has painted).
+   Before this, the clock started as the HTML was parsed, while the phone was
+   still busy loading the app behind its own splash screen, so most of the
+   opening played where nobody could see it (founder, 25 Nov 2026). */
+html[data-open]:not(.dd-open-run):not(.dd-open-skip):not(.dd-open-out) #dd-open,
+html[data-open]:not(.dd-open-run):not(.dd-open-skip):not(.dd-open-out) #dd-open * {
+  animation-play-state: paused !important;
+}
+
 /* The drawing is laid out on the 390 x 844 box the prototypes used, centred
    on the lockup, never cut off at the top on a short phone */
 .dd-open-box {
