@@ -219,6 +219,17 @@
       "words": "merge 95"
     },
     {
+      "agent": "release-checker",
+      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. After merge, check sw hoopiq-v8 installs.",
+      "group": "live",
+      "id": "pr-171",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/171",
+      "onApprove": "The next Claude Code session merges PR #171 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #171: Fix opening animation timing/replay and rotate loading slogans",
+      "words": "merge 171"
+    },
+    {
       "agent": "founder",
       "detail": "Everything from the 20-24 Nov design round is live (#162-#168) but none of it was seen signed in on a phone (Chrome froze on the low-memory laptop; previews need the tester signed in). Founder, on a phone at deadeye.ie with the tester account: (1) setup at phone size (open it from Profile or Settings): slim header, Step n of 3, full-width Next, Irish words, height in cm, the age question only for a 16+ sign-up; Profile shows 16-17 or 18+, the leaderboard filters read U16 / 16-17 / 18+ (D4, #168); (2) opening animations and the new screens: open the app fresh in a new tab three times (A,... Last checked: 2026-11-24: all merged and deployed; production error log empty for the hour after #168.",
       "group": "yours",
@@ -486,6 +497,39 @@
       "kind": "task",
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
       "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. Check a cold open plays the opening in full on the preview.",
+      "group": "live",
+      "id": "pr-172",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/172",
+      "onApprove": "The next Claude Code session merges PR #172 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #172: Start the opening only once the app is on screen, and play it in full",
+      "words": "merge 172"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "DUPLICATE of #171 (already on main, empty diff, conflicting): close, don't merge. Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars.",
+      "group": "live",
+      "id": "pr-173",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/173",
+      "onApprove": "The next Claude Code session merges PR #173 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #173: Fix opening and loader: longer hold, replay after 30 min, slogan per …",
+      "words": "merge 173"
+    },
+    {
+      "agent": "release-checker",
+      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. Opening now replays only after the app is fully closed.",
+      "group": "live",
+      "id": "pr-174",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/174",
+      "onApprove": "The next Claude Code session merges PR #174 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #174: Play the opening every time the app is opened from fully closed",
+      "words": "merge 174"
     }
   ],
   "clubs": {
@@ -698,12 +742,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #170, 24 Nov) is running (checked 25 Nov).",
+      "detail": "Live and up to date: the latest version (PR #174, 25 Nov) is running (checked 26 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors on the live site in the last 24 hours (checked 25 Nov).",
+      "detail": "No real errors on the live site in the last 24 hours; 1 harmless warning from a library ignored (checked 26 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -713,7 +757,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 25 Nov).",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 26 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -758,14 +802,39 @@
   ],
   "log": [
     {
-      "at": "2026-11-25T08:09:43Z",
-      "text": "Morning check: no live errors in 24 hours; live site is the latest main (c3c14f0, PR #170); 1 pull request open (#95), checks green.",
+      "at": "2026-11-26T08:09:40Z",
+      "text": "Morning check: live site up to date (PR #174), no real errors in 24h, 1 open PR with green checks.",
       "tone": "good"
     },
     {
-      "at": "2026-11-24T19:02:35Z",
+      "at": "2026-11-25T21:12:49Z",
+      "text": "PR #174 checked: safety PASS, all release checks green, no migrations or env vars.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-25T21:05:00Z",
+      "text": "PR #173 checked: duplicate of #171 (already merged, no net change). Safety PASS, checks green; recommend closing it.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-25T20:45:00Z",
+      "text": "PR #172 checked: safety PASS, all release checks green, no migrations or env vars.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-25T19:25:00Z",
+      "text": "PR #171 checked: safety PASS, all release checks green, no migrations or env vars.",
+      "tone": "good"
+    },
+    {
+      "at": "2026-11-25T19:02:17Z",
       "text": "To-do list rebuilt from STATUS (main c3c14f0): 30 open (1 pull requests), 0 new, 0 gone since the last update.",
       "tone": "ok"
+    },
+    {
+      "at": "2026-11-25T08:09:43Z",
+      "text": "Morning check: no live errors in 24 hours; live site is the latest main (c3c14f0, PR #170); 1 pull request open (#95), checks green.",
+      "tone": "good"
     },
     {
       "at": "2026-11-24T08:10:04Z",
@@ -872,6 +941,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-25T08:09:43Z",
+  "updatedAt": "2026-11-26T08:09:40Z",
   "updatedBy": "Morning check"
 }
