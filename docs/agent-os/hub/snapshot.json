@@ -219,17 +219,6 @@
       "words": "merge 95"
     },
     {
-      "agent": "release-checker",
-      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. After merge, check sw hoopiq-v8 installs.",
-      "group": "live",
-      "id": "pr-171",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/171",
-      "onApprove": "The next Claude Code session merges PR #171 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #171: Fix opening animation timing/replay and rotate loading slogans",
-      "words": "merge 171"
-    },
-    {
       "agent": "founder",
       "detail": "Everything from the 20-24 Nov design round is live (#162-#168) but none of it was seen signed in on a phone (Chrome froze on the low-memory laptop; previews need the tester signed in). Founder, on a phone at deadeye.ie with the tester account: (1) setup at phone size (open it from Profile or Settings): slim header, Step n of 3, full-width Next, Irish words, height in cm, the age question only for a 16+ sign-up; Profile shows 16-17 or 18+, the leaderboard filters read U16 / 16-17 / 18+ (D4, #168); (2) opening animations and the new screens: open the app fresh in a new tab three times (A,... Last checked: 2026-11-24: all merged and deployed; production error log empty for the hour after #168.",
       "group": "yours",
@@ -499,37 +488,19 @@
       "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
     },
     {
-      "agent": "release-checker",
-      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. Check a cold open plays the opening in full on the preview.",
-      "group": "live",
-      "id": "pr-172",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/172",
-      "onApprove": "The next Claude Code session merges PR #172 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #172: Start the opening only once the app is on screen, and play it in full",
-      "words": "merge 172"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "DUPLICATE of #171 (already on main, empty diff, conflicting): close, don't merge. Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars.",
-      "group": "live",
-      "id": "pr-173",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/173",
-      "onApprove": "The next Claude Code session merges PR #173 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #173: Fix opening and loader: longer hold, replay after 30 min, slogan per …",
-      "words": "merge 173"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS; typegen, tsc, lint, tests (1,940) pass; no migrations or env vars. Opening now replays only after the app is fully closed.",
-      "group": "live",
-      "id": "pr-174",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/174",
-      "onApprove": "The next Claude Code session merges PR #174 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #174: Play the opening every time the app is opened from fully closed",
-      "words": "merge 174"
+      "agent": "marketing",
+      "group": "agents",
+      "id": "mk-weekend-2026-11-27",
+      "kind": "approve",
+      "title": "Approve this weekend's posts (Day 5 Friday, Day 7 Sunday)",
+      "detail": "Fri 27: Day 5 form spots (opening A). Sat 28: optional Story \"Day 7 tomorrow\". Sun 29: Day 7 vs Day 1 (opening B), posted without the competition line because S50 is not done. If Day 1 never went up, pick \"shift\": Friday becomes Day 1 and Sunday Day 3. Also tell marketing whether Day 1 and Day 3 went up, and the dates.",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-26-weekend.md",
+      "onApprove": "Marketing treats the drafts as approved; the founder films and posts them. Marketing logs the dates and 48h counts in results.md when sent.",
+      "options": [
+        "as drafted",
+        "shift"
+      ],
+      "words": "approve weekend"
     }
   ],
   "clubs": {
@@ -621,22 +592,22 @@
   "film": {
     "days": [
       {
-        "day": "Fri 20",
-        "post": "Founder post in the app: \"Two weeks, starting Monday\" (or Focus Finder / Log it by hand)",
-        "where": "In the app"
+        "day": "Fri 27",
+        "post": "Day 5: 50 close shots from 5 spots, one fix (elbow under the ball), opening A. If Day 1 never went up, Friday is Day 1 instead",
+        "where": "TikTok + Reels 17:30 to 19:00"
       },
       {
-        "day": "Sat 21",
-        "post": "Day 0 carousel: 4 photos of an empty court + the 5-spot 3s screen, \"Starts Monday\"",
-        "where": "TikTok photo post 11:00 · IG carousel 12:00"
+        "day": "Sat 28",
+        "post": "Optional Story: \"My Day 1 was [m]/50. Day 7 is tomorrow. Better or worse?\" slider + link sticker",
+        "where": "IG Story, any time"
       },
       {
-        "day": "Sun 22",
-        "post": "Story: \"Guess my Day 1 score\" slider + link sticker; answer Monday",
-        "where": "IG Story 17:00 · 19:00"
+        "day": "Sun 29",
+        "post": "Day 7: same 50 threes as Day 1, Day 1 vs Day 7, opening B. No competition line until S50 is done",
+        "where": "TikTok + Reels 17:30 to 19:00"
       }
     ],
-    "experiment": "Shooting series from Mon 23 Nov: opening A (action first) vs B (number first), alternating; read on average watch time and the 3-second hold. Under about 1,000 views it is a hint."
+    "experiment": "Shooting series: opening A (action first) vs B (number first), alternating; read on average watch time and the 3-second hold at 48h. Under about 1,000 views it is a hint."
   },
   "funnel": {
     "history": [
@@ -802,6 +773,16 @@
   ],
   "log": [
     {
+      "at": "2026-11-26T10:03:06Z",
+      "text": "Marketing mid-week: weekend drafts for 27 to 29 Nov (Day 5 Friday, Day 7 Sunday without the competition line). No marketing decisions in the hub; no new numbers.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T09:02:06Z",
+      "text": "To-do list rebuilt from STATUS (main 9c54a10): 30 open (1 pull requests), 0 new, 4 gone since the last update.",
+      "tone": "ok"
+    },
+    {
       "at": "2026-11-26T08:09:40Z",
       "text": "Morning check: live site up to date (PR #174), no real errors in 24h, 1 open PR with green checks.",
       "tone": "good"
@@ -825,11 +806,6 @@
       "at": "2026-11-25T19:25:00Z",
       "text": "PR #171 checked: safety PASS, all release checks green, no migrations or env vars.",
       "tone": "good"
-    },
-    {
-      "at": "2026-11-25T19:02:17Z",
-      "text": "To-do list rebuilt from STATUS (main c3c14f0): 30 open (1 pull requests), 0 new, 0 gone since the last update.",
-      "tone": "ok"
     },
     {
       "at": "2026-11-25T08:09:43Z",
@@ -895,36 +871,6 @@
       "at": "2026-11-23T13:48:17Z",
       "text": "PR #165 (D1 Watch it back + D11 decode screen) re-checked at 45bde63 after main was merged in: safety PASS, typegen, tsc, eslint and 1871 tests pass, up to date with main, no migrations or env vars.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T13:41:49Z",
-      "text": "PR #164 (D3/D5/D8 auth polish) re-checked at 00df944 after main was merged in: safety PASS, typegen, tsc, eslint and 1856 tests pass, no migrations or env vars.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T13:34:02Z",
-      "text": "PR #163 (D9 logo C) re-checked at a0b6f16: safety PASS, typegen, tsc, eslint and 1831 tests pass, up to date with main, no migrations or env vars.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T13:55:00Z",
-      "text": "PR #165 (D1 Watch it back + decode screen) re-checked at 80373e3: privacy fix in, safety PASS; typegen, tsc, eslint and 1822 tests pass, merges cleanly, no migrations or env vars.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T13:30:01Z",
-      "text": "PR #164 (D3/D5/D8 auth polish, hubs stop sliding) checked at 1d9d1a8: safety PASS, typegen, tsc, eslint and 1832 tests pass, merges cleanly, no migrations or env vars.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T13:40:00Z",
-      "text": "PR #165 (D1 Watch it back + decode screen) checked at 05d9c9b: safety BLOCK (privacy page misses watch_back_played/edited), typegen, tsc, eslint and 1822 tests pass, no migrations or env vars.",
-      "tone": "warn"
-    },
-    {
-      "at": "2026-11-23T13:25:00Z",
-      "text": "PR #162 (D6 Today for a new player) re-checked at ab7a97f (main merged in): safety PASS, typegen, tsc, eslint and 1819 tests pass, no migrations or env vars. It was merged at 13:21, so its card is gone.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -941,6 +887,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-26T08:09:40Z",
-  "updatedBy": "Morning check"
+  "updatedAt": "2026-11-26T10:03:06Z",
+  "updatedBy": "Marketing mid-week"
 }
