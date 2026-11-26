@@ -85,6 +85,13 @@ describe('the opening rotation', () => {
     expect(coldOpen()).toBe('b');
   });
 
+  it('plays again on the next open after the app was fully closed, however soon', () => {
+    expect(coldOpen()).toBe('a');
+    expect(coldOpen()).toBeNull(); // reloaded while still open
+    newVisit(); // swiped away and opened again a minute later
+    expect(coldOpen()).toBe('b');
+  });
+
   it('shows nothing when sessionStorage is blocked, so it can never repeat on every load', () => {
     session = blocked;
     expect(coldOpen()).toBeNull();
@@ -131,7 +138,7 @@ describe('the opening rotation', () => {
 });
 
 describe("the visit's slogan", () => {
-  it('stays the same all visit and changes on the next visit', () => {
+  it('stays the same across reloads in a visit and changes on the next visit', () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     coldOpen();
     const first = document.documentElement.getAttribute('data-sl');
@@ -153,16 +160,30 @@ describe("the visit's slogan", () => {
 });
 
 describe('when the app ends the opening', () => {
-  it('waits for the minimum, then exits as soon as the app is ready', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 1250)).toBe(500);
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 1000, 1250)).toBe(0);
+  it('plays every opening to its own end: the app never cuts it short', () => {
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 300, 2000)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.c, 1900, 2000)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 2600)).toBeNull();
   });
-  it('never holds an opening past its own end', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 1300, 1250)).toBeNull();
-    // reduced motion: the still leaves at 0.7 s on its own, before the minimum
-    expect(earlyExitDelay(MIN_SHOW_MS.a, 100, 700)).toBeNull();
+  it('still never holds an opening past its own end', () => {
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 2100, 2000)).toBeNull();
+    expect(earlyExitDelay(MIN_SHOW_MS.a, 100, 1400)).toBeNull();
   });
-  it('lets B land its lock before leaving', () => {
-    expect(earlyExitDelay(MIN_SHOW_MS.b, 200, 1850)).toBe(1250);
+});
+
+describe('when the opening starts', () => {
+  it('waits for the app, but starts by itself if the app never hydrates', () => {
+    vi.useFakeTimers();
+    try {
+      coldOpen();
+      const root = document.documentElement;
+      expect(root.classList.contains('dd-open-run')).toBe(false);
+      vi.advanceTimersByTime(5999);
+      expect(root.classList.contains('dd-open-run')).toBe(false);
+      vi.advanceTimersByTime(1);
+      expect(root.classList.contains('dd-open-run')).toBe(true);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

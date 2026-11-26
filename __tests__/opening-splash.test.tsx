@@ -70,7 +70,7 @@ describe("opening B's swish file", () => {
     expect([...props].sort()).toEqual(['animation-timing-function', 'opacity', 'transform']);
   });
 
-  it('builds the hoop around the splash and starts it in one frame, only when B was picked', () => {
+  it('builds the hoop around the splash and starts it once the app is on screen, only when B was picked', () => {
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { cb(0); return 0; });
     const go = vi.fn();
     document.addEventListener('dd-open-go', go);
@@ -82,10 +82,17 @@ describe("opening B's swish file", () => {
     expect(s.start()).toBe(true);
     expect(document.querySelectorAll('.dd-b-scene')).toHaveLength(2);
     expect(document.getElementById('ddneta')?.getAttribute('values')?.split(';').length).toBeGreaterThan(60);
+    // the hoop is drawn, but B waits until the app is on screen
+    expect(root.classList.contains('dd-b-go')).toBe(false);
+    expect(go).not.toHaveBeenCalled();
+    root.classList.add('dd-open-run');
+    document.dispatchEvent(new Event('dd-open-run'));
     expect(root.classList.contains('dd-b-go')).toBe(true);
     expect(go).toHaveBeenCalledTimes(1);
     expect(s.start()).toBe(false); // never twice
     document.removeEventListener('dd-open-go', go);
+    root.classList.remove('dd-open-run', 'dd-b-go');
+    root.removeAttribute('data-open');
     vi.unstubAllGlobals();
   });
 });

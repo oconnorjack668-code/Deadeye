@@ -18,7 +18,10 @@
 // v7 is for logo C (22 Nov 2026): the precached icon-192 and icon-512 were
 // redrawn under the same names, so installed devices need a new cache to drop
 // the old artwork.
-const CACHE_NAME = 'hoopiq-v7';
+// v8 precaches /opening/swish.js, so opening B starts at once on a cold open
+// instead of waiting on the network (and showing a blank dark screen on a
+// slow connection).
+const CACHE_NAME = 'hoopiq-v8';
 const PAGE_CACHE = 'hoopiq-pages-v1';
 // The hoop finder's model (36 MB), written by its worker (src/lib/video/
 // rimModel.ts). Kept across updates, or every update would download it again.
@@ -32,6 +35,7 @@ const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/sounds/swish.mp3',
   '/sounds/rim-clank.mp3',
+  '/opening/swish.js',
 ];
 
 // Install event - cache the offline page and icons

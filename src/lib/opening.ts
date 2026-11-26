@@ -7,13 +7,17 @@
 //   cold open: a counter in localStorage (`dd-open-n`) goes 0, 1, 2, 0...; 0 is
 //   A, so a brand-new device sees A first. If localStorage is blocked, the
 //   pick is random.
-// - Once per visit: a sessionStorage flag (`dd-opened`) is set as the opening
-//   is picked, so a reload, a tab switch or coming back within the visit never
-//   plays it again; page changes never run this script at all. If
-//   sessionStorage is blocked, nothing plays (better none than one per page).
+// - Every time the app is opened from fully closed (founder, 25 Nov 2026).
+//   A sessionStorage flag (`dd-opened`) is set as the opening is picked.
+//   Fully closing the app (or the tab) clears sessionStorage, so the next open
+//   plays it; coming back to the app from the background does not reload the
+//   page, so it does not play, and a reload while the app is open keeps the
+//   flag, so it does not play either. Page changes never run this script. If
+//   sessionStorage is blocked, nothing plays (better none than one per load).
 // - Not on the website's own pages (the landing page, legal pages, clubs,
 //   competition, install): a visitor from a link gets the page, not a splash.
-// - The slogan: one per visit, never last visit's (src/lib/slogans.ts).
+// - The slogan: a new one each time the app is opened, never the last one
+//   shown (src/lib/slogans.ts).
 //
 // It sets <html data-open="a|b|c"> and <html data-sl="n">; CSS in
 // src/components/brand/opening.css shows the matching scene. B's hoop and net
@@ -30,18 +34,24 @@ export const OPENED_KEY = 'dd-opened';
 export const SLOGAN_KEY = 'dd-sl';
 export const SLOGAN_LAST_KEY = 'dd-sl-last';
 export const SWISH_SRC = '/opening/swish.js';
+export const RUN_CLASS = 'dd-open-run';
+export const RUN_EVENT = 'dd-open-run';
+/** If the app never hydrates (a script error), the opening starts anyway after this. */
+export const RUN_FALLBACK_MS = 6000;
 
 /** Paths that are the website rather than the app: no opening there. */
 // /clubs itself is the website's clubs page; /clubs/<id> is a club in the app.
 export const NO_OPENING_PATH = /^\/(?:(?:privacy|terms|parents|parent-approval|competition|install|account-deletion|auth)(?:\/|$)|clubs\/?$)/;
 
 /**
- * The shortest time the opening stays up on a cold open, so the lock lands:
- * 0.8 s for A and C (decision 3); B's brackets only land at 1.45 s, so B waits
- * for that. The exit starts when the app is ready, but never sooner than this
+ * The shortest time the opening stays up once it starts: its whole length, so
+ * the app never cuts it short (founder, 25 Nov 2026: "the user doesn't have
+ * the chance to see it"). It only starts once the app is on screen
+ * (html.dd-open-run, OpeningSplashRunner), so the whole of it is seen. The exit starts when the app is ready, but never sooner than this
  * and never later than the opening's own end.
  */
-export const MIN_SHOW_MS: Record<Opening, number> = { a: 800, b: 1450, c: 800 };
+export const MIN_SHOW_MS: Record<Opening, number> = { a: 2000, b: 2600, c: 2000 };
+
 
 export function isOpening(v: unknown): v is Opening {
   return v === 'a' || v === 'b' || v === 'c';
@@ -69,15 +79,17 @@ function g(s,k){try{return s?s.getItem(k):null}catch(e){return null}}
 function p(s,k,v){try{if(s)s.setItem(k,String(v))}catch(e){}}
 var path=location.pathname;
 if(path==='/'||${NO_OPENING_PATH.toString()}.test(path))return;
+var fresh=!!ss&&!g(ss,'${OPENED_KEY}');
 var k=parseInt(g(ss,'${SLOGAN_KEY}'),10);
-if(!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=0&&l<M;k=Math.floor(Math.random()*(a?M-1:M));if(a&&k>=l)k++;p(ss,'${SLOGAN_KEY}',k);p(ls,'${SLOGAN_LAST_KEY}',k)}
+if(fresh||!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=0&&l<M;k=Math.floor(Math.random()*(a?M-1:M));if(a&&k>=l)k++;p(ss,'${SLOGAN_KEY}',k);p(ls,'${SLOGAN_LAST_KEY}',k)}
 d.setAttribute('data-sl',k);
-if(!ss||g(ss,'${OPENED_KEY}'))return;
+if(!fresh)return;
 p(ss,'${OPENED_KEY}',1);
 var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%3;if(!(n>=0))n=0;ls.setItem('${OPEN_COUNT_KEY}',String(n))}catch(e){n=Math.floor(Math.random()*3)}
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
 document.addEventListener('pointerdown',skip,true);document.addEventListener('keydown',skip,true);
+setTimeout(function(){if(!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
 var still=false;try{still=w.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
 if(n===1&&!still){var s=document.createElement('script');s.src='${SWISH_SRC}';s.async=true;s.onerror=function(){d.setAttribute('data-open','a')};document.head.appendChild(s)}
 })();`;
