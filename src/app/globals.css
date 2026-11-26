@@ -330,6 +330,24 @@ body {
 .deadeye-loader-in {
   animation: deadeye-loader-in 240ms var(--ease-deadeye) 400ms backwards;
 }
+/* The navigation pill (NavLoader): in at once, out with a short fade */
+.deadeye-loader-now {
+  animation: deadeye-loader-in 240ms var(--ease-deadeye) backwards;
+}
+@keyframes deadeye-loader-out {
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+.deadeye-loader-out {
+  animation: deadeye-loader-out 200ms ease-in forwards;
+}
+@keyframes deadeye-fade-out {
+  to {
+    opacity: 0;
+  }
+}
 @keyframes deadeye-spin {
   to {
     transform: rotate(360deg);
@@ -345,7 +363,11 @@ body {
   .deadeye-spin {
     animation: none;
   }
-  .deadeye-loader-in {
+  .deadeye-loader-in,
+  .deadeye-loader-now {
     animation-name: deadeye-fade-in;
+  }
+  .deadeye-loader-out {
+    animation-name: deadeye-fade-out;
   }
 }

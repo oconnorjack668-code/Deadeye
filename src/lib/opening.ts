@@ -61,7 +61,7 @@ export function isOpening(v: unknown): v is Opening {
  * How long to wait before ending the opening early, now that the app is
  * ready: elapsed is how long it has run, ownEnd when its exit would start on
  * its own. null means let it finish by itself (the minimum is already past
- * its own end, as under reduced motion, or it has reached the end).
+ * its own end, or it has reached the end).
  */
 export function earlyExitDelay(minMs: number, elapsedMs: number, ownEndMs: number): number | null {
   const at = Math.max(minMs, elapsedMs);
@@ -89,7 +89,6 @@ var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
 document.addEventListener('pointerdown',skip,true);document.addEventListener('keydown',skip,true);
-setTimeout(function(){if(!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
-var still=false;try{still=w.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
-if(n===1&&!still){var s=document.createElement('script');s.src='${SWISH_SRC}';s.async=true;s.onerror=function(){d.setAttribute('data-open','a')};document.head.appendChild(s)}
+setTimeout(function(){if(d.getAttribute('data-open')&&!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
+if(n===1){var s=document.createElement('script');s.src='${SWISH_SRC}';s.async=true;s.onerror=function(){d.setAttribute('data-open','a')};document.head.appendChild(s)}
 })();`;

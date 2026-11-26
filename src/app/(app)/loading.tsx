@@ -1,8 +1,8 @@
 // src/app/(app)/loading.tsx
 // Shown instantly while a page's data loads, so taps on the nav feel immediate.
-// The skeleton is there at 0 ms with one slow light sweep across it; the
-// slogan pill (PageLoader) joins only if the page takes longer than 400 ms.
-import { PageLoader } from '@/components/brand/PageLoader';
+// The skeleton is there at 0 ms with one slow light sweep across it. The
+// slogan pill is NavLoader's, in the (app) layout, so it shows on every move
+// between pages, not only the ones that land here.
 
 export default function Loading() {
   return (
@@ -30,7 +30,6 @@ export default function Loading() {
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="deadeye-sweep absolute inset-y-0 left-0 w-full bg-gradient-to-r from-transparent via-white/[0.04] to-transparent" />
       </div>
-      <PageLoader />
     </div>
   );
 }
