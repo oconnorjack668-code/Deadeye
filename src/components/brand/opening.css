@@ -169,44 +169,40 @@ html[data-open='c'] .dd-ln { display: block; }
 @keyframes dd-open-lnout { to { opacity: 0; } }
 @keyframes dd-open-bksin { from { opacity: 0; transform: scale(1.16); } }
 
-@media (prefers-reduced-motion: no-preference) {
-  /* A, Lock on (1.45 s): the brackets close in on the ball like a scope */
-  html[data-open='a'] .dd-open-glow { animation: dd-open-fade 700ms ease-out 260ms backwards; }
-  html[data-open='a'] .dd-open-ball { animation: dd-open-ballin 400ms var(--ease-deadeye) 100ms backwards; }
-  html[data-open='a'] .dd-open-ballwrap { animation: dd-open-thump 320ms var(--ease-deadeye) 520ms both; }
-  html[data-open='a'] .dd-bk { animation: dd-open-bkclose 460ms linear 60ms backwards, dd-open-fade 140ms linear 60ms backwards; }
-  html[data-open='a'] .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 520ms forwards; }
-  html[data-open='a'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 560ms backwards; }
-  html[data-open='a'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 800ms backwards; }
+/* Every opening plays in full even when the phone asks for reduced motion
+   (founder, 26 Nov 2026: with it on, all three showed the same still lockup,
+   so players only ever saw one opening). It is under 3 s, plays once per open
+   and a tap skips it. */
+/* A, Lock on (1.45 s): the brackets close in on the ball like a scope */
+html[data-open='a'] .dd-open-glow { animation: dd-open-fade 700ms ease-out 260ms backwards; }
+html[data-open='a'] .dd-open-ball { animation: dd-open-ballin 400ms var(--ease-deadeye) 100ms backwards; }
+html[data-open='a'] .dd-open-ballwrap { animation: dd-open-thump 320ms var(--ease-deadeye) 520ms both; }
+html[data-open='a'] .dd-bk { animation: dd-open-bkclose 460ms linear 60ms backwards, dd-open-fade 140ms linear 60ms backwards; }
+html[data-open='a'] .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 520ms forwards; }
+html[data-open='a'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 560ms backwards; }
+html[data-open='a'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 800ms backwards; }
 
-  /* C, Reticle (1.4 s): hairlines meet at the centre, the ball shows, the brackets settle */
-  html[data-open='c'] .dd-ln-l,
-  html[data-open='c'] .dd-ln-r { animation: dd-open-sweepx 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
-  html[data-open='c'] .dd-ln-t,
-  html[data-open='c'] .dd-ln-b { animation: dd-open-sweepy 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
-  html[data-open='c'] .dd-open-glow { animation: dd-open-fade 600ms ease-out 360ms backwards; }
-  html[data-open='c'] .dd-open-ball { animation: dd-open-ballin 380ms var(--ease-deadeye) 340ms backwards; }
-  html[data-open='c'] .dd-open-bks { animation: dd-open-bksin 380ms var(--ease-deadeye) 420ms backwards; }
-  html[data-open='c'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 640ms backwards; }
-  html[data-open='c'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 820ms backwards; }
+/* C, Reticle (1.4 s): hairlines meet at the centre, the ball shows, the brackets settle */
+html[data-open='c'] .dd-ln-l,
+html[data-open='c'] .dd-ln-r { animation: dd-open-sweepx 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
+html[data-open='c'] .dd-ln-t,
+html[data-open='c'] .dd-ln-b { animation: dd-open-sweepy 400ms cubic-bezier(0.7, 0, 0.2, 1) backwards, dd-open-lnout 260ms linear 400ms forwards; }
+html[data-open='c'] .dd-open-glow { animation: dd-open-fade 600ms ease-out 360ms backwards; }
+html[data-open='c'] .dd-open-ball { animation: dd-open-ballin 380ms var(--ease-deadeye) 340ms backwards; }
+html[data-open='c'] .dd-open-bks { animation: dd-open-bksin 380ms var(--ease-deadeye) 420ms backwards; }
+html[data-open='c'] .dd-open-word { animation: dd-open-rise 360ms var(--ease-deadeye) 640ms backwards; }
+html[data-open='c'] .dd-open-slogan { animation: dd-open-rise 360ms var(--ease-deadeye) 820ms backwards; }
 
-  /* B, Swish (B2, about 2.8 s): /opening/swish.js draws the hoop and adds
-     .dd-b-go. Until then the screen is plain dark; if the file never comes,
-     the splash still leaves on its own (dd-open-wait). */
-  html[data-open='b']:not(.dd-b-go) .dd-open-lock { visibility: hidden; }
-  html[data-open='b']:not(.dd-b-go) #dd-open { animation-name: dd-open-wait; animation-delay: 2600ms; }
-  html[data-open='b'].dd-b-go #dd-open { animation-name: dd-open-exit-b; animation-delay: 2600ms; }
-  html[data-open='b'].dd-b-go .dd-open-glow { animation: dd-open-fade 700ms ease-out 1150ms backwards; }
-  html[data-open='b'].dd-b-go .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 1380ms forwards; }
-  html[data-open='b'].dd-b-go .dd-open-word { animation: dd-open-rise 380ms var(--ease-deadeye) 1340ms backwards; }
-  html[data-open='b'].dd-b-go .dd-open-slogan { animation: dd-open-rise 380ms var(--ease-deadeye) 1540ms backwards; }
-}
-
-/* Reduced motion: the finished lockup at once, held 1.4 s, then a 200 ms fade */
-@media (prefers-reduced-motion: reduce) {
-  html[data-open] #dd-open { animation-delay: 1400ms; animation-duration: 200ms; animation-timing-function: linear; }
-  html[data-open] .dd-ln { display: none; }
-}
+/* B, Swish (B2, about 2.8 s): /opening/swish.js draws the hoop and adds
+   .dd-b-go. Until then the screen is plain dark; if the file never comes,
+   the splash still leaves on its own (dd-open-wait). */
+html[data-open='b']:not(.dd-b-go) .dd-open-lock { visibility: hidden; }
+html[data-open='b']:not(.dd-b-go) #dd-open { animation-name: dd-open-wait; animation-delay: 2600ms; }
+html[data-open='b'].dd-b-go #dd-open { animation-name: dd-open-exit-b; animation-delay: 2600ms; }
+html[data-open='b'].dd-b-go .dd-open-glow { animation: dd-open-fade 700ms ease-out 1150ms backwards; }
+html[data-open='b'].dd-b-go .dd-open-ping { animation: dd-open-ping 560ms var(--ease-deadeye) 1380ms forwards; }
+html[data-open='b'].dd-b-go .dd-open-word { animation: dd-open-rise 380ms var(--ease-deadeye) 1340ms backwards; }
+html[data-open='b'].dd-b-go .dd-open-slogan { animation: dd-open-rise 380ms var(--ease-deadeye) 1540ms backwards; }
 
 /* Skip and the app-ready exit beat every scene's own timing */
 html.dd-open-out[data-open] #dd-open { animation: dd-open-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }

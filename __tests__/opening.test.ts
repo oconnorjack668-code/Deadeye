@@ -2,7 +2,7 @@
 // The opening animation's head script (src/lib/opening.ts): A, B, C in turn
 // per cold open, A first on a new device, random when localStorage is
 // blocked, once per visit, never on the website's own pages, B's file only
-// when B plays with motion allowed, and a tap skips. Runs the real inlined
+// when B plays, and a tap skips. Runs the real inlined
 // script text, as the browser does.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC } from '@/lib/opening';
@@ -116,7 +116,7 @@ describe('the opening rotation', () => {
     }
   });
 
-  it('loads the swish file only when B plays with motion allowed', () => {
+  it('loads the swish file only when B plays, reduced motion or not', () => {
     const swish = () => [...document.head.querySelectorAll('script')].some((s) => s.getAttribute('src') === SWISH_SRC);
     coldOpen(); // a
     expect(swish()).toBe(false);
@@ -126,8 +126,8 @@ describe('the opening rotation', () => {
     reducedMotion = true;
     (local as MemoryStorage).setItem('dd-open-n', '0');
     newVisit();
-    expect(coldOpen()).toBe('b'); // still B's turn: it shows as the still lockup
-    expect(swish()).toBe(false);
+    expect(coldOpen()).toBe('b'); // the full swish plays even with reduced motion on
+    expect(swish()).toBe(true);
   });
 
   it('a tap or a key skips it', () => {
