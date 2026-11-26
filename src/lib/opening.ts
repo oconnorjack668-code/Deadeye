@@ -3,10 +3,13 @@
 // first paint (docs/agent-os/design/2026-11-22-loading.md, founder's decisions
 // of 22-23 Nov 2026).
 //
-// - Openings A (Lock on), B (Swish, B2) and C (Reticle) take turns, one per
-//   cold open: a counter in localStorage (`dd-open-n`) goes 0, 1, 2, 0...; 0 is
-//   A, so a brand-new device sees A first. If localStorage is blocked, the
-//   pick is random.
+// - Openings A (Lock on), B (Swish, B2) and C (Reticle): a random one each
+//   open, never the one stored as last time (`dd-open-n` in localStorage).
+//   Not a strict A, B, C turn: Chrome on a phone writes localStorage to disk
+//   a few seconds late, so a player who opens the app, watches the opening
+//   and swipes it away within that time never had the turn saved, and saw the
+//   same opening on every open (founder, 26 Nov 2026). Random still varies
+//   when the save is lost.
 // - Every time the app is opened from fully closed (founder, 25 Nov 2026).
 //   A sessionStorage flag (`dd-opened`) is set as the opening is picked.
 //   Fully closing the app (or the tab) clears sessionStorage, so the next open
@@ -85,7 +88,7 @@ if(fresh||!(k>=0&&k<M)){var l=parseInt(g(ls,'${SLOGAN_LAST_KEY}'),10),a=M>1&&l>=
 d.setAttribute('data-sl',k);
 if(!fresh)return;
 p(ss,'${OPENED_KEY}',1);
-var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%3;if(!(n>=0))n=0;ls.setItem('${OPEN_COUNT_KEY}',String(n))}catch(e){n=Math.floor(Math.random()*3)}
+var o=parseInt(g(ls,'${OPEN_COUNT_KEY}'),10),n;if(o>=0&&o<3){n=Math.floor(Math.random()*2);if(n>=o)n++}else n=Math.floor(Math.random()*3);p(ls,'${OPEN_COUNT_KEY}',n);
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
 document.addEventListener('pointerdown',skip,true);document.addEventListener('keydown',skip,true);
