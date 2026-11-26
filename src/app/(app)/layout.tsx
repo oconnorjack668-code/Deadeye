@@ -8,6 +8,7 @@ import { Navbar } from '@/components/layout/Navbar';
 import { BottomNav } from '@/components/layout/BottomNav';
 import { QuickLog } from '@/components/layout/QuickLog';
 import { OfflineSync } from '@/components/OfflineSync';
+import { NavLoader } from '@/components/brand/NavLoader';
 import { appModeFor } from '@/lib/coachSide';
 
 export const metadata = {
@@ -49,6 +50,8 @@ export default async function AppLayout({
       {mode === 'playing' && <QuickLog />}
       <BottomNav mode={mode} />
       <OfflineSync />
+      {/* The slogan pill on every move between pages */}
+      <NavLoader />
     </div>
   );
 }

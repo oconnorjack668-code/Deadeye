@@ -89,7 +89,7 @@ var n;try{var r=ls.getItem('${OPEN_COUNT_KEY}');n=r===null?0:(parseInt(r,10)+1)%
 d.setAttribute('data-open','abc'.charAt(n));
 function skip(){d.classList.add('dd-open-skip');document.removeEventListener('pointerdown',skip,true);document.removeEventListener('keydown',skip,true)}
 document.addEventListener('pointerdown',skip,true);document.addEventListener('keydown',skip,true);
-setTimeout(function(){if(!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
+setTimeout(function(){if(d.getAttribute('data-open')&&!d.classList.contains('${RUN_CLASS}')){d.classList.add('${RUN_CLASS}');document.dispatchEvent(new Event('${RUN_EVENT}'))}},${RUN_FALLBACK_MS});
 var still=false;try{still=w.matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){}
 if(n===1&&!still){var s=document.createElement('script');s.src='${SWISH_SRC}';s.async=true;s.onerror=function(){d.setAttribute('data-open','a')};document.head.appendChild(s)}
 })();`;
