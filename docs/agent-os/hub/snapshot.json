@@ -219,6 +219,17 @@
       "words": "merge 95"
     },
     {
+      "agent": "release-checker",
+      "detail": "Safety PASS; typegen, tsc, eslint, opening tests 15/15 and full suite (1944) pass; no migrations or env vars. Try the preview on your Android phone first (open, swipe away, repeat).",
+      "group": "live",
+      "id": "pr-176",
+      "kind": "merge",
+      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/176",
+      "onApprove": "The next Claude Code session merges PR #176 if its checks are green and it is up to date with main.",
+      "title": "Merge PR #176: Pick a random opening each open instead of a saved A, B, C turn",
+      "words": "merge 176"
+    },
+    {
       "agent": "founder",
       "detail": "Everything from the 20-24 Nov design round is live (#162-#168) but none of it was seen signed in on a phone (Chrome froze on the low-memory laptop; previews need the tester signed in). Founder, on a phone at deadeye.ie with the tester account: (1) setup at phone size (open it from Profile or Settings): slim header, Step n of 3, full-width Next, Irish words, height in cm, the age question only for a 16+ sign-up; Profile shows 16-17 or 18+, the leaderboard filters read U16 / 16-17 / 18+ (D4, #168); (2) opening animations and the new screens: open the app fresh in a new tab three times (A,... Last checked: 2026-11-24: all merged and deployed; production error log empty for the hour after #168.",
       "group": "yours",
@@ -486,21 +497,6 @@
       "kind": "task",
       "link": "https://github.com/oconnorjack668-code/Deadeye/pull/112",
       "title": "Check a few Film clips for adverts and the plays for basketball mistakes"
-    },
-    {
-      "agent": "marketing",
-      "group": "agents",
-      "id": "mk-weekend-2026-11-27",
-      "kind": "approve",
-      "title": "Approve this weekend's posts (Day 5 Friday, Day 7 Sunday)",
-      "detail": "Fri 27: Day 5 form spots (opening A). Sat 28: optional Story \"Day 7 tomorrow\". Sun 29: Day 7 vs Day 1 (opening B), posted without the competition line because S50 is not done. If Day 1 never went up, pick \"shift\": Friday becomes Day 1 and Sunday Day 3. Also tell marketing whether Day 1 and Day 3 went up, and the dates.",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/blob/agent-os/docs/agent-os/marketing/2026-11-26-weekend.md",
-      "onApprove": "Marketing treats the drafts as approved; the founder films and posts them. Marketing logs the dates and 48h counts in results.md when sent.",
-      "options": [
-        "as drafted",
-        "shift"
-      ],
-      "words": "approve weekend"
     }
   ],
   "clubs": {
@@ -713,12 +709,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #174, 25 Nov) is running (checked 26 Nov).",
+      "detail": "Live and up to date: the latest version (PR #176, 26 Nov) is running (checked 27 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No real errors on the live site in the last 24 hours; 1 harmless warning from a library ignored (checked 26 Nov).",
+      "detail": "No errors on the live site in the last 24 hours (checked 27 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -728,7 +724,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 26 Nov).",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 27 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -773,13 +769,38 @@
   ],
   "log": [
     {
-      "at": "2026-11-26T10:03:06Z",
-      "text": "Marketing mid-week: weekend drafts for 27 to 29 Nov (Day 5 Friday, Day 7 Sunday without the competition line). No marketing decisions in the hub; no new numbers.",
+      "at": "2026-11-27T08:09:35Z",
+      "text": "Morning check: no live errors in 24 hours, live site on the newest version (PR #176), 1 pull request open with green checks.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-26T09:02:06Z",
-      "text": "To-do list rebuilt from STATUS (main 9c54a10): 30 open (1 pull requests), 0 new, 4 gone since the last update.",
+      "at": "2026-11-26T20:10:00Z",
+      "text": "PR #176 checked (random opening each open): safety PASS, all checks green, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T19:01:44Z",
+      "text": "To-do list rebuilt from STATUS (main 914dc57): 30 open (1 pull requests), 0 new, 2 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T16:54:14Z",
+      "text": "PR #175 re-checked after its description was edited (same code): safety PASS, all checks green including GitHub checks, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T16:52:32Z",
+      "text": "PR #175 re-checked after new commit (full openings with reduce-motion on): safety PASS with an accessibility note, all checks green, no migrations or env vars.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T14:47:54Z",
+      "text": "PR #175 checked (slogan pill on every page move): safety PASS, all checks green, no migrations or env vars. Merge card added.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-26T10:03:06Z",
+      "text": "Marketing mid-week: weekend drafts for 27 to 29 Nov (Day 5 Friday, Day 7 Sunday without the competition line). No marketing decisions in the hub; no new numbers.",
       "tone": "ok"
     },
     {
@@ -846,31 +867,6 @@
       "at": "2026-11-23T23:50:00Z",
       "text": "PR #166 (D10, D2, D7) re-checked at eaf4554: safety PASS; typegen, tsc, eslint, 1892 tests pass (share-sheet mock fixed); CI still running at check time; no migrations or env vars. Ready for merge 166 once CI is green.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T23:35:53Z",
-      "text": "PR #167 (D11) re-checked at cfdcb9c after the safety fixes: safety PASS; typegen, tsc, eslint, 1896 tests pass; CI still running at check time; no migrations or env vars. Ready for merge 167 once CI is green.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T23:34:57Z",
-      "text": "PR #166 re-checked at 650e3c9 after the safety fixes: safety PASS; typegen, tsc, eslint pass; the same 3 share-sheet tests still fail in CI (test mock, not the app). No migrations or env vars. Back to builder.",
-      "tone": "warn"
-    },
-    {
-      "at": "2026-11-23T23:35:00Z",
-      "text": "PR #167 (D11 openings, slogans, page loader, landing) checked at 2fb8284: safety PASS; typegen, tsc, eslint, 1895 tests and CI pass; no migrations or env vars. Ready for merge 167.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T23:45:00Z",
-      "text": "PR #166 (D10/D2/D7 chart, first result, share cards) checked at ff4ece8: safety PASS with one privacy-text fix; typegen, tsc, eslint pass; 3 share-sheet tests fail in CI (Node 22 mock Blob). No migrations or env vars. Back to builder.",
-      "tone": "warn"
-    },
-    {
-      "at": "2026-11-23T13:48:17Z",
-      "text": "PR #165 (D1 Watch it back + D11 decode screen) re-checked at 45bde63 after main was merged in: safety PASS, typegen, tsc, eslint and 1871 tests pass, up to date with main, no migrations or env vars.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -887,6 +883,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-26T10:03:06Z",
-  "updatedBy": "Marketing mid-week"
+  "updatedAt": "2026-11-27T08:09:35Z",
+  "updatedBy": "Morning check"
 }
