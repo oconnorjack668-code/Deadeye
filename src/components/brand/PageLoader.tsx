@@ -31,7 +31,8 @@ export function resetLoaderSlogan() {
   lastShown = -1;
 }
 
-export function PageLoader() {
+/** instant: show at once (the navigation pill), not after the page loader's 400 ms wait. leaving: fade out. */
+export function PageLoader({ instant = false, leaving = false }: { instant?: boolean; leaving?: boolean } = {}) {
   const hydrated = useSyncExternalStore(noSubscribe, () => true, () => false);
   // One pick per pill, made on the client when it mounts; the server and the
   // hydration pass render the first line, and the pill is still invisible
@@ -42,7 +43,7 @@ export function PageLoader() {
     <div className="pointer-events-none fixed inset-x-0 bottom-[92px] z-30 flex justify-center px-4">
       <div
         role="status"
-        className="deadeye-loader-in flex h-11 items-center gap-2.5 rounded-full border border-zinc-700 bg-zinc-900/95 pl-2 pr-4 shadow-lg shadow-black/30"
+        className={`${leaving ? 'deadeye-loader-out' : instant ? 'deadeye-loader-now' : 'deadeye-loader-in'} flex h-11 items-center gap-2.5 rounded-full border border-zinc-700 bg-zinc-900/95 pl-2 pr-4 shadow-lg shadow-black/30`}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- tiny pre-sized static asset, as in Logo */}
         <img src="/logo.webp" alt="" width={26} height={26} className="deadeye-spin rounded-full" />

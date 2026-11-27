@@ -1,9 +1,9 @@
 // __tests__/opening.test.ts
-// The opening animation's head script (src/lib/opening.ts): A, B, C in turn
-// per cold open, A first on a new device, random when localStorage is
-// blocked, once per visit, never on the website's own pages, B's file only
-// when B plays with motion allowed, and a tap skips. Runs the real inlined
-// script text, as the browser does.
+// The opening animation's head script (src/lib/opening.ts): a random opening
+// per open, never the last one, still varied when the save is lost; once per
+// open from fully closed, never on the website's own pages, B's file only
+// when B plays, and a tap skips. Runs the real inlined script text, as the
+// browser does.
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { OPENING_SCRIPT, MIN_SHOW_MS, earlyExitDelay, SWISH_SRC } from '@/lib/opening';
 import { SHORT_SLOGANS } from '@/lib/slogans';
@@ -52,14 +52,25 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('the opening rotation', () => {
-  it('plays A on a brand-new device, then B, then C, then A again, one per visit', () => {
-    const seen: (string | null)[] = [];
-    for (let i = 0; i < 4; i++) {
+  it('never plays the same opening twice in a row', () => {
+    let last: string | null = null;
+    for (let i = 0; i < 30; i++) {
       newVisit();
-      seen.push(coldOpen());
+      const o = coldOpen();
+      expect(o).not.toBeNull();
+      expect(o).not.toBe(last);
+      last = o;
     }
-    expect(seen).toEqual(['a', 'b', 'c', 'a']);
-    expect((local as MemoryStorage).getItem('dd-open-n')).toBe('0');
+  });
+
+  it('still varies when the phone never saved the last one (killed before the write)', () => {
+    const seen = new Set<string | null>();
+    for (let i = 0; i < 30; i++) {
+      local = new MemoryStorage(); // nothing saved from the last open
+      newVisit();
+      seen.add(coldOpen());
+    }
+    expect(seen).toEqual(new Set(['a', 'b', 'c']));
   });
 
   it('picks at random when localStorage is blocked', () => {
@@ -71,25 +82,17 @@ describe('the opening rotation', () => {
     expect(coldOpen()).toBe('a');
   });
 
-  it('starts again at A if the stored counter is not a number', () => {
+  it('ignores a stored value that is not 0, 1 or 2', () => {
     (local as MemoryStorage).setItem('dd-open-n', 'junk');
-    expect(coldOpen()).toBe('a');
-  });
-
-  it('plays once per visit: a reload or a second tab load in the same visit shows nothing', () => {
-    expect(coldOpen()).toBe('a');
-    expect(coldOpen()).toBeNull();
-    expect(coldOpen('/profile')).toBeNull();
-    // and the turn did not advance
-    newVisit();
+    vi.spyOn(Math, 'random').mockReturnValue(0.5);
     expect(coldOpen()).toBe('b');
   });
 
   it('plays again on the next open after the app was fully closed, however soon', () => {
-    expect(coldOpen()).toBe('a');
+    expect(coldOpen()).not.toBeNull();
     expect(coldOpen()).toBeNull(); // reloaded while still open
     newVisit(); // swiped away and opened again a minute later
-    expect(coldOpen()).toBe('b');
+    expect(coldOpen()).not.toBeNull();
   });
 
   it('shows nothing when sessionStorage is blocked, so it can never repeat on every load', () => {
@@ -102,9 +105,9 @@ describe('the opening rotation', () => {
     for (const p of ['/', '/privacy', '/terms', '/parents', '/competition', '/install', '/clubs', '/auth/callback']) {
       expect(coldOpen(p), p).toBeNull();
     }
-    expect(coldOpen('/login')).toBe('a');
+    expect(coldOpen('/login')).not.toBeNull();
     newVisit();
-    expect(coldOpen('/clubs/abc')).toBe('b');
+    expect(coldOpen('/clubs/abc')).not.toBeNull();
   });
 
   it('writes nothing to the device on website pages (ePrivacy: storage only where it is used)', () => {
@@ -116,18 +119,20 @@ describe('the opening rotation', () => {
     }
   });
 
-  it('loads the swish file only when B plays with motion allowed', () => {
+  it('loads the swish file only when B plays, reduced motion or not', () => {
     const swish = () => [...document.head.querySelectorAll('script')].some((s) => s.getAttribute('src') === SWISH_SRC);
-    coldOpen(); // a
+    const random = vi.spyOn(Math, 'random').mockReturnValue(0.1);
+    expect(coldOpen()).toBe('a');
     expect(swish()).toBe(false);
     newVisit();
+    random.mockReturnValue(0.1); // last was A: picks from B, C
     expect(coldOpen()).toBe('b');
     expect(swish()).toBe(true);
     reducedMotion = true;
     (local as MemoryStorage).setItem('dd-open-n', '0');
     newVisit();
-    expect(coldOpen()).toBe('b'); // still B's turn: it shows as the still lockup
-    expect(swish()).toBe(false);
+    expect(coldOpen()).toBe('b'); // the full swish plays even with reduced motion on
+    expect(swish()).toBe(true);
   });
 
   it('a tap or a key skips it', () => {
