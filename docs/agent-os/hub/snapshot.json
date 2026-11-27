@@ -4,7 +4,7 @@
       "ask": "Ask the activation analyst why players who finish setup never log a session, using this week's funnel.",
       "id": "activation-analyst",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 2,
+      "lessons": 3,
       "name": "Activation analyst",
       "num": 1,
       "output": "Report: biggest drop is setup to first session (21 of 24). E4 marked NEXT, E5 and E6 added.",
@@ -18,35 +18,35 @@
       "ask": "Ask the builder to fix the three follow-up notes on E4 in a small PR.",
       "id": "builder",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 16,
+      "lessons": 18,
       "name": "Builder",
       "num": 2,
       "output": "Built E4 on exp/E4-dashboard-reminder (PR #74).",
-      "researched": "2026-11-16",
+      "researched": "2026-11-23",
       "role": "Builds the NEXT experiment on its own branch, with tests.",
       "schedule": "Mondays, after the analyst",
       "skills": "fixed",
-      "sources": 36
+      "sources": 40
     },
     {
       "ask": "Ask the safety reviewer to check the C4 consent wording for parents of 16 and 17 year olds.",
       "id": "safety-reviewer",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 4,
+      "lessons": 6,
       "name": "Safety reviewer",
       "num": 3,
       "output": "E4: PASS with three non-blocking notes.",
-      "researched": "2026-11-18",
+      "researched": "2026-11-23",
       "role": "Checks every branch for under-18s, parents, personal data and messages.",
       "schedule": "On every agent PR",
       "skills": "fixed",
-      "sources": 36
+      "sources": 37
     },
     {
       "ask": "Ask the release checker for the after-deploy checklist for PR #74.",
       "id": "release-checker",
       "lastRun": "2026-11-09T12:24:00Z",
-      "lessons": 10,
+      "lessons": 9,
       "name": "Release checker",
       "num": 4,
       "output": "E4 checklist: no migration, no env vars, 5 checks after deploy.",
@@ -60,7 +60,7 @@
       "ask": "Ask support triage to check last night's live errors in Vercel.",
       "id": "support-triage",
       "lastRun": "2026-11-09T14:14:00Z",
-      "lessons": 8,
+      "lessons": 9,
       "name": "Support triage",
       "num": 5,
       "output": "Morning check: 0 live errors, deploy READY, no P1.",
@@ -74,7 +74,7 @@
       "ask": "Ask marketing to script the 5-spot challenge video shot by shot.",
       "id": "marketing",
       "lastRun": "2026-11-09T12:16:00Z",
-      "lessons": 10,
+      "lessons": 11,
       "name": "Marketing",
       "num": 6,
       "output": "7 video ideas, a Mon to Sun calendar, 2 founder posts, a 3-opening test.",
@@ -102,7 +102,7 @@
       "ask": "Ask the video editor to cut Thursday's 60-second challenge from the founder's new footage, then run the critic panel.",
       "id": "video-editor",
       "lastRun": "2026-11-10T12:14:00Z",
-      "lessons": 23,
+      "lessons": 24,
       "name": "Video editor",
       "num": 8,
       "output": "Set up 10 Nov. Tuesday's video v4 (9.2s, silent and voice) cut from marketing's script; critic panel of six teen players.",
@@ -116,21 +116,21 @@
       "ask": "Ask the designer to redesign the end-of-session card so players want to share it.",
       "id": "designer",
       "lastRun": null,
-      "lessons": 2,
+      "lessons": 8,
       "name": "Designer",
       "num": 9,
       "output": "Set up 11 Nov. Trend board seeded from about 70 sources; first job: the tracker visuals (flame, MAKE/MISS, end card).",
-      "researched": "2026-11-11",
+      "researched": "2026-11-20",
       "role": "Studies what looks good in basketball right now and designs screens, share cards, badges and store screenshots. Drafts only.",
       "schedule": "On request, and before any screen change is built",
       "skills": "new",
-      "sources": 68
+      "sources": 80
     },
     {
       "ask": "Ask player outreach where to find the next ten players and draft the first posts for me.",
       "id": "player-outreach",
       "lastRun": null,
-      "lessons": 4,
+      "lessons": 5,
       "name": "Player outreach",
       "num": 10,
       "output": "Set up 11 Nov. Routes list started; first job: the message to 5 players you know, and a tracking link per route.",
@@ -217,17 +217,6 @@
       "onApprove": "The next Claude Code session merges PR #95 if its checks are green and it is up to date with main.",
       "title": "Merge PR #95: Agent OS: scheduled runs (hub snapshots, drafts)",
       "words": "merge 95"
-    },
-    {
-      "agent": "release-checker",
-      "detail": "Safety PASS; typegen, tsc, eslint, opening tests 15/15 and full suite (1944) pass; no migrations or env vars. Try the preview on your Android phone first (open, swipe away, repeat).",
-      "group": "live",
-      "id": "pr-176",
-      "kind": "merge",
-      "link": "https://github.com/oconnorjack668-code/Deadeye/pull/176",
-      "onApprove": "The next Claude Code session merges PR #176 if its checks are green and it is up to date with main.",
-      "title": "Merge PR #176: Pick a random opening each open instead of a saved A, B, C turn",
-      "words": "merge 176"
     },
     {
       "agent": "founder",
@@ -731,43 +720,53 @@
   ],
   "learn": [
     {
-      "agent": "video-editor",
-      "date": "2026-11-18",
-      "latest": "The first second decides the video. Frame 0 is a shot already in the air or dropping through the net with the count on screen, never a lead-in, logo or setup.",
-      "lessons": 23
-    },
-    {
-      "agent": "marketing",
-      "date": "2026-11-18",
-      "latest": "A series repeats one session (Day 1, 7, 14) so the answer is fair; never stage a bad day.",
-      "lessons": 10
-    },
-    {
-      "agent": "player-outreach",
-      "date": "2026-11-18",
-      "latest": "Never \"second prize\" or \"came second\" (banned practice under EU consumer law), say \"everyone who entered gets 25% off\".",
-      "lessons": 4
+      "agent": "activation-analyst",
+      "date": "2026-11-23",
+      "latest": "A measurement item a decision depends on goes to a PR the day it passes safety, split from anything waiting on approval; any change to a screen gets its \"seen\" marker in the same build or first.",
+      "lessons": 3
     },
     {
       "agent": "builder",
-      "date": "2026-11-16",
-      "latest": "Every new EVENT_NAMES entry is named in the privacy page's \"A few steps you reach in the app\" clause in the same branch.",
-      "lessons": 16
+      "date": "2026-11-23",
+      "latest": "A script that runs before hydration only changes attributes or fills the innerHTML of an empty element React rendered; read the production console on every variant before pushing.",
+      "lessons": 18
     },
     {
       "agent": "safety-reviewer",
-      "date": "2026-11-16",
-      "latest": "A condition I set is checked as a fact today, and if it is false it becomes a finding with a fix, not a note.",
-      "lessons": 4
+      "date": "2026-11-23",
+      "latest": "For every EVENT_NAMES entry, write one line pairing it with the clause words that cover it, read from the place in the code that fires it. On a re-review, check each condition I set earlier.",
+      "lessons": 6
     },
     {
-      "agent": "activation-analyst",
-      "date": "2026-11-16",
-      "latest": "A bet's success line is a number of players out of a counted denominator, and the screen it changes must already have a marker, or the item adds one.",
-      "lessons": 2
+      "agent": "player-outreach",
+      "date": "2026-11-23",
+      "latest": "When drafts have waited two weeks, the plan picks ONE route and the smallest send (one message to up to 5 known players), not three.",
+      "lessons": 5
+    },
+    {
+      "agent": "support-triage",
+      "date": "2026-11-23",
+      "latest": "An open crash count that does not move for a week is old rows nobody marked fixed, not a new fault; say \"unchanged\", do not re-rank it.",
+      "lessons": 9
+    },
+    {
+      "agent": "designer",
+      "date": "2026-11-22",
+      "latest": "Motion is transform and opacity only, eased, 60 fps, tested on a throttled CPU; plain boxes and bare bars are not finished.",
+      "lessons": 8
     }
   ],
   "log": [
+    {
+      "at": "2026-11-27T16:13:41Z",
+      "text": "Learning digest: 15 new lessons (designer 6, builder 2, safety reviewer 2, and 1 each for activation analyst, player outreach, support triage, marketing, video editor). No research refresh due.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-27T09:01:57Z",
+      "text": "To-do list rebuilt from STATUS (main e041f4f): 30 open (1 pull requests), 0 new, 1 gone since the last update.",
+      "tone": "ok"
+    },
     {
       "at": "2026-11-27T08:09:35Z",
       "text": "Morning check: no live errors in 24 hours, live site on the newest version (PR #176), 1 pull request open with green checks.",
@@ -776,11 +775,6 @@
     {
       "at": "2026-11-26T20:10:00Z",
       "text": "PR #176 checked (random opening each open): safety PASS, all checks green, no migrations or env vars.",
-      "tone": "ok"
-    },
-    {
-      "at": "2026-11-26T19:01:44Z",
-      "text": "To-do list rebuilt from STATUS (main 914dc57): 30 open (1 pull requests), 0 new, 2 gone since the last update.",
       "tone": "ok"
     },
     {
@@ -862,11 +856,6 @@
       "at": "2026-11-23T23:55:00Z",
       "text": "PR #167 (D11) re-checked at 061c292 after main was merged in: safety PASS; typegen, tsc, eslint, 1917 tests pass; CI still running at check time; no migrations or env vars. Ready for merge 167 once CI is green.",
       "tone": "ok"
-    },
-    {
-      "at": "2026-11-23T23:50:00Z",
-      "text": "PR #166 (D10, D2, D7) re-checked at eaf4554: safety PASS; typegen, tsc, eslint, 1892 tests pass (share-sheet mock fixed); CI still running at check time; no migrations or env vars. Ready for merge 166 once CI is green.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -883,6 +872,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-27T08:09:35Z",
-  "updatedBy": "Morning check"
+  "updatedAt": "2026-11-27T16:13:41Z",
+  "updatedBy": "Learning digest"
 }
