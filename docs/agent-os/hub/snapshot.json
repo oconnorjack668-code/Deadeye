@@ -698,12 +698,12 @@
       "status": "ok"
     },
     {
-      "detail": "Live and up to date: the latest version (PR #176, 26 Nov) is running (checked 27 Nov).",
+      "detail": "Live and up to date: the latest version (PR #176, 26 Nov) is running (checked 28 Nov).",
       "name": "Live site",
       "status": "ok"
     },
     {
-      "detail": "No errors on the live site in the last 24 hours (checked 27 Nov).",
+      "detail": "No real errors on the live site in the last 24 hours; 1 harmless warning from the reminders add-on (checked 28 Nov).",
       "name": "Errors and crash reports",
       "status": "ok"
     },
@@ -713,7 +713,7 @@
       "status": "warn"
     },
     {
-      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 27 Nov).",
+      "detail": "1 open, checks green: PR #95 (agent scheduled runs) (checked 28 Nov).",
       "name": "Code changes",
       "status": "ok"
     }
@@ -758,13 +758,18 @@
   ],
   "log": [
     {
-      "at": "2026-11-27T16:13:41Z",
-      "text": "Learning digest: 15 new lessons (designer 6, builder 2, safety reviewer 2, and 1 each for activation analyst, player outreach, support triage, marketing, video editor). No research refresh due.",
+      "at": "2026-11-28T08:09:16Z",
+      "text": "Morning check: no real live errors in 24 hours (1 harmless warning from the reminders add-on), live site on the newest version (PR #176), 1 pull request open with green checks.",
       "tone": "ok"
     },
     {
-      "at": "2026-11-27T09:01:57Z",
-      "text": "To-do list rebuilt from STATUS (main e041f4f): 30 open (1 pull requests), 0 new, 1 gone since the last update.",
+      "at": "2026-11-27T19:01:45Z",
+      "text": "To-do list rebuilt from STATUS (main e041f4f): 30 open (1 pull requests), 0 new, 0 gone since the last update.",
+      "tone": "ok"
+    },
+    {
+      "at": "2026-11-27T16:13:41Z",
+      "text": "Learning digest: 15 new lessons (designer 6, builder 2, safety reviewer 2, and 1 each for activation analyst, player outreach, support triage, marketing, video editor). No research refresh due.",
       "tone": "ok"
     },
     {
@@ -851,11 +856,6 @@
       "at": "2026-11-24T00:02:19Z",
       "text": "PR #168 (D4 setup) checked at 897c4ae: safety BLOCK, setup_started marker missing from the privacy policy step list; typegen, tsc, eslint, 1937 tests pass; migrations 00068 (before merge) and 00069 (after deploy); no env vars.",
       "tone": "warn"
-    },
-    {
-      "at": "2026-11-23T23:55:00Z",
-      "text": "PR #167 (D11) re-checked at 061c292 after main was merged in: safety PASS; typegen, tsc, eslint, 1917 tests pass; CI still running at check time; no migrations or env vars. Ready for merge 167 once CI is green.",
-      "tone": "ok"
     }
   ],
   "scoreboard": {
@@ -872,6 +872,6 @@
     "setup": 24,
     "third": 0
   },
-  "updatedAt": "2026-11-27T16:13:41Z",
-  "updatedBy": "Learning digest"
+  "updatedAt": "2026-11-28T08:09:16Z",
+  "updatedBy": "Morning check"
 }
