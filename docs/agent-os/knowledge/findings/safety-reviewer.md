@@ -169,6 +169,20 @@ when a better source arrives, rather than adding beside it.
   finding above, 2026, practitioner judgement **(legal advice)** if a cash or
   high-value prize is ever offered.
 
+### Google Play listing and target audience
+
+- Google Play Families policy: its requirements apply when children are one
+  of the app's target audiences (no fixed age; "children" varies by country).
+  Listing imagery and words affect how Google judges the audience, whatever
+  the Console answers say, and wrong answers can get the app removed. For
+  child or unknown-age users: no personalised ads, only self-certified ad
+  SDKs, disclose all data collected. The page says nothing specific about
+  13-17. **For Deadeye:** declare 13-15, 16-17 and 18+, never under 13; keep
+  the listing and screenshots free of anything aimed at younger children; the
+  Data safety form says the same as the listing (uploaded clips, AI provider).
+  Whether a 13-17 audience triggers any part of Families is open.
+  [Google Play Families policy](https://support.google.com/googleplay/android-developer/answer/9893335), read 2026-11-23, platform rule (benchmark).
+
 ### AI with minors
 
 - Anthropic: services with minor users must disclose the AI and follow

@@ -27,7 +27,16 @@ summary), `weak`/`practitioner`; `dated` = over ~2 years.
 What the outcome of earlier work taught (see "Results review" in the agent file). Newest
 first, each with the date, what happened, and the rule.
 
-- None yet.
+- 2026-11-23 · Week 2: 0 joined in 7 days, still nothing sent (S11), so no route could be credited or dropped. Rule:
+  when drafts have waited two weeks, the plan picks ONE route and the smallest send (one message to up to 5 known
+  players), not three; prefer the route whose answer no other agent's posts share ("A friend or teammate"). Public
+  files: write "under 5", never a count of 1 to 4, and do not repeat earlier small counts.
+- 2026-11-16 · Week 1: 2 players answered the sign-up question (grouped, under 5), 0 first sessions, and nobody
+  could say which drafts had been sent, so no route could be credited or dropped. Rule: each plan opens with a
+  "sent? on what day?" check for the founder, and a route stays `drafted` until the founder confirms it went out.
+- 2026-11-16 · The 13 Nov drafts said "the 60-second timed drill" as if it were a named feature; the code has
+  one-minute drills in text and a drill timer, not a named timed drill. Rule: phrase challenges as something the
+  player does ("makes in one minute"), and grep the code for any feature a draft names.
 
 ## Checklist
 
@@ -50,6 +59,7 @@ first, each with the date, what happened, and the rule.
 - [ ] Only features that exist and prices on `/pro`; no "thousands of players", no results an
       ordinary child cannot reach, no pressure to recruit friends (ASAI section 7, CAP 5.2.2).
 - [ ] The founder sends or posts; nothing published by the agent.
+- [ ] Every feature a draft names is found in the code (grep it), not carried over from an earlier plan.
 
 ### Creators and partners
 
@@ -69,6 +79,7 @@ first, each with the date, what happened, and the rule.
 ### Reading results
 
 - [ ] Judged on first sessions within 7 days; under about 30 players a hint, not a result.
+- [ ] Which drafts the founder sent, and when, is confirmed before any route is credited or dropped.
 - [ ] Zero from a small number is not proof of zero (rule of three: 0 of 30 could still be up
       to about 10%).
 - [ ] One or two routes run for several weeks before adding more.

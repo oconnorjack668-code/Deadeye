@@ -3,11 +3,22 @@
 The marketing agent's running list, newest first. Status: `idea` · `approved` · `posted` · `dropped`.
 The founder approves and posts; the agent never does.
 
-Drafts: [2026-11-09-plan.md](2026-11-09-plan.md) (the founder's week) and [2026-11-09-plan-weekly-run.md](2026-11-09-plan-weekly-run.md) (the scheduled run, same day), and [2026-11-09-scripts.md](2026-11-09-scripts.md)
+Drafts: [2026-11-26-weekend.md](2026-11-26-weekend.md) (weekend 27 to 29 Nov, mid-week run); [2026-11-23-week.md](2026-11-23-week.md) (week of 23 Nov); [2026-11-19-weekend.md](2026-11-19-weekend.md) (weekend 20 to 22 Nov, mid-week run); [2026-11-18-shooting-series.md](2026-11-18-shooting-series.md) (series from 23 Nov); [2026-11-16-plan.md](2026-11-16-plan.md) (week of 16 Nov); [2026-11-12-weekend.md](2026-11-12-weekend.md) (weekend 13 to 15 Nov, mid-week run); [2026-11-09-plan.md](2026-11-09-plan.md) (the founder's week) and [2026-11-09-plan-weekly-run.md](2026-11-09-plan-weekly-run.md) (the scheduled run, same day), and [2026-11-09-scripts.md](2026-11-09-scripts.md)
 for the 9 Nov items; [2026-10-23-first-promo.md](2026-10-23-first-promo.md) for the older ones.
 Results: [results.md](results.md).
 
-**Founder: approve, change or drop the top three (9 Nov).**
+- 2026-11-26 · `idea` · **Weekend 27 to 29 Nov**: Fri Day 5 form spots, Sat optional Story "Day 7 tomorrow", Sun Day 7 vs Day 1 without the competition line (S50 not done). Next: Day 8 depends on S48; "Deadeye called [x]. I fixed [y]." See [2026-11-26-weekend.md](2026-11-26-weekend.md).
+- 2026-11-23 · `idea` · **Week of 23 Nov short list**: Day 1 (50 threes), Day 3 (50 free throws), Day 5 form spots (60-second makes from the 18 Nov footage is BLOCKED, S48). Play Store listing rewrite (S47) drafted. See [2026-11-23-week.md](2026-11-23-week.md).
+- 2026-11-19 · `idea` · **Day 0 carousel**: series trailer, 4 photos of an empty court + the tester's "5-spot 3s" screen, "Starts Monday". Weekend pick for Sat 21 ([2026-11-19-weekend.md](2026-11-19-weekend.md)).
+- 2026-11-19 · `idea` · **Guess my Day 1 score**: IG Story slider, answer on Monday. Weekend pick for Sun 22.
+
+**Founder: approve, change or drop the top three (16 Nov).** No people in any of them, so none waits on consent.
+
+- 2026-11-16 · `idea` · **Two taps a spot**: screen recording, tester account: New session, Enter totals, tap a spot, tap the makes, saved. "Trained today? Log it." Same words as the welcome screen. Short list 1.
+- 2026-11-16 · `idea` · **In my head vs the number**: split screen, "pretty good" in your head vs a real logged 12/30. Never "app vs hand count". Short list 2.
+- 2026-11-16 · `idea` · **Session reveal carousel**: 5 photos of an empty court, last slide the logged number and "next week: +1". No people, no signage. Short list 3.
+- 2026-11-16 · `idea` · **Shots go in at practice, not in games**: Focus Finder's free list, screen only. Spare.
+- 2026-11-16 · `idea` · **Name your role**: one free play from Plays, quiz "where do you go?". Spare; founder checks the play first.
 
 - 2026-11-09 · `idea` · **"It caught fire"**: a real session saved with "Video with the tracker", cut to about 20s: the count catches fire at 3 in a row, slow-mo replay, end card. Founder or an adult from behind. Scripted.
 - 2026-11-09 · `idea` · **60-second makes challenge**: the tracker counts one minute of shooting, "N is the number to beat, what's yours?", ends on "Log your number". This week's experiment. Scripted.

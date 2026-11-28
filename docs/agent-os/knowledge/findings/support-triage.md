@@ -74,6 +74,13 @@ when a better source arrives, rather than adding beside it.
   forum](https://discussions.unity.com/t/android-chromium-unable-to-grow-allocated-memory-above-256mb-confirmed/818820),
   2020, practitioner, weak, `dated`.
 
+- WebCodecs `VideoDecoder` is in Safari on iOS from 16.4 (HEVC from 17.4). WebKit bug 287516 had it
+  output frames out of order on B-frame clips; fixed in WebKit in Jan 2026, so phones not yet updated
+  may still have it. **Deadeye:** `clipDecoder.ts` draws frames in output order; wrong calls on an
+  iPhone upload point here first. [caniuse VideoDecoder](https://caniuse.com/mdn-api_videodecoder),
+  current, compatibility data, strong; [WebKit 287516](https://bugs.webkit.org/show_bug.cgi?id=287516),
+  2025-2026, official bug tracker, strong.
+
 ### Storage, offline and the service worker
 
 - Safari storage is best-effort: under pressure or after long disuse it deletes whole sites, least
@@ -129,6 +136,13 @@ when a better source arrives, rather than adding beside it.
 - A function past its time limit returns 504 `FUNCTION_INVOCATION_TIMEOUT` (Hobby default 300s).
   **Deadeye:** a stuck save or cron with a 504 is a slow query or a missing response. [Vercel
   limits](https://vercel.com/docs/functions/limitations), 2026, official, strong.
+
+- `Cache.match()` ignores the URL fragment (`#...`) by design; Web Platform Tests check it.
+  **Deadeye:** a cached Turbopack worker bootstrap (`turbopack-worker-*.js#params=...`) was served to
+  later builds, so live workers ran old code (14 Nov, fixed in #120). A tracker crash that names old
+  message shapes, or a decode with "last step sent", means a stale worker.
+  [MDN Cache.match](https://developer.mozilla.org/docs/Web/API/Cache/match), current, official, strong;
+  [Firefox bug 1264178](https://bugzilla.mozilla.org/show_bug.cgi?id=1264178), 2016, official, strong.
 
 ## Open questions
 

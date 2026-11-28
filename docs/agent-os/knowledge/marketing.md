@@ -78,6 +78,10 @@ file). Newest first, each with the date, what happened, and the rule.
   no paid ads yet; no weekly sound tracking (pick a Commercial Music Library
   track per video) and no weekly Creative Center check (no basketball data).
   No "on Android" or Play Store line until the listing is live (STATUS S3).
+- 2026-11-16 · Two weekly tests (23 Oct, 9 Nov) could not be read: no post dates or link
+  taps came back, TikTok has no bio link, and 2 players a week join. **Rule:** test one
+  thing per week across every post, read it on the week's sign-up answers and first
+  sessions (`/admin/funnel`), and ask the founder for each post's date when it goes up.
 
 ## Checklist before the founder sees a video or post
 

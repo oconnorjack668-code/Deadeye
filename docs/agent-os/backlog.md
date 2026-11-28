@@ -57,7 +57,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `exp/E1-totals
      phone has a mode saved.
 - Live check (2026-10-22, founder): merged to main (pull request 18). A new account's first log opens in
   Enter totals; an account that has logged before still opens in Track every shot.
-- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups.
+- Result (2026-11-09, [report](reports/2026-11-09-activation.md)): 3 of 24 (12%, range 4% to 32%) against 2 of 18 (2% to 34%); a hint only, and the one new session marker is a tracker save. No signups since 2026-10-24, so almost no new player has met it. **kept** by default, not confirmed; re-read after two weeks of new signups. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 3 of 27 (11%, 3% to 29%); `log_opened` is 0 all-time, so no player has met the change yet: not enough players yet, stays **kept**. 2026-11-23 ([report](reports/2026-11-23-activation.md)): unchanged (under 5 of 27), 0 joined in 7 days, `log_opened` still 0: not enough players yet, stays **kept**.
 
 ## E2 · "Trained already? Log it" for players away from a court · kept (shipped 2026-10-25)
 
@@ -89,7 +89,7 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      today already? Log it by hand" shows under the intro, and opens the logger in Enter totals.
   5. Open Watch the tracker call a session, let it finish: the end card has Open the tracker, Log shots by hand
      and Back to my dashboard.
-- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed.
+- Result: read after two weeks live, from `/admin/funnel` "Everyone", against 2 of 18 (11%). Merged and live 2026-10-25 (PR #45). As of 2026-11-01 no player has signed up since 2026-10-24, so nobody has reached it yet: the two weeks start from the first new signup. 2026-11-09: still none (33 joined, unchanged), welcome answers 0 and logger opens 0. **kept** by default, not confirmed. 2026-11-16 ([report](reports/2026-11-16-activation.md)): 0 of 1 who answered "Not right now" and 0 of 2 who finished the sample opened the logger (logger opens 0 all-time). Hint only (3 players); stays **kept**. 2026-11-23 ([report](reports/2026-11-23-activation.md)): no new answers, logger opens 0; not enough players yet, stays **kept**.
 
 ## E3 · Markers for the welcome answer and the by-hand logger · kept (shipped 2026-10-25)
 
@@ -124,9 +124,9 @@ Report: [2026-10-22](reports/2026-10-22-activation.md) · Branch: `agent-os` (co
      spot logged. At `/admin/funnel` the new rows show 1 at each step you reached (the page counts players who
      joined in the window, so use a new test account).
   5. The next Monday data file in `docs/agent-os/data/` has the new rows under Welcome and "Logging shots".
-- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup.
+- Result: read in the next data file, then after two weeks. As of 2026-11-01: 0 rows for all four steps, as expected with no signups since 2026-10-24 (not a fault). 2026-11-09: still 0 for real players, so the markers are unverified in production (test accounts are left out of the counts). **kept**; confirm on the first real signup. 2026-11-16: `welcome_court` 1 and `welcome_later` 1 from real players, so `track()` records live and the logger's 0 is a real 0. **kept**, confirmed. 2026-11-23 ([report](reports/2026-11-23-activation.md)): unchanged, **kept**.
 
-## E4 · Training-days reminder on the dashboard for a player with no session · shipped 2026-11-09
+## E4 · Training-days reminder on the dashboard for a player with no session · dropped (shipped 2026-11-09)
 
 Report: [2026-11-09](reports/2026-11-09-activation.md)
 
@@ -188,7 +188,13 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
     until fixed the policy is slightly narrower than the behaviour. (2) The Mon/Wed/Fri default shows as picked
     before anything is saved, with no "saved" message. (3) `reminder_set` means days saved, not a reminder that
     can arrive, and fires from any RemindersCard (profile, welcome, dashboard); read it that way.
-- Result:
+- Result (2026-11-16, week 1 of 2, [report](reports/2026-11-16-activation.md)): `reminder_set` 0 (everyone and
+  7-day); first sessions 3 of 27, unchanged. How many no-session players saw the card is unknown (no dashboard
+  marker, so E6). The Signal set no number, so it cannot be called a win or a loss: not enough players yet.
+  Final read 2026-11-23 with E6's count if live; keep only if at least 1 player turns reminders on from it.
+  Final read 2026-11-23 ([report](reports/2026-11-23-activation.md)): `reminder_set` 0 (everyone and 7-day), 0 joined in the week, E6 not live, so reach
+  is still unknown. Against its line (at least 1): **dropped**. This judges the card, not reminders in general.
+  The card can stay until D6 or a clean-up removes it; no build needed to drop it now.
 
 ## E5 · Tracker "no shots detected" offers a by-hand log · idea
 
@@ -203,16 +209,260 @@ Report: [2026-11-09](reports/2026-11-09-activation.md)
 - Founder checklist: <from release-checker>
 - Result:
 
-## E6 · Markers for the dashboard and the Today card · idea
+## E6 · Marker for a no-session player reaching the dashboard · NEXT
 
-Report: [2026-11-09](reports/2026-11-09-activation.md)
+Report: [2026-11-23](reports/2026-11-23-activation.md), [2026-11-16](reports/2026-11-16-activation.md) (first proposed [2026-11-09](reports/2026-11-09-activation.md))
 
-- Hypothesis: the dashboard is where a stalled player returns, and nothing records arriving there or tapping
-  "Log shots", so a stall before the logger looks like no activity.
-- Change: add `dashboard_seen` (zero-session players) and `today_log_tapped` to `src/lib/events.ts`, list them
-  on `/admin/funnel` and in `docs/funnel-counts.sql`. No migration.
-- Signal: counts at the two steps in the next data file; not activation itself.
+- NEXT (2026-11-23): bring `exp/E6-dashboard-seen` (head dbad62f, 124 commits behind main) up to date with main
+  and open the PR. Main has since changed 5 of its 12 files: `privacy/page.tsx` (#137 added the Today card, Video AI
+  page and tracker steps to the clause, so the safety-approved wording must be merged with main's, then re-checked
+  by safety-reviewer and approved by the founder), `funnel.ts` (Today card group), `events.ts`, `dashboard/page.tsx`
+  (#126; PR #162 edits it too: keep E6's change to the `totalSessions === 0` block) and `docs/funnel-counts.sql`.
+  Why it is NEXT: no screen changes; it is the one denominator for E4, the Today card (S42) and D6, and it carries
+  the small-count fix main's counts job still lacks (11-23 file prints a raw 1). Builder fallback if "too big" or
+  the founder's clause approval waits: the `agentCounts.ts` under-5 fix (with its tests) as its own PR first, the
+  marker second. Reach: every older stalled player who opens Home; 0 new signups needed.
+
+- Hypothesis: barrier **forgot**. At least 23 of 27 who finished setup never opened the logger or tracker, and
+  nothing shows whether they ever come back. Every dashboard bet (E4, E7) assumes they do; if they don't, only
+  messages from outside the app (E0) and new signups can move the number.
+- Change: fire `dashboard_seen` (one row per player a day, as every step) when a player with no saved session
+  opens the dashboard: a small client component rendered only in the `metrics.totalSessions === 0` branch of
+  `dashboard/page.tsx`. Add the name to `src/lib/events.ts`, `/admin/funnel` (`funnel.ts`), `docs/funnel-counts.sql`
+  and the events clause of `privacy/page.tsx`. No migration (the name rule is a regex); nothing on screen changes.
+  `today_log_tapped` is dropped: `log_opened` and `tracker_opened` already count the next step.
+- Built: `dashboard_seen` fires once a day (the server keeps one row per player a day) when a player with no saved
+  hoops session opens the dashboard: `DashboardSeen.tsx`, a client component that renders nothing, in the
+  `metrics.totalSessions === 0` block of `dashboard/page.tsx`. Fired from the browser, so a link prefetch is never
+  counted. Shows on `/admin/funnel` and in the weekly counts as a new last group, "Coming back", and in
+  `docs/funnel-counts.sql`. The privacy clause names it ("opening the dashboard before you have logged any shots",
+  last updated 16 Nov). No migration, nothing on screen. Branch `exp/E6-dashboard-seen` (code 0e35d1f; docs moved
+  to `agent-os`, ab80f98). 1702 tests pass; the new tests fail on main.
+- Signal: `dashboard_seen`, Everyone minus Joined in 7 days = older stalled players coming back. Decision line,
+  set 2026-11-16 (unchanged). Read date moved 2026-11-23 because E6 is not live (no data, nothing read): 2026-12-14
+  (files 12-07 and 12-14) if merged by 2026-11-30, otherwise 14 days after merge; the founder reads it on
+  `/admin/funnel` since the public file shows "under 5". Was: read 2026-11-30 (files 11-23 and 11-30): 2 or fewer: stop dashboard bets, next is E8 plus E0.
+  5 or more, with at most 1 of them opening the logger or tracker: E7 next. 3 or 4: read one more week. Hint:
+  under 30 players. Guardrail: no change players can see; first sessions not lower than 3.
+- Safety: PASS WITH NOTES (2026-11-16, head ab80f98; no BLOCK). Findings, most urgent first, all FIX SOON:
+  (1) S45, already on main, not this branch: `src/app/privacy/page.tsx:135-141` presents the recorded steps as
+  a complete list but leaves out the five Plays and Film steps (`play_opened`, `play_quiz_done`, `play_drawn`,
+  `film_opened`, `film_done`, live since F2 and F3, 13-14 Nov). Its purpose, "where new players get stuck", also does
+  not cover them. This breaks GDPR Art 5(1)(a) and Art 12(1) and DPC Fundamental 6 (transparency for children);
+  E3 was blocked for the same gap. Fix: the founder approves one clause covering E6 and S45 together (suggested
+  text below); merge it in this branch or the same day.
+  (2) Pre-existing, made slightly worse by E6: `src/lib/agentCounts.ts:150-156` prints every funnel step count,
+  including 1 to 4 in the "Joined in 7 days" column, into a file in a public repo (GitHub visibility checked
+  16 Nov: public). The file's "This file is public" is right. E3's note that "the repo must stay private" was a
+  condition that was never met, so it no longer holds. Grouping counts under 5 (PR #97) was done only for the
+  where-you-heard table. E6 adds one more small-count row, and it says something negative about a player
+  ("came Home, still saved nothing"). Its decision line also asks the analyst to compare small numbers across
+  columns and weeks. Standards: ICO anonymisation guidance 2025 (someone who knows the two players who joined
+  could work out which one it was), Revenue statistical disclosure guidance (cells under 10), and our own checklist
+  rule for counts under 5. Fix before the counts job runs on 23 Nov: if fewer than 5 joined in the 7 days, print
+  "under 5" and no 7-day split for any step; otherwise print 1 to 4 as "under 5". Exact numbers stay on
+  `/admin/funnel`. Update DPIA R8 (`docs/legal/dpia.md:92`) to cover step rows. If the analyst needs exact small
+  numbers, the founder moves the weekly data to a private place. Making the repo private now would not hide
+  what is already public in git history.
+  (3) `privacy/page.tsx:140` "No page tracking" now sits in the same sentence as "opening the dashboard"
+  (`:136`). E6 records a visit to one page, so this contradicts itself (Art 12(1), DPC F6). Also, the app calls this
+  screen "Home" (`BottomNav.tsx:20`), not "dashboard". The marker fires while no hoops session is saved
+  (`dashboard/page.tsx:298`), even for a player who logged shots in a game box score, so "saved a shooting session"
+  is more accurate than "logged any shots". Suggested clause for the founder (the privacy-page test regex
+  changes with it): "A few steps you reach in the app, at most once a day each: seeing the welcome screen and
+  which answer you gave there (at a court, or not right now), opening the Home screen before you have saved a
+  shooting session, playing the sample clip, opening the shot logger and pressing Finish in it, and opening,
+  starting and finishing the shot tracker. On the IQ tab, opening a play, finishing its quiz, opening a film clip
+  and answering all its questions, and, for coaches, saving a play you drew. We also note when you turn training
+  reminders on, or change your reminder days while they are on. Kept for 90 days, with your account id, only to
+  see where players get stuck so we can fix it. We record only the steps named here, not the other pages you
+  open; no device details, nothing shared with anyone. Deleting your account deletes them straight away."
+  NOTE (needs a solicitor, not for this branch): `DashboardSeen.tsx:16` sends the step from the browser. EDPB 2/2023
+  para 33 puts JavaScript that tells the browser to send information inside ePrivacy Art 5(3), and every
+  `track()` step works this way. Open question in findings. NOTE: `cron/reminders/route.ts:50-58` swallows
+  delete errors, so a failed 90-day clean-up goes unseen (checklist: retention jobs report failures); this
+  is pre-existing.
+  Data map, `dashboard_seen`: what = a row (`user_id`, `name`, `day`, `created_at`), at most one per player a
+  day, with no free text and no device details. About = players in player mode with no saved hoops session.
+  Coaching mode is redirected first (`page.tsx:102`) and under-16s waiting for a parent never reach it
+  (`(app)/layout.tsx:36`). Why = to see whether players who stalled come back (E6 decision). Lawful basis =
+  legitimate interest, covered by "the app steps above" (`privacy/page.tsx:172`). Low impact, so it does not
+  work against the child's interests (DPC F3). Stored = `public.app_events` (00045). Who reads = service_role
+  only (RLS on, no policies, REVOKE from anon and authenticated), the owner at `/admin/funnel`, and the weekly
+  counts as a number (see 2). Sent to = no AI or other processor beyond the hosting. Export = yes
+  (`api/account/export/route.ts:69`). Deletion = ON DELETE CASCADE (00045:24) when the account is deleted.
+  Kept = 90 days, deleted by the daily job (`cron/reminders/route.ts:50`). No DPIA change needed: same table,
+  purpose and basis as E3. The update in (2) is for R8.
+  Per file: `DashboardSeen.tsx` (data): only a client event, renders nothing, no message. Gate, nudges, AI
+  and public surfaces: not applicable. `dashboard/page.tsx` (data): mounted only when `totalSessions === 0`;
+  nothing a player sees changes. `events.ts` (data): adds a name to the allow-list; the server route is unchanged
+  and checks the user server-side (`api/events/route.ts:12`). `funnel.ts` (data, surface): a new group on the
+  owner-only page and in the public counts file (see 2). `docs/funnel-counts.sql` (data): read in the SQL editor,
+  counts only, no ids. `privacy/page.tsx` (copy): names the step correctly; see (1) and (3). Tests
+  (`dashboard-seen`, `funnel`, `privacy-page`): none, no data. Security review: no issues (no new route,
+  table or secret; a player can only fake their own marker).
+  Not checked: tests and the build were not run by me (the branch was read with `git show`, not checked out). No
+  migration, so the Supabase advisors were not needed. Whether Next 16 prefetch would have triggered a
+  server-side record was not checked; I took the builder's word.
+  Follow-up (2026-11-16, head b93c10c): PASS WITH NOTES. Fixes (1)-(3) are done: the clause matches my text word
+  for word, steps reached by 1 to 4 players read "under 5" in both columns with the 7-day split hidden when fewer
+  than 5 joined, the biggest-drop line hides its number, and the label says Home. The founder still approves the
+  clause before merging. Builder's gap (b) must change before 23 Nov: `agentCounts.ts:194` prints the
+  where-you-heard "1st session" column raw (as does the grouped "Other answers" row), so "A friend | 6 | 1" points
+  at one child among friends who know each other. That breaks our under-5 rule for every column (PR #97 N1). Fix:
+  print `funnelCell`-style "under 5" for 1 to 4 in the Joined and 1st session columns, plus a test. Gap (a)
+  (Everyone minus 7-day, and differences between rows or weeks) is accepted as a leftover risk: no code change.
+  Two conditions: the analyst never writes a worked-out number from 1 to 4 into a public report (write "under 5";
+  the founder reads E6's 2-or-fewer / 3-4 / 5-or-more decision on `/admin/funnel`), and DPIA R8 records it.
+  Follow-up (2026-11-23, head 7d4ab59, after the merge of main): PASS WITH NOTES, no BLOCK. The merged clause
+  (`privacy/page.tsx:147-156`) keeps my three sentences word for word. It names 22 of the 23 `EVENT_NAMES` in plain
+  words (`play_drawn` only in part), and its purpose and "only the steps named here" fit every step. "Where new
+  players hear about us" (`:188`) is about the sign-up answer, so it does not clash. The under-5 rule holds cell by cell
+  (`agentCounts.ts:148,176,200,206`): every funnel group including Coming back, the 7-day column (no split when 1 to 4
+  joined), the biggest-drop line, and both columns of the answers table, "Other answers" and "Didn't say" included.
+  The 4 changed test files pass (32 tests, run on an exported copy of 7d4ab59). Findings, all FIX SOON:
+  (1) `privacy/page.tsx:149` "playing the sample clip" does not name `sample_finished` (`SampleClient.tsx:27`), and
+  `:153` "saving a play you drew" leaves out a copied-in play (`PlayEditor.tsx:295` fires for any new play). GDPR
+  Art 5(1)(a), Art 12(1), DPC F6. Both wordings were on main before E6, and I approved the same words on 16 Nov. Fix,
+  folded into the one founder approval: "playing the sample clip and whether you watched it to the end" and "saving a
+  new play you drew or copied in". The privacy-page test regexes still match.
+  (2) `docs/legal/dpia.md:93` R8 still covers only the sign-up answers, so my 16 Nov condition is not met (GDPR Art
+  35(7)). Fix: add to R8: "Funnel step counts are in the public file too: 1 to 4 read 'under 5', and the 7-day column
+  has no split when fewer than 5 joined. Accepted leftover: the difference between two rows, between a total and its
+  answers, or between two weeks' files can give back a number under 5; agents write 'under 5', never a worked-out
+  1 to 4."
+  (3) Already on main, not in this diff: `agentCounts.ts:215,217` print "Players on a team" and "Players who picked a
+  home club" as raw numbers (the 11-23 file says "1"). This breaks our under-5 rule for every public table. Fix:
+  `publicCount()` on those two lines, plus a test. Coach, team and board counts can stay exact.
+  NOTE: main's 11-23 counts file printed raw 1 to 4 step counts (`data/2026-11-23-funnel.md:13-43`). Merging before
+  the 30 Nov 08:30 run stops that; what is already in git history stays public. The accepted leftover also covers the
+  answers table: Joined minus the exact rows gives back a lone "under 5" row (24 - 21 = 3). That only tells you
+  "some other answer", so no code change is needed.
+  Per file: `privacy/page.tsx` (copy): see (1); LAST_UPDATED 23 Nov (`:12`) is right. `agentCounts.ts` (data,
+  public file): the rule holds; see (3). `events.ts` (data): adds one name; the route is unchanged and checks the user
+  server-side. `funnel.ts` (data, owner page and public file): adds "Coming back" as the last group. `DashboardSeen.tsx`
+  (data): renders nothing; the parent gate (`(app)/layout.tsx:34-36`) and the coach redirect (`dashboard/page.tsx:104`)
+  still apply. `dashboard/page.tsx` (data): the marker sits only in the `totalSessions === 0` block (`:285-287`), and
+  nothing a player sees changes. `docs/funnel-counts.sql` (data): adds the name, counts only.
+  `docs/agent-os/data/README.md` (copy): accurate. Tests (`agentCounts`, `dashboard-seen`, `funnel`, `privacy-page`):
+  no data; they pin down the under-5 rule and the three kept sentences. The 16 Nov data map is still true (export
+  `:69`, cascade delete, 90-day job). Security review: no new route, table or secret. Accessibility: nothing a player
+  taps or sees changes. NOTE: the clause is one long paragraph, and a bullet list would be easier for a 13-year-old
+  (DPC F6). The founder still needs to approve the merged clause, with fix (1), before merging, because it is not the
+  text approved on 16 Nov.
+  Not checked: the build, lint and the full test suite; the Supabase advisors (no migration); the live preview.
+- Founder checklist: <from release-checker>
+- Result:
+
+## E7 · Today card leads with the camera for a player with no session · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **no reason yet**. Players come for the camera (the TikTok promise): 4 tracker opens vs 0
+  logger opens all-time, 3 of them from the dashboard's secondary button or the menu. The Today card's primary
+  button is the by-hand logger nobody opens.
+- Change: in the `metrics.totalSessions === 0` branch of `dashboard/page.tsx` (l.241-247), swap the two buttons'
+  variants: "Track with the camera" primary, "Log shots" outline. Copy unchanged.
+- Signal: tracker opens from no-session players, then first sessions. Success: 3 of the next 10 no-session players
+  seen on the dashboard (E6) open the tracker, and at least 1 saves. Guardrail: logger opens do not fall (they are 0)
+  and tracker saves per open not below 1 of 4. Hint: under 30. Read 2 weeks after it ships. Needs E6 first.
+  2026-11-23: #126 (live 11-17) went the other way (one "Log shots" button, quiet camera link) and D6 (PR #162)
+  changes the same card. Wait for E6 and the S42 read before building; compare with E11.
 - Safety: <safety-reviewer verdict>
+- Founder checklist: <from release-checker>
+- Result:
+
+## E8 · "Got a clip of you shooting? Track it now" on Not right now · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **can't** (no court now). Most new players answer "Not right now" (1 of the 2 answers this
+  week); the tracker takes a video from the phone, so a player with a clip can save a first session from the sofa,
+  and nothing on that branch says so.
+- Change: one link in `welcome/WelcomeClient.tsx`'s later branch, beside E2's, to `/video`, labelled "Got a clip of
+  you shooting? Track it now", with the line "Pick a video from your phone. No court needed."
+- Signal: `tracker_opened` from players who said "Not right now", then `tracker_saved`. Success: 2 of the next 10
+  who answer "Not right now" open the tracker. Guardrail: E2's by-hand link and the sample still get taps. Hint.
+- Safety: <safety-reviewer verdict> (check where an uploaded clip goes, and that it may show other people)
+- Founder checklist: <from release-checker>
+- Result:
+
+## E9 · "Add to my calendar" when push is off · idea
+
+Report: [2026-11-16](reports/2026-11-16-activation.md)
+
+- Hypothesis: barrier **forgot**. 0 of 27 turned reminders on: it takes days, "Remind me" and push permission, and
+  on iPhone a Home Screen install first. A calendar entry needs none of that.
+- Change: in `profile/RemindersCard.tsx`, when this device has no push, an "Add to my calendar" button that builds
+  an .ics on the phone for the next picked day at the reminder time ("Deadeye: track your shots", link to `/video`).
+  Nothing stored on the server. One marker, `calendar_added`.
+- Signal: `reminder_set` + `calendar_added` from no-session players. Success: 3 of the next 15 who see the card
+  (E6). Guardrail: `reminder_set` not lower. Hint.
+- Safety: <safety-reviewer verdict> (neutral wording; nothing stored)
+- Founder checklist: <from release-checker>
+- Result:
+
+## E10 · Send a no-session player who never saw the welcome there once · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't** (unsure what to do). 17 of 27 who finished setup did it before the welcome screen
+  existed (10-21); it is the only screen that asks "at a court?" and gives a next step for each answer. They never saw it.
+- Change: on Home, a player with no saved session and no `welcome_seen` row goes to `/welcome` once (a flag on the
+  phone or the profile stops a loop). No new screen.
+- Signal: `welcome_seen` then `welcome_court` / `welcome_later` from players set up before 10-21. Success: at least 5
+  of the next 15 sent there pick an answer, and at least 1 saves a first session within 7 days. Guardrail: Home not
+  skipped twice (no loop); first sessions not lower. Read 14 days after it ships. Reach: needs E6 to show they return.
+- ICE 3/2/4. Safety: <safety-reviewer verdict> · Founder checklist: <from release-checker> · Result:
+
+## E11 · Today's camera link reads "Track a clip from your phone" · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't** (no court now). The quiet camera link reads as "go to a court"; the tracker also takes a
+  video already on the phone. Camera beats logger all-time (under 5 tracker opens vs 0 logger opens).
+- Change: copy only, on `TodayFirstStep.tsx`'s camera link, after D6 (PR #162) merges.
+- Signal: `today_track_tapped` per no-session player seen on Home (E6). Success: 3 of the next 15 seen tap it.
+  Guardrail: `today_log_tapped` not lower. Hint. Read 14 days after it ships. Needs E6.
+- ICE 2/2/5. Safety: <safety-reviewer verdict> (a clip may show other people) · Founder checklist: <from release-checker> · Result:
+
+## E12 · One picture for the rim taps in tracker setup · idea
+
+Report: [2026-11-23](reports/2026-11-23-activation.md)
+
+- Hypothesis: barrier **can't**. About half who open the tracker never start tracking (all-time, under 5 players);
+  the rim taps are the unguided step between `tracker_setup` and `tracker_started`.
+- Change: one still picture above the rim step in `ShotTracker.tsx` ("Tap the left and right edge of the rim").
+- Signal: `tracker_started` per `tracker_setup`. Success: 4 of the next 6 who pick a source start. Guardrail:
+  `tracker_saved` not lower. Hint, tiny reach. Read 14 days after it ships.
+- ICE 2/2/3. Safety: <safety-reviewer verdict> · Founder checklist: <from release-checker> · Result:
+
+Safety question first, not scored (2026-11-23): one email to players who set up and saved nothing, pointing back to
+Home. It messages under-18s; safety-reviewer before it is ranked.
+
+## S41 · Landing demo stuck on "Starting…" when the clip download fails · idea (P2, found by qa-tester)
+
+Report: [qa 2026-11-16](qa/2026-11-16-qa.md) B3 · for support-triage to check before the builder takes it
+
+- Hypothesis: a visitor on weak signal taps "Play the sample" on `/`; the 3.6 MB clip download fails and the
+  demo shows "Starting…" for ever (6 of 6 on live `0454f77`: offline, connection reset, and offline then back
+  online). No message, no retry; only a reload recovers. Likely `downloadSample()` (`src/lib/video/sampleClip.ts`)
+  keeps the plain URL after a failed fetch and nothing handles the video's load error. Likely the same on
+  `/welcome/sample` (setup step 2), not yet confirmed signed in.
+- Change: on a failed download or a video load error, show "Couldn't load the clip. Check your connection" with
+  a "Try again" that fetches afresh (clear the cached promise). No data, no new markers.
+- Signal: the journey passes on the next run (qa B3 steps: offline, then reset, then back online, each ends in a
+  message or the verdict, never a spinner past 15 s).
+- Support-triage check (2026-11-16): real, P2 confirmed (a reload gets round it; no data lost; the
+  sample is optional at setup). Cause from the code: `src/lib/video/sampleClip.ts:39` turns a failed
+  fetch into the plain `SAMPLE_URL`, and `:36` (`download ??=`) keeps that answer for the page's life,
+  so a retry never fetches again. `ShotTracker.tsx:1281-1283` then sets `video.src` with no `error`
+  listener; `calibrating` stays true, so `:1686` shows "Starting…" for ever (`videoReady` never fires).
+  Same path on `/welcome/sample` (`SampleClient.tsx:19`), so setup step 2 has it too. Not known before:
+  not in STATUS.md; the 13 Nov QA's "slow sample-clip load" P3 is a different bug. Fix also needs: clear
+  `download` on failure. Check that would have caught it: a test with `fetch` rejecting that expects a
+  message, not "Starting…". Signal also: no new report of this.
+- Safety: <safety-reviewer verdict> (signed-out page; nothing stored)
 - Founder checklist: <from release-checker>
 - Result:
 
